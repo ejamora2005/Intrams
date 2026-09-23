@@ -9,6 +9,7 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Jetstream\HasProfilePhoto;
 use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class User extends Authenticatable
 {
@@ -27,6 +28,8 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'role',
+        'status',
     ];
 
     /**
@@ -49,6 +52,33 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    /**
+     * Determine whether this account may use the shared intramurals login.
+     */
+    public function canUseIntramuralsLogin(): bool
+    {
+        return $this->status === 'active'
+            && in_array($this->role, ['admin', 'coordinator'], true);
+    }
+
+    /** @return HasMany<CoordinatorAssignment> */
+    public function coordinatorAssignments(): HasMany
+    {
+        return $this->hasMany(CoordinatorAssignment::class, 'coordinator_id');
+    }
+
+    /** @return HasMany<CoordinatorRequest> */
+    public function coordinatorRequests(): HasMany
+    {
+        return $this->hasMany(CoordinatorRequest::class, 'coordinator_id');
+    }
+
+    /** @return HasMany<CoordinatorDevice> */
+    public function coordinatorDevices(): HasMany
+    {
+        return $this->hasMany(CoordinatorDevice::class);
+    }
 
     /**
      * The accessors to append to the model's array form.

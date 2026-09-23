@@ -1,0 +1,23 @@
+@extends('layouts.admin', ['title' => 'Manage coordinator', 'subtitle' => 'Account access, event assignments, requests, and trusted device.'])
+
+@section('content')
+    @if (session('success'))<div class="mb-6 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800">{{ session('success') }}</div>@endif
+    <div class="grid gap-6 xl:grid-cols-2">
+        <form method="POST" action="{{ route('admin.coordinators.update', $coordinator) }}" class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+            @method('PUT')
+            @include('admin.coordinators.form', ['submitLabel' => 'Save account'])
+        </form>
+        <section class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm"><h2 class="font-semibold text-slate-900">Trusted device</h2><p class="mt-2 text-sm leading-6 text-slate-600">Only one active device may use this coordinator account. Resetting revokes the current device and allows the next successful login to register a new one.</p>
+            @php($activeDevice = $coordinator->coordinatorDevices->first(fn ($device) => $device->revoked_at === null))
+            <p class="mt-4 text-sm text-slate-700">{{ $activeDevice ? 'Active device registered: '.($activeDevice->device_label ?: 'Unknown device') : 'No active device is registered.' }}</p>
+            <form method="POST" action="{{ route('admin.coordinators.device.reset', $coordinator) }}" class="mt-5">@csrf<button class="rounded-lg border border-red-200 bg-white px-4 py-2.5 text-sm font-semibold text-red-700 hover:bg-red-50">Reset trusted device</button></form>
+        </section>
+    </div>
+
+    <div class="mt-6 grid gap-6 xl:grid-cols-2">
+        <section class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm"><h2 class="font-semibold text-slate-900">Event assignments</h2><form method="POST" action="{{ route('admin.coordinators.assignments.store', $coordinator) }}" class="mt-4 flex flex-col gap-3 sm:flex-row">@csrf<select name="event_id" required class="w-full rounded-lg border-slate-300 py-2.5 text-sm focus:border-blue-600 focus:ring-blue-600"><option value="">Choose an event</option>@foreach ($events as $event)<option value="{{ $event->id }}">{{ $event->name }}{{ $event->division ? ' — '.$event->division : '' }}</option>@endforeach</select><button class="shrink-0 rounded-lg bg-blue-700 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-800">Assign</button></form>@error('event_id')<p class="mt-2 text-sm text-red-600">{{ $message }}</p>@enderror
+            <div class="mt-5 divide-y divide-slate-100">@forelse ($coordinator->coordinatorAssignments as $assignment)<div class="flex items-center justify-between gap-4 py-3"><div><p class="font-medium text-slate-800">{{ $assignment->event?->name ?? 'Removed event' }}</p><p class="text-sm text-slate-500">{{ ucfirst($assignment->status) }}</p></div>@if($assignment->status === 'active')<form method="POST" action="{{ route('admin.coordinators.assignments.destroy', [$coordinator, $assignment]) }}">@csrf @method('DELETE')<button class="text-sm font-medium text-red-700">Revoke</button></form>@endif</div>@empty<p class="py-5 text-sm text-slate-500">No event assignments yet.</p>@endforelse</div>
+        </section>
+        <section class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm"><h2 class="font-semibold text-slate-900">Assignment requests</h2><div class="mt-4 divide-y divide-slate-100">@forelse ($coordinator->coordinatorRequests as $request)<div class="py-4"><p class="font-medium text-slate-800">{{ ucfirst(str_replace('_', ' ', $request->request_type)) }} — {{ $request->event?->name ?? 'Removed event' }}</p>@if($request->sourceEvent)<p class="mt-1 text-sm text-slate-500">From: {{ $request->sourceEvent->name }}</p>@endif<p class="mt-1 text-sm text-slate-600">{{ $request->reason }}</p><p class="mt-1 text-xs text-slate-500">{{ ucfirst($request->status) }}</p>@if($request->status === 'pending')<form method="POST" action="{{ route('admin.coordinator-requests.review', $request) }}" class="mt-3 flex flex-wrap gap-2">@csrf<input name="review_notes" placeholder="Review note (optional)" class="rounded-lg border-slate-300 px-3 py-2 text-sm"><button name="decision" value="approved" class="rounded-lg bg-blue-700 px-3 py-2 text-sm font-semibold text-white">Approve</button><button name="decision" value="rejected" class="rounded-lg border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-700">Reject</button></form>@endif</div>@empty<p class="py-5 text-sm text-slate-500">No assignment requests.</p>@endforelse</div></section>
+    </div>
+@endsection

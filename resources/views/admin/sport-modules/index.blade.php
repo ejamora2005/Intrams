@@ -1,0 +1,2 @@
+@extends('layouts.admin',['title'=>'Sports','subtitle'=>'Choose a sport to manage the events created under it.'])
+@section('content')<div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">@foreach($sports as $sport)<a href="{{ route('admin.sport-modules.show',$sport) }}" class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm transition hover:border-blue-400"><p class="font-semibold text-slate-900">{{ $sport->name }}</p><p class="mt-1 text-sm text-slate-500">View and manage its events</p></a>@endforeach</div>@endsection
