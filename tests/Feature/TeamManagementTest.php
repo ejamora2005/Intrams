@@ -12,6 +12,28 @@ function teamModuleAdmin(): User
     return User::factory()->create(['role' => 'admin', 'status' => 'active']);
 }
 
+test('large team rosters are paginated and assigned students remain unavailable', function () {
+    $admin = teamModuleAdmin();
+    $edition = teamModuleEdition();
+    $team = Team::query()->create(validTeamData($edition));
+    $students = Student::factory()->count(60)->create(['status' => 'active']);
+    foreach ($students as $student) {
+        $team->members()->create(['edition_id' => $edition->id, 'student_id' => $student->id, 'assigned_by' => $admin->id, 'assigned_at' => now()]);
+    }
+    $available = teamModuleStudent();
+
+    $response = $this->actingAs($admin)->get(route('admin.teams.edit', $team))->assertOk();
+    expect($response->viewData('rosterMembers')->count())->toBe(50)
+        ->and($response->viewData('rosterMembers')->total())->toBe(60)
+        ->and($response->viewData('team')->members_count)->toBe(60)
+        ->and($response->viewData('team')->relationLoaded('members'))->toBeFalse()
+        ->and($response->viewData('availableStudents')->modelKeys())->toBe([$available->id]);
+    $second = $this->get(route('admin.teams.edit', [$team, 'roster_page' => 2]))->assertOk();
+    expect($second->viewData('rosterMembers')->count())->toBe(10)
+        ->and($response->viewData('rosterMembers')->getCollection()->modelKeys())
+        ->not->toContain(...$second->viewData('rosterMembers')->getCollection()->modelKeys());
+});
+
 function teamModuleEdition(array $overrides = []): IntramuralEdition
 {
     return IntramuralEdition::query()->create(array_merge([

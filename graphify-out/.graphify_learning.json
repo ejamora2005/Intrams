@@ -1,0 +1,96 @@
+{
+  "generated_at": "2026-09-27T02:14:26.485215+00:00",
+  "nodes": {
+    "app_http_controllers_admin_sportcontroller_sportcontroller_downloadbasketballscoresheet": {
+      "code_fingerprint": "faa78a174caca5357d8727a00679fce9a3db13dae8ee9c4cbea446bc3d1981c6",
+      "label": ".downloadBasketballScoreSheet()",
+      "last": "2026-09-27T02:04:43.899953+00:00",
+      "provenance": [
+        {
+          "date": "2026-09-27T02:04:43.899953+00:00",
+          "outcome": "useful",
+          "q": "inheret the format from preview to the download"
+        }
+      ],
+      "score": 0.999844218,
+      "source_file": "app/Http/Controllers/Admin/SportController.php",
+      "status": "tentative",
+      "uses": 1
+    },
+    "app_models_course_course": {
+      "code_fingerprint": "a8c3619fe1b89e0b25e41ba2f947891b36726e536dfb033683fb6c46d4ebff3e",
+      "label": "Course",
+      "last": "2026-09-27T01:52:32.938154+00:00",
+      "provenance": [
+        {
+          "date": "2026-09-27T01:52:32.938154+00:00",
+          "outcome": "useful",
+          "q": "replace the basketball score sheet with this, but inheret the function autofill name based on the team, and lisence replaced with course."
+        }
+      ],
+      "score": 0.999648796,
+      "source_file": "app/Models/Course.php",
+      "status": "tentative",
+      "uses": 1
+    },
+    "app_models_team_team": {
+      "code_fingerprint": "e56b1a6cda586fad42967a2a6b124ffbf2cc57ec95dc6ae00afee7cfd9bf47fe",
+      "label": "Team",
+      "last": "2026-09-27T01:52:32.938154+00:00",
+      "provenance": [
+        {
+          "date": "2026-09-27T01:52:32.938154+00:00",
+          "outcome": "useful",
+          "q": "replace the basketball score sheet with this, but inheret the function autofill name based on the team, and lisence replaced with course."
+        }
+      ],
+      "score": 0.999648796,
+      "source_file": "app/Models/Team.php",
+      "status": "tentative",
+      "uses": 1
+    },
+    "resources_views_admin_sports_basketball_score_sheet_pdf_blade": {
+      "code_fingerprint": "c94a8a33ff5865e1a6fd8462be47ae2176167dc1ec56e4d5e243d24253859e3e",
+      "label": "basketball-score-sheet-pdf.blade.php",
+      "last": "2026-09-27T02:10:29.636977+00:00",
+      "provenance": [
+        {
+          "date": "2026-09-27T02:10:29.636977+00:00",
+          "outcome": "useful",
+          "q": "swap the competition and team b, make this changes in both the preview and downloadable"
+        },
+        {
+          "date": "2026-09-27T02:04:43.899953+00:00",
+          "outcome": "useful",
+          "q": "inheret the format from preview to the download"
+        },
+        {
+          "date": "2026-09-27T01:52:32.938154+00:00",
+          "outcome": "useful",
+          "q": "replace the basketball score sheet with this, but inheret the function autofill name based on the team, and lisence replaced with course."
+        }
+      ],
+      "score": 2.999429679,
+      "source_file": "resources/views/admin/sports/basketball-score-sheet-pdf.blade.php",
+      "status": "preferred",
+      "uses": 3
+    },
+    "resources_views_admin_sports_partials_basketball_score_sheet_blade": {
+      "code_fingerprint": "b787cbdc24f795cf26513677751c6e932545bf881e96a0f57e9d9a0b27d56bd1",
+      "label": "partials/basketball-score-sheet.blade.php",
+      "last": "2026-09-27T02:10:29.636977+00:00",
+      "provenance": [
+        {
+          "date": "2026-09-27T02:10:29.636977+00:00",
+          "outcome": "useful",
+          "q": "swap the competition and team b, make this changes in both the preview and downloadable"
+        }
+      ],
+      "score": 0.999936665,
+      "source_file": "resources/views/admin/sports/partials/basketball-score-sheet.blade.php",
+      "status": "tentative",
+      "uses": 1
+    }
+  },
+  "version": 1
+}

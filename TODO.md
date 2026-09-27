@@ -186,11 +186,13 @@ Do not add student-facing accounts in version 1 unless the project requirements 
 - [ ] Public/admin live monitor shows event, coordinator, status, current score/placements, and last update.
 - [ ] Use broadcast/WebSockets when available; provide polling every 3–5 seconds as a safe fallback.
 - [ ] Generate printable score sheets and reports for events, coordinators, athlete participation, and overall tally. Queue large exports.
-- [x] Provide an editable Basketball score sheet from Basketball sport cards, matching the supplied FIBA reference as a fixed A4-portrait preview and downloadable layout with compact Team A/B grids, four A/B running-score blocks, period/final score, official-signature fields, selected-edition roster prefilling, and a one-page A4 PDF download.
-- [x] Replace the Basketball scoresheet licence-number field with **Yr. & Sec.** prefilled from each registered student's profile, while leaving the player **No.** fields blank for game-day entry.
+- [x] Provide an editable Basketball score sheet from Basketball sport cards, matching the supplied FIBA reference as a fixed A4-portrait preview and downloadable layout with compact Team A/B grids, four A/B running-score blocks, period/final score, official-signature fields, selected-edition roster prefilling, and a direct Excel download.
+- [x] Replace the Basketball scoresheet licence-number field with **Course**, prefilled from each registered student's course code, while leaving the player **No.** fields blank for game-day entry.
 - [x] Replace the Basketball scoresheet's temporary CSS logo with the supplied FIBA Basketball WebP asset for both screen preview and print output.
-- [x] Add an audited Basketball scoresheet PDF preview that carries the current editable form values into a dedicated one-page A4-portrait Dompdf template, opens in a new browser tab, and exposes the browser PDF viewer's download control.
-- [x] Expand Basketball scoresheet player-name space by reducing the player **No.** field and each foul cell to 5 px squares; adapt player-name text to fit and place each running-score number inside its sole compact editable box under the A/B columns, without an extra score box or gap, in both preview and PDF output.
+- [x] Add a keyboard-accessible download drawer for DOCX, XLSX, and PDF, with direct attachment downloads and validated format selection.
+- [x] Swap Course and Player in; replace Player in with a blank heading and automatic row counts 1–12 for each team.
+- [x] Restore image-based DOCX and XLSX exports so all formats preserve the same captured A4 sheet layout.
+- [x] Place Competition beside Team A on the first scoresheet details row and move Team B before Date/Time/Referee on the second row in both the editable sheet and Excel export.
 
 ### FR-09 Auditability and operations
 
@@ -369,5 +371,14 @@ Every successful or denied major operation must create an append-only audit entr
 - [ ] Measure before optimizing; add eager loading, pagination, targeted indexes, cache, and Redis only where evidence supports it.
 
 ## 8. Definition of done
+
+- [x] Show the editable sheet on white 210 × 297 mm A4 paper against a gray background; use the same paper capture and margins for DOCX, XLSX, and PDF.
+
+- [x] Share optimized full-paper image capture across Word, Excel, and PDF exports.
+
+- [x] Bound team roster rendering to 50 rows; retain pagination access and page-scoped bulk selection.
+- [x] Remove duplicate team/course loads and assigned-ID materialization; remove unused admin Livewire assets and improve nested navigation highlighting.
+- [x] Add roster pagination regression coverage; document production asset and view compilation.
+- [ ] Reconcile legacy event/coordinator features with the migration that removes the events table before optimizing those screens.
 
 A module is done only when its migration/schema, model relationships, form/API validation, service logic, policy checks, routes/UI, audit coverage, and automated tests are complete. A screen that works visually but bypasses authorization, server-side validation, or database constraints is not complete.

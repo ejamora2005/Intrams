@@ -3,13 +3,13 @@
 <div class="grid gap-5 sm:grid-cols-2">
     <div class="sm:col-span-2">
         <label for="edition_id" class="block text-sm font-medium text-slate-700">Intramurals edition</label>
-        <select id="edition_id" name="edition_id" required class="mt-1 block w-full rounded-lg border-slate-300 text-sm shadow-sm focus:border-blue-600 focus:ring-blue-600" @disabled(isset($team) && $team->members->isNotEmpty())>
+        <select id="edition_id" name="edition_id" required class="mt-1 block w-full rounded-lg border-slate-300 text-sm shadow-sm focus:border-blue-600 focus:ring-blue-600" @disabled(($team->members_count ?? 0) > 0)>
             <option value="">Select an edition</option>
             @foreach ($editions as $edition)
                 <option value="{{ $edition->id }}" @selected((string) old('edition_id', $team->edition_id) === (string) $edition->id)>{{ $edition->name }} ({{ $edition->school_year }})</option>
             @endforeach
         </select>
-        @if (isset($team) && $team->members->isNotEmpty())
+        @if (($team->members_count ?? 0) > 0)
             <input type="hidden" name="edition_id" value="{{ $team->edition_id }}">
             <p class="mt-1 text-xs text-slate-500">The edition is locked while this team has roster members.</p>
         @endif
@@ -27,7 +27,7 @@
         <p class="mt-1 text-xs text-slate-500">Unique within the selected edition.</p>
         @error('code')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
     </div>
-    <div class="sm:col-span-2"><label for="course_id" class="block text-sm font-medium text-slate-700">Course <span class="font-normal text-slate-500">(optional)</span></label><select id="course_id" name="course_id" class="mt-1 block w-full rounded-lg border-slate-300 text-sm"><option value="">No course</option>@foreach(\App\Models\Course::where('status','active')->orderBy('name')->get() as $course)<option value="{{ $course->id }}" @selected(old('course_id',$team->course_id)===$course->id)>{{ $course->name }}</option>@endforeach</select><p class="mt-1 text-xs text-slate-500">On creation, all active students in this course are added to the team roster.</p></div>
+    <div class="sm:col-span-2"><label for="course_id" class="block text-sm font-medium text-slate-700">Course <span class="font-normal text-slate-500">(optional)</span></label><select id="course_id" name="course_id" class="mt-1 block w-full rounded-lg border-slate-300 text-sm"><option value="">No course</option>@foreach($courses as $course)<option value="{{ $course->id }}" @selected(old('course_id',$team->course_id)===$course->id)>{{ $course->name }}</option>@endforeach</select><p class="mt-1 text-xs text-slate-500">On creation, all active students in this course are added to the team roster.</p></div>
     <div>
         <label for="status" class="block text-sm font-medium text-slate-700">Status</label>
         <select id="status" name="status" required class="mt-1 block w-full rounded-lg border-slate-300 text-sm shadow-sm focus:border-blue-600 focus:ring-blue-600">

@@ -24,7 +24,7 @@ The bracket header includes a guarded **Reset bracket** action. It requires conf
 
 The bracket page is a fixed, two-axis scrollable tournament canvas for large fields. It labels the game/elimination style and tournament name, renders connected game cards through the finals and winner container, and shows a separate **Loser Bracket if needed** section only for double-elimination sports. Right-angle connector lines follow each winner and loser path; hover a game or competitor to highlight its immediate connected path and dim unrelated games. Clicking a team awaiting a result keeps it visibly marked **Selected** and preserves its path focus while the administrator chooses its result.
 
-Basketball sport cards include an editable **Score sheet**. Its fixed 202 mm A4-portrait preview and downloadable page mirror the supplied FIBA scoresheet arrangement, using the supplied FIBA Basketball logo asset in its header: the game details at the top; compact Team A and Team B roster, foul, time-out, and coach sections on the left; four A/B running-score blocks (1–160) on the right; and period/final score plus official-signature areas across the bottom. Registered athletes can be prefilled into either team, including their year and section in the **Yr. & Sec.** column. The player **No.** field and each individual foul field are 5 px squares, giving the player-name column the remaining roster width; names shrink only when required to fit. Each running-score number is shown inside its only compact editable box directly under the A or B column, with no second score box or gap. The clearly visible **Preview & Download PDF** action opens an audited, completed one-page A4-portrait PDF in a new browser tab. Use the browser PDF viewer's download control after reviewing it. This action does not change stored bracket results or athlete registrations.
+Basketball sport cards include an editable **Score sheet** with team/course autofill, displayed on a white **A4 portrait paper (210 × 297 mm)** against a gray background. The sheet fits proportionally within 4.25 mm paper margins. Roster columns remain the unlabeled 1–12 counter, Players, No., Course, and four foul fields. **Download** opens a drawer for Word (.docx), Excel (.xlsx), and PDF; all three directly download the same high-resolution image of the full A4 paper. The downloaded sheet is image-based, not editable cells or tables, so its lines and layout remain fixed. JavaScript and PHP ext-zip are required; exports are audited.
 
 Dual pairs display both athlete names as one bracket competitor without changing the registration workflow. Individual athletes use the same progression engine without needing a team record.
 
@@ -237,6 +237,14 @@ The system will provide an administrator-only, append-only activity log. It is d
 Each entry retains the actor, actor role, action, affected record, safe before/after values, IP address, user agent, request ID, outcome, and timestamp. Passwords, raw device tokens, and other secrets are never logged. Administrators can use the **System Logs** sidebar screen to filter recorded activity by actor, role, action, outcome, and date. Authentication-event logging remains pending.
 
 ## Development conventions
+
+All score-sheet downloads target **A4 portrait (210 × 297 mm)**. The paper preview and exported page share the same scale and margins; the full sheet is captured without reflowing individual cells. Print using A4 paper size.
+
+All formats capture the same A4 paper element, including its whitespace and margins. Word places the image at page origin, Excel embeds it with an A4 one-page print area, and PDF embeds it on an A4 page. The surrounding gray preview background and paper shadow are excluded from exports. The original form stays editable before downloading.
+
+Team editing loads a roster count and 50 roster rows per page, reuses the course list, and excludes already assigned students with a database subquery. Bulk selection applies to the visible roster page. Admin navigation includes Courses and Coordinators and highlights nested screens; the Blade-only admin layout no longer loads unused Livewire assets.
+
+Build production assets with `npm run build`. On deployment, run `php artisan view:cache` to precompile Blade views; use `php artisan view:clear` when returning to template development. Performance changes are verified with isolated SQLite tests; no production database migration is needed.
 
 - Use Laravel migrations for all database changes; do not alter a migration that has already been run in shared environments—create a new migration instead.
 - Keep controllers thin. Put business rules in services, authorization in policies/middleware, and validation in form requests.

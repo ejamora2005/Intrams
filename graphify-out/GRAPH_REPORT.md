@@ -1,40 +1,40 @@
-# Graph Report - IntramsProj  (2026-09-22)
+# Graph Report - IntramsProj  (2026-09-27)
 
 ## Corpus Check
-- 299 files · ~75,052 words
+- 307 files · ~80,227 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 21 file(s) not represented in the graph (top: (none) 16, .graphify-bak 1, .example 1)
 
 ## Summary
-- 1177 nodes · 2027 edges · 209 communities (60 shown, 149 thin omitted)
+- 1210 nodes · 2059 edges · 199 communities (57 shown, 142 thin omitted)
 - Extraction: 99% EXTRACTED · 1% INFERRED · 0% AMBIGUOUS · INFERRED: 19 edges (avg confidence: 0.95)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `2d21e3d0`
+- Built from commit: `24592ae6`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
 ## Community Hubs (Navigation)
-- Illuminate\View\Component
+- Illuminate\View\View
 - IntramuralEdition
 - Illuminate\Database\Migrations\Migration
 - StoreRegistrationRequest
 - composer.json
-- BracketService
-- Illuminate\View\View
+- EditionSport
+- Controller
 - package.json
 - TODO_old.md
-- .update
+- ScoreSheetImageOfficeService.php
 - User
 - Illuminate\Database\Eloquent\Model
 - What You Must Do When Invoked
 - 3. Database schema
-- CoordinatorService
-- Illuminate\Database\Seeder
+- CoordinatorDeviceService
+- AuditService
 - Illuminate\Http\Request
 - Intramurals Management System
-- SportService
+- Event
 - 2. Functional requirements
 - graphify reference: extra exports and benchmark
 - Intramurals Management System — Master Implementation TODO
@@ -48,7 +48,7 @@
 - Kernel
 - PHASE 35 — Security Checklist
 - PHASE 30 — Reports
-- Illuminate\Support\ServiceProvider
+- StoreEventRequest
 - Handler.php
 - graphify reference: add a URL and watch a folder
 - graphify reference: commit hook and native CLAUDE.md integration
@@ -95,45 +95,35 @@
 - PHASE 6 — Athlete Participation Rules
 - Recommended Laravel Folder Structure
 - CoordinatorController
-- Event
-- FortifyServiceProvider.php
+- Q: replace the basketball score sheet with this, but inheret the function autofill name based on the team, and lisence replaced with course.
 - Livewire\Livewire
 - Closure
 - StoreStudentRequest
-- TeamMember
-- StoreCoordinatorRequest
-- Team
-- EditionSportController.php
 - 4. Application services and key functions
+- StoreCoordinatorRequest
 - Student
-- CoordinatorDeviceService
-- RouteServiceProvider
-- CoordinatorController.php
+- CoordinatorService
+- ParticipationService
+- Q: swap the competition and team b, make this changes in both the preview and downloadable
 - Illuminate\Foundation\Http\FormRequest
-- ResultSubmission
-- Illuminate\Support\Str
-- CreateNewUser.php
-- Illuminate\Support\Facades\Hash
-- UserFactory.php
+- .reviewRequest
+- UpdateSportRequest
+- admin.sports.partials.basketball-score-sheet
+- SportService
+- Illuminate\Http\RedirectResponse
 - admin.sports.partials.bracket-match
-- UpdateUserProfileInformation.php
-- AssignTeamMemberRequest
-- EventServiceProvider.php
+- FortifyServiceProvider.php
+- .update
 - Authenticate.php
 - EventService
-- Illuminate\Http\RedirectResponse
+- SportController.php
 - TrustProxies.php
 - StoreSportRequest
-- .update
-- StoreEditionRequest
-- EventRegistration
+- Q: inheret the format from preview to the download
+- Illuminate\Support\ServiceProvider
 - CompetitionSchedule
-- AuditService
-- UpdateStudentRequest
-- UpdateSportRequest
-- TeamManagementTest.php
-- StoreEventRequest
-- StoreParticipationRuleRequest
+- ScheduleParticipant
+- ScoreSheetPdfService.php
 
 ## God Nodes (most connected - your core abstractions)
 1. `User` - 78 edges
@@ -156,21 +146,21 @@
   TODO.md → app/Services/EditionService.php
 - `4. Application services and key functions` --references--> `EventService`  [INFERRED]
   TODO.md → app/Services/EventService.php
-- `4. Application services and key functions` --references--> `ResultService`  [INFERRED]
-  TODO.md → app/Services/ResultService.php
+- `4. Application services and key functions` --references--> `ParticipationService`  [INFERRED]
+  TODO.md → app/Services/ParticipationService.php
 
 ## Import Cycles
 - None detected.
 
-## Communities (209 total, 149 thin omitted)
+## Communities (199 total, 142 thin omitted)
 
-### Community 0 - "Illuminate\View\Component"
-Cohesion: 0.38
-Nodes (3): AppLayout, GuestLayout, Illuminate\View\Component
+### Community 0 - "Illuminate\View\View"
+Cohesion: 0.14
+Nodes (6): EventController, SportModuleController, AppLayout, GuestLayout, Illuminate\View\Component, Illuminate\View\View
 
 ### Community 1 - "IntramuralEdition"
-Cohesion: 0.17
-Nodes (4): EditionController, IntramuralEdition, EditionService, DefaultSportsSeeder
+Cohesion: 0.06
+Nodes (19): EditionController, UpdateEditionRequest, IntramuralEdition, EditionService, AdminUserSeeder, DatabaseSeeder, DefaultSportsSeeder, TestIntramuralsDataSeeder (+11 more)
 
 ### Community 2 - "Illuminate\Database\Migrations\Migration"
 Cohesion: 0.05
@@ -180,29 +170,33 @@ Nodes (3): Illuminate\Database\Migrations\Migration, Illuminate\Database\Schema\
 Cohesion: 0.04
 Nodes (48): pestphp/pest-plugin, php-http/discovery, autoload, autoload-dev, psr-4, psr-4, config, allow-plugins (+40 more)
 
-### Community 5 - "BracketService"
-Cohesion: 0.09
-Nodes (7): AthleteEntry, BracketCompetitor, BracketMatch, BracketService, Illuminate\Support\Collection, bracketEngineEdition(), finishReadyBracketMatches()
+### Community 5 - "EditionSport"
+Cohesion: 0.08
+Nodes (11): AthleteEntry, BracketCompetitor, BracketMatch, EditionSport, BracketService, Illuminate\Support\Collection, bracketEngineSport(), finishReadyBracketMatches() (+3 more)
 
-### Community 6 - "Illuminate\View\View"
-Cohesion: 0.10
-Nodes (13): CompetitionController, DashboardController, EventController, ModuleController, RegistrationController, SportModuleController, SystemLogController, Controller (+5 more)
+### Community 6 - "Controller"
+Cohesion: 0.13
+Nodes (10): CompetitionController, DashboardController, ModuleController, SystemLogController, Controller, DashboardController, Illuminate\Foundation\Auth\Access\AuthorizesRequests, Illuminate\Foundation\Validation\ValidatesRequests (+2 more)
 
 ### Community 7 - "package.json"
-Cohesion: 0.08
-Nodes (22): devDependencies, autoprefixer, axios, laravel-vite-plugin, postcss, tailwindcss, @tailwindcss/forms, @tailwindcss/typography (+14 more)
+Cohesion: 0.06
+Nodes (28): dependencies, html-to-image, devDependencies, autoprefixer, axios, laravel-vite-plugin, postcss, tailwindcss (+20 more)
 
 ### Community 8 - "TODO_old.md"
 Cohesion: 0.04
 Nodes (44): 🚦 Development Order, ⭐ Most Important Rule for the Junior Developer, PHASE 11 — Coordinator Permissions, PHASE 12 — Event Status, PHASE 13 — Competition Results, PHASE 14 — Sport-Specific Scoring, PHASE 15 — Score Submission Workflow, PHASE 16 — Disqualification System (+36 more)
 
+### Community 9 - "ScoreSheetImageOfficeService.php"
+Cohesion: 0.40
+Nodes (3): ScoreSheetImageOfficeService, RuntimeException, ZipArchive
+
 ### Community 10 - "User"
-Cohesion: 0.13
-Nodes (13): User, Illuminate\Database\Eloquent\Relations\HasMany, Illuminate\Foundation\Auth\User, Illuminate\Notifications\Notifiable, Laravel\Fortify\TwoFactorAuthenticatable, Laravel\Jetstream\HasProfilePhoto, Laravel\Sanctum\HasApiTokens, coordinatorModuleAdmin() (+5 more)
+Cohesion: 0.18
+Nodes (9): User, Illuminate\Database\Eloquent\Relations\HasMany, Illuminate\Foundation\Auth\User, Illuminate\Notifications\Notifiable, Laravel\Fortify\TwoFactorAuthenticatable, Laravel\Jetstream\HasProfilePhoto, Laravel\Sanctum\HasApiTokens, editionModuleAdmin() (+1 more)
 
 ### Community 11 - "Illuminate\Database\Eloquent\Model"
-Cohesion: 0.10
-Nodes (7): AuditLog, CompetitionResult, ScheduleParticipant, TeamFlag, TeamTally, Illuminate\Database\Eloquent\Model, Illuminate\Database\Eloquent\SoftDeletes
+Cohesion: 0.13
+Nodes (6): AuditLog, CompetitionResult, TeamFlag, TeamTally, Illuminate\Database\Eloquent\Model, Illuminate\Database\Eloquent\SoftDeletes
 
 ### Community 12 - "What You Must Do When Invoked"
 Cohesion: 0.08
@@ -212,17 +206,21 @@ Nodes (24): For /graphify add and --watch, For /graphify query, For the commit h
 Cohesion: 0.24
 Nodes (7): Database schema, 3.1 Identity and reference data, 3.2 Registration, rules, and staffing, 3.3 Competition and scoring, 3.4 Compliance and history, 3.5 Required indexes and integrity rules, 3. Database schema
 
-### Community 15 - "Illuminate\Database\Seeder"
-Cohesion: 0.38
-Nodes (3): DatabaseSeeder, TestIntramuralsDataSeeder, Illuminate\Database\Seeder
+### Community 14 - "CoordinatorDeviceService"
+Cohesion: 0.18
+Nodes (7): EnsureCoordinatorDevice, CoordinatorDevice, CoordinatorDeviceService, Illuminate\Contracts\Auth\StatefulGuard, Illuminate\Validation\ValidationException, Laravel\Fortify\Fortify, coordinatorModuleAdmin()
 
 ### Community 16 - "Illuminate\Http\Request"
-Cohesion: 0.14
-Nodes (8): SportController, EditionSport, Sport, Barryvdh\DomPDF\Facade\Pdf, Illuminate\Contracts\Http\Kernel, Illuminate\Http\Request, bracketEngineSport(), bulkAssignmentSport()
+Cohesion: 0.23
+Nodes (4): SportController, Sport, Illuminate\Contracts\Http\Kernel, Illuminate\Http\Request
 
 ### Community 17 - "Intramurals Management System"
 Cohesion: 0.12
 Nodes (16): Admin landing page and navigation, Athletes and participation rules, Competition operations, Current implementation state, Current next step, Development conventions, Intramurals edition management, Intramurals Management System (+8 more)
+
+### Community 18 - "Event"
+Cohesion: 0.13
+Nodes (6): CoordinatorAssignment, CoordinatorRequest, Event, Illuminate\Database\Eloquent\Factories\HasFactory, Illuminate\Support\Arr, coordinatorModuleEvent()
 
 ### Community 19 - "2. Functional requirements"
 Cohesion: 0.14
@@ -245,8 +243,8 @@ Cohesion: 0.22
 Nodes (9): 5. Business rules and workflows, BR-01 Registration, BR-02 Coordinator authorization, BR-02A Team roster assignment, BR-03 Event state transitions, BR-04 Result approval and tally update, BR-05 Flag/disqualification, BR-06 Device restriction (+1 more)
 
 ### Community 24 - "Illuminate\Validation\Rule"
-Cohesion: 0.20
-Nodes (3): StoreTeamRequest, UpdateEditionRequest, Illuminate\Validation\Rule
+Cohesion: 0.18
+Nodes (3): StoreEditionRequest, StoreTeamRequest, Illuminate\Validation\Rule
 
 ### Community 25 - "7. Delivery plan"
 Cohesion: 0.29
@@ -275,10 +273,6 @@ Nodes (5): API, Authentication, Authorization, Input security, PHASE 35 — Secu
 ### Community 31 - "PHASE 30 — Reports"
 Cohesion: 0.40
 Nodes (5): Athlete participation report, Coordinator report, Event report, Overall tally, PHASE 30 — Reports
-
-### Community 32 - "Illuminate\Support\ServiceProvider"
-Cohesion: 0.11
-Nodes (9): DeleteUser, AppServiceProvider, BroadcastServiceProvider, JetstreamServiceProvider, Illuminate\Support\Facades\Broadcast, Illuminate\Support\Facades\Facade, Illuminate\Support\ServiceProvider, Laravel\Jetstream\Contracts\DeletesUsers (+1 more)
 
 ### Community 33 - "Handler.php"
 Cohesion: 0.50
@@ -328,101 +322,90 @@ Nodes (3): Events, PHASE 3 — Sports and Events, Sports
 Cohesion: 0.67
 Nodes (3): PHASE 2 — Database Design, TODO 2.1 — Create users table, TODO 2.2 — Students/Athletes
 
-### Community 164 - "Event"
-Cohesion: 0.16
-Nodes (6): CoordinatorAssignment, CoordinatorDevice, Event, Illuminate\Database\Eloquent\Factories\HasFactory, Illuminate\Support\Arr, coordinatorModuleEvent()
-
-### Community 165 - "FortifyServiceProvider.php"
-Cohesion: 0.22
-Nodes (6): FortifyServiceProvider, Laravel\Fortify\Actions\AttemptToAuthenticate, Laravel\Fortify\Actions\CanonicalizeUsername, Laravel\Fortify\Actions\EnsureLoginIsNotThrottled, Laravel\Fortify\Actions\PrepareAuthenticatedSession, Laravel\Fortify\Actions\RedirectIfTwoFactorAuthenticatable
+### Community 165 - "Q: replace the basketball score sheet with this, but inheret the function autofill name based on the team, and lisence replaced with course."
+Cohesion: 0.40
+Nodes (4): Answer, Outcome, Q: replace the basketball score sheet with this, but inheret the function autofill name based on the team, and lisence replaced with course., Source Nodes
 
 ### Community 166 - "Livewire\Livewire"
-Cohesion: 0.18
-Nodes (7): Laravel\Jetstream\Features, Laravel\Jetstream\Http\Livewire\ApiTokenManager, Laravel\Jetstream\Http\Livewire\DeleteUserForm, Laravel\Jetstream\Http\Livewire\LogoutOtherBrowserSessionsForm, Laravel\Jetstream\Http\Livewire\UpdateProfileInformationForm, Laravel\Jetstream\Http\Middleware\AuthenticateSession, Livewire\Livewire
+Cohesion: 0.15
+Nodes (8): Laravel\Jetstream\Features, Laravel\Jetstream\Http\Livewire\ApiTokenManager, Laravel\Jetstream\Http\Livewire\DeleteUserForm, Laravel\Jetstream\Http\Livewire\LogoutOtherBrowserSessionsForm, Laravel\Jetstream\Http\Livewire\TwoFactorAuthenticationForm, Laravel\Jetstream\Http\Livewire\UpdateProfileInformationForm, Laravel\Jetstream\Http\Middleware\AuthenticateSession, Livewire\Livewire
 
 ### Community 167 - "Closure"
-Cohesion: 0.24
-Nodes (7): EnsureUserHasRole, Response, RedirectIfAuthenticated, ReturnAdminSavesToModuleIndex, Closure, Illuminate\Support\Facades\Auth, Symfony\Component\HttpFoundation\Response
+Cohesion: 0.07
+Nodes (21): EnsureUserHasRole, Response, RedirectIfAuthenticated, ReturnAdminSavesToModuleIndex, EventServiceProvider, RouteServiceProvider, Closure, Illuminate\Auth\Events\Registered (+13 more)
 
-### Community 169 - "TeamMember"
-Cohesion: 0.22
-Nodes (3): TeamMember, bulkAssignmentAdmin(), bulkAssignmentEdition()
+### Community 168 - "StoreStudentRequest"
+Cohesion: 0.16
+Nodes (3): SanitizesStudentInput, StoreStudentRequest, UpdateStudentRequest
+
+### Community 169 - "4. Application services and key functions"
+Cohesion: 0.27
+Nodes (4): Fixture, ResultSubmission, ResultService, 4. Application services and key functions
 
 ### Community 170 - "StoreCoordinatorRequest"
 Cohesion: 0.18
 Nodes (4): StoreCoordinatorRequest, UpdateCoordinatorRequest, Illuminate\Contracts\Validation\Rule, Illuminate\Validation\Rules\Password
 
-### Community 173 - "4. Application services and key functions"
-Cohesion: 0.25
-Nodes (3): ParticipationRule, ParticipationService, 4. Application services and key functions
+### Community 171 - "Student"
+Cohesion: 0.05
+Nodes (14): TeamController, AssignTeamMemberRequest, RemoveTeamMembersRequest, UpdateTeamRequest, Student, Team, TeamMember, StudentService (+6 more)
 
-### Community 175 - "CoordinatorDeviceService"
-Cohesion: 0.23
-Nodes (5): EnsureCoordinatorDevice, CoordinatorDeviceService, Illuminate\Contracts\Auth\StatefulGuard, Illuminate\Validation\ValidationException, Laravel\Fortify\Fortify
+### Community 173 - "ParticipationService"
+Cohesion: 0.17
+Nodes (3): EventRegistration, ParticipationRule, ParticipationService
 
-### Community 176 - "RouteServiceProvider"
-Cohesion: 0.11
-Nodes (11): RouteServiceProvider, Illuminate\Auth\Events\Verified, Illuminate\Auth\Notifications\ResetPassword, Illuminate\Cache\RateLimiting\Limit, Illuminate\Foundation\Support\Providers\RouteServiceProvider, Illuminate\Support\Facades\Notification, Illuminate\Support\Facades\RateLimiter, Illuminate\Support\Facades\Route (+3 more)
-
-### Community 179 - "Illuminate\Foundation\Http\FormRequest"
-Cohesion: 0.19
-Nodes (4): RemoveTeamMembersRequest, StoreCoordinatorAssignmentRequest, StoreCoordinatorChangeRequest, Illuminate\Foundation\Http\FormRequest
-
-### Community 182 - "ResultSubmission"
-Cohesion: 0.24
-Nodes (3): Fixture, ResultSubmission, ResultService
-
-### Community 183 - "Illuminate\Support\Str"
-Cohesion: 0.25
-Nodes (3): Illuminate\Support\Facades\Cookie, Illuminate\Support\Facades\DB, Illuminate\Support\Str
-
-### Community 184 - "CreateNewUser.php"
-Cohesion: 0.24
-Nodes (5): CreateNewUser, PasswordValidationRules, ResetUserPassword, Laravel\Fortify\Contracts\CreatesNewUsers, Laravel\Fortify\Contracts\ResetsUserPasswords
-
-### Community 185 - "Illuminate\Support\Facades\Hash"
-Cohesion: 0.22
-Nodes (5): UpdateUserPassword, AdminUserSeeder, Illuminate\Support\Facades\Hash, Laravel\Fortify\Contracts\UpdatesUserPasswords, Laravel\Jetstream\Http\Livewire\UpdatePasswordForm
-
-### Community 186 - "UserFactory.php"
-Cohesion: 0.27
-Nodes (4): StudentFactory, UserFactory, Illuminate\Database\Eloquent\Factories\Factory, static
-
-### Community 188 - "UpdateUserProfileInformation.php"
-Cohesion: 0.38
-Nodes (4): UpdateUserProfileInformation, Illuminate\Contracts\Auth\MustVerifyEmail, Illuminate\Support\Facades\Validator, Laravel\Fortify\Contracts\UpdatesUserProfileInformation
-
-### Community 190 - "EventServiceProvider.php"
-Cohesion: 0.29
-Nodes (5): EventServiceProvider, Illuminate\Auth\Events\Registered, Illuminate\Auth\Listeners\SendEmailVerificationNotification, Illuminate\Foundation\Support\Providers\EventServiceProvider, Illuminate\Support\Facades\Event
-
-### Community 194 - "Illuminate\Http\RedirectResponse"
-Cohesion: 0.14
-Nodes (5): CourseController, StudentController, TeamController, Course, Illuminate\Http\RedirectResponse
-
-### Community 205 - "TeamManagementTest.php"
+### Community 174 - "Q: swap the competition and team b, make this changes in both the preview and downloadable"
 Cohesion: 0.40
-Nodes (4): teamModuleAdmin(), teamModuleEdition(), teamModuleStudent(), validTeamData()
+Nodes (4): Answer, Outcome, Q: swap the competition and team b, make this changes in both the preview and downloadable, Source Nodes
+
+### Community 176 - "Illuminate\Foundation\Http\FormRequest"
+Cohesion: 0.19
+Nodes (4): StoreCoordinatorAssignmentRequest, StoreCoordinatorChangeRequest, StoreParticipationRuleRequest, Illuminate\Foundation\Http\FormRequest
+
+### Community 186 - "Illuminate\Http\RedirectResponse"
+Cohesion: 0.14
+Nodes (3): EditionSportController, RegistrationController, Illuminate\Http\RedirectResponse
+
+### Community 188 - "FortifyServiceProvider.php"
+Cohesion: 0.09
+Nodes (19): CreateNewUser, PasswordValidationRules, ResetUserPassword, UpdateUserPassword, UpdateUserProfileInformation, FortifyServiceProvider, Illuminate\Contracts\Auth\MustVerifyEmail, Illuminate\Support\Facades\Hash (+11 more)
+
+### Community 194 - "SportController.php"
+Cohesion: 0.21
+Nodes (3): CourseController, StudentController, Course
+
+### Community 197 - "Q: inheret the format from preview to the download"
+Cohesion: 0.40
+Nodes (4): Answer, Outcome, Q: inheret the format from preview to the download, Source Nodes
+
+### Community 198 - "Illuminate\Support\ServiceProvider"
+Cohesion: 0.11
+Nodes (9): DeleteUser, AppServiceProvider, BroadcastServiceProvider, JetstreamServiceProvider, Illuminate\Support\Facades\Broadcast, Illuminate\Support\Facades\Facade, Illuminate\Support\ServiceProvider, Laravel\Jetstream\Contracts\DeletesUsers (+1 more)
 
 ## Knowledge Gaps
-- **240 isolated node(s):** `name`, `type`, `description`, `keywords`, `license` (+235 more)
-  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 563 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
-- **149 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **253 isolated node(s):** `name`, `type`, `description`, `keywords`, `license` (+248 more)
+  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 583 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
+- **142 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+
+## Work-memory lessons
+
+**Preferred sources** — corroborated by past sessions; start here.
+- `basketball-score-sheet-pdf.blade.php` (3× useful, score=2.999429679) _(code changed — re-verify)_
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `User` connect `User` to `IntramuralEdition`, `BracketService`, `Illuminate\View\View`, `CoordinatorService`, `Illuminate\Http\Request`, `Illuminate\Support\ServiceProvider`, `CoordinatorController`, `Event`, `FortifyServiceProvider.php`, `Livewire\Livewire`, `TeamMember`, `StoreCoordinatorRequest`, `CoordinatorDeviceService`, `RouteServiceProvider`, `CoordinatorController.php`, `Illuminate\Support\Str`, `CreateNewUser.php`, `Illuminate\Support\Facades\Hash`, `UserFactory.php`, `UpdateUserProfileInformation.php`, `TeamManagementTest.php`?**
-  _High betweenness centrality (0.066) - this node is a cross-community bridge._
-- **Why does `IntramuralEdition` connect `IntramuralEdition` to `EventService`, `Illuminate\Http\RedirectResponse`, `BracketService`, `Illuminate\View\View`, `TeamMember`, `User`, `Illuminate\Database\Eloquent\Model`, `EditionSportController.php`, `3. Database schema`, `TeamManagementTest.php`, `Illuminate\Database\Seeder`, `Illuminate\Http\Request`, `Illuminate\Support\Str`, `Illuminate\Validation\Rule`?**
-  _High betweenness centrality (0.056) - this node is a cross-community bridge._
-- **Why does `Event` connect `Event` to `EventService`, `CoordinatorController`, `StoreRegistrationRequest`, `Illuminate\View\View`, `.update`, `Illuminate\Database\Eloquent\Model`, `3. Database schema`, `Student`, `CoordinatorService`, `4. Application services and key functions`, `CoordinatorController.php`, `Illuminate\Support\Str`?**
-  _High betweenness centrality (0.032) - this node is a cross-community bridge._
+- **Why does `User` connect `User` to `IntramuralEdition`, `CoordinatorController`, `EditionSport`, `Illuminate\Support\ServiceProvider`, `Controller`, `Livewire\Livewire`, `Closure`, `StoreCoordinatorRequest`, `Student`, `CoordinatorService`, `CoordinatorDeviceService`, `Event`, `FortifyServiceProvider.php`?**
+  _High betweenness centrality (0.087) - this node is a cross-community bridge._
+- **Why does `IntramuralEdition` connect `IntramuralEdition` to `Illuminate\View\View`, `EventService`, `SportController.php`, `EditionSport`, `User`, `Student`, `Illuminate\Database\Eloquent\Model`, `3. Database schema`, `Illuminate\Http\Request`, `Illuminate\Validation\Rule`, `Illuminate\Http\RedirectResponse`?**
+  _High betweenness centrality (0.044) - this node is a cross-community bridge._
+- **Why does `Event` connect `Event` to `Illuminate\View\View`, `IntramuralEdition`, `EventService`, `StoreRegistrationRequest`, `CoordinatorController`, `Controller`, `Illuminate\Database\Eloquent\Model`, `CoordinatorService`, `3. Database schema`, `ParticipationService`, `CoordinatorDeviceService`, `Illuminate\Http\RedirectResponse`, `.update`?**
+  _High betweenness centrality (0.029) - this node is a cross-community bridge._
 - **What connects `name`, `type`, `description` to the rest of the system?**
-  _240 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _253 weakly-connected nodes found - possible documentation gaps or missing edges._
+- **Should `Illuminate\View\View` be split into smaller, more focused modules?**
+  _Cohesion score 0.13852813852813853 - nodes in this community are weakly interconnected._
+- **Should `IntramuralEdition` be split into smaller, more focused modules?**
+  _Cohesion score 0.05714285714285714 - nodes in this community are weakly interconnected._
 - **Should `Illuminate\Database\Migrations\Migration` be split into smaller, more focused modules?**
   _Cohesion score 0.051203277009728626 - nodes in this community are weakly interconnected._
-- **Should `composer.json` be split into smaller, more focused modules?**
-  _Cohesion score 0.04081632653061224 - nodes in this community are weakly interconnected._
-- **Should `BracketService` be split into smaller, more focused modules?**
-  _Cohesion score 0.09393939393939393 - nodes in this community are weakly interconnected._

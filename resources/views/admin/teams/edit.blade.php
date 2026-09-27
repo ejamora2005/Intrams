@@ -53,7 +53,7 @@
         <div class="flex flex-col justify-between gap-3 border-b border-slate-200 px-6 py-5 sm:flex-row sm:items-center">
             <div>
                 <h2 id="current-roster-heading" class="font-semibold text-slate-900">Current roster</h2>
-                <p class="mt-1 text-sm text-slate-500">{{ $team->members->count() }} assigned athlete{{ $team->members->count() === 1 ? '' : 's' }} in total.</p>
+                <p class="mt-1 text-sm text-slate-500">{{ $team->members_count }} assigned athlete{{ $team->members_count === 1 ? '' : 's' }} in total.</p>
             </div>
         </div>
         <div class="p-6">
@@ -76,7 +76,7 @@
             @else
                 <form method="POST" action="{{ route('admin.teams.members.bulk-remove', $team) }}" class="mt-5">
                     @csrf
-                    <label class="mb-3 flex w-fit items-center gap-2 text-sm font-semibold text-slate-700"><input id="select-all-roster-members" type="checkbox" class="rounded border-slate-300 text-blue-700"> Select all filtered members</label>
+                    <label class="mb-3 flex w-fit items-center gap-2 text-sm font-semibold text-slate-700"><input id="select-all-roster-members" type="checkbox" class="rounded border-slate-300 text-blue-700"> Select all members on this page</label>
                     <div class="divide-y divide-slate-100 rounded-lg border border-slate-200">
                         @foreach ($rosterMembers as $member)
                             <label class="flex cursor-pointer items-center gap-3 px-4 py-3 text-sm hover:bg-slate-50">
@@ -87,6 +87,7 @@
                     </div>
                     <button type="submit" class="mt-4 rounded-lg border border-red-200 bg-white px-4 py-2.5 text-sm font-semibold text-red-700 transition hover:border-red-300 hover:bg-red-50" onclick="return confirm('Remove the selected athletes from this team?');">Remove selected members</button>
                 </form>
+                <div class="mt-4">{{ $rosterMembers->links() }}</div>
                 @error('member_ids')<p class="mt-2 text-sm text-red-600">{{ $message }}</p>@enderror
             @endif
         </div>

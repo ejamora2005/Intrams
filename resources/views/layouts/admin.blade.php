@@ -8,7 +8,6 @@
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700&display=swap" rel="stylesheet" />
         @vite(['resources/css/app.css', 'resources/js/app.js'])
-        @livewireStyles
     </head>
     <body class="bg-slate-50 font-sans text-slate-900 antialiased">
         <div class="min-h-screen md:flex md:h-screen md:overflow-hidden">
@@ -27,6 +26,8 @@
                             ['label' => 'Dashboard', 'route' => 'admin.dashboard', 'match' => 'admin/dashboard'],
                             ['label' => 'Events / Editions', 'route' => 'admin.editions.index', 'match' => 'admin/editions'],
                             ['label' => 'Students', 'route' => 'admin.students.index', 'match' => 'admin/students'],
+                            ['label' => 'Courses', 'route' => 'admin.courses.index', 'match' => 'admin/courses'],
+                            ['label' => 'Coordinators', 'route' => 'admin.coordinators.index', 'match' => 'admin/coordinators'],
                             ['label' => 'Teams', 'route' => 'admin.teams.index', 'match' => 'admin/teams'],
                             ['label' => 'Sports', 'route' => 'admin.sports.index', 'match' => 'admin/sports'],
                             ['label' => 'Live Competition', 'route' => 'admin.competition.index', 'match' => 'admin/competition'],
@@ -34,11 +35,12 @@
                         ];
                     @endphp
                     @foreach ($navigation as $item)
+                        @php($isActive = request()->is($item['match'], $item['match'].'/*'))
                         <a href="{{ route($item['route']) }}" @class([
                             'whitespace-nowrap rounded-lg px-3 py-2.5 text-sm font-medium transition md:w-full',
-                            'bg-blue-700 text-white shadow-sm' => request()->is($item['match']),
-                            'text-blue-200 hover:bg-blue-900 hover:text-white' => !request()->is($item['match']),
-                        ]) @if (request()->is($item['match'])) aria-current="page" @endif>
+                            'bg-blue-700 text-white shadow-sm' => $isActive,
+                            'text-blue-200 hover:bg-blue-900 hover:text-white' => !$isActive,
+                        ]) @if ($isActive) aria-current="page" @endif>
                             {{ $item['label'] }}
                         </a>
                     @endforeach
@@ -70,7 +72,6 @@
                 <div class="mx-auto max-w-7xl px-5 py-8 sm:px-8">@yield('content')</div>
             </main>
         </div>
-        @livewireScripts
         <script>
             document.addEventListener('submit', (event) => {
                 const form = event.target;

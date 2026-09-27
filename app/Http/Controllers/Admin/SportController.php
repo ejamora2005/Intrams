@@ -18,7 +18,7 @@ use App\Models\TeamMember;
 use App\Services\AuditService;
 use App\Services\BracketService;
 use App\Services\SportService;
-use Barryvdh\DomPDF\Facade\Pdf;
+use App\Services\ScoreSheetImageOfficeService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -153,19 +153,34 @@ class SportController extends Controller
 
     public function downloadBasketballScoreSheet(Request $request, Sport $sport): Response
     {
-        $request->validate(['edition_id' => ['required', 'integer', 'exists:intramural_editions,id']]);
-        $context = $this->basketballScoreSheetContext($request, $sport);
+        $request->validate([
+            'edition_id' => ['required', 'integer', 'exists:intramural_editions,id'],
+            'format' => ['required', 'in:docx,xlsx,pdf'],
+            'preview_image' => ['required', 'file', 'image', 'mimetypes:image/png', 'max:8192', 'dimensions:max_width=4096,max_height=4096'],
+        ]);
+        $context = $this->basketballScoreSheetContext($request, $sport, false);
         $edition = $context['edition'];
+        $format = $request->input('format');
+        $mime = match ($format) {
+            'docx' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            'pdf' => 'application/pdf',
+            default => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        };
+        $preview = $request->file('preview_image');
+        [$width, $height] = getimagesize($preview->getRealPath());
+        abort_if(abs($width / $height - 210 / 297) > .005, 422, 'The capture must include the full A4 paper. Refresh the page and try again.');
+        if ($format === 'pdf') {
+            $workbook = app(\App\Services\ScoreSheetPdfService::class)->create(file_get_contents($preview->getRealPath()), $width, $height);
+        } else {
+            $workbook = app(ScoreSheetImageOfficeService::class)->create($format, file_get_contents($preview->getRealPath()));
+        }
+        app(AuditService::class)->record('basketball_score_sheet.downloaded', $sport, null, ['edition_id' => $edition->id, 'format' => $format]);
 
-        app(AuditService::class)->record('basketball_score_sheet.previewed', $sport, null, ['edition_id' => $edition->id]);
-
-        return Pdf::loadView('admin.sports.basketball-score-sheet-pdf', [
-            ...$context,
-            'form' => $request->all(),
-            'logoDataUri' => 'data:image/png;base64,'.base64_encode((string) file_get_contents(public_path('images/fiba-basketball.png'))),
-        ])
-            ->setPaper('a4', 'portrait')
-            ->stream('basketball-score-sheet-'.$edition->id.'.pdf');
+        return response($workbook, 200, [
+            'Content-Type' => $mime,
+            'Content-Disposition' => 'attachment; filename="basketball-score-sheet-'.$edition->id.'.'.$format.'"',
+            'Cache-Control' => 'private, no-store',
+        ]);
     }
 
     public function recordBracketResult(Request $request, Sport $sport, BracketMatch $match): RedirectResponse
@@ -330,7 +345,7 @@ class SportController extends Controller
     }
 
     /** @return array{sport: Sport, edition: IntramuralEdition, editionSport: EditionSport, teams: \Illuminate\Support\Collection<int, array<string, mixed>>} */
-    private function basketballScoreSheetContext(Request $request, Sport $sport): array
+    private function basketballScoreSheetContext(Request $request, Sport $sport, bool $loadRosters = true): array
     {
         abort_unless(str_contains(strtolower($sport->name), 'basketball'), 404);
 
@@ -340,8 +355,12 @@ class SportController extends Controller
         $editionSport = EditionSport::query()
             ->where('edition_id', $edition->id)
             ->where('sport_id', $sport->id)
-            ->with(['athleteEntries.student', 'athleteEntries.team'])
+            ->when($loadRosters, fn ($query) => $query->with(['athleteEntries.student.course', 'athleteEntries.team']))
             ->firstOrFail();
+
+        if (! $loadRosters) {
+            return compact('sport', 'edition', 'editionSport') + ['teams' => collect()];
+        }
 
         $teams = $editionSport->athleteEntries
             ->where('status', 'active')
@@ -353,7 +372,9 @@ class SportController extends Controller
                 'name' => $entries->first()->team->name,
                 'players' => $entries->map(fn (AthleteEntry $entry) => [
                     'name' => $entry->student->full_name,
-                    'year_section' => trim($entry->student->year_level.' - '.$entry->student->section, ' -'),
+                    'course' => $entry->student->course?->code
+                        ?: $entry->student->course?->name
+                        ?: '',
                 ])->values(),
             ])
             ->values();

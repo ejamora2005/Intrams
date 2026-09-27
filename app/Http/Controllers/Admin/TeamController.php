@@ -52,6 +52,7 @@ class TeamController extends Controller
     {
         return view('admin.teams.create', [
             'team' => new Team(['edition_id' => $request->integer('edition_id') ?: null]),
+            'courses' => \App\Models\Course::query()->where('status', 'active')->orderBy('name')->get(),
             'editions' => IntramuralEdition::query()->orderByDesc('starts_on')->orderByDesc('id')->get(),
         ]);
     }
@@ -65,14 +66,13 @@ class TeamController extends Controller
 
     public function edit(Team $team): View
     {
-        $team->load(['edition', 'members']);
+        $team->load('edition')->loadCount('members');
         $courseId = request()->integer('course_id') ?: null;
         $rosterCourseId = request()->integer('roster_course_id') ?: null;
         $rosterSearch = request()->string('roster_search')->value();
-        $assignedStudentIds = TeamMember::query()->where('edition_id', $team->edition_id)->pluck('student_id');
         $availableStudents = Student::query()
             ->where('status', 'active')
-            ->whereNotIn('id', $assignedStudentIds)
+            ->whereDoesntHave('teamMembers', fn ($query) => $query->where('edition_id', $team->edition_id))
             ->when($courseId, fn ($query) => $query->where('course_id', $courseId))
             ->orderBy('last_name')->orderBy('first_name')
             ->limit(250)
@@ -89,8 +89,12 @@ class TeamController extends Controller
                         ->orWhere('last_name', 'like', "%{$rosterSearch}%");
                 });
             })
-            ->get()
-            ->sortBy(fn ($member) => $member->student->full_name);
+            ->whereHas('student')
+            ->orderBy(Student::query()->select('first_name')->whereColumn('students.id', 'team_members.student_id')->limit(1))
+            ->orderBy(Student::query()->select('last_name')->whereColumn('students.id', 'team_members.student_id')->limit(1))
+            ->orderBy('team_members.id')
+            ->paginate(50, ['*'], 'roster_page')
+            ->withQueryString();
 
         return view('admin.teams.edit', [
             'team' => $team,
