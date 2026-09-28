@@ -13,6 +13,7 @@ use App\Models\Student;
 use App\Models\AthleteEntry;
 use App\Models\BracketCompetitor;
 use App\Models\BracketMatch;
+use App\Models\CompetitionSchedule;
 use App\Models\Team;
 use App\Models\TeamMember;
 use App\Services\AuditService;
@@ -23,6 +24,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 
@@ -137,7 +139,7 @@ class SportController extends Controller
         $this->bracketService->initialize($editionSport);
         $matches = BracketMatch::query()
             ->where('edition_sport_id', $editionSport->id)
-            ->with(['competitorOne', 'competitorTwo', 'winnerCompetitor'])
+            ->with(['competitorOne', 'competitorTwo', 'winnerCompetitor', 'schedule'])
             ->orderBy('bracket')
             ->orderBy('round_number')
             ->orderBy('match_number')
@@ -149,6 +151,11 @@ class SportController extends Controller
     public function basketballScoreSheet(Request $request, Sport $sport): View
     {
         return view('admin.sports.basketball-score-sheet', $this->basketballScoreSheetContext($request, $sport));
+    }
+
+    public function volleyballScoreSheet(Request $request, Sport $sport): View
+    {
+        return view('admin.sports.volleyball-score-sheet', $this->volleyballScoreSheetContext($request, $sport));
     }
 
     public function downloadBasketballScoreSheet(Request $request, Sport $sport): Response
@@ -183,6 +190,36 @@ class SportController extends Controller
         ]);
     }
 
+    public function downloadVolleyballScoreSheet(Request $request, Sport $sport): Response
+    {
+        $request->validate([
+            'edition_id' => ['required', 'integer', 'exists:intramural_editions,id'],
+            'format' => ['required', 'in:docx,xlsx,pdf'],
+            'preview_image' => ['required', 'file', 'image', 'mimetypes:image/png', 'max:8192', 'dimensions:max_width=4096,max_height=4096'],
+        ]);
+        $context = $this->volleyballScoreSheetContext($request, $sport, false);
+        $edition = $context['edition'];
+        $format = $request->input('format');
+        $mime = match ($format) {
+            'docx' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            'pdf' => 'application/pdf',
+            default => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        };
+        $preview = $request->file('preview_image');
+        [$width, $height] = getimagesize($preview->getRealPath());
+        abort_if(abs($width / $height - 297 / 210) > .005, 422, 'The capture must include the full A4 landscape paper. Refresh the page and try again.');
+        $content = $format === 'pdf'
+            ? app(\App\Services\ScoreSheetPdfService::class)->create(file_get_contents($preview->getRealPath()), $width, $height, 'landscape')
+            : app(ScoreSheetImageOfficeService::class)->create($format, file_get_contents($preview->getRealPath()), 'landscape', 'Volleyball score sheet');
+        app(AuditService::class)->record('volleyball_score_sheet.downloaded', $sport, null, ['edition_id' => $edition->id, 'format' => $format]);
+
+        return response($content, 200, [
+            'Content-Type' => $mime,
+            'Content-Disposition' => 'attachment; filename="volleyball-score-sheet-'.$edition->id.'.'.$format.'"',
+            'Cache-Control' => 'private, no-store',
+        ]);
+    }
+
     public function recordBracketResult(Request $request, Sport $sport, BracketMatch $match): RedirectResponse
     {
         abort_unless($match->editionSport->sport_id === $sport->id, 404);
@@ -202,6 +239,53 @@ class SportController extends Controller
                 ->firstOrFail();
         $this->bracketService->record($match, $winner);
         return redirect()->route('admin.sports.bracket', ['sport' => $sport, 'edition_id' => $edition->id])->with('success', $winner->label.' was declared the winner.');
+    }
+
+    public function scheduleBracketMatch(Request $request, Sport $sport, BracketMatch $match): RedirectResponse
+    {
+        abort_unless($match->editionSport->sport_id === $sport->id, 404);
+        $edition = $this->selectedEdition($request);
+        abort_unless($edition !== null && $match->editionSport->edition_id === $edition->id, 404);
+        abort_unless($match->status === 'pending' && $match->competitor_one_id && $match->competitor_two_id, 422, 'Only a ready bracket match can be scheduled.');
+
+        $data = $request->validate([
+            'date' => ['required', 'date_format:Y-m-d', 'after_or_equal:'.$edition->starts_on->format('Y-m-d'), 'before_or_equal:'.$edition->ends_on->format('Y-m-d')],
+            'period' => ['required', 'in:morning,afternoon'],
+        ]);
+        $startsAt = Carbon::createFromFormat('Y-m-d H:i', $data['date'].' '.($data['period'] === 'morning' ? '08:00' : '13:00'));
+        $match->loadMissing(['competitorOne', 'competitorTwo']);
+
+        $schedule = DB::transaction(function () use ($match, $startsAt): CompetitionSchedule {
+            $schedule = CompetitionSchedule::query()->updateOrCreate(
+                ['bracket_match_id' => $match->id],
+                [
+                    'edition_sport_id' => $match->edition_sport_id,
+                    'starts_at' => $startsAt,
+                    'ends_at' => $startsAt->copy()->addHours(2),
+                    'status' => 'scheduled',
+                ]
+            );
+            $schedule->participants()->delete();
+
+            foreach ([['competitor' => $match->competitorOne, 'slot' => 'A'], ['competitor' => $match->competitorTwo, 'slot' => 'B']] as $side) {
+                if ($side['competitor']->team_id) {
+                    $schedule->participants()->create(['team_id' => $side['competitor']->team_id, 'slot' => $side['slot'], 'status' => 'active']);
+                    continue;
+                }
+
+                foreach ($side['competitor']->athlete_entry_ids ?? [] as $index => $athleteEntryId) {
+                    $schedule->participants()->create(['athlete_entry_id' => $athleteEntryId, 'slot' => $side['slot'].($index + 1), 'status' => 'active']);
+                }
+            }
+
+            return $schedule;
+        });
+
+        app(AuditService::class)->record('bracket_match.scheduled', $schedule, null, $schedule->only($schedule->getFillable()));
+
+        return redirect()
+            ->route('admin.sports.bracket', ['sport' => $sport, 'edition_id' => $edition->id])
+            ->with('success', 'Game '.$match->match_number.' scheduled for '.$startsAt->format('M j, Y').' '.ucfirst($data['period']).'.');
     }
 
     public function resetBracket(Request $request, Sport $sport): RedirectResponse
@@ -355,14 +439,53 @@ class SportController extends Controller
         $editionSport = EditionSport::query()
             ->where('edition_id', $edition->id)
             ->where('sport_id', $sport->id)
-            ->when($loadRosters, fn ($query) => $query->with(['athleteEntries.student.course', 'athleteEntries.team']))
+            ->when($loadRosters, fn ($query) => $query->with([
+                'athleteEntries' => fn ($entries) => $entries
+                    ->where('status', 'active')
+                    ->whereNotNull('team_id')
+                    ->whereNotNull('student_id')
+                    ->with(['student.course', 'team']),
+            ]))
             ->firstOrFail();
 
         if (! $loadRosters) {
             return compact('sport', 'edition', 'editionSport') + ['teams' => collect()];
         }
 
-        $teams = $editionSport->athleteEntries
+        $teams = $this->scoreSheetTeams($editionSport);
+
+        return compact('sport', 'edition', 'editionSport', 'teams');
+    }
+
+    /** @return array{sport: Sport, edition: IntramuralEdition, editionSport: EditionSport, teams: \Illuminate\Support\Collection<int, array<string, mixed>>} */
+    private function volleyballScoreSheetContext(Request $request, Sport $sport, bool $loadRosters = true): array
+    {
+        abort_unless(str_contains(strtolower($sport->name), 'volleyball'), 404);
+
+        $edition = $this->selectedEdition($request);
+        abort_unless($edition !== null, 404);
+
+        $editionSport = EditionSport::query()
+            ->where('edition_id', $edition->id)
+            ->where('sport_id', $sport->id)
+            ->when($loadRosters, fn ($query) => $query->with([
+                'athleteEntries' => fn ($entries) => $entries
+                    ->where('status', 'active')
+                    ->whereNotNull('team_id')
+                    ->whereNotNull('student_id')
+                    ->with(['student.course', 'team']),
+            ]))
+            ->firstOrFail();
+
+        return compact('sport', 'edition', 'editionSport') + [
+            'teams' => $loadRosters ? $this->scoreSheetTeams($editionSport, true) : collect(),
+        ];
+    }
+
+    /** @return \Illuminate\Support\Collection<int, array<string, mixed>> */
+    private function scoreSheetTeams(EditionSport $editionSport, bool $includeSheetName = false): \Illuminate\Support\Collection
+    {
+        return $editionSport->athleteEntries
             ->where('status', 'active')
             ->filter(fn (AthleteEntry $entry) => $entry->team !== null && $entry->student !== null)
             ->groupBy('team_id')
@@ -370,15 +493,20 @@ class SportController extends Controller
             ->map(fn ($entries) => [
                 'id' => $entries->first()->team->id,
                 'name' => $entries->first()->team->name,
-                'players' => $entries->map(fn (AthleteEntry $entry) => [
-                    'name' => $entry->student->full_name,
-                    'course' => $entry->student->course?->code
-                        ?: $entry->student->course?->name
-                        ?: '',
-                ])->values(),
+                'players' => $entries->map(function (AthleteEntry $entry) use ($includeSheetName) {
+                    $player = [
+                        'name' => $entry->student->full_name,
+                        'course' => $entry->student->course?->code
+                            ?: $entry->student->course?->name
+                            ?: '',
+                    ];
+                    if ($includeSheetName) {
+                        $player['sheet_name'] = $entry->student->last_name.'. '.Str::upper(Str::substr($entry->student->first_name, 0, 1)).'.';
+                    }
+
+                    return $player;
+                })->values(),
             ])
             ->values();
-
-        return compact('sport', 'edition', 'editionSport', 'teams');
     }
 }

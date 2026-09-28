@@ -376,6 +376,24 @@ Every successful or denied major operation must create an append-only audit entr
 
 - [x] Share optimized full-paper image capture across Word, Excel, and PDF exports.
 
+- [x] Add the supplied volleyball score-sheet reference as an A4 landscape preview with Basketball-style team/roster autofill, compact `Last name. F.` player names, and matching DOCX, XLSX, and PDF downloads.
+
+- [x] Optimize score-sheet loading with conditional JavaScript chunks, cacheable Volleyball automation, filtered roster eager loading, and stable prioritized image rendering.
+
+- [x] Reuse the login screen's SLSU logo and INTRAMURALS MANAGEMENT name in the admin sidebar and browser title.
+
+- [x] Replace the login screen with a static daily competition board and blurred-backdrop login modal; query only the active edition's current-day schedule and refresh data only on a manual page request.
+
+- [x] Keep the guest-page browser title aligned with the INTRAMURALS MANAGEMENT brand.
+
+- [x] Group multiple same-day games for one sport under a shared sport cell while keeping each game's time, teams, and facilitator assignment accurate.
+
+- [x] Schedule a ready bracket match from its selection actions using only a date and Morning/Afternoon, with competitors inherited from the bracket.
+
+- [x] Cover bracket scheduling and duplicate-free rescheduling with a feature test.
+
+- [x] Show each scheduled bracket game's number above its competitors on the public login-page schedule.
+
 - [x] Bound team roster rendering to 50 rows; retain pagination access and page-scoped bulk selection.
 - [x] Remove duplicate team/course loads and assigned-ID materialization; remove unused admin Livewire assets and improve nested navigation highlighting.
 - [x] Add roster pagination regression coverage; document production asset and view compilation.

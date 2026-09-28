@@ -12,7 +12,7 @@
         </div>
     </div>
 
-    <form id="basketball-score-sheet" method="POST" action="{{ route('admin.sports.basketball-score-sheet.download', $sport) }}" autocomplete="off">
+    <form id="basketball-score-sheet" data-score-sheet-export data-download-prefix="basketball-score-sheet" method="POST" action="{{ route('admin.sports.basketball-score-sheet.download', $sport) }}" autocomplete="off">
         @csrf
         <input type="hidden" name="edition_id" value="{{ $edition->id }}" />
 

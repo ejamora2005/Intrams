@@ -6,7 +6,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 
 class ScoreSheetPdfService
 {
-    public function create(string $png, int $width, int $height): string
+    public function create(string $png, int $width, int $height, string $orientation = 'portrait'): string
     {
         $source = imagecreatefromstring($png);
         $opaque = imagecreatetruecolor($width, $height);
@@ -20,6 +20,7 @@ class ScoreSheetPdfService
 
         return Pdf::loadView('admin.sports.basketball-score-sheet-pdf', [
             'previewDataUri' => 'data:image/png;base64,'.base64_encode($png),
-        ])->setPaper('a4', 'portrait')->output();
+            'orientation' => $orientation,
+        ])->setPaper('a4', $orientation)->output();
     }
 }

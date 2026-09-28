@@ -24,7 +24,7 @@
     @if ($match->status === 'pending' && $match->competitor_one_id && $match->competitor_two_id)
         <div id="match-actions-{{ $match->id }}" class="match-actions hidden border-t border-blue-100 bg-blue-50 p-3 text-xs text-blue-900">
             <p class="mb-2 font-semibold">Record the selected competitor</p>
-            <div class="flex gap-2">
+            <div class="flex flex-wrap gap-2">
                 <form method="POST" action="{{ route('admin.sports.bracket.result', [$sport, $match]) }}">
                     @csrf
                     <input type="hidden" name="edition_id" value="{{ $edition->id }}">
@@ -37,7 +37,20 @@
                     <input class="selected-loser-winner" type="hidden" name="winner_competitor_id">
                     <button class="rounded border border-red-200 bg-white px-2.5 py-1.5 font-semibold text-red-700 hover:bg-red-50">Declare loss</button>
                 </form>
+                <button type="button" data-schedule-toggle aria-expanded="false" aria-controls="match-schedule-{{ $match->id }}" class="rounded border border-blue-200 bg-white px-2.5 py-1.5 font-semibold text-blue-700 hover:bg-blue-100">{{ $match->schedule ? 'Edit schedule' : 'Schedule game' }}</button>
             </div>
+            <form id="match-schedule-{{ $match->id }}" data-schedule-form method="POST" action="{{ route('admin.sports.bracket.schedule', [$sport, $match]) }}" class="mt-3 hidden space-y-2 border-t border-blue-200 pt-3">
+                @csrf
+                <input type="hidden" name="edition_id" value="{{ $edition->id }}">
+                <label class="block font-semibold" for="schedule-date-{{ $match->id }}">Date</label>
+                <input id="schedule-date-{{ $match->id }}" name="date" type="date" required min="{{ $edition->starts_on->format('Y-m-d') }}" max="{{ $edition->ends_on->format('Y-m-d') }}" value="{{ $match->schedule?->starts_at?->format('Y-m-d') ?? $edition->starts_on->format('Y-m-d') }}" class="block w-full rounded border-slate-300 text-sm focus:border-blue-600 focus:ring-blue-600">
+                <label class="block font-semibold" for="schedule-period-{{ $match->id }}">Time of day</label>
+                <select id="schedule-period-{{ $match->id }}" name="period" required class="block w-full rounded border-slate-300 text-sm focus:border-blue-600 focus:ring-blue-600">
+                    <option value="morning" @selected(! $match->schedule || $match->schedule->starts_at->hour < 12)>Morning</option>
+                    <option value="afternoon" @selected($match->schedule && $match->schedule->starts_at->hour >= 12)>Afternoon</option>
+                </select>
+                <button class="w-full rounded bg-blue-700 px-3 py-2 font-semibold text-white hover:bg-blue-800">Save schedule</button>
+            </form>
         </div>
     @elseif ($match->status === 'bye')
         <p class="border-t border-slate-200 px-3 py-2 text-xs font-medium text-blue-700">Advanced by bye</p>

@@ -1,6 +1,6 @@
 import { scoreSheetCaptureOptions } from './score-sheet-capture';
 
-const form = document.getElementById('basketball-score-sheet');
+const form = document.querySelector('[data-score-sheet-export]');
 const drawer = document.getElementById('score-sheet-download-drawer');
 
 if (form && drawer) {
@@ -8,12 +8,13 @@ if (form && drawer) {
     const sheet = form.querySelector('.fiba-sheet');
     const content = form.querySelector('.score-sheet-paper-content');
     const fitPaper = () => {
+        if (!sheet || !content) return;
         const scale = Math.min(content.clientWidth / sheet.offsetWidth, content.clientHeight / sheet.offsetHeight);
         sheet.style.transform = `scale(${scale})`;
         sheet.style.left = `${(content.clientWidth - sheet.offsetWidth * scale) / 2}px`;
     };
     fitPaper();
-    new ResizeObserver(fitPaper).observe(sheet);
+    if (sheet) new ResizeObserver(fitPaper).observe(sheet);
     document.fonts.ready.then(fitPaper);
     const open = document.getElementById('open-score-sheet-download');
     open.addEventListener('click', () => drawer.showModal());
@@ -43,7 +44,7 @@ if (form && drawer) {
             data.append('format', format);
                 document.activeElement?.blur();
                 await document.fonts.ready;
-                await Promise.all([...sheet.querySelectorAll('img')].map(img => img.decode()));
+                await Promise.all([...paper.querySelectorAll('img')].map(img => img.decode()));
                 fitPaper();
                 const { toBlob } = await import('html-to-image');
                 const image = await toBlob(paper, scoreSheetCaptureOptions);
@@ -58,7 +59,7 @@ if (form && drawer) {
             const url = URL.createObjectURL(await response.blob());
             const link = document.createElement('a');
             link.href = url;
-            link.download = 'basketball-score-sheet-' + form.elements.edition_id.value + '.' + format;
+            link.download = form.dataset.downloadPrefix + '-' + form.elements.edition_id.value + '.' + format;
             document.body.appendChild(link);
             link.click();
             link.remove();

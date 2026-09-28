@@ -256,11 +256,21 @@
 
             highlightBracketFocus(selectedBracketFocus.matchId, selectedBracketFocus.competitorId);
 
+            document.querySelectorAll('.match-actions').forEach((actions) => actions.classList.toggle('hidden', actions !== panel));
+
             if (! panel || ! other) return;
 
             panel.querySelector('.selected-winner').value = button.dataset.competitorId;
             panel.querySelector('.selected-loser-winner').value = other.dataset.competitorId;
             panel.classList.remove('hidden');
+        }));
+
+        document.querySelectorAll('[data-schedule-toggle]').forEach((button) => button.addEventListener('click', () => {
+            const form = document.getElementById(button.getAttribute('aria-controls'));
+            const opening = form?.classList.contains('hidden');
+            form?.classList.toggle('hidden');
+            button.setAttribute('aria-expanded', opening ? 'true' : 'false');
+            if (opening) form.querySelector('input[type="date"]')?.focus();
         }));
 
         document.querySelectorAll('.bracket-team').forEach((button) => {

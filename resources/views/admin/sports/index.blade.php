@@ -47,6 +47,8 @@
                     <a href="{{ route('admin.sports.participants', ['sport' => $sport, 'edition_id' => $editionId]) }}" onclick="event.stopPropagation()" class="rounded-lg bg-blue-700 px-3.5 py-2 text-sm font-semibold text-white transition hover:bg-blue-800">Manage participants</a>
                     @if (str_contains(strtolower($sport->name), 'basketball'))
                         <a href="{{ route('admin.sports.basketball-score-sheet', ['sport' => $sport, 'edition_id' => $editionId]) }}" onclick="event.stopPropagation()" class="rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-sm font-semibold text-slate-700 transition hover:border-blue-300 hover:bg-blue-50">Score sheet</a>
+                    @elseif (str_contains(strtolower($sport->name), 'volleyball'))
+                        <a href="{{ route('admin.sports.volleyball-score-sheet', ['sport' => $sport, 'edition_id' => $editionId]) }}" onclick="event.stopPropagation()" class="rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-sm font-semibold text-slate-700 transition hover:border-blue-300 hover:bg-blue-50">Score sheet</a>
                     @endif
                     <a href="{{ route('admin.sports.edit', ['sport' => $sport, 'edition_id' => $editionId]) }}" onclick="event.stopPropagation()" class="rounded-lg border border-blue-200 bg-white px-3.5 py-2 text-sm font-semibold text-blue-700 transition hover:border-blue-300 hover:bg-blue-50">Edit</a>
                 </div>

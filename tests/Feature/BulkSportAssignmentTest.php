@@ -2,6 +2,7 @@
 
 use App\Models\AthleteEntry;
 use App\Models\BracketMatch;
+use App\Models\CompetitionSchedule;
 use App\Models\EditionSport;
 use App\Models\IntramuralEdition;
 use App\Models\Sport;
@@ -122,6 +123,54 @@ test('a sport has a separate bracket page from participant management', function
         ->assertSee('Game Style / Elimination Style')
         ->assertSee('Tournament Name')
         ->assertSee('Manage participants');
+});
+
+test('an admin schedules a selected bracket match by date and time of day', function () {
+    $admin = bulkAssignmentAdmin();
+    $edition = bulkAssignmentEdition();
+    $editionSport = bulkAssignmentSport($edition);
+    $teams = collect(range(1, 2))->map(fn ($number) => Team::query()->create([
+        'edition_id' => $edition->id,
+        'name' => 'SCHEDULE TEAM '.$number,
+        'code' => 'SCHEDULE'.$number,
+        'status' => 'active',
+    ]));
+
+    foreach ($teams as $team) {
+        $student = Student::factory()->create(['status' => 'active']);
+        AthleteEntry::query()->create(['edition_sport_id' => $editionSport->id, 'student_id' => $student->id, 'team_id' => $team->id, 'status' => 'active', 'assigned_by' => $admin->id, 'assigned_at' => now()]);
+    }
+
+    $this->actingAs($admin)
+        ->get(route('admin.sports.bracket', ['sport' => $editionSport->sport, 'edition_id' => $edition->id]))
+        ->assertOk()
+        ->assertSee('Schedule game')
+        ->assertSee('Time of day');
+
+    $match = BracketMatch::query()->where('edition_sport_id', $editionSport->id)->where('status', 'pending')->firstOrFail();
+
+    $this->actingAs($admin)
+        ->post(route('admin.sports.bracket.schedule', [$editionSport->sport, $match]), [
+            'edition_id' => $edition->id,
+            'date' => '2026-10-02',
+            'period' => 'morning',
+        ])
+        ->assertRedirect(route('admin.sports.bracket', ['sport' => $editionSport->sport, 'edition_id' => $edition->id]));
+
+    $schedule = CompetitionSchedule::query()->where('bracket_match_id', $match->id)->firstOrFail();
+    expect($schedule->starts_at->format('Y-m-d H:i'))->toBe('2026-10-02 08:00')
+        ->and($schedule->participants()->orderBy('slot')->pluck('team_id')->all())->toBe($teams->pluck('id')->all());
+
+    $this->actingAs($admin)
+        ->post(route('admin.sports.bracket.schedule', [$editionSport->sport, $match]), [
+            'edition_id' => $edition->id,
+            'date' => '2026-10-03',
+            'period' => 'afternoon',
+        ])
+        ->assertRedirect();
+
+    expect(CompetitionSchedule::query()->where('bracket_match_id', $match->id)->count())->toBe(1)
+        ->and($schedule->fresh()->starts_at->format('Y-m-d H:i'))->toBe('2026-10-03 13:00');
 });
 
 test('declaring a bracket winner advances the team to the next matchup', function () {

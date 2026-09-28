@@ -31,4 +31,5 @@ class BracketMatch extends Model
     public function competitorTwo() { return $this->belongsTo(BracketCompetitor::class, 'competitor_two_id'); }
     public function winnerCompetitor() { return $this->belongsTo(BracketCompetitor::class, 'winner_competitor_id'); }
     public function loserCompetitor() { return $this->belongsTo(BracketCompetitor::class, 'loser_competitor_id'); }
+    public function schedule() { return $this->hasOne(CompetitionSchedule::class); }
 }

@@ -8,6 +8,7 @@ use App\Actions\Fortify\UpdateUserPassword;
 use App\Actions\Fortify\UpdateUserProfileInformation;
 use App\Models\User;
 use App\Services\CoordinatorDeviceService;
+use App\Services\PublicScheduleService;
 use App\Actions\Fortify\EnsureCoordinatorDevice;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
@@ -42,6 +43,7 @@ class FortifyServiceProvider extends ServiceProvider
         Fortify::updateUserPasswordsUsing(UpdateUserPassword::class);
         Fortify::resetUserPasswordsUsing(ResetUserPassword::class);
         Fortify::redirectUserForTwoFactorAuthenticationUsing(RedirectIfTwoFactorAuthenticatable::class);
+        Fortify::loginView(fn () => view('auth.login', app(PublicScheduleService::class)->today()));
         Fortify::authenticateUsing(function (Request $request): ?User {
             $user = User::query()->where('email', $request->string('email'))->first();
 

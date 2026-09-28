@@ -4,7 +4,7 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
-        <title>{{ $title ?? 'Admin' }} | Intramurals Management System</title>
+        <title>{{ $title ?? 'Admin' }} | INTRAMURALS MANAGEMENT</title>
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700&display=swap" rel="stylesheet" />
         @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -12,13 +12,9 @@
     <body class="bg-slate-50 font-sans text-slate-900 antialiased">
         <div class="min-h-screen md:flex md:h-screen md:overflow-hidden">
             <aside class="shrink-0 bg-blue-950 text-blue-100 md:flex md:h-screen md:w-64 md:flex-col md:overflow-y-auto">
-                <div class="flex items-center gap-3 border-b border-blue-900 px-5 py-5">
-                    <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-white text-sm font-bold tracking-wide text-blue-800">IM</div>
-                    <div>
-                        <p class="text-sm font-semibold leading-tight text-white">Intramurals</p>
-                        <p class="mt-0.5 text-xs text-blue-300">Administration</p>
-                    </div>
-                </div>
+                <a href="{{ route('admin.dashboard') }}" aria-label="INTRAMURALS MANAGEMENT dashboard" class="block border-b border-blue-900 px-5 py-5 transition hover:bg-blue-900/60 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-400">
+                    <x-intramurals-brand compact />
+                </a>
 
                 <nav class="flex gap-1 overflow-x-auto px-3 py-4 md:flex-col md:overflow-visible" aria-label="Admin navigation">
                     @php

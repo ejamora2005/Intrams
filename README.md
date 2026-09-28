@@ -138,6 +138,18 @@ Role and status columns are enforced by route middleware. Active administrators 
 
 ## Universal staff login
 
+The public `/login` screen is also the read-only daily competition board. It shows the active edition and today's non-cancelled schedules with sport, Morning/Afternoon period, competitors, and assigned facilitator. The table is rendered entirely on the server and has no polling, AJAX refresh, or Livewire updates; changes appear only after the browser page is manually refreshed. Pressing **Login** opens the email/password form in an accessible modal over a blurred backdrop, and validation errors reopen that modal automatically.
+
+When one sport has multiple games on the same day, the board groups those games under one sport cell while retaining a separate chronological row for every game's time and competitors. A shared facilitator is also shown once for the group; differing facilitator assignments remain visible on their corresponding game rows.
+
+Bracket scheduling is handled directly on the sport bracket. Selecting a competitor in a ready match reveals **Schedule game**; the administrator chooses only a date and Morning/Afternoon. The match supplies its competitors automatically, and saving again updates the same schedule instead of creating a duplicate.
+
+On the public daily board, bracket-scheduled matchups show their bracket game number directly above the competing names (for example, **Game 1** above **Team A VS Team B**).
+
+Feature coverage verifies both initial bracket scheduling and rescheduling without duplicate competition records.
+
+The guest browser title uses `INTRAMURALS MANAGEMENT`, keeping the public board and login modal aligned with the application branding.
+
 The application uses one shared `/login` page for both administrators and coordinators. It has a blue-and-white interface and accepts only an email address and password—users do not choose a role on the form.
 
 - Only accounts with `status = active` and role `admin` or `coordinator` can sign in.
@@ -168,7 +180,7 @@ The feature test suite uses `RefreshDatabase`; if you run tests against the loca
 
 ## Admin landing page and navigation
 
-Active administrators are redirected from `/dashboard` to `/admin/dashboard`. This page provides the first administrative workspace with a blue-and-white sidebar containing:
+Active administrators are redirected from `/dashboard` to `/admin/dashboard`. The login screen and admin sidebar share one reusable brand component, displaying the `SLSU` mark and `INTRAMURALS MANAGEMENT` name consistently. The blue-and-white sidebar contains:
 
 - Dashboard
 - Events
@@ -238,9 +250,11 @@ Each entry retains the actor, actor role, action, affected record, safe before/a
 
 ## Development conventions
 
-All score-sheet downloads target **A4 portrait (210 × 297 mm)**. The paper preview and exported page share the same scale and margins; the full sheet is captured without reflowing individual cells. Print using A4 paper size.
+Basketball score-sheet downloads target **A4 portrait (210 × 297 mm)**. Volleyball uses its supplied reference layout on **A4 landscape (297 × 210 mm)**. Each on-screen paper preview and exported page share the same orientation, scale, and margins; the full sheet is captured without reflowing individual cells.
 
-All formats capture the same A4 paper element, including its whitespace and margins. Word places the image at page origin, Excel embeds it with an A4 one-page print area, and PDF embeds it on an A4 page. The surrounding gray preview background and paper shadow are excluded from exports. The original form stays editable before downloading.
+The volleyball Sports card opens its landscape score-sheet preview and the same download drawer used by basketball. Its Home and Visitor selectors load active registered teams, show each roster with course information, fill the team names, and place the first six athletes into Player Name rows using `Last name. F.` formatting. All formats capture the same A4 paper element, including its whitespace and margins. Word places the image at page origin, Excel embeds it with an A4 one-page print area, and PDF embeds it on an A4 page. The surrounding gray preview background and paper shadow are excluded from exports.
+
+Score-sheet JavaScript is loaded only on score-sheet pages, and Volleyball's roster automation is delivered as a separate cacheable module. Roster queries retrieve only active athlete entries with valid team and student relationships. The reference image declares its intrinsic dimensions and is prioritized to reserve the final layout immediately and avoid preview movement while it decodes.
 
 Team editing loads a roster count and 50 roster rows per page, reuses the course list, and excludes already assigned students with a database subquery. Bulk selection applies to the visible roster page. Admin navigation includes Courses and Coordinators and highlights nested screens; the Blade-only admin layout no longer loads unused Livewire assets.
 

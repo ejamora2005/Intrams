@@ -1,12 +1,97 @@
 <?php
 
+use App\Models\CompetitionSchedule;
+use App\Models\BracketMatch;
+use App\Models\EditionSport;
+use App\Models\IntramuralEdition;
+use App\Models\ScheduleParticipant;
+use App\Models\Sport;
+use App\Models\Team;
 use App\Models\User;
 use App\Providers\RouteServiceProvider;
+use Illuminate\Support\Carbon;
 
 test('login screen can be rendered', function () {
     $response = $this->get('/login');
 
-    $response->assertStatus(200);
+    $response->assertStatus(200)
+        ->assertSee('SLSU')
+        ->assertSee('INTRAMURALS MANAGEMENT');
+});
+
+test('login page shows a manually refreshed snapshot of todays competition schedule', function () {
+    Carbon::setTestNow('2026-09-27 09:00:00');
+
+    try {
+        $edition = IntramuralEdition::query()->create([
+            'name' => '2026 SLSU Intramurals',
+            'school_year' => '2026-2027',
+            'starts_on' => '2026-09-27',
+            'ends_on' => '2026-09-30',
+            'status' => 'active',
+        ]);
+        $sport = Sport::query()->create(['name' => 'Volleyball', 'code' => 'VOLLEYBALL', 'status' => 'active']);
+        $editionSport = EditionSport::query()->create([
+            'edition_id' => $edition->id,
+            'sport_id' => $sport->id,
+            'participant_type' => 'team',
+            'game_mechanic' => 'single_elimination',
+            'status' => 'active',
+        ]);
+        $home = Team::query()->create(['edition_id' => $edition->id, 'name' => 'Blue Spikers', 'code' => 'BLUE', 'status' => 'active']);
+        $visitor = Team::query()->create(['edition_id' => $edition->id, 'name' => 'Red Smashers', 'code' => 'RED', 'status' => 'active']);
+        $afternoonHome = Team::query()->create(['edition_id' => $edition->id, 'name' => 'Green Servers', 'code' => 'GREEN', 'status' => 'active']);
+        $afternoonVisitor = Team::query()->create(['edition_id' => $edition->id, 'name' => 'Gold Blockers', 'code' => 'GOLD', 'status' => 'active']);
+        $coordinator = User::factory()->create(['name' => 'Jamie Facilitator', 'role' => 'coordinator', 'status' => 'active']);
+        $morningBracketMatch = BracketMatch::query()->create(['edition_sport_id' => $editionSport->id, 'bracket' => 'winners', 'round_number' => 1, 'match_number' => 1, 'status' => 'pending']);
+        $schedule = CompetitionSchedule::query()->create([
+            'edition_sport_id' => $editionSport->id,
+            'bracket_match_id' => $morningBracketMatch->id,
+            'starts_at' => '2026-09-27 09:30:00',
+            'ends_at' => '2026-09-27 11:00:00',
+            'status' => 'scheduled',
+            'coordinator_id' => $coordinator->id,
+        ]);
+        ScheduleParticipant::query()->create(['competition_schedule_id' => $schedule->id, 'team_id' => $home->id, 'slot' => 'A', 'status' => 'active']);
+        ScheduleParticipant::query()->create(['competition_schedule_id' => $schedule->id, 'team_id' => $visitor->id, 'slot' => 'B', 'status' => 'active']);
+        $afternoonBracketMatch = BracketMatch::query()->create(['edition_sport_id' => $editionSport->id, 'bracket' => 'winners', 'round_number' => 1, 'match_number' => 2, 'status' => 'pending']);
+        $afternoonSchedule = CompetitionSchedule::query()->create([
+            'edition_sport_id' => $editionSport->id,
+            'bracket_match_id' => $afternoonBracketMatch->id,
+            'starts_at' => '2026-09-27 14:00:00',
+            'ends_at' => '2026-09-27 15:30:00',
+            'status' => 'scheduled',
+            'coordinator_id' => $coordinator->id,
+        ]);
+        ScheduleParticipant::query()->create(['competition_schedule_id' => $afternoonSchedule->id, 'team_id' => $afternoonHome->id, 'slot' => 'A', 'status' => 'active']);
+        ScheduleParticipant::query()->create(['competition_schedule_id' => $afternoonSchedule->id, 'team_id' => $afternoonVisitor->id, 'slot' => 'B', 'status' => 'active']);
+
+        $response = $this->get('/login');
+
+        $response
+            ->assertOk()
+            ->assertSee('2026 SLSU Intramurals')
+            ->assertSee('September 27, 2026')
+            ->assertSee('Volleyball')
+            ->assertSee('Morning')
+            ->assertSeeInOrder(['Game 1', 'Blue Spikers VS Red Smashers'])
+            ->assertSee('Blue Spikers VS Red Smashers')
+            ->assertSee('Afternoon')
+            ->assertSeeInOrder(['Game 2', 'Green Servers VS Gold Blockers'])
+            ->assertSee('Green Servers VS Gold Blockers')
+            ->assertSee('Jamie Facilitator')
+            ->assertSee('<th scope="rowgroup" rowspan="2"', false)
+            ->assertSee('data-open-login', false)
+            ->assertSee('data-login-modal', false)
+            ->assertSee('backdrop:backdrop-blur-md', false)
+            ->assertSee('Refresh this page manually to load updated data.')
+            ->assertDontSee('wire:poll', false)
+            ->assertDontSee('setInterval(', false);
+
+        expect(substr_count($response->getContent(), '>Volleyball</th>'))->toBe(1);
+    } finally {
+        Carbon::setTestNow();
+    }
 });
 
 test('active administrators and coordinators can authenticate using the shared login screen', function (string $role) {
@@ -53,6 +138,10 @@ test('administrators can access the admin dashboard and its sidebar modules', fu
 
     $response->assertOk()
         ->assertSee('Program overview')
+        ->assertSee('SLSU')
+        ->assertSee('INTRAMURALS')
+        ->assertSee('MANAGEMENT')
+        ->assertSee('INTRAMURALS MANAGEMENT dashboard')
         ->assertSee('Students')
         ->assertSee('Events / Editions')
         ->assertSee('Live Competition')
