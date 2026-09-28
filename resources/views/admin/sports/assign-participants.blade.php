@@ -50,7 +50,7 @@
                 <p class="mt-1 text-sm text-slate-500">Already registered students are excluded from this list.</p>
             </div>
             @if ($editionSport->participant_type === 'dual')
-                <span class="w-fit rounded-full bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-800">Select exactly two students</span>
+                <span class="w-fit rounded-full bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-800">Create one two-student pair</span>
             @endif
         </div>
 
@@ -65,6 +65,36 @@
                 <div class="px-5 py-12 text-center text-sm text-slate-500">Select a team and apply the filters to show its eligible roster students.</div>
             @elseif ($students->isEmpty())
                 <div class="px-5 py-12 text-center text-sm text-slate-500">No eligible active students match the selected filters.</div>
+            @elseif ($editionSport->participant_type === 'dual')
+                <div class="border-b border-slate-200 bg-slate-50 px-5 py-4 sm:px-6">
+                    <div class="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
+                        <p id="pair-selection-summary" class="text-sm font-medium text-slate-600">Select one student from each column.</p>
+                        <button id="add-selected-pair" type="submit" disabled class="w-fit rounded-lg bg-blue-700 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-800 disabled:cursor-not-allowed disabled:bg-slate-300">Add selected pair</button>
+                    </div>
+                </div>
+                <div class="grid divide-y divide-slate-200 md:grid-cols-2 md:divide-x md:divide-y-0">
+                    @foreach ([0 => 'First pair member', 1 => 'Second pair member'] as $side => $heading)
+                        <section data-pair-column data-side="{{ $side }}" aria-labelledby="pair-member-{{ $side }}-heading">
+                            <div class="sticky top-0 z-10 border-b border-slate-200 bg-white p-4">
+                                <h3 id="pair-member-{{ $side }}-heading" class="text-sm font-semibold text-slate-900">{{ $heading }}</h3>
+                                <label for="pair-search-{{ $side }}" class="sr-only">Search {{ strtolower($heading) }}</label>
+                                <input id="pair-search-{{ $side }}" data-pair-search type="search" placeholder="Search name or student number" class="mt-3 block w-full rounded-lg border-slate-300 text-sm focus:border-blue-600 focus:ring-blue-600">
+                            </div>
+                            <div class="max-h-[30rem] divide-y divide-slate-100 overflow-y-auto" data-pair-list>
+                                @foreach ($students as $student)
+                                    <label data-pair-row data-search="{{ Str::lower($student->full_name.' '.$student->student_number.' '.$student->course?->name) }}" class="flex cursor-pointer items-center gap-3 px-4 py-3 text-sm transition hover:bg-blue-50 has-[:checked]:bg-blue-50">
+                                        <input name="student_ids[{{ $side }}]" value="{{ $student->id }}" type="radio" data-pair-radio data-student-name="{{ $student->full_name }}" class="rounded-full border-slate-300 text-blue-700 focus:ring-blue-600">
+                                        <span class="min-w-0">
+                                            <span class="block truncate font-medium text-slate-900">{{ $student->full_name }}</span>
+                                            <span class="block truncate text-xs text-slate-500">{{ $student->course?->name }} - {{ $student->student_number }}</span>
+                                        </span>
+                                    </label>
+                                @endforeach
+                                <p data-pair-empty hidden class="px-4 py-10 text-center text-sm text-slate-500">No matching students.</p>
+                            </div>
+                        </section>
+                    @endforeach
+                </div>
             @else
                 <div class="border-b border-slate-100 bg-slate-50 px-5 py-3">
                     <label class="flex w-fit items-center gap-2 text-sm font-semibold text-slate-700">
@@ -98,5 +128,46 @@
                 document.querySelectorAll('.student-checkbox').forEach((checkbox) => checkbox.checked = this.checked);
             });
         }
+
+        const pairColumns = [...document.querySelectorAll('[data-pair-column]')];
+        const pairSubmit = document.getElementById('add-selected-pair');
+        const pairSummary = document.getElementById('pair-selection-summary');
+
+        const selectedPairMember = (side) => document.querySelector(`[data-pair-column][data-side="${side}"] [data-pair-radio]:checked`);
+        const updatePairSelection = () => {
+            const first = selectedPairMember(0);
+            const second = selectedPairMember(1);
+
+            document.querySelectorAll('[data-pair-radio]').forEach((radio) => {
+                const other = radio.closest('[data-pair-column]').dataset.side === '0' ? second : first;
+                radio.disabled = Boolean(other && other.value === radio.value && ! radio.checked);
+                radio.closest('[data-pair-row]').classList.toggle('opacity-40', radio.disabled);
+            });
+
+            pairSubmit.disabled = ! first || ! second || first.value === second.value;
+            pairSummary.textContent = first && second
+                ? `${first.dataset.studentName} / ${second.dataset.studentName}`
+                : 'Select one student from each column.';
+        };
+
+        pairColumns.forEach((column) => {
+            const search = column.querySelector('[data-pair-search]');
+            const rows = [...column.querySelectorAll('[data-pair-row]')];
+            const empty = column.querySelector('[data-pair-empty]');
+
+            search.addEventListener('input', () => {
+                const term = search.value.trim().toLowerCase();
+                let visible = 0;
+                rows.forEach((row) => {
+                    const matches = row.dataset.search.includes(term);
+                    row.hidden = ! matches;
+                    if (matches) visible++;
+                });
+                empty.hidden = visible !== 0;
+            });
+        });
+
+        document.querySelectorAll('[data-pair-radio]').forEach((radio) => radio.addEventListener('change', updatePairSelection));
+        if (pairSubmit) updatePairSelection();
     </script>
 @endsection

@@ -3,8 +3,10 @@
 use App\Models\AthleteEntry;
 use App\Models\BracketCompetitor;
 use App\Models\BracketMatch;
+use App\Models\CompetitionSchedule;
 use App\Models\EditionSport;
 use App\Models\IntramuralEdition;
+use App\Models\ScheduleParticipant;
 use App\Models\Sport;
 use App\Models\Student;
 use App\Models\Team;
@@ -89,6 +91,89 @@ test('an odd-sized double-elimination bracket advances byes and completes every 
 
     expect(BracketMatch::query()->where('edition_sport_id', $editionSport->id)->where('status', 'pending')->count())->toBe(0);
     expect(BracketMatch::query()->where('edition_sport_id', $editionSport->id)->where('bracket', 'finals')->where('round_number', 1)->value('winner_competitor_id'))->not->toBeNull();
+});
+
+test('the open-source engine creates and records an odd-sized round-robin schedule', function () {
+    $admin = User::factory()->create(['role' => 'admin', 'status' => 'active']);
+    $edition = bracketEngineEdition();
+    $editionSport = bracketEngineSport($edition, 'team', 'round_robin');
+
+    foreach (range(1, 5) as $number) {
+        $team = Team::query()->create([
+            'edition_id' => $edition->id,
+            'name' => 'ROBIN TEAM '.$number,
+            'code' => 'ROBINTEAM'.$number,
+            'status' => 'active',
+        ]);
+        AthleteEntry::query()->create([
+            'edition_sport_id' => $editionSport->id,
+            'student_id' => Student::factory()->create(['status' => 'active'])->id,
+            'team_id' => $team->id,
+            'status' => 'active',
+            'assigned_at' => now(),
+        ]);
+    }
+
+    app(BracketService::class)->initialize($editionSport);
+
+    $matches = BracketMatch::query()
+        ->where('edition_sport_id', $editionSport->id)
+        ->orderBy('round_number')
+        ->orderBy('match_number')
+        ->get();
+    $pairings = $matches->map(fn (BracketMatch $match) => collect([$match->competitor_one_id, $match->competitor_two_id])->sort()->implode('-'));
+    $appearances = $matches
+        ->flatMap(fn (BracketMatch $match) => [$match->competitor_one_id, $match->competitor_two_id])
+        ->countBy();
+
+    expect($matches)->toHaveCount(10);
+    expect($matches->pluck('bracket')->unique()->all())->toBe(['round_robin']);
+    expect($matches->groupBy('round_number'))->toHaveCount(5);
+    expect($matches->groupBy('round_number')->every(fn ($round) => $round->count() === 2))->toBeTrue();
+    expect($pairings->unique())->toHaveCount(10);
+    expect($appearances->count())->toBe(5);
+    expect($appearances->every(fn ($count) => $count === 4))->toBeTrue();
+
+    $firstMatch = $matches->first();
+    $secondMatch = $matches->first(fn (BracketMatch $match) => $match->id !== $firstMatch->id
+        && collect([$match->competitor_one_id, $match->competitor_two_id])
+            ->intersect([$firstMatch->competitor_one_id, $firstMatch->competitor_two_id])
+            ->isNotEmpty());
+
+    $this->actingAs($admin)
+        ->post(route('admin.sports.bracket.schedule', [$editionSport->sport, $firstMatch]), [
+            'edition_id' => $edition->id,
+            'date' => '2026-10-02',
+            'period' => 'morning',
+        ])
+        ->assertRedirect(route('admin.sports.bracket', ['sport' => $editionSport->sport, 'edition_id' => $edition->id]));
+    $this->actingAs($admin)
+        ->post(route('admin.sports.bracket.schedule', [$editionSport->sport, $secondMatch]), [
+            'edition_id' => $edition->id,
+            'date' => '2026-10-03',
+            'period' => 'afternoon',
+        ])
+        ->assertRedirect(route('admin.sports.bracket', ['sport' => $editionSport->sport, 'edition_id' => $edition->id]));
+
+    $scheduledGames = CompetitionSchedule::query()->whereIn('bracket_match_id', [$firstMatch->id, $secondMatch->id])->get();
+    $sharedCompetitorId = collect([$firstMatch->competitor_one_id, $firstMatch->competitor_two_id])
+        ->intersect([$secondMatch->competitor_one_id, $secondMatch->competitor_two_id])
+        ->first();
+    $sharedTeamId = BracketCompetitor::query()->findOrFail($sharedCompetitorId)->team_id;
+
+    expect($scheduledGames)->toHaveCount(2);
+    expect(ScheduleParticipant::query()->whereIn('competition_schedule_id', $scheduledGames->pluck('id'))->where('team_id', $sharedTeamId)->count())->toBe(2);
+
+    app(BracketService::class)->record($firstMatch, BracketCompetitor::query()->findOrFail($firstMatch->competitor_one_id));
+
+    expect($firstMatch->fresh()->status)->toBe('completed');
+    expect($matches->slice(1)->every(fn (BracketMatch $match) => $match->fresh()->status === 'pending'))->toBeTrue();
+
+    app(BracketService::class)->reset($editionSport);
+
+    expect(BracketMatch::query()->where('edition_sport_id', $editionSport->id)->count())->toBe(10);
+    expect(BracketMatch::query()->where('edition_sport_id', $editionSport->id)->where('status', 'pending')->count())->toBe(10);
+    expect(AthleteEntry::query()->where('edition_sport_id', $editionSport->id)->count())->toBe(5);
 });
 
 test('dual pairs become double-elimination competitors and advance as pairs', function () {

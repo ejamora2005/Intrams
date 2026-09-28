@@ -18,8 +18,8 @@
         <!-- Styles -->
         @if ($livewire) @livewireStyles @endif
     </head>
-    <body>
-        <div class="font-sans text-gray-900 antialiased">
+    <body class="bg-slate-50">
+        <div class="font-sans text-slate-900 antialiased">
             {{ $slot }}
         </div>
 

@@ -82,6 +82,47 @@ test('the universal assignment page filters students by the selected team', func
         ->assertDontSee($excluded->full_name);
 });
 
+test('an admin can create multiple tied dual pairs for one team', function () {
+    $admin = bulkAssignmentAdmin();
+    $edition = bulkAssignmentEdition();
+    $editionSport = bulkAssignmentSport($edition, 'dual');
+    $team = Team::query()->create(['edition_id' => $edition->id, 'name' => 'DUAL TEAM', 'code' => 'DUALTEAM', 'status' => 'active']);
+    $students = Student::factory()->count(4)->sequence(
+        ['first_name' => 'First', 'last_name' => 'Pair One'],
+        ['first_name' => 'Second', 'last_name' => 'Pair One'],
+        ['first_name' => 'First', 'last_name' => 'Pair Two'],
+        ['first_name' => 'Second', 'last_name' => 'Pair Two'],
+    )->create(['status' => 'active']);
+
+    foreach ($students as $student) {
+        TeamMember::query()->create(['edition_id' => $edition->id, 'team_id' => $team->id, 'student_id' => $student->id, 'assigned_by' => $admin->id, 'assigned_at' => now()]);
+    }
+
+    $this->actingAs($admin)
+        ->get(route('admin.sports.participants.assign', [$editionSport->sport, 'edition_id' => $edition->id, 'team_id' => $team->id]))
+        ->assertOk()
+        ->assertSee('First pair member')
+        ->assertSee('Second pair member')
+        ->assertSee('Add selected pair')
+        ->assertSee('Search name or student number');
+
+    foreach ($students->chunk(2) as $pair) {
+        $this->actingAs($admin)
+            ->post(route('admin.sports.participants.store', $editionSport->sport), [
+                'edition_id' => $edition->id,
+                'team_id' => $team->id,
+                'student_ids' => $pair->pluck('id')->all(),
+            ])
+            ->assertRedirect(route('admin.sports.participants', ['sport' => $editionSport->sport, 'edition_id' => $edition->id]));
+    }
+
+    $entries = AthleteEntry::query()->where('edition_sport_id', $editionSport->id)->get();
+    expect($entries)->toHaveCount(4);
+    expect($entries->groupBy('pair_key'))->toHaveCount(2);
+    expect($entries->groupBy('pair_key')->every(fn ($pair) => $pair->count() === 2))->toBeTrue();
+    expect($entries->pluck('team_id')->unique()->all())->toBe([$team->id]);
+});
+
 test('an admin can bulk-remove selected participant registrations without affecting another team', function () {
     $admin = bulkAssignmentAdmin();
     $edition = bulkAssignmentEdition();

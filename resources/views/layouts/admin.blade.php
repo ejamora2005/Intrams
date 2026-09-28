@@ -11,12 +11,19 @@
     </head>
     <body class="bg-slate-50 font-sans text-slate-900 antialiased">
         <div class="min-h-screen md:flex md:h-screen md:overflow-hidden">
-            <aside class="shrink-0 bg-blue-950 text-blue-100 md:flex md:h-screen md:w-64 md:flex-col md:overflow-y-auto">
-                <a href="{{ route('admin.dashboard') }}" aria-label="INTRAMURALS MANAGEMENT dashboard" class="block border-b border-blue-900 px-5 py-5 transition hover:bg-blue-900/60 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-400">
-                    <x-intramurals-brand compact />
-                </a>
+            <div data-admin-sidebar-backdrop class="fixed inset-0 z-40 hidden bg-slate-950/55 backdrop-blur-sm md:hidden" aria-hidden="true"></div>
 
-                <nav class="flex gap-1 overflow-x-auto px-3 py-4 md:flex-col md:overflow-visible" aria-label="Admin navigation">
+            <aside id="admin-sidebar" data-admin-sidebar class="fixed inset-y-0 left-0 z-50 flex w-[min(18rem,calc(100vw-3rem))] -translate-x-full flex-col overflow-hidden bg-blue-950 text-blue-100 shadow-2xl transition-transform duration-200 ease-out md:static md:z-auto md:h-screen md:w-64 md:translate-x-0 md:shadow-none" aria-label="Admin sidebar">
+                <div class="flex items-center border-b border-blue-900">
+                    <a href="{{ route('admin.dashboard') }}" aria-label="INTRAMURALS MANAGEMENT dashboard" class="min-w-0 flex-1 px-5 py-5 transition hover:bg-blue-900/60 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-400">
+                        <x-intramurals-brand compact />
+                    </a>
+                    <button type="button" data-close-admin-sidebar class="mr-3 rounded-lg p-2 text-blue-200 transition hover:bg-blue-900 hover:text-white focus:outline-none focus:ring-2 focus:ring-blue-400 md:hidden" aria-label="Close navigation">
+                        <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" d="M6 6l12 12M18 6 6 18" /></svg>
+                    </button>
+                </div>
+
+                <nav class="flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto px-3 py-4" aria-label="Admin navigation">
                     @php
                         $navigation = [
                             ['label' => 'Dashboard', 'route' => 'admin.dashboard', 'match' => 'admin/dashboard'],
@@ -33,8 +40,8 @@
                     @foreach ($navigation as $item)
                         @php($isActive = request()->is($item['match'], $item['match'].'/*'))
                         <a href="{{ route($item['route']) }}" @class([
-                            'whitespace-nowrap rounded-lg px-3 py-2.5 text-sm font-medium transition md:w-full',
-                            'bg-blue-700 text-white shadow-sm' => $isActive,
+                            'w-full whitespace-nowrap rounded-lg px-3 py-2.5 text-sm font-medium transition',
+                            'bg-white text-blue-950 shadow-sm' => $isActive,
                             'text-blue-200 hover:bg-blue-900 hover:text-white' => !$isActive,
                         ]) @if ($isActive) aria-current="page" @endif>
                             {{ $item['label'] }}
@@ -42,7 +49,7 @@
                     @endforeach
                 </nav>
 
-                <div class="hidden border-t border-blue-900 p-4 md:mt-auto md:block">
+                <div class="border-t border-blue-900 p-4">
                     <p class="truncate text-sm font-medium text-white">{{ auth()->user()->name }}</p>
                     <p class="mt-0.5 text-xs capitalize text-blue-300">{{ auth()->user()->role }}</p>
                     <form method="POST" action="{{ route('logout') }}" class="mt-4">
@@ -53,22 +60,54 @@
             </aside>
 
             <main class="min-w-0 flex-1 md:h-screen md:overflow-y-auto">
-                <header class="border-b border-slate-200 bg-white px-5 py-4 sm:px-8 md:sticky md:top-0 md:z-20">
-                    <div class="mx-auto flex max-w-7xl items-center justify-between gap-4">
-                        <div>
-                            <h1 class="text-xl font-semibold tracking-tight text-slate-900">{{ $title ?? 'Admin' }}</h1>
-                            @isset($subtitle)<p class="mt-1 text-sm text-slate-500">{{ $subtitle }}</p>@endisset
+                <header class="sticky top-0 z-30 border-b border-slate-200 bg-white/95 px-3 py-3 backdrop-blur sm:px-6 md:z-20 md:px-8 md:py-4">
+                    <div class="mx-auto flex max-w-7xl items-center gap-3 sm:gap-4">
+                        <button type="button" data-open-admin-sidebar class="shrink-0 rounded-lg border border-slate-200 bg-white p-2 text-slate-700 shadow-sm transition hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-600 md:hidden" aria-controls="admin-sidebar" aria-expanded="false" aria-label="Open navigation">
+                            <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" d="M4 7h16M4 12h16M4 17h16" /></svg>
+                        </button>
+                        <div class="min-w-0">
+                            <h1 class="truncate text-lg font-semibold tracking-tight text-slate-900 sm:text-xl">{{ $title ?? 'Admin' }}</h1>
+                            @isset($subtitle)<p class="mt-0.5 truncate text-xs text-slate-500 sm:mt-1 sm:text-sm">{{ $subtitle }}</p>@endisset
                         </div>
-                        <form method="POST" action="{{ route('logout') }}" class="md:hidden">
-                            @csrf
-                            <button type="submit" class="text-sm font-medium text-blue-700 hover:text-blue-900">Sign out</button>
-                        </form>
                     </div>
                 </header>
-                <div class="mx-auto max-w-7xl px-5 py-8 sm:px-8">@yield('content')</div>
+                <div class="mx-auto max-w-7xl px-3 py-5 sm:px-6 sm:py-7 md:px-8 md:py-8">@yield('content')</div>
             </main>
         </div>
         <script>
+            const adminSidebar = document.querySelector('[data-admin-sidebar]');
+            const adminSidebarBackdrop = document.querySelector('[data-admin-sidebar-backdrop]');
+            const adminSidebarOpener = document.querySelector('[data-open-admin-sidebar]');
+            const adminSidebarCloser = document.querySelector('[data-close-admin-sidebar]');
+
+            const setAdminSidebarOpen = (open, restoreFocus = true) => {
+                if (!adminSidebar || !adminSidebarBackdrop || !adminSidebarOpener) return;
+
+                const desktop = window.innerWidth >= 768;
+                const mobileOpen = open && !desktop;
+                adminSidebar.classList.toggle('-translate-x-full', !mobileOpen);
+                adminSidebarBackdrop.classList.toggle('hidden', !mobileOpen);
+                adminSidebarOpener.setAttribute('aria-expanded', String(mobileOpen));
+                adminSidebar.toggleAttribute('inert', !desktop && !mobileOpen);
+                if (desktop) adminSidebar.removeAttribute('aria-hidden');
+                else adminSidebar.setAttribute('aria-hidden', String(!mobileOpen));
+                document.body.classList.toggle('overflow-hidden', mobileOpen);
+
+                if (mobileOpen) requestAnimationFrame(() => adminSidebarCloser?.focus());
+                else if (restoreFocus && adminSidebar.contains(document.activeElement)) adminSidebarOpener.focus();
+            };
+
+            adminSidebarOpener?.addEventListener('click', () => setAdminSidebarOpen(true));
+            adminSidebarCloser?.addEventListener('click', () => setAdminSidebarOpen(false));
+            adminSidebarBackdrop?.addEventListener('click', () => setAdminSidebarOpen(false));
+            document.addEventListener('keydown', (event) => {
+                if (event.key === 'Escape') setAdminSidebarOpen(false);
+            });
+            window.addEventListener('resize', () => {
+                setAdminSidebarOpen(false, false);
+            });
+            setAdminSidebarOpen(false, false);
+
             document.addEventListener('submit', (event) => {
                 const form = event.target;
                 const submitter = event.submitter;

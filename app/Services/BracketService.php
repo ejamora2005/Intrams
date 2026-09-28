@@ -8,6 +8,8 @@ use App\Models\BracketMatch;
 use App\Models\EditionSport;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use TournamentGenerator\Constants;
+use TournamentGenerator\Group;
 
 class BracketService
 {
@@ -17,7 +19,7 @@ class BracketService
 
     public function initialize(EditionSport $editionSport): void
     {
-        if (! $this->usesElimination($editionSport) || BracketMatch::query()->where('edition_sport_id', $editionSport->id)->exists()) {
+        if (! $this->usesBracketEngine($editionSport) || BracketMatch::query()->where('edition_sport_id', $editionSport->id)->exists()) {
             return;
         }
 
@@ -28,7 +30,7 @@ class BracketService
 
     public function reset(EditionSport $editionSport): void
     {
-        abort_unless($this->usesElimination($editionSport), 422, 'Only elimination brackets can be reset.');
+        abort_unless($this->usesBracketEngine($editionSport), 422, 'Only generated tournament brackets can be reset.');
 
         DB::transaction(function () use ($editionSport): void {
             $editionSport = EditionSport::query()->lockForUpdate()->findOrFail($editionSport->id);
@@ -77,6 +79,10 @@ class BracketService
             ]);
             $this->auditService->record('bracket.match.completed', $match, null, $match->fresh()->only($match->getFillable()));
 
+            if ($match->editionSport->game_mechanic === 'round_robin') {
+                return;
+            }
+
             $this->advanceOutcome($match->fresh(), $winner, $loser);
             $this->settleAutomaticMatches($match->editionSport);
         });
@@ -87,6 +93,12 @@ class BracketService
         $competitors = $this->synchronizeCompetitors($editionSport);
 
         if ($competitors->count() < 2) {
+            return;
+        }
+
+        if ($editionSport->game_mechanic === 'round_robin') {
+            $this->createRoundRobinSchedule($editionSport, $competitors);
+
             return;
         }
 
@@ -185,6 +197,33 @@ class BracketService
         $this->createMatch($editionSport, 'finals', 2, 1);
     }
 
+    private function createRoundRobinSchedule(EditionSport $editionSport, Collection $competitors): void
+    {
+        $group = new Group($editionSport->sport?->name ?? 'Round robin');
+
+        foreach ($competitors as $competitor) {
+            $group->team($competitor->label, $competitor->id);
+        }
+
+        $games = array_values($group
+            ->setInGame(2)
+            ->setType(Constants::ROUND_ROBIN)
+            ->genGames());
+        $gamesPerRound = intdiv($competitors->count(), 2);
+
+        foreach ($games as $index => $game) {
+            [$oneId, $twoId] = $game->getTeamsIds();
+            $this->createMatch(
+                $editionSport,
+                'round_robin',
+                intdiv($index, $gamesPerRound) + 1,
+                ($index % $gamesPerRound) + 1,
+                $competitors->firstWhere('id', $oneId),
+                $competitors->firstWhere('id', $twoId),
+            );
+        }
+    }
+
     private function createWinnersBracket(EditionSport $editionSport, Collection $competitors): int
     {
         $size = $this->bracketSize($competitors->count());
@@ -247,6 +286,7 @@ class BracketService
                 if ($competitors->count() === 0) {
                     $match->update(['status' => 'void']);
                     $changed = true;
+
                     continue;
                 }
 
@@ -318,6 +358,7 @@ class BracketService
     {
         if ($winnerRounds === 1) {
             $this->placeCompetitor($this->matchAt($editionSport, 'finals', 1, 1), 'two', $loser);
+
             return;
         }
 
@@ -327,6 +368,7 @@ class BracketService
                 $match->match_number % 2 === 1 ? 'one' : 'two',
                 $loser,
             );
+
             return;
         }
 
@@ -433,8 +475,8 @@ class BracketService
         return 2 ** (int) ceil(log(max($competitorCount, 2), 2));
     }
 
-    private function usesElimination(EditionSport $editionSport): bool
+    private function usesBracketEngine(EditionSport $editionSport): bool
     {
-        return in_array($editionSport->game_mechanic, ['single_elimination', 'double_elimination'], true);
+        return in_array($editionSport->game_mechanic, ['single_elimination', 'double_elimination', 'round_robin'], true);
     }
 }

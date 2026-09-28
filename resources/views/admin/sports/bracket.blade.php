@@ -5,6 +5,7 @@
         $winnerRounds = $matches->get('winners', collect())->groupBy('round_number')->sortKeys();
         $loserRounds = $matches->get('losers', collect())->groupBy('round_number')->sortKeys();
         $finalMatches = $matches->get('finals', collect())->sortBy('round_number');
+        $roundRobinRounds = $matches->get('round_robin', collect())->groupBy('round_number')->sortKeys();
         $lastWinnerRound = $winnerRounds->keys()->last();
         $maxWinnerMatches = max(1, $winnerRounds->map(fn ($round) => $round->count())->max() ?? 0);
         $canvasWidth = max(1120, ($winnerRounds->count() * 320) + ($finalMatches->isNotEmpty() ? 320 : 260));
@@ -26,7 +27,7 @@
                 <div class="sm:text-right"><p class="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Tournament Name</p><p class="mt-1 text-sm font-semibold text-slate-900">{{ $edition->name }} — {{ $sport->name }}</p></div>
                 <div class="flex flex-wrap gap-2 sm:justify-end">
                     <a href="{{ route('admin.sports.participants', ['sport' => $sport, 'edition_id' => $edition->id]) }}" class="w-fit rounded-lg border border-blue-200 bg-white px-4 py-2 text-sm font-semibold text-blue-700 transition hover:border-blue-300 hover:bg-blue-50">Manage participants</a>
-                    @if ($matches->isNotEmpty() && in_array($editionSport->game_mechanic, ['single_elimination', 'double_elimination'], true))
+                    @if ($matches->isNotEmpty() && in_array($editionSport->game_mechanic, ['single_elimination', 'double_elimination', 'round_robin'], true))
                         <form method="POST" action="{{ route('admin.sports.bracket.reset', $sport) }}" onsubmit="return confirm('Reset this bracket? All recorded bracket results will be removed and the bracket will be rebuilt from the current registrations. Teams, students, and registrations will not be changed.');">
                             @csrf
                             <input type="hidden" name="edition_id" value="{{ $edition->id }}">
@@ -38,10 +39,41 @@
             </div>
         </header>
 
-        @if (! in_array($editionSport->game_mechanic, ['single_elimination', 'double_elimination'], true))
-            <div class="m-6 rounded-lg border border-blue-100 bg-blue-50 p-5 text-sm text-blue-900">This sport does not use an elimination bracket.</div>
+        @if (! in_array($editionSport->game_mechanic, ['single_elimination', 'double_elimination', 'round_robin'], true))
+            <div class="m-6 rounded-lg border border-blue-100 bg-blue-50 p-5 text-sm text-blue-900">This sport does not use an automated tournament mechanic.</div>
         @elseif ($matches->isEmpty())
-            <div class="m-6 rounded-lg border border-dashed border-slate-300 bg-slate-50 p-8 text-center text-sm text-slate-500">Register at least two competitors in Manage Participants to generate the bracket. Teams, dual pairs, and individual athletes are supported.</div>
+            <div class="m-6 rounded-lg border border-dashed border-slate-300 bg-slate-50 p-8 text-center text-sm text-slate-500">Register at least two competitors in Manage Participants to generate the tournament. Teams, dual pairs, and individual athletes are supported.</div>
+        @elseif ($editionSport->game_mechanic === 'round_robin')
+            @php
+                $roundRobinWidth = max(1120, ($roundRobinRounds->count() * 320) + 80);
+                $roundRobinHeight = max(520, (($roundRobinRounds->map(fn ($round) => $round->count())->max() ?? 1) * 320) + 140);
+            @endphp
+            <div class="border-t border-slate-100 bg-slate-50 px-5 py-2 text-xs text-slate-500 sm:px-6">Every competitor plays every other competitor once. Scroll horizontally for rounds and vertically for large fields.</div>
+            <div class="h-[calc(100vh-19rem)] min-h-[34rem] max-h-[52rem] overflow-auto bg-slate-100 p-4 sm:p-6" aria-label="Round-robin tournament canvas">
+                <div class="bracket-canvas relative isolate rounded-lg border border-slate-300 bg-white p-6" data-bracket-canvas style="min-width: {{ $roundRobinWidth }}px; min-height: {{ $roundRobinHeight }}px;">
+                    <svg class="bracket-connectors pointer-events-none absolute inset-0 z-0 h-full w-full overflow-visible" data-bracket-connectors aria-hidden="true"></svg>
+                    <section class="relative z-10" aria-labelledby="round-robin-heading">
+                        <div class="mb-5 flex items-center justify-between border-b-2 border-slate-900 pb-3">
+                            <div><p class="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">League schedule</p><h3 id="round-robin-heading" class="mt-1 text-base font-semibold text-slate-900">Round Robin</h3></div>
+                            <span class="rounded border border-slate-300 px-2 py-1 text-xs font-semibold text-slate-600">{{ $roundRobinRounds->flatten(1)->count() }} {{ Str::plural('game', $roundRobinRounds->flatten(1)->count()) }}</span>
+                        </div>
+                        <div class="flex min-w-max items-start gap-12">
+                            @foreach ($roundRobinRounds as $roundNumber => $roundMatches)
+                                <div class="w-64">
+                                    <h4 class="mb-4 border-b border-slate-300 pb-2 text-xs font-semibold uppercase tracking-wide text-slate-600">Round {{ $roundNumber }}</h4>
+                                    <div class="space-y-6">
+                                        @foreach ($roundMatches as $match)
+                                            <div class="bracket-node relative" data-bracket-node data-match-id="{{ $match->id }}">
+                                                @include('admin.sports.partials.bracket-match', ['match' => $match])
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    </section>
+                </div>
+            </div>
         @else
             <div class="border-t border-slate-100 bg-slate-50 px-5 py-2 text-xs text-slate-500 sm:px-6">Scroll horizontally for additional rounds and vertically for large team fields.</div>
             <div class="h-[calc(100vh-19rem)] min-h-[34rem] max-h-[52rem] overflow-auto bg-slate-100 p-4 sm:p-6" aria-label="Tournament bracket canvas">
@@ -144,17 +176,17 @@
     <style>
         .bracket-node { transition: opacity 150ms ease; }
         .bracket-node > article { transition: border-color 150ms ease, box-shadow 150ms ease, transform 150ms ease; }
-        .bracket-node.is-highlighted > article { border-color: rgb(37 99 235); box-shadow: 0 0 0 3px rgb(191 219 254), 0 12px 22px -16px rgb(30 64 175); transform: translateY(-1px); }
-        .bracket-node.is-competitor-highlighted .bracket-team[data-competitor-id] { background-color: rgb(239 246 255); color: rgb(30 64 175); }
+        .bracket-node.is-highlighted > article { border-color: #355872; box-shadow: 0 0 0 3px #9CD5FF, 0 12px 22px -16px #355872; transform: translateY(-1px); }
+        .bracket-node.is-competitor-highlighted .bracket-team[data-competitor-id] { background-color: #F7F8F0; color: #355872; }
         .bracket-team { transition: background-color 150ms ease, box-shadow 150ms ease, color 150ms ease; }
-        .bracket-team.is-click-selected { background-color: rgb(219 234 254); box-shadow: inset 4px 0 0 rgb(37 99 235); color: rgb(30 64 175); }
-        .bracket-team.is-click-selected:focus-visible { outline: 2px solid rgb(37 99 235); outline-offset: -2px; }
+        .bracket-team.is-click-selected { background-color: #9CD5FF; box-shadow: inset 4px 0 0 #355872; color: #355872; }
+        .bracket-team.is-click-selected:focus-visible { outline: 2px solid #355872; outline-offset: -2px; }
         .bracket-canvas.has-bracket-focus .bracket-node:not(.is-highlighted):not(.is-competitor-highlighted) { opacity: .42; }
-        .bracket-connector { fill: none; stroke: rgb(148 163 184); stroke-linecap: square; stroke-linejoin: miter; stroke-width: 2; transition: stroke 150ms ease, stroke-width 150ms ease, opacity 150ms ease; }
-        .bracket-connector--loser { stroke: rgb(244 114 182); stroke-dasharray: 6 5; }
+        .bracket-connector { fill: none; stroke: #7AAACE; stroke-linecap: square; stroke-linejoin: miter; stroke-width: 2; transition: stroke 150ms ease, stroke-width 150ms ease, opacity 150ms ease; }
+        .bracket-connector--loser { stroke: #9CD5FF; stroke-dasharray: 6 5; }
         .bracket-canvas.has-bracket-focus .bracket-connector:not(.is-highlighted) { opacity: .18; }
-        .bracket-connector.is-highlighted { stroke: rgb(37 99 235); stroke-width: 3.5; opacity: 1; }
-        .bracket-connector--loser.is-highlighted { stroke: rgb(225 29 72); }
+        .bracket-connector.is-highlighted { stroke: #355872; stroke-width: 3.5; opacity: 1; }
+        .bracket-connector--loser.is-highlighted { stroke: #7AAACE; }
     </style>
 
     <script>

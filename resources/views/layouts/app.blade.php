@@ -17,10 +17,10 @@
         <!-- Styles -->
         @livewireStyles
     </head>
-    <body class="font-sans antialiased">
+    <body class="bg-slate-50 font-sans text-slate-900 antialiased">
         <x-banner />
 
-        <div class="min-h-screen bg-gray-100">
+        <div class="min-h-screen bg-slate-50">
             @livewire('navigation-menu')
 
             <!-- Page Heading -->

@@ -14,19 +14,21 @@ Sport editing updates the catalogue details and current edition mechanics withou
 
 Each sport includes a participant manager that groups active registered athletes by team, including a safe empty state when no athletes are registered.
 
-For elimination sports, a dedicated bracket page generates and persists current seeding from registrations. Brackets treat a team, a two-athlete dual pair, or an individual athlete as one competitor.
+For automated tournament sports, a dedicated bracket page generates and persists current seeding or round-robin pairings from registrations. Brackets treat a team, a two-athlete dual pair, or an individual athlete as one competitor.
 
 Each Sports card opens its dedicated dynamic bracket page. Manage Participants is kept separate for participant registration and roster review.
 
 For single- and double-elimination configurations, the bracket persists generated matches. Administrators select a competing competitor and declare a win or loss; the winner advances automatically and odd-sized fields receive automatic byes. Double elimination generates the complete winners bracket, losers bracket, grand final, and conditional reset final for any field size of at least two competitors.
 
-The bracket header includes a guarded **Reset bracket** action. It requires confirmation, records an audit entry, removes only that edition sport's generated bracket results, and then rebuilds the bracket from the existing registrations. It never changes students, teams, or athlete registrations.
+Round-robin configurations use the free, MIT-licensed `heroyt/tournament-generator` v0.5 API locally through Composer. It requires no account, API key, subscription, or runtime network access. Every competitor plays every other competitor once; odd fields receive one rest slot per round, real games are persisted in the existing bracket tables, and recording a result affects only that game. The existing single- and double-elimination progression code remains unchanged.
+
+The bracket header includes a guarded **Reset bracket** action for single elimination, double elimination, and round robin. It requires confirmation, records an audit entry, removes only that edition sport's generated tournament results, and then rebuilds the matches from the existing registrations. It never changes students, teams, or athlete registrations.
 
 The bracket page is a fixed, two-axis scrollable tournament canvas for large fields. It labels the game/elimination style and tournament name, renders connected game cards through the finals and winner container, and shows a separate **Loser Bracket if needed** section only for double-elimination sports. Right-angle connector lines follow each winner and loser path; hover a game or competitor to highlight its immediate connected path and dim unrelated games. Clicking a team awaiting a result keeps it visibly marked **Selected** and preserves its path focus while the administrator chooses its result.
 
 Basketball sport cards include an editable **Score sheet** with team/course autofill, displayed on a white **A4 portrait paper (210 × 297 mm)** against a gray background. The sheet fits proportionally within 4.25 mm paper margins. Roster columns remain the unlabeled 1–12 counter, Players, No., Course, and four foul fields. **Download** opens a drawer for Word (.docx), Excel (.xlsx), and PDF; all three directly download the same high-resolution image of the full A4 paper. The downloaded sheet is image-based, not editable cells or tables, so its lines and layout remain fixed. JavaScript and PHP ext-zip are required; exports are audited.
 
-Dual pairs display both athlete names as one bracket competitor without changing the registration workflow. Individual athletes use the same progression engine without needing a team record.
+Dual-sport registration uses two independently searchable roster columns in the lower student-selection section while retaining the existing course/team filters above it. The administrator selects one distinct student from each column and saves them as one pair; a team may register multiple pairs. Both athlete entries share one pair key and remain tied as one bracket competitor. Individual athletes use the same progression engine without needing a team record.
 
 Administrators register participants from each sport's Manage Participants page. The sport's configured participant type is displayed automatically, and course/team filters support selecting multiple eligible students at once.
 
@@ -138,11 +140,11 @@ Role and status columns are enforced by route middleware. Active administrators 
 
 ## Universal staff login
 
-The public `/login` screen is also the read-only daily competition board. It shows the active edition and today's non-cancelled schedules with sport, Morning/Afternoon period, competitors, and assigned facilitator. The table is rendered entirely on the server and has no polling, AJAX refresh, or Livewire updates; changes appear only after the browser page is manually refreshed. Pressing **Login** opens the email/password form in an accessible modal over a blurred backdrop, and validation errors reopen that modal automatically.
+The public `/login` screen is also the read-only daily competition board. It shows the active edition and today's non-cancelled schedules with sport, Morning/Afternoon period, competitors, and assigned facilitator. The table is rendered entirely on the server and has no polling, AJAX refresh, or Livewire updates; changes appear only after the browser page is manually refreshed. On narrow screens, the same schedule becomes stacked cards without horizontal scrolling. Pressing **Login** opens the email/password form in an accessible, viewport-bounded modal over a blurred backdrop, and validation errors reopen that modal automatically.
 
 When one sport has multiple games on the same day, the board groups those games under one sport cell while retaining a separate chronological row for every game's time and competitors. A shared facilitator is also shown once for the group; differing facilitator assignments remain visible on their corresponding game rows.
 
-Bracket scheduling is handled directly on the sport bracket. Selecting a competitor in a ready match reveals **Schedule game**; the administrator chooses only a date and Morning/Afternoon. The match supplies its competitors automatically, and saving again updates the same schedule instead of creating a duplicate.
+Bracket scheduling is handled directly on every ready match card. **Schedule game** is available without selecting a winner; the administrator chooses only a date and Morning/Afternoon. The match supplies its competitors automatically, including repeated round-robin appearances, and saving again updates the same schedule instead of creating a duplicate.
 
 On the public daily board, bracket-scheduled matchups show their bracket game number directly above the competing names (for example, **Game 1** above **Team A VS Team B**).
 
@@ -150,7 +152,9 @@ Feature coverage verifies both initial bracket scheduling and rescheduling witho
 
 The guest browser title uses `INTRAMURALS MANAGEMENT`, keeping the public board and login modal aligned with the application branding.
 
-The application uses one shared `/login` page for both administrators and coordinators. It has a blue-and-white interface and accepts only an email address and password—users do not choose a role on the form.
+The application uses one shared `/login` page for both administrators and coordinators. It uses the system-wide slate-blue interface and accepts only an email address and password—users do not choose a role on the form.
+
+The visual system is centrally defined in `tailwind.config.js` and `resources/css/app.css` from the Color Hunt palette `#355872`, `#7AAACE`, `#9CD5FF`, and `#F7F8F0`. `#355872` is the dark base for navigation and primary actions; the two lighter blues provide highlights, focus states, and supporting surfaces; `#F7F8F0` is the application background. Existing blue, indigo, slate, and gray utilities inherit this mapping across public, authentication, administrator, coordinator, and Jetstream screens. Red, amber, and green remain reserved for destructive, warning, and success feedback. Printable score-sheet paper remains white for accurate output.
 
 - Only accounts with `status = active` and role `admin` or `coordinator` can sign in.
 - Suspended, inactive, and unsupported-role accounts are rejected with the standard generic login error.
@@ -180,7 +184,9 @@ The feature test suite uses `RefreshDatabase`; if you run tests against the loca
 
 ## Admin landing page and navigation
 
-Active administrators are redirected from `/dashboard` to `/admin/dashboard`. The login screen and admin sidebar share one reusable brand component, displaying the `SLSU` mark and `INTRAMURALS MANAGEMENT` name consistently. The blue-and-white sidebar contains:
+Active administrators are redirected from `/dashboard` to `/admin/dashboard`. The login screen and admin sidebar share one reusable brand component, displaying the `SLSU` mark and `INTRAMURALS MANAGEMENT` name consistently. The admin shell keeps its fixed sidebar and independently scrolling content panel on desktop. On phones and tablets, the sidebar becomes a vertically scrollable off-canvas menu with a backdrop, close control, Escape-key support, and body-scroll locking; the dashboard cards, buttons, spacing, and headings reflow for narrow screens.
+
+The slate-blue palette sidebar contains:
 
 - Dashboard
 - Events

@@ -2,6 +2,42 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+    --intrams-base: #355872;
+    --intrams-accent: #7AAACE;
+    --intrams-highlight: #9CD5FF;
+    --intrams-surface: #F7F8F0;
+}
+
+html {
+    background: var(--intrams-surface);
+    color-scheme: light;
+}
+
+body {
+    background-color: var(--intrams-surface);
+    color: #233C4D;
+}
+
+::selection {
+    background-color: var(--intrams-highlight);
+    color: #172D3D;
+}
+
+button,
+[type='button'],
+[type='reset'],
+[type='submit'],
+input,
+select,
+textarea {
+    accent-color: var(--intrams-base);
+}
+
+:focus-visible {
+    outline-color: var(--intrams-base);
+}
+
 [x-cloak] {
     display: none;
 }

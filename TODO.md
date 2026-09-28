@@ -11,6 +11,7 @@
 - [x] Add edition-scoped sport configuration with automatic custom-sport codes, name normalization, participant type, game mechanic, description, and rules; excluded legacy event inputs remain removed.
 - [x] Make team management edition-scoped from the Events/Editions workspace while retaining roster assignment, course filtering, and audited team changes.
 - [x] Add student sport assignment against configured edition sports, with server-side participant-type, team-edition, roster, duplicate, and dual-pair validation.
+- [x] Give the lower dual-sport student selector a two-column pair builder with independent live search, one distinct roster student per side, multiple pairs per team, and one shared pair key per saved pair while leaving the filters above unchanged.
 - [x] Automate course-team membership for both existing students at team creation and newly created or course-updated active students.
 - [x] Synchronize existing active course students when a course is selected or changed on an existing team in Team Management.
 - [x] Add course/name-filtered team-roster search with Select All and bulk member removal.
@@ -25,6 +26,7 @@
 - [x] Add persistent elimination matches, click-to-declare win/loss controls, automatic byes, and automatic winner advancement to the next matchup.
 - [x] Correct single-elimination progression so a future match cannot auto-advance until both source matches are resolved.
 - [x] Implement scalable single- and double-elimination brackets for any field of at least two teams, dual pairs, or individual athletes, including odd-field byes, winners/losers progression, grand finals, and conditional reset finals.
+- [x] Add round-robin mechanics through the free MIT-licensed `heroyt/tournament-generator` v0.5 Composer API: generate every unique pairing for team, dual, and individual competitors, handle odd fields without fake matches, persist results and schedules locally, and leave the existing elimination progression engines unchanged.
 - [x] Keep the dynamic participant view Blade-safe by using explicitly nested conditional markup for dual-pair labels.
 - [x] Add bulk participant registration inside each sport's Manage Participants module, with automatic participant-type status, course/team filters, filtered multi-select, and Select All.
 - [x] Verify bulk participant registration through isolated end-to-end tests; team/dual registration requires a team before eligible roster students are shown, and already-registered students are excluded.
@@ -47,6 +49,8 @@
 - [x] Initial intramurals schema exists: access fields, master data, registrations, coordinator operations, competition/results, tally, flags, and audit-log tables.
 - [x] Universal blue-and-white email/password login is implemented for active administrators and coordinators; public registration is disabled.
 - [x] Admin-only application shell is implemented with a blue-and-white sidebar, landing dashboard, live database summary counts, and module routes for Events, Students, Teams, Coordinators, Sports, and System Logs.
+- [x] Make the public login board and admin dashboard responsive: use stacked schedule cards and a viewport-bounded login modal on phones, plus an off-canvas scrollable admin sidebar and reflowing dashboard cards at narrow widths.
+- [x] Apply the Color Hunt `#355872 / #7AAACE / #9CD5FF / #F7F8F0` palette across public, authentication, administrator, coordinator, and shared Jetstream pages through centralized Tailwind color families and global theme tokens; retain semantic danger, warning, and success colors and white printable score sheets.
 - [x] Local-development test administrator is seeded with an active `admin` role for dashboard testing.
 - [x] Students/Athletes module is implemented with search, validation, create/edit, archive/restore, and audit history.
 - [x] Student entry uses sanitized, normalized names and controlled school-year, year-level, section, and gender selections.
@@ -388,7 +392,7 @@ Every successful or denied major operation must create an append-only audit entr
 
 - [x] Group multiple same-day games for one sport under a shared sport cell while keeping each game's time, teams, and facilitator assignment accurate.
 
-- [x] Schedule a ready bracket match from its selection actions using only a date and Morning/Afternoon, with competitors inherited from the bracket.
+- [x] Schedule every ready bracket or round-robin match directly from its card using only a date and Morning/Afternoon, with competitors inherited from the match and no winner selection required.
 
 - [x] Cover bracket scheduling and duplicate-free rescheduling with a feature test.
 

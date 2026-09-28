@@ -116,7 +116,7 @@
     .fiba-sheet .fiba-top td:last-child { border-right: 0; }
     .fiba-sheet .field { border-bottom: 1px solid #000; display: inline-block; font-weight: normal; margin-left: 1mm; min-height: 3mm; vertical-align: bottom; }
     .fiba-sheet .sheet-control { background: transparent; border: 0; border-radius: 0; color: #000; display: inline-block; font: inherit; line-height: 1; min-width: 0; outline: 0; overflow: hidden; padding: 0 .2mm; vertical-align: middle; white-space: nowrap; width: 100%; }
-    .fiba-sheet input.sheet-control:focus { background: #e0f2fe; box-shadow: inset 0 0 0 1px #0c4a6e; }
+    .fiba-sheet input.sheet-control:focus { background: #9CD5FF; box-shadow: inset 0 0 0 1px #355872; }
     .fiba-sheet .fiba-main { border: 1px solid #000; border-top: 0; table-layout: fixed; }
     .fiba-sheet .fiba-main > tbody > tr > td { vertical-align: top; width: 50%; }
     .fiba-sheet .teams { border-right: 1px solid #000; }

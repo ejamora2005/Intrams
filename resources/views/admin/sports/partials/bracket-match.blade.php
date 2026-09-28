@@ -37,8 +37,10 @@
                     <input class="selected-loser-winner" type="hidden" name="winner_competitor_id">
                     <button class="rounded border border-red-200 bg-white px-2.5 py-1.5 font-semibold text-red-700 hover:bg-red-50">Declare loss</button>
                 </form>
-                <button type="button" data-schedule-toggle aria-expanded="false" aria-controls="match-schedule-{{ $match->id }}" class="rounded border border-blue-200 bg-white px-2.5 py-1.5 font-semibold text-blue-700 hover:bg-blue-100">{{ $match->schedule ? 'Edit schedule' : 'Schedule game' }}</button>
             </div>
+        </div>
+        <div class="border-t border-slate-200 bg-white p-3 text-xs">
+            <button type="button" data-schedule-toggle aria-expanded="false" aria-controls="match-schedule-{{ $match->id }}" class="w-full rounded border border-blue-200 bg-white px-2.5 py-1.5 font-semibold text-blue-700 hover:bg-blue-50">{{ $match->schedule ? 'Edit schedule' : 'Schedule game' }}</button>
             <form id="match-schedule-{{ $match->id }}" data-schedule-form method="POST" action="{{ route('admin.sports.bracket.schedule', [$sport, $match]) }}" class="mt-3 hidden space-y-2 border-t border-blue-200 pt-3">
                 @csrf
                 <input type="hidden" name="edition_id" value="{{ $edition->id }}">
@@ -55,6 +57,6 @@
     @elseif ($match->status === 'bye')
         <p class="border-t border-slate-200 px-3 py-2 text-xs font-medium text-blue-700">Advanced by bye</p>
     @elseif ($match->status === 'completed')
-        <p class="border-t border-slate-200 px-3 py-2 text-xs font-medium text-green-700">Winner advanced automatically</p>
+        <p class="border-t border-slate-200 px-3 py-2 text-xs font-medium text-green-700">{{ $match->bracket === 'round_robin' ? 'Winner recorded' : 'Winner advanced automatically' }}</p>
     @endif
 </article>

@@ -11,12 +11,23 @@ use App\Models\User;
 use App\Providers\RouteServiceProvider;
 use Illuminate\Support\Carbon;
 
+test('public landing page uses the intramurals design system', function () {
+    $this->get('/')
+        ->assertOk()
+        ->assertSee('Run every intramurals event from one organized workspace.')
+        ->assertSee('View schedule and sign in')
+        ->assertSee('bg-blue-950', false)
+        ->assertSee('bg-slate-50', false);
+});
+
 test('login screen can be rendered', function () {
     $response = $this->get('/login');
 
     $response->assertStatus(200)
         ->assertSee('SLSU')
-        ->assertSee('INTRAMURALS MANAGEMENT');
+        ->assertSee('INTRAMURALS MANAGEMENT')
+        ->assertSee('class="space-y-3 lg:hidden"', false)
+        ->assertSee('max-h-[calc(100dvh-1rem)]', false);
 });
 
 test('login page shows a manually refreshed snapshot of todays competition schedule', function () {
@@ -142,6 +153,9 @@ test('administrators can access the admin dashboard and its sidebar modules', fu
         ->assertSee('INTRAMURALS')
         ->assertSee('MANAGEMENT')
         ->assertSee('INTRAMURALS MANAGEMENT dashboard')
+        ->assertSee('data-open-admin-sidebar', false)
+        ->assertSee('data-admin-sidebar-backdrop', false)
+        ->assertSee('aria-controls="admin-sidebar"', false)
         ->assertSee('Students')
         ->assertSee('Events / Editions')
         ->assertSee('Live Competition')

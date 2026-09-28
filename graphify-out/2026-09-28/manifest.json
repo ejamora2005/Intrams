@@ -108,9 +108,9 @@
     "semantic_hash": ""
   },
   "app/Http/Controllers/Admin/SportController.php": {
-    "mtime": 1790557136.6747732,
-    "seen": 1790557210.8388174,
-    "ast_hash": "d63a0bbc603e06065eca78fa20751162",
+    "mtime": 1790566357.7426515,
+    "seen": 1790566375.177017,
+    "ast_hash": "bf3b207c103ac50b482d4cb478f151a2",
     "semantic_hash": ""
   },
   "app/Http/Controllers/Admin/SportModuleController.php": {
@@ -570,9 +570,9 @@
     "semantic_hash": "602c20aacb6ff929c61a540d6dc508b2"
   },
   "composer.json": {
-    "mtime": 1790073326.2456481,
-    "seen": 1790073557.825865,
-    "ast_hash": "1e41476ed5950e88c83e7d363859bda0",
+    "mtime": 1790559620.6376078,
+    "seen": 1790559859.9962466,
+    "ast_hash": "94967e3bba99a99fa82d3b0f737cbfe7",
     "semantic_hash": ""
   },
   "config/app.php": {
@@ -1068,9 +1068,9 @@
     "semantic_hash": "db35ed00c135a61a70cc787199e82107"
   },
   "resources/views/auth/login.blade.php": {
-    "mtime": 1790520230.4268007,
-    "seen": 1790520260.5682333,
-    "ast_hash": "0d27216268b679a367c5f9e5d9ce0aaa",
+    "mtime": 1790558033.0837507,
+    "seen": 1790558064.3501952,
+    "ast_hash": "36570379640767583784c8a6a7fde202",
     "semantic_hash": ""
   },
   "resources/views/auth/register.blade.php": {
@@ -1410,9 +1410,9 @@
     "semantic_hash": "f7d87914364053641c0a4b5197c1de99"
   },
   "tests/Feature/AuthenticationTest.php": {
-    "mtime": 1790520230.4277973,
-    "seen": 1790520260.5682333,
-    "ast_hash": "691020fd6cc66ed62c7b54ad4aa1873a",
+    "mtime": 1790558033.084749,
+    "seen": 1790558064.3511934,
+    "ast_hash": "90de6f02b0166bcd517084b078ccae70",
     "semantic_hash": ""
   },
   "tests/Feature/BrowserSessionsTest.php": {
@@ -1608,15 +1608,15 @@
     "semantic_hash": ""
   },
   "README.md": {
-    "mtime": 1790557162.032556,
-    "seen": 1790557210.839815,
-    "ast_hash": "9e198a2336aa71b5b4ca79582ba513ef",
+    "mtime": 1790566256.3117554,
+    "seen": 1790566375.1780143,
+    "ast_hash": "0cb5382b496ab6afd5255d4278ded225",
     "semantic_hash": ""
   },
   "TODO.md": {
-    "mtime": 1790557162.034552,
-    "seen": 1790557210.839815,
-    "ast_hash": "fabed167b7252e0d2c2d903a5c1c99bb",
+    "mtime": 1790566256.3127525,
+    "seen": 1790566375.1780143,
+    "ast_hash": "1dc9aeb11213d2fcfd2feb2077fe223f",
     "semantic_hash": ""
   },
   "TODO_old.md": {
@@ -1716,21 +1716,21 @@
     "semantic_hash": ""
   },
   "resources/views/admin/sports/participants.blade.php": {
-    "mtime": 1790039956.013319,
-    "seen": 1790040011.6847787,
+    "mtime": 1790566256.3087647,
+    "seen": 1790566375.1780143,
     "ast_hash": "db088009fab002bb91ed8f8beabb157c",
     "semantic_hash": ""
   },
   "tests/Feature/BulkSportAssignmentTest.php": {
-    "mtime": 1790557154.1358848,
-    "seen": 1790557210.839815,
-    "ast_hash": "81921d4d15c21fb25b8e84937d8e1602",
+    "mtime": 1790566343.919102,
+    "seen": 1790566375.1780143,
+    "ast_hash": "2ae14f9f5e10207d23ef5ee96a8120dc",
     "semantic_hash": ""
   },
   "resources/views/admin/sports/assign-participants.blade.php": {
-    "mtime": 1790001775.3603363,
-    "seen": 1790001881.0397024,
-    "ast_hash": "4f7fd5484a2555edb2987edd5a235890",
+    "mtime": 1790566159.1155384,
+    "seen": 1790566375.1780143,
+    "ast_hash": "9d0ab068ed36c155dbc8112cd7ab6576",
     "semantic_hash": ""
   },
   "app/Http/Requests/RemoveTeamMembersRequest.php": {
@@ -1740,9 +1740,9 @@
     "semantic_hash": ""
   },
   "resources/views/admin/sports/bracket.blade.php": {
-    "mtime": 1790557136.677761,
-    "seen": 1790557210.8388174,
-    "ast_hash": "e3bd967c37efce43b1d9656a443b328b",
+    "mtime": 1790559751.8396928,
+    "seen": 1790559859.9972436,
+    "ast_hash": "54de574ac7d4e35553682fa1509c0a4b",
     "semantic_hash": ""
   },
   "app/Models/BracketMatch.php": {
@@ -1752,9 +1752,9 @@
     "semantic_hash": ""
   },
   "app/Services/BracketService.php": {
-    "mtime": 1790039513.651545,
-    "seen": 1790039573.5827067,
-    "ast_hash": "b9ac420b9e3d9ba61d5222bb64a548e9",
+    "mtime": 1790559829.7791953,
+    "seen": 1790559859.9962466,
+    "ast_hash": "3a16e21137d067432df377ab1ddaf4d3",
     "semantic_hash": ""
   },
   "database/migrations/2026_09_21_140000_create_bracket_matches_table.php": {
@@ -1770,9 +1770,9 @@
     "semantic_hash": ""
   },
   "resources/views/admin/sports/partials/bracket-match.blade.php": {
-    "mtime": 1790557136.6757662,
-    "seen": 1790557210.8388174,
-    "ast_hash": "800a373f1e99c98d1839e14939e7e91f",
+    "mtime": 1790565523.5069673,
+    "seen": 1790565582.6274602,
+    "ast_hash": "ba7fa859e5a69a6d49fe7f442e2afbb7",
     "semantic_hash": ""
   },
   "app/Models/BracketCompetitor.php": {
@@ -1788,9 +1788,9 @@
     "semantic_hash": ""
   },
   "tests/Feature/BracketEngineTest.php": {
-    "mtime": 1790039535.1600583,
-    "seen": 1790039573.5837035,
-    "ast_hash": "07be60108c66951713b6d2c8fbc89bc2",
+    "mtime": 1790565554.9880874,
+    "seen": 1790565582.6274602,
+    "ast_hash": "215d07efe9dee0c5deb50e8110545b51",
     "semantic_hash": ""
   },
   "resources/views/admin/sports/basketball-score-sheet.blade.php": {
@@ -1914,9 +1914,9 @@
     "semantic_hash": ""
   },
   "app/Services/PublicScheduleService.php": {
-    "mtime": 1790519433.6017795,
-    "seen": 1790519647.1122565,
-    "ast_hash": "ab99885a73246b9a3cb3c616ad4eda6e",
+    "mtime": 1790558033.0817575,
+    "seen": 1790558064.3501952,
+    "ast_hash": "ee2239922815d64530f5e7541cc713e5",
     "semantic_hash": ""
   },
   "resources/js/login-modal.js": {

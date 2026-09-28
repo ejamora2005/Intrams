@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "a0e533aa4fd1a0922ba552c701622148",
+    "content-hash": "1a424af7756cc6fe136d839375df9698",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -1394,6 +1394,63 @@
                 }
             ],
             "time": "2026-08-24T09:15:32+00:00"
+        },
+        {
+            "name": "heroyt/tournament-generator",
+            "version": "v0.5.5",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Heroyt/tournament-generator.git",
+                "reference": "111c39329fbc4711fd9ba061e96043fc9aeb8950"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Heroyt/tournament-generator/zipball/111c39329fbc4711fd9ba061e96043fc9aeb8950",
+                "reference": "111c39329fbc4711fd9ba061e96043fc9aeb8950",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=8.0"
+            },
+            "require-dev": {
+                "infection/infection": "^0.26",
+                "phpunit/phpunit": "^9.6"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "TournamentGenerator\\": "src/TournamentGenerator/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Tomáš Vojík",
+                    "email": "vojik@wboy.cz",
+                    "role": "lead"
+                }
+            ],
+            "description": "A set of classes used to create multiple kinds of tournament brackets in PHP.",
+            "homepage": "https://github.com/Heroyt/tournament-generator",
+            "keywords": [
+                "Teams",
+                "bracket",
+                "generator",
+                "scheduler",
+                "tournament",
+                "tournaments"
+            ],
+            "support": {
+                "docs": "https://heroyt.github.io/tournament-generator/",
+                "email": "vojik@wboy.cz",
+                "issues": "https://github.com/Heroyt/tournament-generator/issues",
+                "source": "https://github.com/Heroyt/tournament-generator",
+                "wiki": "https://tournament-generator.readthedocs.io/en/latest/"
+            },
+            "time": "2023-12-09T13:12:45+00:00"
         },
         {
             "name": "laravel/fortify",

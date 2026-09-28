@@ -315,7 +315,7 @@ class SportController extends Controller
         $requiresTeam = in_array($editionSport->participant_type, ['team', 'dual'], true);
         $teams = Team::query()->where('edition_id', $edition->id)->where('status', 'active')->orderBy('name')->get();
 
-        $students = Student::query()
+        $studentQuery = Student::query()
             ->where('status', 'active')
             ->with('course')
             ->whereDoesntHave('athleteEntries', fn ($entryQuery) => $entryQuery->where('edition_sport_id', $editionSport->id))
@@ -323,9 +323,11 @@ class SportController extends Controller
             ->when($courseId, fn ($query) => $query->where('course_id', $courseId))
             ->when($teamId, fn ($query) => $query->whereHas('teamMembers', fn ($memberQuery) => $memberQuery->where('team_id', $teamId)))
             ->orderBy('last_name')
-            ->orderBy('first_name')
-            ->paginate(30)
-            ->withQueryString();
+            ->orderBy('first_name');
+
+        $students = $editionSport->participant_type === 'dual'
+            ? $studentQuery->get()
+            : $studentQuery->paginate(30)->withQueryString();
 
         return view('admin.sports.assign-participants', ['sport' => $sport, 'edition' => $edition, 'editionSport' => $editionSport, 'courses' => Course::query()->where('status', 'active')->orderBy('name')->get(), 'teams' => $teams, 'students' => $students, 'courseId' => $courseId, 'teamId' => $teamId, 'requiresTeam' => $requiresTeam]);
     }
