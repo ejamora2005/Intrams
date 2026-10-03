@@ -9,6 +9,7 @@ use App\Models\Sport;
 use App\Models\Team;
 use App\Models\User;
 use App\Providers\RouteServiceProvider;
+use Database\Seeders\AdminUserSeeder;
 use Illuminate\Support\Carbon;
 
 test('public landing page uses the intramurals design system', function () {
@@ -160,6 +161,37 @@ test('administrators can access the admin dashboard and its sidebar modules', fu
         ->assertSee('Events / Editions')
         ->assertSee('Live Competition')
         ->assertSee('System Logs');
+});
+
+test('default account seeding does not log out active sessions when the password is unchanged', function () {
+    $previous = $_ENV['INTRAMURALS_DEFAULT_ACCOUNT_PASSWORD'] ?? null;
+    putenv('INTRAMURALS_DEFAULT_ACCOUNT_PASSWORD=password');
+    $_ENV['INTRAMURALS_DEFAULT_ACCOUNT_PASSWORD'] = 'password';
+    $_SERVER['INTRAMURALS_DEFAULT_ACCOUNT_PASSWORD'] = 'password';
+
+    try {
+        $this->seed(AdminUserSeeder::class);
+
+        $this->post('/login', [
+            'email' => 'admin@example.com',
+            'password' => 'password',
+        ])->assertRedirect(RouteServiceProvider::HOME);
+
+        $this->get('/admin/dashboard')->assertOk();
+
+        $this->seed(AdminUserSeeder::class);
+
+        $this->get('/admin/dashboard')->assertOk();
+    } finally {
+        if ($previous === null) {
+            putenv('INTRAMURALS_DEFAULT_ACCOUNT_PASSWORD');
+            unset($_ENV['INTRAMURALS_DEFAULT_ACCOUNT_PASSWORD'], $_SERVER['INTRAMURALS_DEFAULT_ACCOUNT_PASSWORD']);
+        } else {
+            putenv('INTRAMURALS_DEFAULT_ACCOUNT_PASSWORD='.$previous);
+            $_ENV['INTRAMURALS_DEFAULT_ACCOUNT_PASSWORD'] = $previous;
+            $_SERVER['INTRAMURALS_DEFAULT_ACCOUNT_PASSWORD'] = $previous;
+        }
+    }
 });
 
 test('coordinators cannot access admin modules', function () {

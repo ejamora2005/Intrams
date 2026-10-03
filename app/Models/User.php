@@ -59,7 +59,7 @@ class User extends Authenticatable
     public function canUseIntramuralsLogin(): bool
     {
         return $this->status === 'active'
-            && in_array($this->role, ['admin', 'coordinator'], true);
+            && in_array($this->role, ['admin', 'gam', 'tabulator', 'coordinator'], true);
     }
 
     /** @return HasMany<CoordinatorAssignment> */

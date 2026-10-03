@@ -7,6 +7,7 @@
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
         <title>INTRAMURALS MANAGEMENT</title>
+        <x-pwa-meta />
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
@@ -14,6 +15,7 @@
 
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
+        @stack('styles')
 
         <!-- Styles -->
         @if ($livewire) @livewireStyles @endif
@@ -24,5 +26,6 @@
         </div>
 
         @if ($livewire) @livewireScripts @endif
+        <x-pwa-install />
     </body>
 </html>

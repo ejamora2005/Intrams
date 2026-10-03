@@ -6,6 +6,7 @@
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
         <title>{{ config('app.name', 'Laravel') }}</title>
+        <x-pwa-meta />
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
@@ -41,5 +42,6 @@
         @stack('modals')
 
         @livewireScripts
+        <x-pwa-install />
     </body>
 </html>

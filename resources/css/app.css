@@ -41,3 +41,239 @@ textarea {
 [x-cloak] {
     display: none;
 }
+
+@font-face {
+    font-family: 'Ops Barlow';
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url('../fonts/barlow-latin-400-normal.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'Ops Barlow';
+    font-style: normal;
+    font-weight: 600;
+    font-display: swap;
+    src: url('../fonts/barlow-latin-600-normal.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'Ops Condensed';
+    font-style: normal;
+    font-weight: 700;
+    font-display: swap;
+    src: url('../fonts/barlow-condensed-latin-700-normal.woff2') format('woff2');
+}
+
+.ops-body {
+    --ops-navy: #041329;
+    --ops-ink: #06152c;
+    --ops-panel: #081d35;
+    --ops-panel-2: #0b2440;
+    --ops-green: #0c7345;
+    --ops-green-soft: #35b46f;
+    --ops-gold: #d9b87d;
+    --ops-gold-bright: #f0d49c;
+    --ops-line: #bbd6f033;
+    --ops-muted: #b4c6dc;
+    min-height: 100dvh;
+    font-family: 'Ops Barlow', Figtree, sans-serif;
+    color: #edf5ff;
+    background:
+        linear-gradient(115deg, #020b1df7 0%, #06152cec 48%, #075133cc 100%),
+        linear-gradient(180deg, #ffffff12 0%, transparent 30%, #01081680 100%),
+        var(--ops-background) center / cover fixed no-repeat,
+        var(--ops-navy);
+}
+
+.ops-body * {
+    letter-spacing: 0;
+}
+
+.ops-sidebar {
+    border-right: 1px solid #d8ecff1f;
+    background:
+        linear-gradient(180deg, #08213ce8, #041329f2),
+        linear-gradient(90deg, #0c73451c, transparent);
+    box-shadow: 20px 0 50px #0004;
+}
+
+.ops-sidebar::before {
+    content: '';
+    display: block;
+    height: 4px;
+    background: linear-gradient(90deg, var(--ops-green), var(--ops-gold), var(--ops-green));
+}
+
+.ops-topbar {
+    border-bottom: 1px solid #d8ecff24;
+    color: #edf5ff;
+    background:
+        linear-gradient(180deg, #102d4be6, #07182de0),
+        linear-gradient(90deg, #0c734526, transparent 42%, #d9b87d1c);
+    box-shadow: 0 14px 38px #0003;
+}
+
+.ops-shell {
+    color: #edf5ff;
+}
+
+.ops-dashboard {
+    color: #edf5ff;
+}
+
+.ops-hero {
+    position: relative;
+    overflow: hidden;
+    border: 1px solid #d8ecff2e;
+    border-radius: 8px;
+    background:
+        linear-gradient(145deg, #0b2440f2, #06172cee),
+        linear-gradient(90deg, #0c734526, transparent 42%, #d9b87d1f);
+    box-shadow: 0 22px 54px #0006, inset 0 1px 0 #ffffff14;
+}
+
+.ops-hero::before,
+.ops-dashboard .ops-stat-card.bg-white::before,
+.ops-dashboard :is(section, article, form, div).bg-white::before,
+.ops-dashboard :is(section, article, form, div).bg-blue-50::before {
+    content: '';
+    position: absolute;
+    inset: 0 0 auto;
+    height: 3px;
+    background: linear-gradient(90deg, var(--ops-green), var(--ops-gold), var(--ops-green));
+}
+
+.ops-dashboard .ops-stat-card.bg-white,
+.ops-dashboard :is(section, article, form, div).bg-white,
+.ops-dashboard :is(section, article, form, div).bg-blue-50 {
+    position: relative;
+    overflow: hidden;
+    border-color: #d8ecff2e !important;
+    color: #edf5ff;
+    background:
+        linear-gradient(180deg, #0b2440eb, #06172cf0),
+        linear-gradient(90deg, #0c73451a, transparent 35%, #d9b87d14) !important;
+    box-shadow: 0 16px 40px #0004, inset 0 1px 0 #ffffff12;
+}
+
+.ops-dashboard .bg-slate-50 {
+    background: #102d4b !important;
+}
+
+.ops-dashboard .bg-slate-100 {
+    background: #ffffff12 !important;
+}
+
+.ops-dashboard :is(.text-slate-950, .text-slate-900, .text-blue-950) {
+    color: #f7fbff !important;
+}
+
+.ops-dashboard :is(.text-slate-800, .text-slate-700, .text-blue-900) {
+    color: #dcecff !important;
+}
+
+.ops-dashboard :is(.text-slate-600, .text-slate-500, .text-blue-800\/75) {
+    color: #b4c6dc !important;
+}
+
+.ops-dashboard :is(.text-blue-700, .text-blue-800) {
+    color: var(--ops-gold-bright) !important;
+}
+
+.ops-dashboard :is(.border-slate-100, .border-slate-200, .border-blue-100, .border-blue-200) {
+    border-color: #d8ecff24 !important;
+}
+
+.ops-dashboard :is(article, form, label).border:not(.bg-white):not(.bg-blue-50) {
+    border-color: #d8ecff24 !important;
+    background: #ffffff08;
+}
+
+.ops-dashboard :is(.divide-slate-100, .divide-slate-200) > :not([hidden]) ~ :not([hidden]) {
+    border-color: #d8ecff24 !important;
+}
+
+.ops-dashboard table thead {
+    color: #f1d9ab;
+    background: #07182d !important;
+}
+
+.ops-dashboard table tbody tr:nth-child(even) {
+    background: #ffffff05;
+}
+
+.ops-dashboard table tbody tr:hover {
+    background: #35b46f0d;
+}
+
+.ops-dashboard :is(input, select, textarea),
+.ops-dashboard :is(input, select, textarea):is(.text-slate-950, .text-slate-900, .text-slate-800, .text-slate-700, .text-slate-600, .text-slate-500, .text-blue-700, .text-blue-800, .text-blue-800\/75) {
+    color: #0f172a !important;
+    background: #f8fafc !important;
+    border-color: #b6c9df !important;
+    opacity: 1 !important;
+}
+
+.ops-dashboard :is(input, select, textarea)::placeholder {
+    color: #64748b !important;
+    opacity: 1 !important;
+}
+
+.ops-dashboard select option {
+    color: #0f172a;
+    background: #f8fafc;
+}
+
+.ops-dashboard :is(input, select, textarea):focus {
+    border-color: var(--ops-gold) !important;
+    box-shadow: 0 0 0 2px #d9b87d33 !important;
+}
+
+.ops-dashboard .bg-blue-700 {
+    color: #06152c !important;
+    background: linear-gradient(180deg, #f1d8a8, #d7b676) !important;
+    box-shadow: 0 12px 28px #0004, inset 0 1px 0 #fff5;
+}
+
+.ops-dashboard .bg-blue-700:hover {
+    background: linear-gradient(180deg, #f7e3b8, #d9b87d) !important;
+}
+
+.ops-dashboard .bg-white:not(section):not(article):not(form):not(div):not(.ops-stat-card) {
+    background: #f8fafc !important;
+}
+
+.ops-dashboard :is(a, button).bg-white:not(.ops-stat-card) {
+    color: #0f172a !important;
+    border-color: #b6c9df !important;
+}
+
+.ops-dashboard :is(span, a, button).bg-blue-50 {
+    color: #06152c !important;
+    background: #fff7e6 !important;
+}
+
+.ops-dashboard .border-dashed {
+    border-color: #d9b87d66 !important;
+    background: #d9b87d0c;
+}
+
+.ops-eyebrow {
+    color: var(--ops-gold-bright);
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.ops-display {
+    font-family: 'Ops Condensed', 'Ops Barlow', sans-serif;
+    font-size: clamp(2rem, 4vw, 3.35rem);
+    line-height: 1;
+    text-transform: uppercase;
+}
+
+.ops-stat-card {
+    min-height: 8rem;
+}

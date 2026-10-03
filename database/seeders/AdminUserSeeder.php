@@ -9,19 +9,37 @@ use Illuminate\Support\Facades\Hash;
 class AdminUserSeeder extends Seeder
 {
     /**
-     * Create or reset the local development administrator account.
+     * Create or reset the local development operations accounts.
      */
     public function run(): void
     {
-        User::query()->updateOrCreate(
-            ['email' => 'admin@example.com'],
-            [
-                'name' => 'System Administrator',
-                'password' => Hash::make('password'),
-                'email_verified_at' => now(),
-                'role' => 'admin',
+        $password = env('INTRAMURALS_DEFAULT_ACCOUNT_PASSWORD');
+
+        if (! is_string($password) || $password === '') {
+            $this->command?->warn('Skipping default admin, GAM, and Tabulator accounts. Set INTRAMURALS_DEFAULT_ACCOUNT_PASSWORD in .env to seed them.');
+
+            return;
+        }
+
+        foreach ([
+            ['name' => 'System Administrator', 'email' => 'admin@example.com', 'role' => 'admin'],
+            ['name' => 'General Athletics Manager', 'email' => 'gam@example.com', 'role' => 'gam'],
+            ['name' => 'Event Tabulator', 'email' => 'tabulator@example.com', 'role' => 'tabulator'],
+        ] as $account) {
+            $user = User::query()->firstOrNew(['email' => $account['email']]);
+
+            $user->forceFill([
+                'name' => $account['name'],
+                'email_verified_at' => $user->email_verified_at ?? now(),
+                'role' => $account['role'],
                 'status' => 'active',
-            ],
-        );
+            ]);
+
+            if (! $user->exists || ! Hash::check($password, (string) $user->password)) {
+                $user->password = Hash::make($password);
+            }
+
+            $user->save();
+        }
     }
 }

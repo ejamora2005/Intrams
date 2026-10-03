@@ -54,6 +54,7 @@ class PublicScheduleService
                     return [
                         'sport' => $schedule->editionSport->sport->name,
                         'game' => $schedule->bracketMatch ? 'Game '.$schedule->bracketMatch->match_number : '',
+                        'time' => $schedule->starts_at->format('g:i A'),
                         'period' => $schedule->starts_at->hour < 12 ? 'Morning' : 'Afternoon',
                         'competitors' => $competitors->isEmpty() ? 'To be announced' : $competitors->implode(' VS '),
                         'facilitator' => $schedule->coordinator?->name ?? 'Unassigned',

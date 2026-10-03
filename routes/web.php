@@ -6,8 +6,10 @@ use App\Http\Controllers\Admin\EditionController;
 use App\Http\Controllers\Admin\EditionSportController;
 use App\Http\Controllers\Admin\EventController;
 use App\Http\Controllers\Admin\ModuleController;
+use App\Http\Controllers\Admin\OperationsAccountController;
 use App\Http\Controllers\Admin\StudentController;
 use App\Http\Controllers\Admin\SportController;
+use App\Http\Controllers\Admin\SportPointController;
 use App\Http\Controllers\Admin\SportModuleController;
 use App\Http\Controllers\Admin\RegistrationController;
 use App\Http\Controllers\Admin\CompetitionController;
@@ -15,6 +17,9 @@ use App\Http\Controllers\Admin\CourseController;
 use App\Http\Controllers\Admin\SystemLogController;
 use App\Http\Controllers\Admin\TeamController;
 use App\Http\Controllers\Coordinator\DashboardController as CoordinatorDashboardController;
+use App\Http\Controllers\Gam\DashboardController as GamDashboardController;
+use App\Http\Controllers\Tabulator\DashboardController as TabulatorDashboardController;
+use App\Services\StandingsService;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -28,8 +33,24 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
+Route::get('/up', fn () => response()->json(['status' => 'ok']))->name('health');
+
+Route::get('/', function (StandingsService $standingsService) {
+    try {
+        $landing = $standingsService->landingData();
+    } catch (Throwable) {
+        $landing = [
+            'teams' => config('landing.teams', []),
+            'preview' => config('landing.preview', true),
+            'updatedAt' => config('landing.updatedAt'),
+        ];
+    }
+
+    return view('welcome', [
+        'landingTeams' => $landing['teams'],
+        'landingPreview' => $landing['preview'],
+        'landingUpdatedAt' => $landing['updatedAt'],
+    ]);
 });
 
 Route::middleware([
@@ -38,9 +59,12 @@ Route::middleware([
     'verified',
 ])->group(function () {
     Route::get('/dashboard', function () {
-        return auth()->user()->role === 'admin'
-            ? redirect()->route('admin.dashboard')
-            : redirect()->route('coordinator.dashboard');
+        return match (auth()->user()->role) {
+            'admin' => redirect()->route('admin.dashboard'),
+            'gam' => redirect()->route('gam.dashboard'),
+            'tabulator' => redirect()->route('tabulator.dashboard'),
+            default => redirect()->route('coordinator.dashboard'),
+        };
     })->name('dashboard');
 
     Route::prefix('admin')->as('admin.')->middleware(['role:admin', 'return.admin.index'])->group(function () {
@@ -81,8 +105,16 @@ Route::middleware([
         Route::delete('/coordinators/{coordinator}/assignments/{assignment}', [CoordinatorController::class, 'revoke'])->name('coordinators.assignments.destroy');
         Route::post('/coordinators/{coordinator}/reset-device', [CoordinatorController::class, 'resetDevice'])->name('coordinators.device.reset');
         Route::post('/coordinator-requests/{coordinatorRequest}/review', [CoordinatorController::class, 'reviewRequest'])->name('coordinator-requests.review');
+        Route::get('/operations-accounts', [OperationsAccountController::class, 'index'])->name('operations-accounts.index');
+        Route::get('/operations-accounts/create', [OperationsAccountController::class, 'create'])->name('operations-accounts.create');
+        Route::post('/operations-accounts', [OperationsAccountController::class, 'store'])->name('operations-accounts.store');
+        Route::get('/operations-accounts/{operationsAccount}/edit', [OperationsAccountController::class, 'edit'])->name('operations-accounts.edit');
+        Route::put('/operations-accounts/{operationsAccount}', [OperationsAccountController::class, 'update'])->name('operations-accounts.update');
         Route::get('/sports-events', fn () => redirect()->route('admin.events.index'))->name('sports-events.index');
+        Route::get('/cultural', [SportController::class, 'cultural'])->name('cultural.index');
         Route::resource('sports', SportController::class)->except(['show']);
+        Route::get('/sports-points', [SportPointController::class, 'index'])->name('sports-points.index');
+        Route::put('/sports-points/{category}', [SportPointController::class, 'update'])->where('category', 'sports|cultural')->name('sports-points.update');
         Route::get('/sports/{sport}/bracket', [SportController::class, 'bracket'])->name('sports.bracket');
         Route::get('/sports/{sport}/basketball-score-sheet', [SportController::class, 'basketballScoreSheet'])->name('sports.basketball-score-sheet');
         Route::post('/sports/{sport}/basketball-score-sheet/download', [SportController::class, 'downloadBasketballScoreSheet'])->name('sports.basketball-score-sheet.download');
@@ -113,5 +145,17 @@ Route::middleware([
     Route::prefix('coordinator')->as('coordinator.')->middleware('role:coordinator')->group(function () {
         Route::get('/dashboard', [CoordinatorDashboardController::class, 'index'])->name('dashboard');
         Route::post('/requests', [CoordinatorDashboardController::class, 'storeRequest'])->name('requests.store');
+    });
+
+    Route::prefix('gam')->as('gam.')->middleware('role:gam')->group(function () {
+        Route::get('/dashboard', [GamDashboardController::class, 'index'])->name('dashboard');
+        Route::post('/teams/{team}/players', [GamDashboardController::class, 'storePlayer'])->name('teams.players.store');
+        Route::post('/teams/{team}/players/assign', [GamDashboardController::class, 'assignExistingPlayer'])->name('teams.players.assign');
+    });
+
+    Route::prefix('tabulator')->as('tabulator.')->middleware('role:tabulator')->group(function () {
+        Route::get('/dashboard', [TabulatorDashboardController::class, 'index'])->name('dashboard');
+        Route::post('/sport-results', [TabulatorDashboardController::class, 'declareSportWinners'])->name('sport-results.store');
+        Route::post('/matches/{match}/result', [TabulatorDashboardController::class, 'recordBracketResult'])->name('matches.result');
     });
 });

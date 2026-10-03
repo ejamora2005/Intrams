@@ -5,15 +5,16 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
         <title>{{ $title ?? 'Admin' }} | INTRAMURALS MANAGEMENT</title>
+        <x-pwa-meta />
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700&display=swap" rel="stylesheet" />
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-    <body class="bg-slate-50 font-sans text-slate-900 antialiased">
+    <body class="ops-body bg-blue-950 font-sans text-slate-900 antialiased" style="--ops-background: url('{{ asset(config('landing.background')) }}')">
         <div class="min-h-screen md:flex md:h-screen md:overflow-hidden">
             <div data-admin-sidebar-backdrop class="fixed inset-0 z-40 hidden bg-slate-950/55 backdrop-blur-sm md:hidden" aria-hidden="true"></div>
 
-            <aside id="admin-sidebar" data-admin-sidebar class="fixed inset-y-0 left-0 z-50 flex w-[min(18rem,calc(100vw-3rem))] -translate-x-full flex-col overflow-hidden bg-blue-950 text-blue-100 shadow-2xl transition-transform duration-200 ease-out md:static md:z-auto md:h-screen md:w-64 md:translate-x-0 md:shadow-none" aria-label="Admin sidebar">
+            <aside id="admin-sidebar" data-admin-sidebar class="ops-sidebar fixed inset-y-0 left-0 z-50 flex w-[min(18rem,calc(100vw-3rem))] -translate-x-full flex-col overflow-hidden bg-blue-950 text-blue-100 shadow-2xl transition-transform duration-200 ease-out md:static md:z-auto md:h-screen md:w-64 md:translate-x-0 md:shadow-none" aria-label="Admin sidebar">
                 <div class="flex items-center border-b border-blue-900">
                     <a href="{{ route('admin.dashboard') }}" aria-label="INTRAMURALS MANAGEMENT dashboard" class="min-w-0 flex-1 px-5 py-5 transition hover:bg-blue-900/60 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-400">
                         <x-intramurals-brand compact />
@@ -31,8 +32,11 @@
                             ['label' => 'Students', 'route' => 'admin.students.index', 'match' => 'admin/students'],
                             ['label' => 'Courses', 'route' => 'admin.courses.index', 'match' => 'admin/courses'],
                             ['label' => 'Coordinators', 'route' => 'admin.coordinators.index', 'match' => 'admin/coordinators'],
+                            ['label' => 'Operations Accounts', 'route' => 'admin.operations-accounts.index', 'match' => 'admin/operations-accounts'],
                             ['label' => 'Teams', 'route' => 'admin.teams.index', 'match' => 'admin/teams'],
                             ['label' => 'Sports', 'route' => 'admin.sports.index', 'match' => 'admin/sports'],
+                            ['label' => 'Cultural', 'route' => 'admin.cultural.index', 'match' => 'admin/cultural'],
+                            ['label' => 'Points System', 'route' => 'admin.sports-points.index', 'match' => 'admin/sports-points'],
                             ['label' => 'Live Competition', 'route' => 'admin.competition.index', 'match' => 'admin/competition'],
                             ['label' => 'System Logs', 'route' => 'admin.system-logs.index', 'match' => 'admin/system-logs'],
                         ];
@@ -60,18 +64,18 @@
             </aside>
 
             <main class="min-w-0 flex-1 md:h-screen md:overflow-y-auto">
-                <header class="sticky top-0 z-30 border-b border-slate-200 bg-white/95 px-3 py-3 backdrop-blur sm:px-6 md:z-20 md:px-8 md:py-4">
+                <header class="ops-topbar sticky top-0 z-30 border-b border-slate-200 bg-white/95 px-3 py-3 backdrop-blur sm:px-6 md:z-20 md:px-8 md:py-4">
                     <div class="mx-auto flex max-w-7xl items-center gap-3 sm:gap-4">
                         <button type="button" data-open-admin-sidebar class="shrink-0 rounded-lg border border-slate-200 bg-white p-2 text-slate-700 shadow-sm transition hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-600 md:hidden" aria-controls="admin-sidebar" aria-expanded="false" aria-label="Open navigation">
                             <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" d="M4 7h16M4 12h16M4 17h16" /></svg>
                         </button>
                         <div class="min-w-0">
-                            <h1 class="truncate text-lg font-semibold tracking-tight text-slate-900 sm:text-xl">{{ $title ?? 'Admin' }}</h1>
-                            @isset($subtitle)<p class="mt-0.5 truncate text-xs text-slate-500 sm:mt-1 sm:text-sm">{{ $subtitle }}</p>@endisset
+                            <h1 class="truncate text-lg font-semibold tracking-tight text-white sm:text-xl">{{ $title ?? 'Admin' }}</h1>
+                            @isset($subtitle)<p class="mt-0.5 truncate text-xs text-blue-100 sm:mt-1 sm:text-sm">{{ $subtitle }}</p>@endisset
                         </div>
                     </div>
                 </header>
-                <div class="mx-auto max-w-7xl px-3 py-5 sm:px-6 sm:py-7 md:px-8 md:py-8">@yield('content')</div>
+                <div class="ops-shell ops-dashboard mx-auto max-w-7xl px-3 py-5 sm:px-6 sm:py-7 md:px-8 md:py-8">@yield('content')</div>
             </main>
         </div>
         <script>
@@ -125,5 +129,6 @@
                 }
             });
         </script>
+        <x-pwa-install />
     </body>
 </html>

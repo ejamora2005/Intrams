@@ -33,20 +33,49 @@ class SportController extends Controller
     public function __construct(private readonly SportService $service, private readonly BracketService $bracketService) {}
     public function index(Request $request): View
     {
+        return $this->catalogue($request, false);
+    }
+
+    public function cultural(Request $request): View
+    {
+        return $this->catalogue($request, true);
+    }
+
+    private function catalogue(Request $request, bool $cultural): View
+    {
         $status = $request->string('status')->value() ?: 'active';
         $edition = $this->selectedEdition($request);
         $editionId = $edition?->id;
         $sports = Sport::query()
+            ->when(
+                $cultural,
+                fn ($query) => $query->where('code', 'like', 'CULT-%'),
+                fn ($query) => $query->where('code', 'not like', 'CULT-%'),
+            )
             ->when($edition, fn ($query) => $query->whereHas('editionSports', fn ($configuration) => $configuration->where('edition_id', $edition->id)))
             ->withCount(['editionSports as edition_sports_count' => fn ($query) => $edition ? $query->where('edition_id', $edition->id) : $query])
             ->when($status === 'archived', fn ($query) => $query->onlyTrashed())
             ->when(in_array($status, ['active', 'inactive'], true), fn ($query) => $query->where('status', $status))
             ->orderBy('name')
-            ->paginate(15)
+            ->paginate(60)
             ->withQueryString();
         $editions = IntramuralEdition::query()->orderByDesc('starts_on')->orderByDesc('id')->get();
 
-        return view('admin.sports.index', compact('sports', 'status', 'edition', 'editionId', 'editions'));
+        return view('admin.sports.index', [
+            'sports' => $sports,
+            'status' => $status,
+            'edition' => $edition,
+            'editionId' => $editionId,
+            'editions' => $editions,
+            'title' => $cultural ? 'Cultural' : 'Sports',
+            'subtitle' => $cultural
+                ? 'Manage cultural scoring events and bonus awards.'
+                : 'Manage the sport catalogue, mechanics, and participants.',
+            'listLabel' => $cultural ? 'Cultural events list' : 'Sports list',
+            'emptyMessage' => $cultural ? 'No cultural events found.' : 'No sports found.',
+            'showAddButton' => ! $cultural,
+            'cardTarget' => $cultural ? 'edit' : 'bracket',
+        ]);
     }
 
     public function create(Request $request): View

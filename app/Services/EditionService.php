@@ -56,7 +56,8 @@ class EditionService
      */
     public function syncDefaultSports(IntramuralEdition $edition): void
     {
-        foreach (Sport::query()->where('is_system', true)->get(['id', 'name']) as $sport) {
+        foreach (Sport::query()->where('is_system', true)->get(['id', 'name', 'code']) as $sport) {
+            $defaults = $this->defaultCompetitionConfiguration($sport);
             $configuration = $edition->editionSports()
                 ->withTrashed()
                 ->where('sport_id', $sport->id)
@@ -67,20 +68,36 @@ class EditionService
                     $configuration->restore();
                 }
 
+                if (empty($configuration->scoring_rules['placements'])) {
+                    $configuration->update(['scoring_rules' => $defaults['scoring_rules']]);
+                }
+
                 continue;
             }
 
             $edition->editionSports()->create([
                 'sport_id' => $sport->id,
-                'participant_type' => match ($sport->name) {
-                    'Badminton' => 'dual',
-                    'Table Tennis' => 'individual',
-                    default => 'team',
-                },
-                'game_mechanic' => 'single_elimination',
+                'participant_type' => $defaults['participant_type'],
+                'game_mechanic' => $defaults['game_mechanic'],
+                'scoring_rules' => $defaults['scoring_rules'],
+                'rules' => $defaults['rules'],
                 'status' => 'preparation',
             ]);
         }
+    }
+
+    /** @return array{participant_type: string, game_mechanic: string, scoring_rules: array<string, mixed>, rules: ?string} */
+    private function defaultCompetitionConfiguration(Sport $sport): array
+    {
+        $catalogItem = collect(config('intramurals.default_competitions', []))
+            ->firstWhere('code', $sport->code);
+
+        return [
+            'participant_type' => $catalogItem['participant_type'] ?? 'team',
+            'game_mechanic' => $catalogItem['game_mechanic'] ?? 'single_elimination',
+            'scoring_rules' => $catalogItem['scoring_rules'] ?? StandingsService::defaultScoringRules(),
+            'rules' => $catalogItem['rules'] ?? null,
+        ];
     }
 
     private function ensureNoOtherActiveEdition(string $status, ?IntramuralEdition $except = null): void
