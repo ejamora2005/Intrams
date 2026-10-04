@@ -5,9 +5,11 @@ const dismissButtons = Array.from(document.querySelectorAll('[data-pwa-dismiss]'
 const refreshButtons = Array.from(document.querySelectorAll('[data-pwa-refresh]'));
 const installTitle = document.querySelector('[data-pwa-install-title]');
 const installCopy = document.querySelector('[data-pwa-install-copy]');
+const installStatuses = Array.from(document.querySelectorAll('[data-pwa-install-status]'));
 
 let installPrompt = null;
 let waitingWorker = null;
+const installUnavailableMessage = 'Chrome cannot open the install prompt right now. If the address bar shows Open in app, SLSU INTRAMURALS is already installed on this device. Remove the installed app first if you want the download button to appear again.';
 
 const isStandalone = () => window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
 const canUseServiceWorker = () => 'serviceWorker' in navigator && (window.isSecureContext || location.hostname === 'localhost' || location.hostname === '127.0.0.1');
@@ -21,6 +23,13 @@ const setInstallButtonsVisible = visible => {
 const setRefreshButtonsVisible = visible => {
     refreshButtons.forEach(button => {
         button.hidden = !visible;
+    });
+};
+
+const setInstallStatus = message => {
+    installStatuses.forEach(status => {
+        status.textContent = message || '';
+        status.hidden = !message;
     });
 };
 
@@ -46,6 +55,7 @@ const showInstallPanel = async mode => {
     if (installPanel) installPanel.hidden = false;
 
     const updateMode = mode === 'update';
+    setInstallStatus('');
     setRefreshButtonsVisible(updateMode);
     setInstallButtonsVisible(!updateMode && Boolean(installPrompt));
 
@@ -62,6 +72,7 @@ const showInstallPanel = async mode => {
 
 const hideInstallControls = () => {
     if (installPanel) installPanel.hidden = true;
+    setInstallStatus('');
     setInstallButtonsVisible(false);
     setRefreshButtonsVisible(false);
 };
@@ -79,12 +90,28 @@ window.addEventListener('appinstalled', () => {
 
 installButtons.forEach(button => {
     button.addEventListener('click', async () => {
-        if (!installPrompt) return;
+        if (!installPrompt) {
+            setInstallStatus(installUnavailableMessage);
+            return;
+        }
 
-        installPrompt.prompt();
-        await installPrompt.userChoice;
+        const prompt = installPrompt;
         installPrompt = null;
-        hideInstallControls();
+
+        try {
+            prompt.prompt();
+            const choice = await prompt.userChoice;
+
+            if (choice.outcome === 'accepted') {
+                setInstallStatus('Installing SLSU INTRAMURALS App...');
+            } else {
+                setInstallStatus('Install was dismissed. Refresh this page if Chrome offers the install prompt again.');
+            }
+        } catch {
+            setInstallStatus(installUnavailableMessage);
+        } finally {
+            setInstallButtonsVisible(false);
+        }
     });
 });
 

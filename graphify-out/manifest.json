@@ -1068,9 +1068,9 @@
     "semantic_hash": "db35ed00c135a61a70cc787199e82107"
   },
   "resources/views/auth/login.blade.php": {
-    "mtime": 1791100172.085442,
-    "seen": 1791100209.2573073,
-    "ast_hash": "f0b23c21d778fe51eee5a607ba7de009",
+    "mtime": 1791102172.3558002,
+    "seen": 1791102199.415921,
+    "ast_hash": "f659ac728e5207c026834cd4dd8b288d",
     "semantic_hash": ""
   },
   "resources/views/auth/register.blade.php": {
@@ -2142,15 +2142,15 @@
     "semantic_hash": ""
   },
   "resources/js/pwa.js": {
-    "mtime": 1791100183.8509107,
-    "seen": 1791100209.2573073,
-    "ast_hash": "03f12de1ea35d18ddf946973925d508a",
+    "mtime": 1791101216.2660227,
+    "seen": 1791101261.0840116,
+    "ast_hash": "75dab522b4c2838ad6686bac7df83a70",
     "semantic_hash": ""
   },
   "resources/views/components/pwa-install.blade.php": {
-    "mtime": 1791100183.8498986,
-    "seen": 1791100209.2573073,
-    "ast_hash": "2510759d6a0381417959be89f8f3695a",
+    "mtime": 1791101216.265025,
+    "seen": 1791101261.0850139,
+    "ast_hash": "fa176356af8f7a3236ce2568efb5b6a9",
     "semantic_hash": ""
   },
   "resources/views/components/pwa-meta.blade.php": {
@@ -2255,12 +2255,6 @@
     "ast_hash": "4184c498ea1d31683dba40427d9fcf21",
     "semantic_hash": ""
   },
-  "public/images/logo/main_logo.png": {
-    "mtime": 1791097163.5201924,
-    "seen": 1791098229.036275,
-    "ast_hash": "e206e50415d79f602cda1031f485bbc4",
-    "semantic_hash": ""
-  },
   "public/images/logo/sea_dragons.png": {
     "mtime": 1791097775.76202,
     "seen": 1791098229.036275,
@@ -2283,6 +2277,12 @@
     "mtime": 1791098596.5059834,
     "seen": 1791099003.133201,
     "ast_hash": "4877b5f047cbd665ec04d14ea68c3372",
+    "semantic_hash": ""
+  },
+  "public/images/logo/main_logo.png": {
+    "mtime": 1791097163.5201924,
+    "seen": 1791100711.6692815,
+    "ast_hash": "e206e50415d79f602cda1031f485bbc4",
     "semantic_hash": ""
   }
 }

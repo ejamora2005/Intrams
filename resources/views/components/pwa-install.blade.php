@@ -7,10 +7,11 @@
                 <p data-pwa-install-title class="text-sm font-semibold">Download SLSU INTRAMURALS App</p>
                 <p data-pwa-install-copy class="mt-1 text-sm leading-5 text-blue-100">Open the system from your device app list with offline-ready assets.</p>
                 <div class="mt-4 flex flex-wrap gap-2">
-                    <button type="button" data-pwa-install-button class="rounded-lg bg-amber-200 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-amber-100">Download SLSU INTRAMURALS App</button>
+                    <button type="button" data-pwa-install-button class="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-800 transition hover:bg-slate-50">Download SLSU INTRAMURALS App</button>
                     <button type="button" data-pwa-refresh hidden class="rounded-lg bg-amber-200 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-amber-100">Update now</button>
                     <button type="button" data-pwa-dismiss class="rounded-lg border border-white/20 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/10">Later</button>
                 </div>
+                <p data-pwa-install-status hidden class="mt-3 rounded-lg border border-white/15 bg-white/10 px-3 py-2 text-xs font-medium leading-5 text-blue-50"></p>
             </div>
         </div>
     </section>
