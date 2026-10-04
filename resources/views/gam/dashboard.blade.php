@@ -42,7 +42,9 @@
         <div class="flex flex-col justify-between gap-3 border-b border-slate-100 pb-4 lg:flex-row lg:items-end">
             <div>
                 <h2 class="text-base font-semibold text-slate-950">Roster management</h2>
-                <p class="mt-1 text-sm text-slate-500">This GAM account can manage only its assigned faction.</p>
+                <p class="mt-1 text-sm text-slate-500">
+                    {{ $hasAllFactionAccess ? 'This GAM account can manage all active factions.' : 'This GAM account can manage only its assigned faction.' }}
+                </p>
             </div>
             @if ($teams->isNotEmpty())
                 <form method="GET" action="{{ route('gam.dashboard') }}" class="flex flex-col gap-2 sm:flex-row sm:items-center">
@@ -136,7 +138,7 @@
             </div>
         @else
             <p class="mt-5 rounded-lg border border-dashed border-slate-300 px-4 py-8 text-center text-sm text-slate-500">
-                {{ $managedTeamId ? 'The assigned faction is not active in the current edition.' : 'No faction is assigned to this GAM account yet. Ask an admin to edit the operations account and choose a faction.' }}
+                {{ $managedTeamId ? 'The assigned faction is not active in the current edition.' : 'No active factions are available for the current edition.' }}
             </p>
         @endif
     </section>

@@ -4,36 +4,18 @@
     <div><label for="email" class="text-sm font-medium text-slate-700">Email address</label><input id="email" name="email" type="email" value="{{ old('email', $account->email) }}" required class="mt-2 block w-full rounded-lg border-slate-300 px-3 py-2.5 text-sm shadow-sm focus:border-blue-600 focus:ring-blue-600">@error('email')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror</div>
     <div><label for="role" class="text-sm font-medium text-slate-700">Role</label><select id="role" name="role" required class="mt-2 block w-full rounded-lg border-slate-300 py-2.5 text-sm shadow-sm focus:border-blue-600 focus:ring-blue-600">@foreach ($roles as $value => $label)<option value="{{ $value }}" @selected(old('role', $account->role ?: 'tabulator') === $value)>{{ $label }}</option>@endforeach</select>@error('role')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror</div>
     <div><label for="status" class="text-sm font-medium text-slate-700">Account status</label><select id="status" name="status" class="mt-2 block w-full rounded-lg border-slate-300 py-2.5 text-sm shadow-sm focus:border-blue-600 focus:ring-blue-600"><option value="active" @selected(old('status', $account->status ?: 'active') === 'active')>Active</option><option value="inactive" @selected(old('status', $account->status) === 'inactive')>Inactive</option><option value="suspended" @selected(old('status', $account->status) === 'suspended')>Suspended</option></select>@error('status')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror</div>
-    <div data-gam-faction-field class="sm:col-span-2">
+    <div class="sm:col-span-2">
         <label for="managed_team_id" class="text-sm font-medium text-slate-700">Assigned faction</label>
         <select id="managed_team_id" name="managed_team_id" class="mt-2 block w-full rounded-lg border-slate-300 py-2.5 text-sm shadow-sm focus:border-blue-600 focus:ring-blue-600">
-            <option value="">Choose faction for GAM</option>
+            <option value="">All active factions</option>
             @foreach ($teams as $team)
                 <option value="{{ $team->id }}" @selected((int) old('managed_team_id', $account->managed_team_id) === $team->id)>{{ $team->name }} @if ($team->edition) / {{ $team->edition->name }} @endif</option>
             @endforeach
         </select>
-        <p class="mt-1 text-xs text-slate-500">Required for GAM accounts. Tabulator accounts do not use a faction assignment.</p>
+        <p class="mt-1 text-xs text-slate-500">Leave blank for the default all-factions access. Choose a faction to limit a GAM account to one team or to label a tabulator account with a faction.</p>
         @error('managed_team_id')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
     </div>
     <div><label for="password" class="text-sm font-medium text-slate-700">{{ $account->exists ? 'New password (optional)' : 'Password' }}</label><input id="password" name="password" type="password" @if (! $account->exists) required @endif class="mt-2 block w-full rounded-lg border-slate-300 px-3 py-2.5 text-sm shadow-sm focus:border-blue-600 focus:ring-blue-600">@error('password')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror</div>
     <div><label for="password_confirmation" class="text-sm font-medium text-slate-700">Confirm password</label><input id="password_confirmation" name="password_confirmation" type="password" class="mt-2 block w-full rounded-lg border-slate-300 px-3 py-2.5 text-sm shadow-sm focus:border-blue-600 focus:ring-blue-600"></div>
 </div>
 <div class="mt-7 flex gap-3 border-t border-slate-100 pt-6"><button class="rounded-lg bg-blue-700 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-800">{{ $submitLabel }}</button><a href="{{ route('admin.operations-accounts.index') }}" class="rounded-lg px-4 py-2.5 text-sm font-semibold text-slate-600 hover:bg-slate-100">Cancel</a></div>
-
-<script>
-    (() => {
-        const role = document.getElementById('role');
-        const field = document.querySelector('[data-gam-faction-field]');
-        const select = document.getElementById('managed_team_id');
-        if (!role || !field || !select) return;
-
-        const syncFactionField = () => {
-            const isGam = role.value === 'gam';
-            field.classList.toggle('hidden', !isGam);
-            select.required = isGam;
-        };
-
-        role.addEventListener('change', syncFactionField);
-        syncFactionField();
-    })();
-</script>

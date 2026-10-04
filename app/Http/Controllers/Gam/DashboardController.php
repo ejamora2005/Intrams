@@ -33,13 +33,14 @@ class DashboardController extends Controller
         $edition = $this->standingsService->activeEdition();
         $editionSportIds = $edition?->editionSports()->pluck('id') ?? collect();
         $managedTeamId = $request->user()?->managed_team_id;
+        $hasAllFactionAccess = $managedTeamId === null;
         $standings = $this->standingsService->standingsFor($edition)
-            ->when($managedTeamId, fn ($rows) => $rows->filter(fn (array $row): bool => (int) $row['team']->id === (int) $managedTeamId)->values(), fn ($rows) => collect());
+            ->when($managedTeamId, fn ($rows) => $rows->filter(fn (array $row): bool => (int) $row['team']->id === (int) $managedTeamId)->values());
         $teams = $edition?->teams()
             ->with('course')
             ->withCount('members')
             ->where('status', 'active')
-            ->when($managedTeamId, fn ($query) => $query->whereKey($managedTeamId), fn ($query) => $query->whereRaw('1 = 0'))
+            ->when($managedTeamId, fn ($query) => $query->whereKey($managedTeamId))
             ->orderBy('name')
             ->get() ?? collect();
         $selectedTeam = $teams->firstWhere('id', $request->integer('team_id')) ?? $teams->first();
@@ -74,10 +75,14 @@ class DashboardController extends Controller
                 ->with(['student.course', 'team', 'editionSport.sport'])
                 ->where('status', 'active')
                 ->whereIn('edition_sport_id', $editionSportIds)
-                ->where(function ($query) use ($edition, $managedTeamId): void {
-                    if (! $managedTeamId || ! $edition) {
+                ->where(function ($query) use ($edition, $managedTeamId, $hasAllFactionAccess): void {
+                    if (! $edition) {
                         $query->whereRaw('1 = 0');
 
+                        return;
+                    }
+
+                    if ($hasAllFactionAccess) {
                         return;
                     }
 
@@ -103,6 +108,7 @@ class DashboardController extends Controller
             'teams' => $teams,
             'selectedTeam' => $selectedTeam,
             'managedTeamId' => $managedTeamId,
+            'hasAllFactionAccess' => $hasAllFactionAccess,
             'availableStudents' => $availableStudents,
             'eligibilityByStudentId' => $eligibilityByStudentId,
             'medicalCertificateEntries' => $medicalCertificateEntries,
@@ -211,15 +217,24 @@ class DashboardController extends Controller
 
     private function userCanManageTeam(?User $user, Team $team): bool
     {
-        return $user?->role === 'gam' && (int) $user->managed_team_id === (int) $team->id;
+        if ($user?->role !== 'gam') {
+            return false;
+        }
+
+        return $user->managed_team_id === null || (int) $user->managed_team_id === (int) $team->id;
     }
 
     private function userCanManageEntry(?User $user, AthleteEntry $entry): bool
     {
-        $managedTeamId = (int) ($user?->managed_team_id ?? 0);
-        if ($user?->role !== 'gam' || $managedTeamId <= 0) {
+        if ($user?->role !== 'gam') {
             return false;
         }
+
+        if ($user->managed_team_id === null) {
+            return true;
+        }
+
+        $managedTeamId = (int) $user->managed_team_id;
 
         if ((int) $entry->team_id === $managedTeamId) {
             return true;

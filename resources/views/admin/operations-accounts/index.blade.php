@@ -38,7 +38,7 @@
                                 <td class="px-5 py-4 font-medium text-slate-900">{{ $account->name }}</td>
                                 <td class="px-5 py-4">{{ $account->email }}</td>
                                 <td class="px-5 py-4">{{ $roles[$account->role] ?? ucfirst($account->role) }}</td>
-                                <td class="px-5 py-4">{{ $account->role === 'gam' ? ($account->managedTeam?->name ?? 'Not assigned') : '-' }}</td>
+                                <td class="px-5 py-4">{{ $account->managedTeam?->name ?? 'All active factions' }}</td>
                                 <td class="px-5 py-4"><span @class(['font-medium', 'text-green-700' => $account->status === 'active', 'text-amber-700' => $account->status === 'inactive', 'text-red-700' => $account->status === 'suspended'])>{{ ucfirst($account->status) }}</span></td>
                                 <td class="px-5 py-4 text-right"><a href="{{ route('admin.operations-accounts.edit', $account) }}" class="font-medium text-blue-700 hover:text-blue-900">Manage</a></td>
                             </tr>

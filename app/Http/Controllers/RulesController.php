@@ -21,7 +21,7 @@ class RulesController extends Controller
 
     public function gam(): View
     {
-        return $this->show('layouts.coordinator', 'gam.dashboard', 'GAM workspace', request()->user()?->managedTeam, true);
+        return $this->show('layouts.coordinator', 'gam.dashboard', 'GAM workspace', request()->user()?->managedTeam);
     }
 
     public function tabulator(): View

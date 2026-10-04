@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Models\Team;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
@@ -22,13 +21,6 @@ class AdminUserSeeder extends Seeder
             return;
         }
 
-        $defaultGamTeamId = Team::query()
-            ->where('status', 'active')
-            ->whereHas('edition', fn ($query) => $query->where('status', 'active'))
-            ->orderBy('name')
-            ->value('id')
-            ?: Team::query()->where('status', 'active')->orderBy('name')->value('id');
-
         foreach ([
             ['name' => 'System Administrator', 'email' => 'admin@example.com', 'role' => 'admin'],
             ['name' => 'General Athletics Manager', 'email' => 'gam@example.com', 'role' => 'gam'],
@@ -41,9 +33,7 @@ class AdminUserSeeder extends Seeder
                 'email_verified_at' => $user->email_verified_at ?? now(),
                 'role' => $account['role'],
                 'status' => 'active',
-                'managed_team_id' => $account['role'] === 'gam'
-                    ? ($user->managed_team_id ?: $defaultGamTeamId)
-                    : null,
+                'managed_team_id' => null,
             ]);
 
             if (! $user->exists || ! Hash::check($password, (string) $user->password)) {

@@ -11,6 +11,7 @@ use App\Models\TeamMember;
 use App\Models\TeamTally;
 use App\Models\User;
 use App\Services\StandingsService;
+use Database\Seeders\AdminUserSeeder;
 use Illuminate\Support\Facades\Hash;
 
 function operationsEdition(): IntramuralEdition
@@ -206,6 +207,7 @@ test('admins can create multiple tabulator and GAM accounts', function () {
         'email' => 'tabulator-two@example.com',
         'role' => 'tabulator',
         'status' => 'active',
+        'managed_team_id' => $team->id,
         'password' => 'secure-password',
         'password_confirmation' => 'secure-password',
     ])->assertRedirect();
@@ -220,8 +222,36 @@ test('admins can create multiple tabulator and GAM accounts', function () {
         'password_confirmation' => 'secure-password',
     ])->assertRedirect();
 
-    $this->assertDatabaseHas('users', ['email' => 'tabulator-two@example.com', 'role' => 'tabulator']);
+    $this->assertDatabaseHas('users', ['email' => 'tabulator-two@example.com', 'role' => 'tabulator', 'managed_team_id' => $team->id]);
     $this->assertDatabaseHas('users', ['email' => 'gam-two@example.com', 'role' => 'gam', 'managed_team_id' => $team->id]);
+});
+
+test('default operations accounts seed with all-faction access', function () {
+    $previous = $_ENV['INTRAMURALS_DEFAULT_ACCOUNT_PASSWORD'] ?? null;
+    putenv('INTRAMURALS_DEFAULT_ACCOUNT_PASSWORD=password');
+    $_ENV['INTRAMURALS_DEFAULT_ACCOUNT_PASSWORD'] = 'password';
+    $_SERVER['INTRAMURALS_DEFAULT_ACCOUNT_PASSWORD'] = 'password';
+
+    try {
+        $this->seed(AdminUserSeeder::class);
+
+        $this->assertDatabaseHas('users', ['email' => 'gam@example.com', 'role' => 'gam', 'managed_team_id' => null]);
+        $this->assertDatabaseHas('users', ['email' => 'tabulator@example.com', 'role' => 'tabulator', 'managed_team_id' => null]);
+
+        $this->post('/login', ['email' => 'gam@example.com', 'password' => 'password'])->assertRedirect(route('dashboard'));
+        $this->assertAuthenticated();
+    } finally {
+        auth()->logout();
+
+        if ($previous === null) {
+            putenv('INTRAMURALS_DEFAULT_ACCOUNT_PASSWORD');
+            unset($_ENV['INTRAMURALS_DEFAULT_ACCOUNT_PASSWORD'], $_SERVER['INTRAMURALS_DEFAULT_ACCOUNT_PASSWORD']);
+        } else {
+            putenv('INTRAMURALS_DEFAULT_ACCOUNT_PASSWORD='.$previous);
+            $_ENV['INTRAMURALS_DEFAULT_ACCOUNT_PASSWORD'] = $previous;
+            $_SERVER['INTRAMURALS_DEFAULT_ACCOUNT_PASSWORD'] = $previous;
+        }
+    }
 });
 
 test('multiple tabulators can access the tabulator dashboard', function () {
@@ -345,6 +375,33 @@ test('GAM users can verify required medical certificates but exempt sports stay 
         'medical_certificate_reviewed_by' => $gam->id,
         'medical_certificate_notes' => 'Cleared',
     ]);
+});
+
+test('unassigned GAM users can manage all active factions', function () {
+    $edition = operationsEdition();
+    $firstTeam = operationsTeam($edition, 'Mighty Sea Dragons', 'mighty-sea-dragons', 'Marine Biology', 'MB');
+    $secondTeam = operationsTeam($edition, 'Trojan Warriors', 'trojan-warriors', 'Information Technology', 'IT');
+    $gam = User::factory()->create(['role' => 'gam', 'status' => 'active', 'managed_team_id' => null]);
+
+    $this->actingAs($gam)->get(route('gam.dashboard'))
+        ->assertOk()
+        ->assertSee('This GAM account can manage all active factions.')
+        ->assertSee('Mighty Sea Dragons')
+        ->assertSee('Trojan Warriors');
+
+    $this->actingAs($gam)->post(route('gam.teams.players.store', $secondTeam), [
+        'student_number' => 'GLOBAL-GAM-001',
+        'first_name' => 'Global',
+        'last_name' => 'Player',
+        'course_id' => $secondTeam->course_id,
+    ])->assertRedirect(route('gam.dashboard', ['team_id' => $secondTeam->id]));
+
+    $this->assertDatabaseHas('team_members', [
+        'team_id' => $secondTeam->id,
+        'student_id' => Student::query()->where('student_number', 'GLOBAL-GAM-001')->value('id'),
+    ]);
+
+    expect($firstTeam->fresh()->members()->count())->toBe(0);
 });
 
 test('GAM users cannot manage another faction', function () {

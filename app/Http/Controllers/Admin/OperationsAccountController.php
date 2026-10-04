@@ -10,7 +10,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
-use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\View\View;
 
@@ -117,13 +116,7 @@ class OperationsAccountController extends Controller
             ],
         ]);
 
-        if ($data['role'] === 'gam' && empty($data['managed_team_id'])) {
-            throw ValidationException::withMessages([
-                'managed_team_id' => 'Choose the faction this GAM account can manage.',
-            ]);
-        }
-
-        if ($data['role'] !== 'gam') {
+        if (! in_array($data['role'], ['gam', 'tabulator'], true)) {
             $data['managed_team_id'] = null;
         }
 
