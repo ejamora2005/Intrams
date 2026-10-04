@@ -67,16 +67,25 @@
                                 <thead class="sticky top-0 z-10 bg-slate-50 text-xs font-semibold uppercase tracking-wide text-slate-500"><tr><th class="w-12 px-4 py-3"><span class="sr-only">Select</span></th><th class="px-4 py-3">Student</th><th class="hidden w-44 px-4 py-3 sm:table-cell">Student number</th></tr></thead>
                                 <tbody class="divide-y divide-slate-100 bg-white">
                                     @foreach ($entries as $entry)
-                                        <tr data-team-row data-search="{{ Str::lower($entry->student->full_name.' '.$entry->student->student_number) }}">
+                                        @php($eligibility = $eligibilityByStudentId->get($entry->student_id))
+                                        <tr data-team-row data-search="{{ Str::lower($entry->student->full_name.' '.$entry->student->student_number) }}" @class(['bg-red-50/90' => $eligibility['possible_dq'] ?? false])>
                                             <td class="px-4 py-3 align-middle"><input name="athlete_entry_ids[]" value="{{ $entry->id }}" type="checkbox" class="team-entry-checkbox rounded border-slate-300 text-blue-700 focus:ring-blue-600" aria-label="Select {{ $entry->student->full_name }}"></td>
                                             <td class="px-4 py-3 align-middle">
-                                                <span class="block font-medium text-slate-900">{{ $entry->student->full_name }}</span>
+                                                <span class="flex flex-wrap items-center gap-2 font-medium text-slate-900">
+                                                    {{ $entry->student->full_name }}
+                                                    @if ($eligibility['possible_dq'] ?? false)
+                                                        <span class="rounded-full bg-red-600 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-white">Possible DQ</span>
+                                                    @endif
+                                                </span>
                                                 <span class="block text-xs text-slate-500">
                                                     {{ $entry->student->course?->name }}
                                                     @if ($editionSport->participant_type === 'dual')
                                                         <span class="ml-1">&middot; Dual pair</span>
                                                     @endif
                                                 </span>
+                                                @if ($eligibility['possible_dq'] ?? false)
+                                                    <span class="mt-1 block text-xs font-medium text-red-700">{{ implode(' ', $eligibility['issues']) }}</span>
+                                                @endif
                                             </td>
                                             <td class="hidden px-4 py-3 text-slate-500 sm:table-cell">{{ $entry->student->student_number }}</td>
                                         </tr>
@@ -103,7 +112,24 @@
                         <div class="border-b border-slate-100 last:border-b-0">
                             <h3 class="sticky top-0 bg-slate-50 px-5 py-3 text-sm font-semibold text-slate-700">{{ $groupName }}</h3>
                             @foreach ($entries as $entry)
-                                <label class="flex cursor-pointer justify-between gap-4 px-5 py-3 text-sm transition hover:bg-slate-50"><span class="flex items-center gap-3"><input name="athlete_entry_ids[]" value="{{ $entry->id }}" type="checkbox" class="rounded border-slate-300 text-blue-700 focus:ring-blue-600"><span class="font-medium text-slate-800">{{ $entry->student->full_name }}</span></span><span class="text-right text-slate-500">{{ $entry->student->student_number }}</span></label>
+                                @php($eligibility = $eligibilityByStudentId->get($entry->student_id))
+                                <label @class(['flex cursor-pointer justify-between gap-4 px-5 py-3 text-sm transition hover:bg-slate-50', 'bg-red-50/90' => $eligibility['possible_dq'] ?? false])>
+                                    <span class="flex items-center gap-3">
+                                        <input name="athlete_entry_ids[]" value="{{ $entry->id }}" type="checkbox" class="rounded border-slate-300 text-blue-700 focus:ring-blue-600">
+                                        <span>
+                                            <span class="flex flex-wrap items-center gap-2 font-medium text-slate-800">
+                                                {{ $entry->student->full_name }}
+                                                @if ($eligibility['possible_dq'] ?? false)
+                                                    <span class="rounded-full bg-red-600 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-white">Possible DQ</span>
+                                                @endif
+                                            </span>
+                                            @if ($eligibility['possible_dq'] ?? false)
+                                                <span class="mt-1 block text-xs font-medium text-red-700">{{ implode(' ', $eligibility['issues']) }}</span>
+                                            @endif
+                                        </span>
+                                    </span>
+                                    <span class="text-right text-slate-500">{{ $entry->student->student_number }}</span>
+                                </label>
                             @endforeach
                         </div>
                     @empty

@@ -56,7 +56,7 @@ On desktop, the sidebar stays fixed while only the main display panel scrolls, s
 
 ## Test data
 
-`php artisan db:seed` provides `admin@example.com` / `password`, the **2026 SLSU Bontoc-campus Intramurals** edition (today through five days later), and five randomized student profiles for each of BSIT, BSFI, BSA, and BSMB.
+`php artisan db:seed` provides the **SLSUBC INTRAMURALS 2026** edition, default factions/teams, sports, cultural events, schedules, point systems, and the supplied student roster. Operation accounts are seeded when `INTRAMURALS_DEFAULT_ACCOUNT_PASSWORD` is set.
 
 ## Current implementation state
 
@@ -172,13 +172,15 @@ For local development, create staff accounts with a securely hashed password and
 
 ### Local test administrator
 
-Running `php artisan db:seed` creates (or resets) a development-only administrator account:
+Running `php artisan db:seed` creates (or resets) the default operations accounts when `INTRAMURALS_DEFAULT_ACCOUNT_PASSWORD` is set. For local testing, set it to `password`.
 
 | Email | Password | Role |
 |---|---|---|
-| `admin@example.com` | `password` | `admin` |
+| `admin@example.com` | value of `INTRAMURALS_DEFAULT_ACCOUNT_PASSWORD` | `admin` |
+| `gam@example.com` | value of `INTRAMURALS_DEFAULT_ACCOUNT_PASSWORD` | `gam` |
+| `tabulator@example.com` | value of `INTRAMURALS_DEFAULT_ACCOUNT_PASSWORD` | `tabulator` |
 
-This account is intentionally for local testing only. Change or remove it before deploying the application.
+These accounts are intentionally for local testing and initial deployment only. Change or remove them before handing the application to production users.
 
 The feature test suite uses `RefreshDatabase`; if you run tests against the local MySQL database, run `php artisan db:seed` again afterward to restore this development account.
 
@@ -216,7 +218,7 @@ When assigning a roster, administrators can filter available athletes by course,
 
 The **Sports & Events** module now manages active/inactive sports and their edition-specific events. Event codes are generated internally, so administrators only provide the event name, competition type, venue, schedule, result mode, and capacity. For team events, capacity is the maximum number of athletes each team may register; for individual events, it is the maximum number of athletes overall. The event lifecycle only allows `draft → scheduled → live → completed`, with cancellation available before completion. Every change is audited.
 
-`php artisan db:seed` also creates the default sports: Basketball 3x3, Basketball 5x5, Volleyball, Badminton, Table Tennis, Baseball, Softball, and Russian Softball.
+`php artisan db:seed` also creates the default sports, athletics events, cultural events, default schedules, and the supplied student roster. Food Committee-only names are intentionally excluded from that roster seed.
 
 When an administrator creates a new intramurals edition, these default sports are automatically linked to that edition. Additional events can then be created for that edition under its linked sports.
 

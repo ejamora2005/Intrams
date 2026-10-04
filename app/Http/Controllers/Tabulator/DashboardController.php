@@ -8,6 +8,7 @@ use App\Models\BracketMatch;
 use App\Models\EditionSport;
 use App\Models\Team;
 use App\Services\BracketService;
+use App\Services\EligibilityService;
 use App\Services\StandingsService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -20,6 +21,7 @@ class DashboardController extends Controller
     public function __construct(
         private readonly BracketService $bracketService,
         private readonly StandingsService $standingsService,
+        private readonly EligibilityService $eligibilityService,
     ) {
     }
 
@@ -49,6 +51,7 @@ class DashboardController extends Controller
             'pointRules' => $selectedSport ? $this->standingsService->pointRulesFor($selectedSport) : [],
             'teams' => $teams,
             'teamsById' => $teams->keyBy('id'),
+            'flaggedStudents' => $edition ? $this->eligibilityService->flaggedStudents($edition)->take(8) : collect(),
             'matches' => $editionSportIds->isEmpty()
                 ? collect()
                 : BracketMatch::query()

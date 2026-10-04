@@ -18,6 +18,7 @@ use App\Models\Team;
 use App\Models\TeamMember;
 use App\Services\AuditService;
 use App\Services\BracketService;
+use App\Services\EligibilityService;
 use App\Services\SportService;
 use App\Services\ScoreSheetImageOfficeService;
 use Illuminate\Http\RedirectResponse;
@@ -30,7 +31,12 @@ use Illuminate\View\View;
 
 class SportController extends Controller
 {
-    public function __construct(private readonly SportService $service, private readonly BracketService $bracketService) {}
+    public function __construct(
+        private readonly SportService $service,
+        private readonly BracketService $bracketService,
+        private readonly EligibilityService $eligibilityService,
+    ) {
+    }
     public function index(Request $request): View
     {
         return $this->catalogue($request, false);
@@ -135,6 +141,13 @@ class SportController extends Controller
             ->sortBy(fn ($entries) => $entries->first()->team->name)
             ->values();
         $participants = $activeEntries->groupBy(fn ($entry) => $entry->team?->name ?? 'Individual participants');
+        $eligibilityByStudentId = $activeEntries
+            ->pluck('student')
+            ->filter()
+            ->unique('id')
+            ->mapWithKeys(fn (Student $student): array => [
+                $student->id => $this->eligibilityService->evaluateStudent($student, $edition),
+            ]);
 
         $competitors = match ($editionSport->participant_type) {
             'team' => $teamGroups->map(fn ($entries) => ['name' => $entries->first()->team->name, 'detail' => $entries->count().' registered athlete(s)'])->values(),
@@ -154,7 +167,7 @@ class SportController extends Controller
             }
         }
 
-        return view('admin.sports.participants', compact('sport', 'edition', 'editionSport', 'participants', 'teamGroups', 'competitors', 'bracketRounds'));
+        return view('admin.sports.participants', compact('sport', 'edition', 'editionSport', 'participants', 'teamGroups', 'competitors', 'bracketRounds', 'eligibilityByStudentId'));
     }
 
     public function bracket(Request $request, Sport $sport): View
@@ -361,7 +374,12 @@ class SportController extends Controller
             ? $studentQuery->get()
             : $studentQuery->paginate(30)->withQueryString();
 
-        return view('admin.sports.assign-participants', ['sport' => $sport, 'edition' => $edition, 'editionSport' => $editionSport, 'courses' => Course::query()->where('status', 'active')->orderBy('name')->get(), 'teams' => $teams, 'students' => $students, 'courseId' => $courseId, 'teamId' => $teamId, 'requiresTeam' => $requiresTeam]);
+        $studentCollection = $students instanceof \Illuminate\Pagination\AbstractPaginator
+            ? $students->getCollection()
+            : $students;
+        $eligibilityPreviewByStudentId = $this->eligibilityService->previewForStudents($studentCollection, $edition, $editionSport);
+
+        return view('admin.sports.assign-participants', ['sport' => $sport, 'edition' => $edition, 'editionSport' => $editionSport, 'courses' => Course::query()->where('status', 'active')->orderBy('name')->get(), 'teams' => $teams, 'students' => $students, 'courseId' => $courseId, 'teamId' => $teamId, 'requiresTeam' => $requiresTeam, 'eligibilityPreviewByStudentId' => $eligibilityPreviewByStudentId]);
     }
 
     public function storeParticipants(Request $request, Sport $sport): RedirectResponse
@@ -383,19 +401,23 @@ class SportController extends Controller
             abort_unless($students->every(fn ($student) => $roster->contains($student->id)), 422, 'Each selected student must be on the chosen team roster.');
         }
 
+        $this->eligibilityService->assertStudentsCanJoin($students, $edition, $editionSport);
+
         abort_if(
             BracketMatch::query()->where('edition_sport_id', $editionSport->id)->where('status', 'completed')->exists(),
             422,
             'Participant registrations cannot be changed after a bracket result has been recorded.'
         );
 
-        DB::transaction(function () use ($students, $editionSport, $team): void {
+        $medicalCertificateStatus = $this->eligibilityService->requiresMedicalCertificate($editionSport) ? 'pending' : 'not_required';
+
+        DB::transaction(function () use ($students, $editionSport, $team, $medicalCertificateStatus): void {
             abort_if(AthleteEntry::query()->where('edition_sport_id', $editionSport->id)->whereIn('student_id', $students->pluck('id'))->exists(), 422, 'One or more selected students are already registered.');
             BracketMatch::query()->where('edition_sport_id', $editionSport->id)->delete();
             BracketCompetitor::query()->where('edition_sport_id', $editionSport->id)->delete();
             $pairKey = $editionSport->participant_type === 'dual' ? (string) Str::uuid() : null;
             foreach ($students as $student) {
-                $entry = AthleteEntry::query()->create(['edition_sport_id' => $editionSport->id, 'student_id' => $student->id, 'team_id' => $team?->id, 'pair_key' => $pairKey, 'status' => 'active', 'assigned_by' => auth()->id(), 'assigned_at' => now()]);
+                $entry = AthleteEntry::query()->create(['edition_sport_id' => $editionSport->id, 'student_id' => $student->id, 'team_id' => $team?->id, 'pair_key' => $pairKey, 'status' => 'active', 'medical_certificate_status' => $medicalCertificateStatus, 'assigned_by' => auth()->id(), 'assigned_at' => now()]);
                 app(AuditService::class)->record('athlete_entry.created', $entry, null, $entry->only($entry->getFillable()));
             }
         });

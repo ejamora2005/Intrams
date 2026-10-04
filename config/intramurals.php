@@ -158,8 +158,36 @@ $defaultEdition = [
     ],
 ];
 
+$venues = [
+    'TBA',
+    'MPCC',
+    'Field/Oval',
+    'SSC Hall',
+    'Open Court (Volleyball/Pickleball)',
+];
+
+$participationRules = [
+    'max_events_per_student' => 2,
+    'allowed_combinations' => [
+        ['label' => '1 minor + 1 major', 'major' => 1, 'minor' => 1, 'individual_or_dual' => 0],
+        ['label' => '1 minor + 1 individual/dual', 'major' => 0, 'minor' => 1, 'individual_or_dual' => 1],
+        ['label' => '1 major + 1 individual/dual', 'major' => 1, 'minor' => 0, 'individual_or_dual' => 1],
+        ['label' => 'No major/minor: up to 2 individual/dual events', 'major' => 0, 'minor' => 0, 'individual_or_dual' => 2],
+    ],
+];
+
+$medicalCertificate = [
+    'exempt_sport_codes' => ['CHESS', 'ESPORT-ML'],
+];
+
 return [
     'default_edition' => $defaultEdition,
+
+    'venues' => $venues,
+
+    'participation_rules' => $participationRules,
+
+    'medical_certificate' => $medicalCertificate,
 
     'point_systems' => $pointSystems,
 

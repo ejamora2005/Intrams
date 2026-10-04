@@ -6,6 +6,8 @@ use App\Models\IntramuralEdition;
 use App\Models\Sport;
 use App\Models\Student;
 use App\Models\Team;
+use App\Models\AthleteEntry;
+use App\Models\TeamMember;
 use App\Models\TeamTally;
 use App\Models\User;
 use App\Services\StandingsService;
@@ -66,16 +68,16 @@ function operationsSport(
 }
 
 test('GAM users are sent to the GAM dashboard', function () {
-    $gam = User::factory()->create(['role' => 'gam', 'status' => 'active']);
-    operationsTeam(operationsEdition());
+    $team = operationsTeam(operationsEdition());
+    $gam = User::factory()->create(['role' => 'gam', 'status' => 'active', 'managed_team_id' => $team->id]);
 
     $this->actingAs($gam)->get(route('dashboard'))->assertRedirect(route('gam.dashboard'));
     $this->actingAs($gam)->get(route('gam.dashboard'))->assertOk()->assertSee('Teams and rosters')->assertSee('Mighty Sea Dragons');
 });
 
-test('GAM users can add players to any active team', function () {
-    $gam = User::factory()->create(['role' => 'gam', 'status' => 'active']);
+test('GAM users can add players to their assigned faction', function () {
     $team = operationsTeam(operationsEdition());
+    $gam = User::factory()->create(['role' => 'gam', 'status' => 'active', 'managed_team_id' => $team->id]);
 
     $this->actingAs($gam)->post(route('gam.teams.players.store', $team), [
         'student_number' => 'GAM-001',
@@ -190,6 +192,7 @@ test('admin sport point changes require the admin password', function () {
 
 test('admins can create multiple tabulator and GAM accounts', function () {
     $admin = User::factory()->create(['role' => 'admin', 'status' => 'active']);
+    $team = operationsTeam(operationsEdition());
 
     $this->actingAs($admin)->post(route('admin.operations-accounts.store'), [
         'name' => 'Tabulator Two',
@@ -205,12 +208,13 @@ test('admins can create multiple tabulator and GAM accounts', function () {
         'email' => 'gam-two@example.com',
         'role' => 'gam',
         'status' => 'active',
+        'managed_team_id' => $team->id,
         'password' => 'secure-password',
         'password_confirmation' => 'secure-password',
     ])->assertRedirect();
 
     $this->assertDatabaseHas('users', ['email' => 'tabulator-two@example.com', 'role' => 'tabulator']);
-    $this->assertDatabaseHas('users', ['email' => 'gam-two@example.com', 'role' => 'gam']);
+    $this->assertDatabaseHas('users', ['email' => 'gam-two@example.com', 'role' => 'gam', 'managed_team_id' => $team->id]);
 });
 
 test('multiple tabulators can access the tabulator dashboard', function () {
@@ -221,4 +225,131 @@ test('multiple tabulators can access the tabulator dashboard', function () {
 
     $this->actingAs($firstTabulator)->get(route('tabulator.dashboard'))->assertOk()->assertSee('Tabulator dashboard');
     $this->actingAs($secondTabulator)->get(route('tabulator.dashboard'))->assertOk()->assertSee('Tabulator dashboard');
+});
+
+test('participation rules flag possible dq students across operations dashboards', function () {
+    $admin = User::factory()->create(['role' => 'admin', 'status' => 'active']);
+    $tabulator = User::factory()->create(['role' => 'tabulator', 'status' => 'active']);
+    $edition = operationsEdition();
+    $team = operationsTeam($edition);
+    $gam = User::factory()->create(['role' => 'gam', 'status' => 'active', 'managed_team_id' => $team->id]);
+    $basketball = operationsSport($edition, 'Basketball 5x5', 'BASKET-5X5');
+    $volleyball = operationsSport($edition, 'Volleyball', 'VOLLEYBALL');
+
+    $student = Student::query()->create([
+        'student_number' => 'DQ-001',
+        'first_name' => 'Riley',
+        'last_name' => 'Cruz',
+        'school_year' => $edition->school_year,
+        'course_id' => $team->course_id,
+        'status' => 'active',
+    ]);
+
+    TeamMember::query()->create([
+        'edition_id' => $edition->id,
+        'team_id' => $team->id,
+        'student_id' => $student->id,
+        'assigned_by' => $admin->id,
+        'assigned_at' => now(),
+    ]);
+
+    AthleteEntry::query()->create([
+        'edition_sport_id' => $basketball->id,
+        'student_id' => $student->id,
+        'team_id' => $team->id,
+        'status' => 'active',
+        'assigned_by' => $admin->id,
+        'assigned_at' => now(),
+    ]);
+
+    $this->actingAs($admin)->post(route('admin.sports.participants.store', $volleyball->sport), [
+        'edition_id' => $edition->id,
+        'team_id' => $team->id,
+        'student_ids' => [$student->id],
+    ])->assertSessionHasErrors('student_ids');
+
+    AthleteEntry::query()->create([
+        'edition_sport_id' => $volleyball->id,
+        'student_id' => $student->id,
+        'team_id' => $team->id,
+        'status' => 'active',
+        'assigned_by' => $admin->id,
+        'assigned_at' => now(),
+    ]);
+
+    $this->actingAs($admin)->get(route('admin.rules.index'))->assertOk()->assertSee('Possible DQ')->assertSee('Riley Cruz');
+    $this->actingAs($gam)->get(route('gam.dashboard', ['team_id' => $team->id]))->assertOk()->assertSee('Possible DQ')->assertSee('Riley Cruz');
+    $this->actingAs($tabulator)->get(route('tabulator.dashboard'))->assertOk()->assertSee('Possible DQ')->assertSee('Riley Cruz');
+});
+
+test('GAM users can verify required medical certificates but exempt sports stay hidden', function () {
+    $edition = operationsEdition();
+    $team = operationsTeam($edition);
+    $gam = User::factory()->create(['role' => 'gam', 'status' => 'active', 'managed_team_id' => $team->id]);
+    $volleyball = operationsSport($edition, 'Volleyball', 'VOLLEYBALL');
+    $chess = operationsSport($edition, 'Chess', 'CHESS');
+    $student = Student::query()->create([
+        'student_number' => 'MED-001',
+        'first_name' => 'Mika',
+        'last_name' => 'Santos',
+        'school_year' => $edition->school_year,
+        'course_id' => $team->course_id,
+        'status' => 'active',
+    ]);
+
+    $physicalEntry = AthleteEntry::query()->create([
+        'edition_sport_id' => $volleyball->id,
+        'student_id' => $student->id,
+        'team_id' => $team->id,
+        'status' => 'active',
+        'medical_certificate_status' => 'pending',
+        'assigned_at' => now(),
+    ]);
+
+    AthleteEntry::query()->create([
+        'edition_sport_id' => $chess->id,
+        'student_id' => $student->id,
+        'team_id' => $team->id,
+        'status' => 'active',
+        'medical_certificate_status' => 'not_required',
+        'assigned_at' => now(),
+    ]);
+
+    $this->actingAs($gam)->get(route('gam.dashboard'))
+        ->assertOk()
+        ->assertSee('Medical certificate verification')
+        ->assertSee('Volleyball')
+        ->assertDontSee('>Chess</td>', false);
+
+    $this->actingAs($gam)->post(route('gam.medical-certificates.update', $physicalEntry), [
+        'medical_certificate_status' => 'verified',
+        'medical_certificate_notes' => 'Cleared',
+    ])->assertRedirect();
+
+    $this->assertDatabaseHas('athlete_entries', [
+        'id' => $physicalEntry->id,
+        'medical_certificate_status' => 'verified',
+        'medical_certificate_reviewed_by' => $gam->id,
+        'medical_certificate_notes' => 'Cleared',
+    ]);
+});
+
+test('GAM users cannot manage another faction', function () {
+    $edition = operationsEdition();
+    $assignedTeam = operationsTeam($edition, 'Mighty Sea Dragons', 'mighty-sea-dragons', 'Marine Biology', 'MB');
+    $otherTeam = operationsTeam($edition, 'Terraquatic Eagles', 'terraquatic-eagles', 'Education', 'EDU');
+    $gam = User::factory()->create(['role' => 'gam', 'status' => 'active', 'managed_team_id' => $assignedTeam->id]);
+
+    $this->actingAs($gam)->get(route('gam.dashboard'))
+        ->assertOk()
+        ->assertSee('Mighty Sea Dragons')
+        ->assertDontSee('Terraquatic Eagles');
+
+    $this->actingAs($gam)->post(route('gam.teams.players.store', $otherTeam), [
+        'student_number' => 'BLOCKED-001',
+        'first_name' => 'Blocked',
+        'last_name' => 'Player',
+    ])->assertNotFound();
+
+    $this->assertDatabaseMissing('students', ['student_number' => 'BLOCKED-001']);
 });

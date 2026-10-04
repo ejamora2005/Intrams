@@ -82,11 +82,21 @@
                             </div>
                             <div class="max-h-[30rem] divide-y divide-slate-100 overflow-y-auto" data-pair-list>
                                 @foreach ($students as $student)
-                                    <label data-pair-row data-search="{{ Str::lower($student->full_name.' '.$student->student_number.' '.$student->course?->name) }}" class="flex cursor-pointer items-center gap-3 px-4 py-3 text-sm transition hover:bg-blue-50 has-[:checked]:bg-blue-50">
-                                        <input name="student_ids[{{ $side }}]" value="{{ $student->id }}" type="radio" data-pair-radio data-student-name="{{ $student->full_name }}" class="rounded-full border-slate-300 text-blue-700 focus:ring-blue-600">
+                                    @php($eligibility = $eligibilityPreviewByStudentId->get($student->id))
+                                    @php($blocked = $eligibility['possible_dq'] ?? false)
+                                    <label data-pair-row data-search="{{ Str::lower($student->full_name.' '.$student->student_number.' '.$student->course?->name) }}" @class(['flex cursor-pointer items-center gap-3 px-4 py-3 text-sm transition hover:bg-blue-50 has-[:checked]:bg-blue-50', 'border-l-4 border-red-500 bg-red-50 hover:bg-red-50' => $blocked])>
+                                        <input name="student_ids[{{ $side }}]" value="{{ $student->id }}" type="radio" data-pair-radio data-student-name="{{ $student->full_name }}" @disabled($blocked) class="rounded-full border-slate-300 text-blue-700 focus:ring-blue-600 disabled:cursor-not-allowed disabled:bg-slate-200">
                                         <span class="min-w-0">
-                                            <span class="block truncate font-medium text-slate-900">{{ $student->full_name }}</span>
+                                            <span class="flex flex-wrap items-center gap-2 font-medium text-slate-900">
+                                                <span class="truncate">{{ $student->full_name }}</span>
+                                                @if ($blocked)
+                                                    <span class="rounded-full bg-red-600 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-white">Possible DQ</span>
+                                                @endif
+                                            </span>
                                             <span class="block truncate text-xs text-slate-500">{{ $student->course?->name }} - {{ $student->student_number }}</span>
+                                            @if ($blocked)
+                                                <span class="mt-1 block text-xs font-medium text-red-700">{{ implode(' ', $eligibility['issues']) }}</span>
+                                            @endif
                                         </span>
                                     </label>
                                 @endforeach
@@ -104,11 +114,21 @@
                 </div>
                 <div class="max-h-[32rem] divide-y divide-slate-100 overflow-y-auto">
                     @foreach ($students as $student)
-                        <label class="flex cursor-pointer items-center gap-3 px-5 py-3 text-sm transition hover:bg-slate-50">
-                            <input name="student_ids[]" value="{{ $student->id }}" type="checkbox" class="student-checkbox rounded border-slate-300 text-blue-700 focus:ring-blue-600">
+                        @php($eligibility = $eligibilityPreviewByStudentId->get($student->id))
+                        @php($blocked = $eligibility['possible_dq'] ?? false)
+                        <label @class(['flex cursor-pointer items-center gap-3 px-5 py-3 text-sm transition hover:bg-slate-50', 'border-l-4 border-red-500 bg-red-50 hover:bg-red-50' => $blocked])>
+                            <input name="student_ids[]" value="{{ $student->id }}" type="checkbox" @disabled($blocked) class="student-checkbox rounded border-slate-300 text-blue-700 focus:ring-blue-600 disabled:cursor-not-allowed disabled:bg-slate-200">
                             <span>
-                                <span class="block font-medium text-slate-900">{{ $student->full_name }}</span>
+                                <span class="flex flex-wrap items-center gap-2 font-medium text-slate-900">
+                                    {{ $student->full_name }}
+                                    @if ($blocked)
+                                        <span class="rounded-full bg-red-600 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-white">Possible DQ</span>
+                                    @endif
+                                </span>
                                 <span class="text-xs text-slate-500">{{ $student->course?->name }} - {{ $student->student_number }}</span>
+                                @if ($blocked)
+                                    <span class="mt-1 block text-xs font-medium text-red-700">{{ implode(' ', $eligibility['issues']) }}</span>
+                                @endif
                             </span>
                         </label>
                     @endforeach
@@ -125,7 +145,7 @@
         const selectAllStudents = document.getElementById('select-all-students');
         if (selectAllStudents) {
             selectAllStudents.addEventListener('change', function () {
-                document.querySelectorAll('.student-checkbox').forEach((checkbox) => checkbox.checked = this.checked);
+                document.querySelectorAll('.student-checkbox:not(:disabled)').forEach((checkbox) => checkbox.checked = this.checked);
             });
         }
 

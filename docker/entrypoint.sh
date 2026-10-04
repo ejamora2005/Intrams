@@ -69,14 +69,14 @@ if [ "${DEPLOY_RUN_MIGRATIONS:-false}" = "true" ]; then
     run_artisan migrate --force
 fi
 
+if [ "${DEPLOY_SEED_DEFAULT_COMPETITIONS:-false}" = "true" ]; then
+    wait_for_mysql
+    run_artisan db:seed --class=DefaultIntramuralsSeeder --force
+fi
+
 if [ "${DEPLOY_SEED_DEFAULT_ACCOUNTS:-false}" = "true" ]; then
     wait_for_mysql
     run_artisan db:seed --class=AdminUserSeeder --force
-fi
-
-if [ "${DEPLOY_SEED_DEFAULT_COMPETITIONS:-false}" = "true" ]; then
-    wait_for_mysql
-    run_artisan db:seed --class=DefaultSportsSeeder --force
 fi
 
 run_artisan config:cache

@@ -37,6 +37,7 @@
                             ['label' => 'Sports', 'route' => 'admin.sports.index', 'match' => 'admin/sports'],
                             ['label' => 'Cultural', 'route' => 'admin.cultural.index', 'match' => 'admin/cultural'],
                             ['label' => 'Points System', 'route' => 'admin.sports-points.index', 'match' => 'admin/sports-points'],
+                            ['label' => 'Rules & Guidelines', 'route' => 'admin.rules.index', 'match' => 'admin/rules-guidelines'],
                             ['label' => 'Live Competition', 'route' => 'admin.competition.index', 'match' => 'admin/competition'],
                             ['label' => 'System Logs', 'route' => 'admin.system-logs.index', 'match' => 'admin/system-logs'],
                         ];

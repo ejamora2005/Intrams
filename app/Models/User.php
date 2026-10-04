@@ -30,6 +30,7 @@ class User extends Authenticatable
         'password',
         'role',
         'status',
+        'managed_team_id',
     ];
 
     /**
@@ -60,6 +61,11 @@ class User extends Authenticatable
     {
         return $this->status === 'active'
             && in_array($this->role, ['admin', 'gam', 'tabulator', 'coordinator'], true);
+    }
+
+    public function managedTeam()
+    {
+        return $this->belongsTo(Team::class, 'managed_team_id');
     }
 
     /** @return HasMany<CoordinatorAssignment> */

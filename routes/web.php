@@ -18,6 +18,7 @@ use App\Http\Controllers\Admin\SystemLogController;
 use App\Http\Controllers\Admin\TeamController;
 use App\Http\Controllers\Coordinator\DashboardController as CoordinatorDashboardController;
 use App\Http\Controllers\Gam\DashboardController as GamDashboardController;
+use App\Http\Controllers\RulesController;
 use App\Http\Controllers\Tabulator\DashboardController as TabulatorDashboardController;
 use App\Services\StandingsService;
 use Illuminate\Support\Facades\Route;
@@ -115,6 +116,7 @@ Route::middleware([
         Route::resource('sports', SportController::class)->except(['show']);
         Route::get('/sports-points', [SportPointController::class, 'index'])->name('sports-points.index');
         Route::put('/sports-points/{system}', [SportPointController::class, 'update'])->where('system', '[A-Za-z0-9_-]+')->name('sports-points.update');
+        Route::get('/rules-guidelines', [RulesController::class, 'admin'])->name('rules.index');
         Route::get('/sports/{sport}/bracket', [SportController::class, 'bracket'])->name('sports.bracket');
         Route::get('/sports/{sport}/basketball-score-sheet', [SportController::class, 'basketballScoreSheet'])->name('sports.basketball-score-sheet');
         Route::post('/sports/{sport}/basketball-score-sheet/download', [SportController::class, 'downloadBasketballScoreSheet'])->name('sports.basketball-score-sheet.download');
@@ -139,6 +141,7 @@ Route::middleware([
         Route::get('/participation-rules', [RegistrationController::class, 'rules'])->name('participation-rules.index');
         Route::post('/participation-rules', [RegistrationController::class, 'storeRule'])->name('participation-rules.store');
         Route::get('/competition', [CompetitionController::class, 'index'])->name('competition.index');
+        Route::put('/competition/schedules/{schedule}', [CompetitionController::class, 'updateSchedule'])->name('competition.schedules.update');
         Route::put('/competition/schedules/{schedule}/venue', [CompetitionController::class, 'updateVenue'])->name('competition.schedule-venue.update');
         Route::get('/system-logs', [SystemLogController::class, 'index'])->name('system-logs.index');
     });
@@ -150,12 +153,15 @@ Route::middleware([
 
     Route::prefix('gam')->as('gam.')->middleware('role:gam')->group(function () {
         Route::get('/dashboard', [GamDashboardController::class, 'index'])->name('dashboard');
+        Route::get('/rules-guidelines', [RulesController::class, 'gam'])->name('rules.index');
         Route::post('/teams/{team}/players', [GamDashboardController::class, 'storePlayer'])->name('teams.players.store');
         Route::post('/teams/{team}/players/assign', [GamDashboardController::class, 'assignExistingPlayer'])->name('teams.players.assign');
+        Route::post('/medical-certificates/{entry}', [GamDashboardController::class, 'updateMedicalCertificate'])->name('medical-certificates.update');
     });
 
     Route::prefix('tabulator')->as('tabulator.')->middleware('role:tabulator')->group(function () {
         Route::get('/dashboard', [TabulatorDashboardController::class, 'index'])->name('dashboard');
+        Route::get('/rules-guidelines', [RulesController::class, 'tabulator'])->name('rules.index');
         Route::post('/sport-results', [TabulatorDashboardController::class, 'declareSportWinners'])->name('sport-results.store');
         Route::post('/matches/{match}/result', [TabulatorDashboardController::class, 'recordBracketResult'])->name('matches.result');
     });

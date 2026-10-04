@@ -16,7 +16,8 @@
                 <h1 class="ops-display">Tabulator dashboard</h1>
                 <p class="mt-3 max-w-2xl text-sm leading-6 text-slate-600">{{ $edition?->name ?? 'No active intramurals edition is available yet.' }}</p>
             </div>
-            <div class="grid grid-cols-2 gap-3 sm:min-w-80">
+            <div class="grid gap-3 sm:min-w-80 sm:grid-cols-2">
+                <a href="{{ route('tabulator.rules.index') }}" class="flex items-center justify-center rounded-lg border border-blue-200 bg-white px-4 py-3 text-sm font-semibold text-blue-800 shadow-sm transition hover:border-blue-300 hover:bg-blue-50 sm:col-span-2">Rules & Guidelines</a>
                 <div class="rounded-lg border border-white/15 bg-white/10 px-4 py-3">
                     <p class="text-xs font-semibold uppercase text-slate-500">Sports</p>
                     <p class="mt-1 text-2xl font-semibold text-slate-950">{{ $editionSports->count() }}</p>
@@ -28,6 +29,32 @@
             </div>
         </div>
     </div>
+
+    <section class="mt-6 rounded-lg border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
+        <div class="flex flex-col justify-between gap-2 border-b border-slate-100 pb-4 sm:flex-row sm:items-end">
+            <div>
+                <h2 class="text-base font-semibold text-slate-950">Possible DQ watchlist</h2>
+                <p class="mt-1 text-sm text-slate-500">Check these registrations before declaring winners.</p>
+            </div>
+            <span class="w-fit rounded-full bg-red-50 px-3 py-1 text-xs font-semibold text-red-700">{{ $flaggedStudents->count() }} flagged</span>
+        </div>
+        <div class="mt-4 grid gap-3 lg:grid-cols-2">
+            @forelse ($flaggedStudents as $evaluation)
+                <article class="rounded-lg border border-red-200 bg-red-50 p-4">
+                    <div class="flex flex-col justify-between gap-2 sm:flex-row sm:items-start">
+                        <div>
+                            <p class="font-semibold text-slate-950">{{ $evaluation['student']->full_name }}</p>
+                            <p class="mt-1 text-xs text-slate-500">{{ $evaluation['student']->student_number }} / {{ $evaluation['summary'] }}</p>
+                        </div>
+                        <span class="w-fit rounded-full bg-red-600 px-2.5 py-1 text-xs font-semibold uppercase tracking-wide text-white">Possible DQ</span>
+                    </div>
+                    <p class="mt-3 text-sm font-medium text-red-800">{{ implode(' ', $evaluation['issues']) }}</p>
+                </article>
+            @empty
+                <p class="rounded-lg border border-dashed border-slate-300 px-4 py-8 text-center text-sm text-slate-500 lg:col-span-2">No Possible DQ students found.</p>
+            @endforelse
+        </div>
+    </section>
 
     <section class="mt-6 rounded-lg border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
         <div class="flex flex-col justify-between gap-3 border-b border-slate-100 pb-4 lg:flex-row lg:items-end">

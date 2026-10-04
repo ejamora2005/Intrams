@@ -26,4 +26,9 @@ class Team extends Model
     {
         return $this->hasMany(AthleteEntry::class);
     }
+
+    public function gamAccounts()
+    {
+        return $this->hasMany(User::class, 'managed_team_id');
+    }
 }

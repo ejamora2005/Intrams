@@ -97,26 +97,49 @@ test('proposal defaults seed scoring groups and cultural schedule items', functi
         ->and($awarding->venue)->toBe('TBA');
 
     $this->actingAs($admin)
-        ->put(route('admin.competition.schedule-venue.update', $run), ['venue' => 'Campus Grounds'])
+        ->put(route('admin.competition.schedule-venue.update', $run), ['venue' => 'SSC Hall'])
         ->assertRedirect();
 
     $this->actingAs($admin)
         ->put(route('admin.competition.schedule-venue.update', $awarding), ['venue' => ''])
         ->assertRedirect();
 
-    expect($run->fresh()->venue)->toBe('Campus Grounds')
+    expect($run->fresh()->venue)->toBe('SSC Hall')
         ->and($awarding->fresh()->venue)->toBe('TBA');
+
+    $this->actingAs($admin)
+        ->put(route('admin.competition.schedules.update', $run), [
+            'title' => 'Ruperto Run Qualifiers',
+            'starts_at' => '2026-10-20T07:30',
+            'ends_at' => '2026-10-20T09:00',
+            'venue' => 'Open Court (Volleyball/Pickleball)',
+            'status' => 'live',
+        ])
+        ->assertRedirect();
+
+    expect($run->fresh()->title)->toBe('Ruperto Run Qualifiers')
+        ->and($run->fresh()->starts_at->format('Y-m-d H:i'))->toBe('2026-10-20 07:30')
+        ->and($run->fresh()->ends_at->format('Y-m-d H:i'))->toBe('2026-10-20 09:00')
+        ->and($run->fresh()->venue)->toBe('Open Court (Volleyball/Pickleball)')
+        ->and($run->fresh()->status)->toBe('live');
 
     $this->actingAs($admin)
         ->get(route('admin.competition.index'))
         ->assertOk()
-        ->assertSee('Campus Grounds')
+        ->assertSee('Edit')
+        ->assertSee('Ruperto Run Qualifiers')
+        ->assertSee('Open Court (Volleyball/Pickleball)')
+        ->assertSee('MPCC')
+        ->assertSee('Field/Oval')
+        ->assertSee('Live')
         ->assertSee('Awarding');
 
     $this->actingAs($admin)
         ->get(route('admin.sports-points.index'))
         ->assertOk()
         ->assertSee('Sports Major Events')
+        ->assertSee('Save Sports Major Events')
+        ->assertDontSee('Save sports_major points')
         ->assertSee('Sports Athletics Events')
         ->assertSee('Cultural Special Awards - 5 Points');
 });

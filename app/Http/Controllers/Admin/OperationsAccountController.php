@@ -3,12 +3,14 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Team;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\View\View;
 
@@ -27,6 +29,7 @@ class OperationsAccountController extends Controller
         $status = $request->string('status')->value() ?: 'active';
 
         $accounts = User::query()
+            ->with('managedTeam')
             ->whereIn('role', array_keys($this->roles))
             ->when(array_key_exists($role, $this->roles), fn ($query) => $query->where('role', $role))
             ->when(in_array($status, ['active', 'inactive', 'suspended'], true), fn ($query) => $query->where('status', $status))
@@ -50,6 +53,7 @@ class OperationsAccountController extends Controller
         return view('admin.operations-accounts.create', [
             'account' => new User(),
             'roles' => $this->roles,
+            'teams' => $this->assignableTeams(),
         ]);
     }
 
@@ -73,6 +77,7 @@ class OperationsAccountController extends Controller
         return view('admin.operations-accounts.edit', [
             'account' => $operationsAccount,
             'roles' => $this->roles,
+            'teams' => $this->assignableTeams($operationsAccount),
         ]);
     }
 
@@ -99,17 +104,54 @@ class OperationsAccountController extends Controller
             $emailRule->ignore($account);
         }
 
-        return $request->validate([
+        $data = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255', $emailRule],
             'password' => [$account === null ? 'required' : 'nullable', 'confirmed', Password::min(8)],
             'role' => ['required', Rule::in(array_keys($this->roles))],
             'status' => ['required', 'in:active,inactive,suspended'],
+            'managed_team_id' => [
+                'nullable',
+                'integer',
+                Rule::exists('teams', 'id')->where(fn ($query) => $query->where('status', 'active')->whereNull('deleted_at')),
+            ],
         ]);
+
+        if ($data['role'] === 'gam' && empty($data['managed_team_id'])) {
+            throw ValidationException::withMessages([
+                'managed_team_id' => 'Choose the faction this GAM account can manage.',
+            ]);
+        }
+
+        if ($data['role'] !== 'gam') {
+            $data['managed_team_id'] = null;
+        }
+
+        return $data;
     }
 
     private function ensureOperationsAccount(User $account): void
     {
         abort_unless(array_key_exists($account->role, $this->roles), 404);
+    }
+
+    private function assignableTeams(?User $account = null)
+    {
+        $teams = Team::query()
+            ->with('edition')
+            ->where('status', 'active')
+            ->whereNull('deleted_at')
+            ->whereHas('edition', fn ($query) => $query->where('status', 'active'))
+            ->orderBy('name')
+            ->get();
+
+        if ($account?->managed_team_id && ! $teams->contains('id', $account->managed_team_id)) {
+            $account->loadMissing('managedTeam.edition');
+            if ($account->managedTeam) {
+                $teams->push($account->managedTeam);
+            }
+        }
+
+        return $teams;
     }
 }
