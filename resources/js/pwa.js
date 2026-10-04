@@ -54,7 +54,7 @@ const showInstallPanel = async mode => {
             installTitle.textContent = 'SLSU INTRAMURALS update ready';
             installCopy.textContent = 'Refresh once to use the newest app shell.';
         } else {
-            installTitle.textContent = 'Download SLSU INTRAMURALS';
+            installTitle.textContent = 'Download SLSU INTRAMURALS App';
             installCopy.textContent = 'Open the system from your device app list with offline-ready assets.';
         }
     }

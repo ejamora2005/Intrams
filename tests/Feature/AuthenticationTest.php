@@ -32,7 +32,7 @@ test('login screen can be rendered', function () {
     $response->assertStatus(200)
         ->assertSee('SLSU INTRAMURALS')
         ->assertSee('rel="shortcut icon"', false)
-        ->assertSee('Download SLSU INTRAMURALS')
+        ->assertSee('Download SLSU INTRAMURALS App')
         ->assertSee('INTRAMURALS 2026: STUDENT FESTIVAL')
         ->assertSee('Compete. Create. Lead. Connect. Express.')
         ->assertSee('class="space-y-3 lg:hidden"', false)

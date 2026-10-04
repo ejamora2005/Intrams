@@ -1068,9 +1068,9 @@
     "semantic_hash": "db35ed00c135a61a70cc787199e82107"
   },
   "resources/views/auth/login.blade.php": {
-    "mtime": 1791099636.7923355,
-    "seen": 1791099851.1126928,
-    "ast_hash": "a906105f32216a4110a69123d17cc123",
+    "mtime": 1791100172.085442,
+    "seen": 1791100209.2573073,
+    "ast_hash": "f0b23c21d778fe51eee5a607ba7de009",
     "semantic_hash": ""
   },
   "resources/views/auth/register.blade.php": {
@@ -1410,9 +1410,9 @@
     "semantic_hash": "f7d87914364053641c0a4b5197c1de99"
   },
   "tests/Feature/AuthenticationTest.php": {
-    "mtime": 1791099742.3334794,
-    "seen": 1791099851.1126928,
-    "ast_hash": "3efe189b3294bf56e7301075fbc5c728",
+    "mtime": 1791100183.8519094,
+    "seen": 1791100209.2573073,
+    "ast_hash": "9cc5349dda3765a04edf3ee0a3bc7fd0",
     "semantic_hash": ""
   },
   "tests/Feature/BrowserSessionsTest.php": {
@@ -2142,15 +2142,15 @@
     "semantic_hash": ""
   },
   "resources/js/pwa.js": {
-    "mtime": 1791099636.7948558,
-    "seen": 1791099851.1126928,
-    "ast_hash": "2c65dc46de729ac17bc8e1dcd2ef5a2b",
+    "mtime": 1791100183.8509107,
+    "seen": 1791100209.2573073,
+    "ast_hash": "03f12de1ea35d18ddf946973925d508a",
     "semantic_hash": ""
   },
   "resources/views/components/pwa-install.blade.php": {
-    "mtime": 1791099636.7638557,
-    "seen": 1791099851.1126928,
-    "ast_hash": "571f555a0d3782134093f630a0e16014",
+    "mtime": 1791100183.8498986,
+    "seen": 1791100209.2573073,
+    "ast_hash": "2510759d6a0381417959be89f8f3695a",
     "semantic_hash": ""
   },
   "resources/views/components/pwa-meta.blade.php": {

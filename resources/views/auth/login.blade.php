@@ -31,6 +31,10 @@
                         <span class="rounded-lg border border-white/15 bg-white/10 px-3 py-2 text-blue-50">Tabulator</span>
                         <span class="rounded-lg border border-white/15 bg-white/10 px-3 py-2 text-blue-50">Coordinator</span>
                     </div>
+                    <button type="button" data-pwa-install-button hidden class="flex w-full items-center justify-center gap-2 rounded-xl border border-amber-200/70 bg-amber-200 px-4 py-3 text-sm font-semibold text-slate-950 shadow-lg shadow-slate-950/15 transition hover:bg-amber-100 focus:outline-none focus:ring-2 focus:ring-amber-200 focus:ring-offset-2 focus:ring-offset-blue-950">
+                        <svg class="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v11m0 0 4-4m-4 4-4-4M5 17v1.5A2.5 2.5 0 0 0 7.5 21h9a2.5 2.5 0 0 0 2.5-2.5V17" /></svg>
+                        <span>Download SLSU INTRAMURALS App</span>
+                    </button>
                     <div class="rounded-xl border border-white/15 bg-white/10 p-4">
                         <p class="text-xs font-semibold uppercase tracking-[0.18em] text-blue-200">Today</p>
                         <p class="mt-2 text-sm leading-6 text-blue-50">Use your assigned account only. Password confirmation is required for protected score changes.</p>
@@ -88,10 +92,6 @@
                     <button type="submit" class="flex w-full items-center justify-center gap-2 rounded-xl bg-blue-700 px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-700/20 transition hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2">
                         <span>Sign in</span>
                         <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path stroke-linecap="round" d="M5 12h14m-5-5 5 5-5 5" /></svg>
-                    </button>
-                    <button type="button" data-pwa-install-button hidden class="flex w-full items-center justify-center gap-2 rounded-xl border border-amber-300 bg-amber-100 px-4 py-3 text-sm font-semibold text-slate-950 shadow-sm transition hover:bg-amber-200 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2">
-                        <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v11m0 0 4-4m-4 4-4-4M5 17v1.5A2.5 2.5 0 0 0 7.5 21h9a2.5 2.5 0 0 0 2.5-2.5V17" /></svg>
-                        <span>Download SLSU INTRAMURALS</span>
                     </button>
                 </form>
                 <p class="mt-6 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-center text-xs font-medium leading-5 text-slate-600">Access is limited to active intramurals operations accounts.</p>
