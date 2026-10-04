@@ -18,10 +18,17 @@ class TestIntramuralsDataSeeder extends Seeder
             ->where('student_number', 'like', 'TEST-%')
             ->delete();
 
-        $start = today();
+        $defaultEdition = config('intramurals.default_edition');
         $edition = IntramuralEdition::updateOrCreate(
-            ['name' => '2026 SLSU Bontoc-campus Intramurals', 'school_year' => '2026-2027'],
-            ['starts_on' => $start, 'ends_on' => $start->copy()->addDays(5), 'status' => 'active'],
+            [
+                'name' => $defaultEdition['name'] ?? 'SLSUBC INTRAMURALS 2026',
+                'school_year' => $defaultEdition['school_year'] ?? '2026-2027',
+            ],
+            [
+                'starts_on' => $defaultEdition['starts_on'] ?? '2026-10-19',
+                'ends_on' => $defaultEdition['ends_on'] ?? '2026-10-23',
+                'status' => $defaultEdition['status'] ?? 'active',
+            ],
         );
         app(EditionService::class)->syncDefaultSports($edition);
 

@@ -1,9 +1,4 @@
 <div data-pwa-shell class="pointer-events-none fixed inset-x-0 bottom-0 z-[90] space-y-3 p-3 sm:p-5">
-    <div data-pwa-status hidden class="pointer-events-auto mx-auto flex max-w-xl items-center justify-between gap-3 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-medium text-amber-950 shadow-lg shadow-slate-950/20">
-        <span data-pwa-status-text>You are offline. Cached assets and the offline page remain available.</span>
-        <button type="button" data-pwa-status-dismiss class="shrink-0 rounded-md px-2 py-1 text-xs font-semibold text-amber-950 transition hover:bg-amber-100">Dismiss</button>
-    </div>
-
     <section data-pwa-install hidden aria-live="polite" class="pointer-events-auto mx-auto max-w-xl overflow-hidden rounded-lg border border-white/15 bg-slate-950 text-white shadow-2xl shadow-slate-950/40">
         <div class="h-1 bg-[linear-gradient(90deg,#0c7345,#d9b87d,#0c7345)]"></div>
         <div class="flex gap-4 p-4">

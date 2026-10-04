@@ -13,9 +13,11 @@ use Illuminate\Support\Facades\Hash;
 
 function operationsEdition(): IntramuralEdition
 {
+    $defaultEdition = config('intramurals.default_edition');
+
     return IntramuralEdition::query()->create([
-        'name' => '2026 SLSU Bontoc-campus Intramurals',
-        'school_year' => '2026-2027',
+        'name' => $defaultEdition['name'],
+        'school_year' => $defaultEdition['school_year'],
         'starts_on' => '2026-10-01',
         'ends_on' => '2026-10-06',
         'status' => 'active',
@@ -145,11 +147,11 @@ test('admin sport point changes require the admin password', function () {
     ]);
     $edition = operationsEdition();
     $volleyball = operationsSport($edition);
-    $badminton = operationsSport($edition, 'Badminton', 'BADMINTON');
-    $cultural = operationsSport($edition, 'Radio Drama', 'CULT-RADIO-DRAMA');
+    $basketball = operationsSport($edition, 'Basketball 5x5', 'BASKET-5X5');
+    $cultural = operationsSport($edition, 'Festival Dance', 'CULT-FEST-DANCE');
     $payload = [
         'systems' => [
-            'sports' => [
+            'sports_major' => [
                 'placements' => [
                     1 => ['label' => 'Champion', 'points' => 12, 'medal' => 'gold'],
                     2 => ['label' => 'Runner-up', 'points' => 8, 'medal' => 'silver'],
@@ -159,30 +161,30 @@ test('admin sport point changes require the admin password', function () {
         ],
     ];
 
-    $this->actingAs($admin)->put(route('admin.sports-points.update', 'sports'), [
+    $this->actingAs($admin)->put(route('admin.sports-points.update', 'sports_major'), [
         ...$payload,
         'systems' => [
-            'sports' => [
-                ...$payload['systems']['sports'],
+            'sports_major' => [
+                ...$payload['systems']['sports_major'],
                 'admin_password' => 'wrong-password',
             ],
         ],
-    ])->assertSessionHasErrors('systems.sports.admin_password');
+    ])->assertSessionHasErrors('systems.sports_major.admin_password');
 
     expect((float) $volleyball->fresh()->scoring_rules['placements'][0]['points'])->toBe(10.0);
 
-    $this->actingAs($admin)->put(route('admin.sports-points.update', 'sports'), [
+    $this->actingAs($admin)->put(route('admin.sports-points.update', 'sports_major'), [
         ...$payload,
         'systems' => [
-            'sports' => [
-                ...$payload['systems']['sports'],
+            'sports_major' => [
+                ...$payload['systems']['sports_major'],
                 'admin_password' => 'correct-password',
             ],
         ],
     ])->assertRedirect();
 
     expect((float) $volleyball->fresh()->scoring_rules['placements'][0]['points'])->toBe(12.0)
-        ->and((float) $badminton->fresh()->scoring_rules['placements'][0]['points'])->toBe(12.0)
+        ->and((float) $basketball->fresh()->scoring_rules['placements'][0]['points'])->toBe(12.0)
         ->and((float) $cultural->fresh()->scoring_rules['placements'][0]['points'])->toBe(10.0);
 });
 

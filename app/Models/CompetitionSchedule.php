@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class CompetitionSchedule extends Model
 {
-    protected $fillable = ['edition_sport_id', 'bracket_match_id', 'starts_at', 'ends_at', 'venue', 'status', 'coordinator_id'];
+    protected $fillable = ['edition_sport_id', 'bracket_match_id', 'title', 'starts_at', 'ends_at', 'venue', 'status', 'coordinator_id'];
     protected $casts = ['starts_at' => 'datetime', 'ends_at' => 'datetime'];
 
     public function editionSport() { return $this->belongsTo(EditionSport::class); }

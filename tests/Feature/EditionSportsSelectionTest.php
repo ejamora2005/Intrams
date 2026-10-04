@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\CompetitionSchedule;
 use App\Models\EditionSport;
 use App\Models\IntramuralEdition;
 use App\Models\Sport;
@@ -53,4 +54,69 @@ test('re-seeding default sports synchronizes them to existing editions and sport
         ->assertOk()
         ->assertSee('Second Edition Only')
         ->assertDontSee('First Edition Only');
+});
+
+test('proposal defaults seed scoring groups and cultural schedule items', function () {
+    $admin = editionSportsAdmin();
+
+    app(DefaultSportsSeeder::class)->run();
+
+    $defaultEdition = config('intramurals.default_edition');
+    $edition = IntramuralEdition::query()
+        ->where('name', $defaultEdition['name'])
+        ->where('school_year', $defaultEdition['school_year'])
+        ->firstOrFail();
+    $expectedCodes = collect(config('intramurals.default_competitions'))->pluck('code')->all();
+
+    expect($edition->name)->toBe('SLSUBC INTRAMURALS 2026')
+        ->and($edition->starts_on->format('Y-m-d'))->toBe('2026-10-19')
+        ->and($edition->ends_on->format('Y-m-d'))->toBe('2026-10-23')
+        ->and($edition->status)->toBe('active');
+
+    expect(Sport::query()->whereIn('code', $expectedCodes)->where('is_system', true)->count())->toBe(count($expectedCodes))
+        ->and(EditionSport::query()->where('edition_id', $edition->id)->whereHas('sport', fn ($query) => $query->whereIn('code', $expectedCodes))->count())->toBe(count($expectedCodes))
+        ->and(CompetitionSchedule::query()->whereIn('edition_sport_id', $edition->editionSports()->select('id'))->whereNotNull('title')->count())->toBe(count(config('intramurals.default_schedules')));
+
+    $basketball = EditionSport::query()->where('edition_id', $edition->id)->whereHas('sport', fn ($query) => $query->where('code', 'BASKET-5X5'))->firstOrFail();
+    $chess = EditionSport::query()->where('edition_id', $edition->id)->whereHas('sport', fn ($query) => $query->where('code', 'CHESS'))->firstOrFail();
+    $festivalDance = EditionSport::query()->where('edition_id', $edition->id)->whereHas('sport', fn ($query) => $query->where('code', 'CULT-FEST-DANCE'))->firstOrFail();
+    $festivalProgram = EditionSport::query()->where('edition_id', $edition->id)->whereHas('sport', fn ($query) => $query->where('code', 'CULT-FESTIVAL-PROGRAM'))->firstOrFail();
+
+    expect($basketball->scoring_rules['point_system'])->toBe('sports_major')
+        ->and((float) $basketball->scoring_rules['placements'][0]['points'])->toBe(25.0)
+        ->and($chess->scoring_rules['point_system'])->toBe('sports_minor')
+        ->and($festivalDance->scoring_rules['point_system'])->toBe('cultural_festival_dance')
+        ->and($festivalProgram->scoring_rules['non_scoring'])->toBeTrue();
+
+    $run = CompetitionSchedule::query()->where('title', 'Ruperto Run 2026')->firstOrFail();
+    $awarding = CompetitionSchedule::query()->where('title', 'Awarding')->firstOrFail();
+
+    expect($run->starts_at->format('Y-m-d H:i'))->toBe('2026-10-19 06:00')
+        ->and($run->venue)->toBe('TBA')
+        ->and($awarding->starts_at->format('Y-m-d H:i'))->toBe('2026-10-23 13:00')
+        ->and($awarding->venue)->toBe('TBA');
+
+    $this->actingAs($admin)
+        ->put(route('admin.competition.schedule-venue.update', $run), ['venue' => 'Campus Grounds'])
+        ->assertRedirect();
+
+    $this->actingAs($admin)
+        ->put(route('admin.competition.schedule-venue.update', $awarding), ['venue' => ''])
+        ->assertRedirect();
+
+    expect($run->fresh()->venue)->toBe('Campus Grounds')
+        ->and($awarding->fresh()->venue)->toBe('TBA');
+
+    $this->actingAs($admin)
+        ->get(route('admin.competition.index'))
+        ->assertOk()
+        ->assertSee('Campus Grounds')
+        ->assertSee('Awarding');
+
+    $this->actingAs($admin)
+        ->get(route('admin.sports-points.index'))
+        ->assertOk()
+        ->assertSee('Sports Major Events')
+        ->assertSee('Sports Athletics Events')
+        ->assertSee('Cultural Special Awards - 5 Points');
 });

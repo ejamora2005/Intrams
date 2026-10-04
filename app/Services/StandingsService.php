@@ -119,6 +119,10 @@ class StandingsService
     public function pointRulesFor(EditionSport $editionSport): array
     {
         $rules = $editionSport->scoring_rules;
+        if (is_array($rules) && ($rules['non_scoring'] ?? false) === true) {
+            return [];
+        }
+
         $placements = is_array($rules) && isset($rules['placements']) && is_array($rules['placements'])
             ? $rules['placements']
             : self::DEFAULT_PLACEMENTS;

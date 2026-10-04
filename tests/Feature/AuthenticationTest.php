@@ -15,10 +15,9 @@ use Illuminate\Support\Carbon;
 test('public landing page uses the intramurals design system', function () {
     $this->get('/')
         ->assertOk()
-        ->assertSee('Run every intramurals event from one organized workspace.')
-        ->assertSee('View schedule and sign in')
-        ->assertSee('bg-blue-950', false)
-        ->assertSee('bg-slate-50', false);
+        ->assertSee('Intramural Meet')
+        ->assertSee('Schedule')
+        ->assertSee('team-banner', false);
 });
 
 test('login screen can be rendered', function () {
@@ -61,6 +60,7 @@ test('login page shows a manually refreshed snapshot of todays competition sched
             'bracket_match_id' => $morningBracketMatch->id,
             'starts_at' => '2026-09-27 09:30:00',
             'ends_at' => '2026-09-27 11:00:00',
+            'venue' => 'Main Court',
             'status' => 'scheduled',
             'coordinator_id' => $coordinator->id,
         ]);
@@ -87,16 +87,18 @@ test('login page shows a manually refreshed snapshot of todays competition sched
             ->assertSee('Volleyball')
             ->assertSee('Morning')
             ->assertSeeInOrder(['Game 1', 'Blue Spikers VS Red Smashers'])
+            ->assertSee('Main Court')
             ->assertSee('Blue Spikers VS Red Smashers')
             ->assertSee('Afternoon')
             ->assertSeeInOrder(['Game 2', 'Green Servers VS Gold Blockers'])
+            ->assertSee('TBA')
             ->assertSee('Green Servers VS Gold Blockers')
             ->assertSee('Jamie Facilitator')
             ->assertSee('<th scope="rowgroup" rowspan="2"', false)
             ->assertSee('data-open-login', false)
             ->assertSee('data-login-modal', false)
             ->assertSee('backdrop:backdrop-blur-md', false)
-            ->assertSee('Refresh this page manually to load updated data.')
+            ->assertSee('Updates appear as coordinator entries are published.')
             ->assertDontSee('wire:poll', false)
             ->assertDontSee('setInterval(', false);
 

@@ -63,8 +63,8 @@
             <div class="schedule-table-wrap hidden lg:block">
                 <table class="schedule-table" aria-describedby="schedule-refresh-note">
                     <caption class="sr-only">Competitions scheduled for {{ $todayLabel }}</caption>
-                    <colgroup><col style="width:20%"><col style="width:17%"><col style="width:41%"><col style="width:22%"></colgroup>
-                    <thead><tr><th scope="col">Sport</th><th scope="col">Session</th><th scope="col">Teams / participants</th><th scope="col">Facilitator</th></tr></thead>
+                    <colgroup><col style="width:18%"><col style="width:15%"><col style="width:34%"><col style="width:15%"><col style="width:18%"></colgroup>
+                    <thead><tr><th scope="col">Sport</th><th scope="col">Session</th><th scope="col">Teams / participants</th><th scope="col">Venue</th><th scope="col">Facilitator</th></tr></thead>
                     <tbody>
                         @forelse ($todaySchedules->groupBy('sport') as $sport => $sportSchedules)
                             @php($sharedFacilitator = $sportSchedules->pluck('facilitator')->unique()->count() === 1)
@@ -83,13 +83,14 @@
                                         @if ($schedule['game'])<span class="schedule-game">{{ $schedule['game'] }}</span>@endif
                                         <span class="schedule-competitors">{{ $schedule['competitors'] }}</span>
                                     </td>
+                                    <td class="schedule-facilitator">{{ $schedule['venue'] }}</td>
                                     @if (! $sharedFacilitator || $loop->first)
                                         <td @if ($sharedFacilitator) rowspan="{{ $sportSchedules->count() }}" @endif class="schedule-facilitator">{{ $schedule['facilitator'] }}</td>
                                     @endif
                                 </tr>
                             @endforeach
                         @empty
-                            <tr><td colspan="4"><x-landing.schedule-empty /></td></tr>
+                            <tr><td colspan="5"><x-landing.schedule-empty /></td></tr>
                         @endforelse
                     </tbody>
                 </table>
@@ -106,6 +107,7 @@
                             @if ($schedule['game'])<span class="schedule-game">{{ $schedule['game'] }}</span>@endif
                             <p class="schedule-competitors">{{ $schedule['competitors'] }}</p>
                         </div>
+                        <dl><dt>Venue</dt><dd>{{ $schedule['venue'] }}</dd></dl>
                         <dl><dt>Facilitator</dt><dd>{{ $schedule['facilitator'] }}</dd></dl>
                     </article>
                 @empty

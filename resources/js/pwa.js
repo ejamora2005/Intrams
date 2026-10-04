@@ -5,9 +5,6 @@ const dismissButton = document.querySelector('[data-pwa-dismiss]');
 const refreshButton = document.querySelector('[data-pwa-refresh]');
 const installTitle = document.querySelector('[data-pwa-install-title]');
 const installCopy = document.querySelector('[data-pwa-install-copy]');
-const statusBar = document.querySelector('[data-pwa-status]');
-const statusText = document.querySelector('[data-pwa-status-text]');
-const statusDismiss = document.querySelector('[data-pwa-status-dismiss]');
 
 let installPrompt = null;
 let waitingWorker = null;
@@ -37,18 +34,6 @@ const hideInstallPanel = () => {
     if (installPanel) installPanel.hidden = true;
 };
 
-const updateConnectionState = () => {
-    if (!statusBar || !statusText) return;
-
-    if (navigator.onLine) {
-        statusBar.hidden = true;
-        return;
-    }
-
-    statusText.textContent = 'You are offline. Cached assets and the offline page remain available.';
-    statusBar.hidden = false;
-};
-
 window.addEventListener('beforeinstallprompt', event => {
     event.preventDefault();
     installPrompt = event;
@@ -70,9 +55,6 @@ installButton?.addEventListener('click', async () => {
 });
 
 dismissButton?.addEventListener('click', hideInstallPanel);
-statusDismiss?.addEventListener('click', () => {
-    if (statusBar) statusBar.hidden = true;
-});
 
 refreshButton?.addEventListener('click', () => {
     if (waitingWorker) {
@@ -81,10 +63,6 @@ refreshButton?.addEventListener('click', () => {
         window.location.reload();
     }
 });
-
-window.addEventListener('online', updateConnectionState);
-window.addEventListener('offline', updateConnectionState);
-updateConnectionState();
 
 if (canUseServiceWorker()) {
     window.addEventListener('load', async () => {

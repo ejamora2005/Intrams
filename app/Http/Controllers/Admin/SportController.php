@@ -280,17 +280,20 @@ class SportController extends Controller
         $data = $request->validate([
             'date' => ['required', 'date_format:Y-m-d', 'after_or_equal:'.$edition->starts_on->format('Y-m-d'), 'before_or_equal:'.$edition->ends_on->format('Y-m-d')],
             'period' => ['required', 'in:morning,afternoon'],
+            'venue' => ['nullable', 'string', 'max:120'],
         ]);
         $startsAt = Carbon::createFromFormat('Y-m-d H:i', $data['date'].' '.($data['period'] === 'morning' ? '08:00' : '13:00'));
+        $venue = trim((string) ($data['venue'] ?? '')) ?: 'TBA';
         $match->loadMissing(['competitorOne', 'competitorTwo']);
 
-        $schedule = DB::transaction(function () use ($match, $startsAt): CompetitionSchedule {
+        $schedule = DB::transaction(function () use ($match, $startsAt, $venue): CompetitionSchedule {
             $schedule = CompetitionSchedule::query()->updateOrCreate(
                 ['bracket_match_id' => $match->id],
                 [
                     'edition_sport_id' => $match->edition_sport_id,
                     'starts_at' => $startsAt,
                     'ends_at' => $startsAt->copy()->addHours(2),
+                    'venue' => $venue,
                     'status' => 'scheduled',
                 ]
             );
@@ -314,7 +317,7 @@ class SportController extends Controller
 
         return redirect()
             ->route('admin.sports.bracket', ['sport' => $sport, 'edition_id' => $edition->id])
-            ->with('success', 'Game '.$match->match_number.' scheduled for '.$startsAt->format('M j, Y').' '.ucfirst($data['period']).'.');
+            ->with('success', 'Game '.$match->match_number.' scheduled for '.$startsAt->format('M j, Y').' '.ucfirst($data['period']).' at '.$venue.'.');
     }
 
     public function resetBracket(Request $request, Sport $sport): RedirectResponse

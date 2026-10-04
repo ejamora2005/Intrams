@@ -186,7 +186,8 @@ test('an admin schedules a selected bracket match by date and time of day', func
         ->get(route('admin.sports.bracket', ['sport' => $editionSport->sport, 'edition_id' => $edition->id]))
         ->assertOk()
         ->assertSee('Schedule game')
-        ->assertSee('Time of day');
+        ->assertSee('Time of day')
+        ->assertSee('Venue');
 
     $match = BracketMatch::query()->where('edition_sport_id', $editionSport->id)->where('status', 'pending')->firstOrFail();
 
@@ -200,6 +201,7 @@ test('an admin schedules a selected bracket match by date and time of day', func
 
     $schedule = CompetitionSchedule::query()->where('bracket_match_id', $match->id)->firstOrFail();
     expect($schedule->starts_at->format('Y-m-d H:i'))->toBe('2026-10-02 08:00')
+        ->and($schedule->venue)->toBe('TBA')
         ->and($schedule->participants()->orderBy('slot')->pluck('team_id')->all())->toBe($teams->pluck('id')->all());
 
     $this->actingAs($admin)
@@ -207,11 +209,13 @@ test('an admin schedules a selected bracket match by date and time of day', func
             'edition_id' => $edition->id,
             'date' => '2026-10-03',
             'period' => 'afternoon',
+            'venue' => 'Campus Gym',
         ])
         ->assertRedirect();
 
     expect(CompetitionSchedule::query()->where('bracket_match_id', $match->id)->count())->toBe(1)
-        ->and($schedule->fresh()->starts_at->format('Y-m-d H:i'))->toBe('2026-10-03 13:00');
+        ->and($schedule->fresh()->starts_at->format('Y-m-d H:i'))->toBe('2026-10-03 13:00')
+        ->and($schedule->fresh()->venue)->toBe('Campus Gym');
 });
 
 test('declaring a bracket winner advances the team to the next matchup', function () {

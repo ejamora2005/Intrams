@@ -22,7 +22,7 @@ class PublicScheduleService
 
         if ($currentEdition) {
             $todaySchedules = CompetitionSchedule::query()
-                ->select(['id', 'edition_sport_id', 'bracket_match_id', 'starts_at', 'coordinator_id', 'status'])
+                ->select(['id', 'edition_sport_id', 'bracket_match_id', 'title', 'starts_at', 'venue', 'coordinator_id', 'status'])
                 ->whereIn('edition_sport_id', $currentEdition->editionSports()->select('id'))
                 ->whereBetween('starts_at', [$now->copy()->startOfDay(), $now->copy()->endOfDay()])
                 ->whereNotIn('status', ['cancelled', 'canceled'])
@@ -53,10 +53,11 @@ class PublicScheduleService
 
                     return [
                         'sport' => $schedule->editionSport->sport->name,
-                        'game' => $schedule->bracketMatch ? 'Game '.$schedule->bracketMatch->match_number : '',
+                        'game' => $schedule->title ?: ($schedule->bracketMatch ? 'Game '.$schedule->bracketMatch->match_number : ''),
                         'time' => $schedule->starts_at->format('g:i A'),
                         'period' => $schedule->starts_at->hour < 12 ? 'Morning' : 'Afternoon',
                         'competitors' => $competitors->isEmpty() ? 'To be announced' : $competitors->implode(' VS '),
+                        'venue' => $schedule->venue ?: 'TBA',
                         'facilitator' => $schedule->coordinator?->name ?? 'Unassigned',
                     ];
                 });

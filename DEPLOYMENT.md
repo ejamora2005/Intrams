@@ -34,3 +34,4 @@ DEPLOY_SEED_DEFAULT_COMPETITIONS=true
 - MySQL data is persisted in the `intrams_mysql` Docker volume.
 - The container runs `config:cache`, `event:cache`, and `view:cache` at startup. Routes are not cached because this project still uses closure routes.
 - The account seeder only creates default Admin, GAM, and Tabulator accounts when `INTRAMURALS_DEFAULT_ACCOUNT_PASSWORD` is set.
+- `DEPLOY_SEED_DEFAULT_COMPETITIONS=true` creates the default event/edition named `SLSUBC INTRAMURALS 2026`, then attaches the default sports, cultural events, point systems, and proposal schedules.

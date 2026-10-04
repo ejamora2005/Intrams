@@ -31,6 +31,7 @@ class DashboardController extends Controller
         $editionSports = $edition?->editionSports()
             ->with(['sport', 'sportResult'])
             ->get()
+            ->filter(fn (EditionSport $editionSport): bool => $this->standingsService->pointRulesFor($editionSport) !== [])
             ->sortBy(fn (EditionSport $editionSport): string => $editionSport->sport?->name ?? '')
             ->values() ?? collect();
         $selectedSport = $editionSports->firstWhere('id', $request->integer('edition_sport_id')) ?? $editionSports->first();

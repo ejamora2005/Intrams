@@ -51,6 +51,8 @@
                     <option value="morning" @selected(! $match->schedule || $match->schedule->starts_at->hour < 12)>Morning</option>
                     <option value="afternoon" @selected($match->schedule && $match->schedule->starts_at->hour >= 12)>Afternoon</option>
                 </select>
+                <label class="block font-semibold" for="schedule-venue-{{ $match->id }}">Venue</label>
+                <input id="schedule-venue-{{ $match->id }}" name="venue" type="text" maxlength="120" value="{{ old('venue', $match->schedule?->venue ?: 'TBA') }}" class="block w-full rounded border-slate-300 text-sm focus:border-blue-600 focus:ring-blue-600">
                 <button class="w-full rounded bg-blue-700 px-3 py-2 font-semibold text-white hover:bg-blue-800">Save schedule</button>
             </form>
         </div>

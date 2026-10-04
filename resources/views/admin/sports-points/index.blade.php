@@ -21,7 +21,7 @@
 
     <div class="mb-6 flex flex-col gap-2">
         <p class="text-sm text-slate-600">{{ $edition?->name ?? 'No active intramurals edition is available yet.' }}</p>
-        <p class="text-sm text-slate-500">Sports and cultural scoring each use one shared point system. Saving changes requires the current admin password and recalculates declared results.</p>
+        <p class="text-sm text-slate-500">Proposal-based sports and cultural groups share point values by category. Saving changes requires the current admin password and recalculates declared results.</p>
     </div>
 
     @if (! $edition)
@@ -42,6 +42,7 @@
                         <div>
                             <h3 class="text-base font-semibold text-slate-950">{{ $system['label'] }}</h3>
                             <p class="mt-1 text-sm text-slate-500">{{ $system['description'] }}</p>
+                            <p class="mt-2 text-xs font-semibold uppercase tracking-wide text-slate-400">{{ ucfirst($system['category']) }} point group</p>
                         </div>
                         <div class="flex flex-wrap gap-2">
                             <span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-slate-600">{{ $system['configured_count'] }} configured</span>

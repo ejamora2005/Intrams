@@ -114,7 +114,7 @@ Route::middleware([
         Route::get('/cultural', [SportController::class, 'cultural'])->name('cultural.index');
         Route::resource('sports', SportController::class)->except(['show']);
         Route::get('/sports-points', [SportPointController::class, 'index'])->name('sports-points.index');
-        Route::put('/sports-points/{category}', [SportPointController::class, 'update'])->where('category', 'sports|cultural')->name('sports-points.update');
+        Route::put('/sports-points/{system}', [SportPointController::class, 'update'])->where('system', '[A-Za-z0-9_-]+')->name('sports-points.update');
         Route::get('/sports/{sport}/bracket', [SportController::class, 'bracket'])->name('sports.bracket');
         Route::get('/sports/{sport}/basketball-score-sheet', [SportController::class, 'basketballScoreSheet'])->name('sports.basketball-score-sheet');
         Route::post('/sports/{sport}/basketball-score-sheet/download', [SportController::class, 'downloadBasketballScoreSheet'])->name('sports.basketball-score-sheet.download');
@@ -139,6 +139,7 @@ Route::middleware([
         Route::get('/participation-rules', [RegistrationController::class, 'rules'])->name('participation-rules.index');
         Route::post('/participation-rules', [RegistrationController::class, 'storeRule'])->name('participation-rules.store');
         Route::get('/competition', [CompetitionController::class, 'index'])->name('competition.index');
+        Route::put('/competition/schedules/{schedule}/venue', [CompetitionController::class, 'updateVenue'])->name('competition.schedule-venue.update');
         Route::get('/system-logs', [SystemLogController::class, 'index'])->name('system-logs.index');
     });
 

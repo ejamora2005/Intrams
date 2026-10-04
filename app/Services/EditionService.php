@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\CompetitionSchedule;
 use App\Models\IntramuralEdition;
 use App\Models\Sport;
 use Illuminate\Support\Facades\DB;
@@ -70,6 +71,8 @@ class EditionService
 
                 if (empty($configuration->scoring_rules['placements'])) {
                     $configuration->update(['scoring_rules' => $defaults['scoring_rules']]);
+                } elseif ($this->usesLegacyDefaultScoring($configuration->scoring_rules)) {
+                    $configuration->update(['scoring_rules' => $defaults['scoring_rules']]);
                 }
 
                 continue;
@@ -84,6 +87,8 @@ class EditionService
                 'status' => 'preparation',
             ]);
         }
+
+        $this->syncDefaultSchedules($edition);
     }
 
     /** @return array{participant_type: string, game_mechanic: string, scoring_rules: array<string, mixed>, rules: ?string} */
@@ -98,6 +103,57 @@ class EditionService
             'scoring_rules' => $catalogItem['scoring_rules'] ?? StandingsService::defaultScoringRules(),
             'rules' => $catalogItem['rules'] ?? null,
         ];
+    }
+
+    private function syncDefaultSchedules(IntramuralEdition $edition): void
+    {
+        $editionSports = $edition->editionSports()
+            ->with('sport:id,code')
+            ->get()
+            ->keyBy(fn ($editionSport): string => $editionSport->sport?->code ?? '');
+
+        foreach (config('intramurals.default_schedules', []) as $schedule) {
+            $editionSport = $editionSports->get($schedule['code'] ?? '');
+            if ($editionSport === null) {
+                continue;
+            }
+
+            $day = max(1, (int) ($schedule['day'] ?? 1));
+            $startsAt = $edition->starts_on
+                ->copy()
+                ->addDays($day - 1)
+                ->setTimeFromTimeString($schedule['starts_at'] ?? '08:00');
+            $endsAt = $edition->starts_on
+                ->copy()
+                ->addDays($day - 1)
+                ->setTimeFromTimeString($schedule['ends_at'] ?? '10:00');
+
+            CompetitionSchedule::query()->firstOrCreate(
+                [
+                    'edition_sport_id' => $editionSport->id,
+                    'starts_at' => $startsAt,
+                    'title' => $schedule['title'] ?? null,
+                ],
+                [
+                    'ends_at' => $endsAt->greaterThan($startsAt) ? $endsAt : $startsAt->copy()->addHours(2),
+                    'venue' => $schedule['venue'] ?? 'TBA',
+                    'status' => $schedule['status'] ?? 'scheduled',
+                ],
+            );
+        }
+    }
+
+    private function usesLegacyDefaultScoring(mixed $scoringRules): bool
+    {
+        if (! is_array($scoringRules)) {
+            return true;
+        }
+
+        if (isset($scoringRules['point_system'])) {
+            return false;
+        }
+
+        return json_encode($scoringRules['placements'] ?? []) === json_encode(StandingsService::DEFAULT_PLACEMENTS);
     }
 
     private function ensureNoOtherActiveEdition(string $status, ?IntramuralEdition $except = null): void
