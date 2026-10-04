@@ -9796,7 +9796,7 @@
       "file_type": "code",
       "norm_label": "{closure#2}()",
       "source_file": "tests/Feature/IntramuralsStudentRosterSeederTest.php",
-      "source_location": "L47"
+      "source_location": "L49"
     },
     {
       "id": "tests_feature_intramuralsstudentrosterseedertest_closure_3",
@@ -9808,7 +9808,7 @@
       "file_type": "code",
       "norm_label": "{closure#3}()",
       "source_file": "tests/Feature/IntramuralsStudentRosterSeederTest.php",
-      "source_location": "L50"
+      "source_location": "L52"
     },
     {
       "id": "tests_feature_intramuralsstudentrosterseedertest_closure_4",
@@ -9820,7 +9820,7 @@
       "file_type": "code",
       "norm_label": "{closure#4}()",
       "source_file": "tests/Feature/IntramuralsStudentRosterSeederTest.php",
-      "source_location": "L53"
+      "source_location": "L55"
     },
     {
       "id": "tests_feature_intramuralsstudentrosterseedertest_closure_5",
@@ -9832,7 +9832,7 @@
       "file_type": "code",
       "norm_label": "{closure#5}()",
       "source_file": "tests/Feature/IntramuralsStudentRosterSeederTest.php",
-      "source_location": "L55"
+      "source_location": "L57"
     },
     {
       "id": "tests_feature_intramuralsstudentrosterseedertest_closure_6",
@@ -9844,7 +9844,7 @@
       "file_type": "code",
       "norm_label": "{closure#6}()",
       "source_file": "tests/Feature/IntramuralsStudentRosterSeederTest.php",
-      "source_location": "L56"
+      "source_location": "L58"
     },
     {
       "id": "database_migrations_2026_10_04_000001_add_title_to_competition_schedules_closure_1",
@@ -27185,7 +27185,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "tests/Feature/IntramuralsStudentRosterSeederTest.php",
-      "source_location": "L46",
+      "source_location": "L48",
       "weight": 1.0
     },
     {
@@ -27197,7 +27197,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "tests/Feature/IntramuralsStudentRosterSeederTest.php",
-      "source_location": "L47",
+      "source_location": "L49",
       "weight": 1.0
     },
     {
@@ -27209,7 +27209,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "tests/Feature/IntramuralsStudentRosterSeederTest.php",
-      "source_location": "L54",
+      "source_location": "L56",
       "weight": 1.0
     },
     {
@@ -53172,7 +53172,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "tests/Feature/IntramuralsStudentRosterSeederTest.php",
-      "source_location": "L47",
+      "source_location": "L49",
       "weight": 1.0
     },
     {
@@ -53183,7 +53183,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "tests/Feature/IntramuralsStudentRosterSeederTest.php",
-      "source_location": "L50",
+      "source_location": "L52",
       "weight": 1.0
     },
     {
@@ -53194,7 +53194,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "tests/Feature/IntramuralsStudentRosterSeederTest.php",
-      "source_location": "L53",
+      "source_location": "L55",
       "weight": 1.0
     },
     {
@@ -53205,7 +53205,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "tests/Feature/IntramuralsStudentRosterSeederTest.php",
-      "source_location": "L55",
+      "source_location": "L57",
       "weight": 1.0
     },
     {
@@ -53216,7 +53216,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "tests/Feature/IntramuralsStudentRosterSeederTest.php",
-      "source_location": "L56",
+      "source_location": "L58",
       "weight": 1.0
     },
     {
@@ -62273,5 +62273,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "0abcd603550faf6a3cd9d4d8877a01ef67b0ced4"
+  "built_at_commit": "8f312842c8b51b3268d0f5e9f77c58133448c8f5"
 }

@@ -1,5 +1,8 @@
 <?php
 
+use App\Models\AthleteEntry;
+use App\Models\IntramuralEdition;
+use App\Models\Sport;
 use App\Models\Student;
 use App\Models\User;
 
@@ -31,6 +34,53 @@ test('admin can browse and search student athlete records', function () {
     $response = $this->actingAs($admin)->get(route('admin.students.index', ['search' => 'Lina']));
 
     $response->assertOk()->assertSee('Lina')->assertDontSee('Marco');
+});
+
+test('admin student records show joined sports and events automatically', function () {
+    $admin = activeAdmin();
+    $edition = IntramuralEdition::query()->create([
+        'name' => 'Active Intramurals',
+        'school_year' => '2026-2027',
+        'starts_on' => '2026-10-19',
+        'ends_on' => '2026-10-23',
+        'status' => 'active',
+    ]);
+    $archivedEdition = IntramuralEdition::query()->create([
+        'name' => 'Archived Intramurals',
+        'school_year' => '2025-2026',
+        'starts_on' => '2025-10-19',
+        'ends_on' => '2025-10-23',
+        'status' => 'archived',
+    ]);
+    $student = Student::factory()->create([
+        'student_number' => '2026-10003',
+        'first_name' => 'Karyl',
+        'last_name' => 'Gesto',
+        'status' => 'active',
+    ]);
+    $russianSoftball = Sport::query()->create(['name' => 'Russian Softball', 'code' => 'RUSSIAN-SOFTBALL', 'status' => 'active']);
+    $painting = Sport::query()->create(['name' => 'Cultural: Collaborative Painting', 'code' => 'CULT-COLLAB-PAINT', 'status' => 'active']);
+    $oldChess = Sport::query()->create(['name' => 'Old Chess', 'code' => 'OLD-CHESS', 'status' => 'active']);
+    $russianSoftballConfig = $edition->editionSports()->create(['sport_id' => $russianSoftball->id, 'participant_type' => 'team', 'game_mechanic' => 'single_elimination', 'status' => 'preparation']);
+    $paintingConfig = $edition->editionSports()->create(['sport_id' => $painting->id, 'participant_type' => 'team', 'game_mechanic' => 'custom', 'status' => 'preparation']);
+    $oldChessConfig = $archivedEdition->editionSports()->create(['sport_id' => $oldChess->id, 'participant_type' => 'individual', 'game_mechanic' => 'single_elimination', 'status' => 'preparation']);
+
+    foreach ([$russianSoftballConfig, $paintingConfig, $oldChessConfig] as $editionSport) {
+        AthleteEntry::query()->create([
+            'edition_sport_id' => $editionSport->id,
+            'student_id' => $student->id,
+            'status' => 'active',
+            'assigned_at' => now(),
+        ]);
+    }
+
+    $this->actingAs($admin)
+        ->get(route('admin.students.index', ['search' => 'Karyl']))
+        ->assertOk()
+        ->assertSee('Joined sports/events')
+        ->assertSee('Russian Softball')
+        ->assertSee('Cultural: Collaborative Painting')
+        ->assertDontSee('Old Chess');
 });
 
 test('admin can create a student and the action is audited', function () {

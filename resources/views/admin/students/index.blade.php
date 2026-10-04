@@ -38,6 +38,7 @@
                         <tr>
                             <th scope="col" class="px-5 py-3">Student</th>
                             <th scope="col" class="px-5 py-3">Student number</th>
+                            <th scope="col" class="px-5 py-3">Joined sports/events</th>
                             <th scope="col" class="px-5 py-3">Year & section</th>
                             <th scope="col" class="px-5 py-3">Status</th>
                             <th scope="col" class="px-5 py-3"><span class="sr-only">Actions</span></th>
@@ -48,6 +49,29 @@
                             <tr class="transition hover:bg-slate-50">
                                 <td class="px-5 py-4 font-medium text-slate-900">{{ $student->full_name }}</td>
                                 <td class="px-5 py-4 font-mono text-xs text-slate-600">{{ $student->student_number }}</td>
+                                <td class="px-5 py-4">
+                                    @php
+                                        $joinedEvents = $student->athleteEntries
+                                            ->map(fn ($entry) => $entry->editionSport?->sport?->name)
+                                            ->filter()
+                                            ->unique()
+                                            ->values();
+                                    @endphp
+
+                                    @if ($joinedEvents->isEmpty())
+                                        <span class="text-sm text-slate-400">None yet</span>
+                                    @else
+                                        <div class="flex max-w-sm flex-wrap gap-1.5">
+                                            @foreach ($joinedEvents->take(4) as $eventName)
+                                                <span class="rounded-full border border-blue-100 bg-blue-50 px-2 py-1 text-xs font-semibold text-blue-800">{{ $eventName }}</span>
+                                            @endforeach
+
+                                            @if ($joinedEvents->count() > 4)
+                                                <span class="rounded-full border border-slate-200 bg-slate-50 px-2 py-1 text-xs font-semibold text-slate-500">+{{ $joinedEvents->count() - 4 }} more</span>
+                                            @endif
+                                        </div>
+                                    @endif
+                                </td>
                                 <td class="px-5 py-4">{{ collect([$student->year_level ? 'Year '.$student->year_level : null, $student->section])->filter()->implode(' · ') ?: '—' }}</td>
                                 <td class="px-5 py-4">
                                     @if ($student->trashed())

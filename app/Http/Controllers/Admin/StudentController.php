@@ -7,6 +7,7 @@ use App\Http\Requests\StoreStudentRequest;
 use App\Http\Requests\UpdateStudentRequest;
 use App\Models\Student;
 use App\Models\Course;
+use App\Models\IntramuralEdition;
 use App\Services\StudentService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -23,6 +24,7 @@ class StudentController extends Controller
         $status = $request->string('status')->value() ?: 'active';
         $search = $request->string('search')->value();
         $courseId = $request->integer('course_id') ?: null;
+        $activeEditionId = IntramuralEdition::query()->where('status', 'active')->value('id');
 
         $students = Student::query()
             ->when($status === 'archived', fn ($query) => $query->onlyTrashed())
@@ -37,7 +39,16 @@ class StudentController extends Controller
                 });
             })
             ->when($courseId, fn ($query) => $query->where('course_id', $courseId))
-            ->with('course')
+            ->with([
+                'course',
+                'athleteEntries' => function ($query) use ($activeEditionId): void {
+                    $query
+                        ->with('editionSport.sport')
+                        ->where('status', 'active')
+                        ->when($activeEditionId, fn ($entryQuery) => $entryQuery
+                            ->whereHas('editionSport', fn ($editionSportQuery) => $editionSportQuery->where('edition_id', $activeEditionId)));
+                },
+            ])
             ->orderBy('last_name')
             ->orderBy('first_name')
             ->paginate(15)
