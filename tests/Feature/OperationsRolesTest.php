@@ -72,7 +72,14 @@ test('GAM users are sent to the GAM dashboard', function () {
     $gam = User::factory()->create(['role' => 'gam', 'status' => 'active', 'managed_team_id' => $team->id]);
 
     $this->actingAs($gam)->get(route('dashboard'))->assertRedirect(route('gam.dashboard'));
-    $this->actingAs($gam)->get(route('gam.dashboard'))->assertOk()->assertSee('Teams and rosters')->assertSee('Mighty Sea Dragons');
+    $this->actingAs($gam)->get(route('gam.dashboard'))
+        ->assertOk()
+        ->assertSee('GAM workspace')
+        ->assertSee('Roster')
+        ->assertSee('Medical Certificates')
+        ->assertSee('Rules & Guidelines')
+        ->assertSee('Teams and rosters')
+        ->assertSee('Mighty Sea Dragons');
 });
 
 test('GAM users can add players to their assigned faction', function () {
@@ -223,7 +230,13 @@ test('multiple tabulators can access the tabulator dashboard', function () {
     $firstTabulator = User::factory()->create(['role' => 'tabulator', 'status' => 'active']);
     $secondTabulator = User::factory()->create(['role' => 'tabulator', 'status' => 'active']);
 
-    $this->actingAs($firstTabulator)->get(route('tabulator.dashboard'))->assertOk()->assertSee('Tabulator dashboard');
+    $this->actingAs($firstTabulator)->get(route('tabulator.dashboard'))
+        ->assertOk()
+        ->assertSee('Tabulator workspace')
+        ->assertSee('Possible DQ')
+        ->assertSee('Declare Sports')
+        ->assertSee('Rules & Guidelines')
+        ->assertSee('Tabulator dashboard');
     $this->actingAs($secondTabulator)->get(route('tabulator.dashboard'))->assertOk()->assertSee('Tabulator dashboard');
 });
 

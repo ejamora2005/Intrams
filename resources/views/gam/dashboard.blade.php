@@ -38,7 +38,7 @@
         @endforeach
     </section>
 
-    <section class="mt-6 rounded-lg border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
+    <section id="roster-management" class="mt-6 scroll-mt-24 rounded-lg border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
         <div class="flex flex-col justify-between gap-3 border-b border-slate-100 pb-4 lg:flex-row lg:items-end">
             <div>
                 <h2 class="text-base font-semibold text-slate-950">Roster management</h2>
@@ -73,21 +73,21 @@
                             <tbody class="divide-y divide-slate-100">
                                 @forelse ($selectedTeam->members as $member)
                                     @php($eligibility = $member->student ? $eligibilityByStudentId->get($member->student->id) : null)
-                                    <tr @class(['bg-red-50/90' => $eligibility['possible_dq'] ?? false])>
+                                    <tr @class(['border-l-4 border-red-400 bg-red-950/45' => $eligibility['possible_dq'] ?? false])>
                                         <td class="px-4 py-3">
                                             <span class="block font-medium text-slate-900">{{ $member->student?->full_name ?? 'Removed student' }}</span>
                                             @if ($eligibility['possible_dq'] ?? false)
-                                                <span class="mt-1 block text-xs font-medium text-red-700">{{ implode(' ', $eligibility['issues']) }}</span>
+                                                <span class="mt-1 block text-xs font-medium text-red-200">{{ implode(' ', $eligibility['issues']) }}</span>
                                             @endif
                                         </td>
                                         <td class="px-4 py-3 text-slate-600">{{ $member->student?->student_number ?? '-' }}</td>
                                         <td class="px-4 py-3 text-slate-600">{{ $member->student?->course?->code ?? '-' }}</td>
                                         <td class="px-4 py-3 text-slate-600">{{ trim(($member->student?->year_level ?? '').' '.($member->student?->section ?? '')) ?: '-' }}</td>
-                                        <td class="px-4 py-3">
+                                        <td class="px-4 py-3 min-w-32">
                                             @if ($eligibility['possible_dq'] ?? false)
-                                                <span class="rounded-full bg-red-600 px-2.5 py-1 text-xs font-semibold uppercase tracking-wide text-white">Possible DQ</span>
+                                                <span class="inline-flex w-max whitespace-nowrap rounded-full bg-red-600 px-2.5 py-1 text-xs font-semibold uppercase tracking-wide text-white">Possible DQ</span>
                                             @else
-                                                <span class="rounded-full bg-green-50 px-2.5 py-1 text-xs font-semibold text-green-700">Clear</span>
+                                                <span class="inline-flex w-max whitespace-nowrap rounded-full bg-green-50 px-2.5 py-1 text-xs font-semibold text-green-700">Clear</span>
                                             @endif
                                         </td>
                                     </tr>
@@ -141,13 +141,13 @@
         @endif
     </section>
 
-    <section class="mt-6 rounded-lg border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
+    <section id="medical-certificates" class="mt-6 scroll-mt-24 rounded-lg border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
         <div class="flex flex-col justify-between gap-2 border-b border-slate-100 pb-4 sm:flex-row sm:items-end">
             <div>
                 <h2 class="text-base font-semibold text-slate-950">Medical certificate verification</h2>
                 <p class="mt-1 text-sm text-slate-500">Review physical sports entries that require clearance. Chess and E-Sport (ML) are excluded.</p>
             </div>
-            <span class="w-fit rounded-full bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-800">{{ $medicalCertificateEntries->where('effective_medical_certificate_status', 'pending')->count() }} pending</span>
+            <span class="inline-flex w-max whitespace-nowrap rounded-full bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-800">{{ $medicalCertificateEntries->where('effective_medical_certificate_status', 'pending')->count() }} pending</span>
         </div>
         <div class="mt-4 overflow-x-auto">
             <table class="min-w-full text-left text-sm">
@@ -164,7 +164,7 @@
                             </td>
                             <td class="px-4 py-3 align-top text-slate-600">{{ $entry->editionSport->sport?->name }}</td>
                             <td class="px-4 py-3 align-top">
-                                <span class="{{ $status === 'pending' ? 'bg-amber-50 text-amber-800' : ($status === 'verified' ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700') }} rounded-full px-2.5 py-1 text-xs font-semibold">{{ Str::headline($status) }}</span>
+                                <span class="{{ $status === 'pending' ? 'bg-amber-50 text-amber-800' : ($status === 'verified' ? 'bg-green-50 text-green-700' : 'bg-red-600 text-white') }} inline-flex w-max whitespace-nowrap rounded-full px-2.5 py-1 text-xs font-semibold">{{ Str::headline($status) }}</span>
                             </td>
                             <td class="px-4 py-3 align-top">
                                 <form method="POST" action="{{ route('gam.medical-certificates.update', $entry) }}" class="grid gap-2 sm:grid-cols-[9rem_minmax(12rem,1fr)_auto]">
@@ -187,7 +187,7 @@
         </div>
     </section>
 
-    <section class="mt-6 rounded-lg border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
+    <section id="team-standings" class="mt-6 scroll-mt-24 rounded-lg border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
         <div class="flex flex-col justify-between gap-2 border-b border-slate-100 pb-4 sm:flex-row sm:items-end">
             <div>
                 <h2 class="text-base font-semibold text-slate-950">Team standings</h2>
@@ -216,7 +216,7 @@
         </div>
     </section>
 
-    <section class="mt-6 rounded-lg border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
+    <section id="ready-matches" class="mt-6 scroll-mt-24 rounded-lg border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
         <h2 class="text-base font-semibold text-slate-950">Ready matches</h2>
         <div class="mt-4 grid gap-3 lg:grid-cols-2">
             @forelse ($upcomingMatches as $match)

@@ -208,6 +208,28 @@ textarea {
     background: #35b46f0d;
 }
 
+.ops-dashboard .bg-red-50,
+.ops-dashboard article.bg-red-50 {
+    color: #ffe4e6 !important;
+    background: #561b27 !important;
+}
+
+.ops-dashboard .bg-red-950\/45,
+.ops-dashboard table tbody tr.bg-red-950\/45,
+.ops-dashboard table tbody tr.bg-red-950\/45:nth-child(even),
+.ops-dashboard table tbody tr.bg-red-950\/45:hover {
+    background: #561b27cc !important;
+}
+
+.ops-dashboard :is(.text-red-700, .text-red-800) {
+    color: #fecdd3 !important;
+}
+
+.ops-dashboard :is(.bg-red-600) {
+    color: #fff !important;
+    background: #dc2626 !important;
+}
+
 .ops-dashboard :is(input, select, textarea),
 .ops-dashboard :is(input, select, textarea):is(.text-slate-950, .text-slate-900, .text-slate-800, .text-slate-700, .text-slate-600, .text-slate-500, .text-blue-700, .text-blue-800, .text-blue-800\/75) {
     color: #0f172a !important;

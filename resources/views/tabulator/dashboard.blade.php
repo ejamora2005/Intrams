@@ -30,25 +30,25 @@
         </div>
     </div>
 
-    <section class="mt-6 rounded-lg border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
+    <section id="possible-dq" class="mt-6 scroll-mt-24 rounded-lg border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
         <div class="flex flex-col justify-between gap-2 border-b border-slate-100 pb-4 sm:flex-row sm:items-end">
             <div>
                 <h2 class="text-base font-semibold text-slate-950">Possible DQ watchlist</h2>
                 <p class="mt-1 text-sm text-slate-500">Check these registrations before declaring winners.</p>
             </div>
-            <span class="w-fit rounded-full bg-red-50 px-3 py-1 text-xs font-semibold text-red-700">{{ $flaggedStudents->count() }} flagged</span>
+            <span class="inline-flex w-max whitespace-nowrap rounded-full bg-red-600 px-3 py-1 text-xs font-semibold text-white">{{ $flaggedStudents->count() }} flagged</span>
         </div>
         <div class="mt-4 grid gap-3 lg:grid-cols-2">
             @forelse ($flaggedStudents as $evaluation)
-                <article class="rounded-lg border border-red-200 bg-red-50 p-4">
+                <article class="rounded-lg border border-red-400/60 bg-red-950/45 p-4">
                     <div class="flex flex-col justify-between gap-2 sm:flex-row sm:items-start">
                         <div>
                             <p class="font-semibold text-slate-950">{{ $evaluation['student']->full_name }}</p>
                             <p class="mt-1 text-xs text-slate-500">{{ $evaluation['student']->student_number }} / {{ $evaluation['summary'] }}</p>
                         </div>
-                        <span class="w-fit rounded-full bg-red-600 px-2.5 py-1 text-xs font-semibold uppercase tracking-wide text-white">Possible DQ</span>
+                        <span class="inline-flex w-max whitespace-nowrap rounded-full bg-red-600 px-2.5 py-1 text-xs font-semibold uppercase tracking-wide text-white">Possible DQ</span>
                     </div>
-                    <p class="mt-3 text-sm font-medium text-red-800">{{ implode(' ', $evaluation['issues']) }}</p>
+                    <p class="mt-3 text-sm font-medium text-red-200">{{ implode(' ', $evaluation['issues']) }}</p>
                 </article>
             @empty
                 <p class="rounded-lg border border-dashed border-slate-300 px-4 py-8 text-center text-sm text-slate-500 lg:col-span-2">No Possible DQ students found.</p>
@@ -56,7 +56,7 @@
         </div>
     </section>
 
-    <section class="mt-6 rounded-lg border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
+    <section id="declare-sports" class="mt-6 scroll-mt-24 rounded-lg border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
         <div class="flex flex-col justify-between gap-3 border-b border-slate-100 pb-4 lg:flex-row lg:items-end">
             <div>
                 <h2 class="text-base font-semibold text-slate-950">Declare sport winners</h2>
@@ -106,7 +106,7 @@
     </section>
 
     <section class="mt-6 grid gap-6 xl:grid-cols-2">
-        <div class="rounded-lg border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
+        <div id="declared-results" class="scroll-mt-24 rounded-lg border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
             <h2 class="text-base font-semibold text-slate-950">Declared results</h2>
             <div class="mt-4 divide-y divide-slate-100">
                 @forelse ($editionSports->filter(fn ($editionSport) => $editionSport->sportResult) as $editionSport)
@@ -114,7 +114,7 @@
                         <p class="font-semibold text-slate-950">{{ $editionSport->sport?->name }}</p>
                         <div class="mt-2 flex flex-wrap gap-2 text-sm text-slate-600">
                             @foreach ($editionSport->sportResult->placements_json ?? [] as $placement => $teamId)
-                                <span class="rounded-full bg-slate-100 px-3 py-1">#{{ $placement }} {{ $teamsById->get((int) $teamId)?->name ?? 'Removed team' }}</span>
+                                <span class="inline-flex max-w-full whitespace-nowrap rounded-full bg-slate-100 px-3 py-1">#{{ $placement }} {{ $teamsById->get((int) $teamId)?->name ?? 'Removed team' }}</span>
                             @endforeach
                         </div>
                     </div>
@@ -148,7 +148,7 @@
         </div>
     </section>
 
-    <section class="mt-6 rounded-lg border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
+    <section id="match-winners" class="mt-6 scroll-mt-24 rounded-lg border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
         <h2 class="text-base font-semibold text-slate-950">Declare match winners</h2>
         <div class="mt-4 grid gap-3 lg:grid-cols-2">
             @forelse ($matches as $match)

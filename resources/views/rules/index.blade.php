@@ -57,7 +57,7 @@
                 <h2 class="text-base font-semibold text-slate-950">Possible DQ watchlist</h2>
                 <p class="mt-1 text-sm text-slate-500">Students currently breaking the participation rules for the active edition.</p>
             </div>
-            <span class="w-fit rounded-full bg-red-50 px-3 py-1 text-xs font-semibold text-red-700">{{ $flaggedStudents->count() }} flagged</span>
+            <span class="inline-flex w-max whitespace-nowrap rounded-full bg-red-600 px-3 py-1 text-xs font-semibold text-white">{{ $flaggedStudents->count() }} flagged</span>
         </div>
         <div class="overflow-x-auto">
             <table class="min-w-full text-left text-sm">
@@ -66,7 +66,7 @@
                 </thead>
                 <tbody class="divide-y divide-slate-100">
                     @forelse ($flaggedStudents as $evaluation)
-                        <tr class="bg-red-50/90">
+                        <tr class="border-l-4 border-red-400 bg-red-950/45">
                             <td class="px-4 py-3 align-top">
                                 <p class="font-semibold text-slate-950">{{ $evaluation['student']->full_name }}</p>
                                 <p class="text-xs text-slate-500">{{ $evaluation['student']->student_number }} / {{ $evaluation['student']->course?->code ?? $evaluation['student']->course?->name ?? 'No course' }}</p>
@@ -74,14 +74,14 @@
                             <td class="px-4 py-3 align-top text-slate-600">
                                 <div class="flex flex-wrap gap-2">
                                     @foreach ($evaluation['entries'] as $entry)
-                                        <span class="rounded-full bg-white px-3 py-1 text-xs font-medium text-slate-700 shadow-sm">{{ $entry['name'] }} - {{ $entry['slot_label'] }}</span>
+                                        <span class="inline-flex max-w-full whitespace-nowrap rounded-full bg-white px-3 py-1 text-xs font-medium text-slate-700 shadow-sm">{{ $entry['name'] }} - {{ $entry['slot_label'] }}</span>
                                     @endforeach
                                 </div>
                                 <p class="mt-2 text-xs text-slate-500">{{ $evaluation['summary'] }}</p>
                             </td>
                             <td class="px-4 py-3 align-top">
-                                <span class="rounded-full bg-red-600 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-white">Possible DQ</span>
-                                <p class="mt-2 text-sm font-medium text-red-800">{{ implode(' ', $evaluation['issues']) }}</p>
+                                <span class="inline-flex w-max whitespace-nowrap rounded-full bg-red-600 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-white">Possible DQ</span>
+                                <p class="mt-2 text-sm font-medium text-red-200">{{ implode(' ', $evaluation['issues']) }}</p>
                             </td>
                         </tr>
                     @empty
