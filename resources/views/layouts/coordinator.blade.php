@@ -57,7 +57,10 @@
                 <nav class="flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto px-3 py-4" aria-label="{{ $workspaceLabel }} sections">
                     @foreach ($navigation as $item)
                         @php
-                            $isActive = ($item['active'] ?? false) && request()->is($item['match'], $item['match'].'/*');
+                            $viewTarget = ($item['route'] ?? null) === $homeRoute
+                                ? ($item['hash'] ?? 'dashboard-overview')
+                                : null;
+                            $isActive = ($item['active'] ?? false) && request()->is($item['match'], $item['match'].'/*') && empty($item['hash']);
                             $url = route($item['route'], $item['params'] ?? []);
                             if (! empty($item['hash'])) {
                                 $url .= '#'.$item['hash'];
@@ -67,7 +70,7 @@
                             'w-full whitespace-nowrap rounded-lg px-3 py-2.5 text-sm font-medium transition',
                             'bg-white text-blue-950 shadow-sm' => $isActive,
                             'text-blue-200 hover:bg-blue-900 hover:text-white' => ! $isActive,
-                        ]) @if ($isActive) aria-current="page" @endif>
+                        ]) @if ($viewTarget) data-ops-view-link data-ops-view-target="{{ $viewTarget }}" @endif @if ($isActive) aria-current="page" @endif>
                             {{ $item['label'] }}
                         </a>
                     @endforeach
@@ -139,6 +142,72 @@
                 setOpsSidebarOpen(false, false);
             });
             setOpsSidebarOpen(false, false);
+
+            const opsViewPanels = Array.from(document.querySelectorAll('[data-ops-view-panel]'));
+            const opsViewLinks = Array.from(document.querySelectorAll('[data-ops-view-link]'));
+            const opsViewShortcuts = Array.from(document.querySelectorAll('[data-ops-view-shortcut]'));
+            const opsActiveNavClasses = ['bg-white', 'text-blue-950', 'shadow-sm'];
+            const opsInactiveNavClasses = ['text-blue-200', 'hover:bg-blue-900', 'hover:text-white'];
+
+            const opsViewPanelFor = (target) => opsViewPanels.find((panel) => panel.dataset.opsViewPanel === target);
+            const resolveOpsView = (target) => {
+                if (target && opsViewPanelFor(target)) return target;
+                if (opsViewPanelFor('dashboard-overview')) return 'dashboard-overview';
+                return opsViewPanels[0]?.dataset.opsViewPanel;
+            };
+
+            const setOpsViewLinkState = (link, active) => {
+                if (active) {
+                    link.classList.add(...opsActiveNavClasses);
+                    link.classList.remove(...opsInactiveNavClasses);
+                    link.setAttribute('aria-current', 'page');
+                    return;
+                }
+
+                link.classList.remove(...opsActiveNavClasses);
+                link.classList.add(...opsInactiveNavClasses);
+                link.removeAttribute('aria-current');
+            };
+
+            const setOpsView = (target, updateHistory = false) => {
+                const resolvedTarget = resolveOpsView(target);
+                if (!resolvedTarget) return;
+
+                opsViewPanels.forEach((panel) => {
+                    panel.hidden = panel.dataset.opsViewPanel !== resolvedTarget;
+                });
+
+                opsViewLinks.forEach((link) => {
+                    setOpsViewLinkState(link, link.dataset.opsViewTarget === resolvedTarget);
+                });
+
+                if (updateHistory) {
+                    const path = `${window.location.pathname}${window.location.search}`;
+                    const nextUrl = resolvedTarget === 'dashboard-overview' ? path : `${path}#${resolvedTarget}`;
+                    window.history.pushState({ opsView: resolvedTarget }, '', nextUrl);
+                    document.querySelector('main')?.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+            };
+
+            if (opsViewPanels.length > 0) {
+                const initialOpsView = window.location.hash ? window.location.hash.slice(1) : 'dashboard-overview';
+                setOpsView(initialOpsView);
+
+                [...opsViewLinks, ...opsViewShortcuts].forEach((link) => {
+                    link.addEventListener('click', (event) => {
+                        const target = link.dataset.opsViewTarget ?? link.dataset.opsViewShortcut;
+                        if (!resolveOpsView(target)) return;
+
+                        event.preventDefault();
+                        setOpsView(target, true);
+                        setOpsSidebarOpen(false);
+                    });
+                });
+
+                window.addEventListener('popstate', () => {
+                    setOpsView(window.location.hash ? window.location.hash.slice(1) : 'dashboard-overview');
+                });
+            }
         </script>
         <x-pwa-install />
     </body>

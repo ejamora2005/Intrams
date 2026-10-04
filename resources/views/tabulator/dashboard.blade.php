@@ -9,28 +9,53 @@
         <div class="mb-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">{{ $errors->first() }}</div>
     @endif
 
-    <div class="ops-hero p-5 sm:p-7 lg:p-8">
-        <p class="ops-eyebrow">Score declaration</p>
-        <div class="mt-2 flex flex-col justify-between gap-5 lg:flex-row lg:items-end">
-            <div class="min-w-0">
-                <h1 class="ops-display">Tabulator dashboard</h1>
-                <p class="mt-3 max-w-2xl text-sm leading-6 text-slate-600">{{ $edition?->name ?? 'No active intramurals edition is available yet.' }}</p>
-            </div>
-            <div class="grid gap-3 sm:min-w-80 sm:grid-cols-2">
-                <a href="{{ route('tabulator.rules.index') }}" class="flex items-center justify-center rounded-lg border border-blue-200 bg-white px-4 py-3 text-sm font-semibold text-blue-800 shadow-sm transition hover:border-blue-300 hover:bg-blue-50 sm:col-span-2">Rules & Guidelines</a>
-                <div class="rounded-lg border border-white/15 bg-white/10 px-4 py-3">
-                    <p class="text-xs font-semibold uppercase text-slate-500">Sports</p>
-                    <p class="mt-1 text-2xl font-semibold text-slate-950">{{ $editionSports->count() }}</p>
+    <section data-ops-view-panel="dashboard-overview" class="ops-view-panel space-y-6">
+        <div class="ops-hero p-5 sm:p-7 lg:p-8">
+            <p class="ops-eyebrow">Score declaration</p>
+            <div class="mt-2 flex flex-col justify-between gap-5 lg:flex-row lg:items-end">
+                <div class="min-w-0">
+                    <h1 class="ops-display">Tabulator dashboard</h1>
+                    <p class="mt-3 max-w-2xl text-sm leading-6 text-slate-600">{{ $edition?->name ?? 'No active intramurals edition is available yet.' }}</p>
                 </div>
-                <div class="rounded-lg border border-white/15 bg-white/10 px-4 py-3">
-                    <p class="text-xs font-semibold uppercase text-slate-500">Pending games</p>
-                    <p class="mt-1 text-2xl font-semibold text-slate-950">{{ $matches->count() }}</p>
+                <div class="grid gap-3 sm:min-w-80 sm:grid-cols-2">
+                    <a href="{{ route('tabulator.rules.index') }}" class="flex items-center justify-center rounded-lg border border-blue-200 bg-white px-4 py-3 text-sm font-semibold text-blue-800 shadow-sm transition hover:border-blue-300 hover:bg-blue-50 sm:col-span-2">Rules & Guidelines</a>
+                    <div class="rounded-lg border border-white/15 bg-white/10 px-4 py-3">
+                        <p class="text-xs font-semibold uppercase text-slate-500">Sports</p>
+                        <p class="mt-1 text-2xl font-semibold text-slate-950">{{ $editionSports->count() }}</p>
+                    </div>
+                    <div class="rounded-lg border border-white/15 bg-white/10 px-4 py-3">
+                        <p class="text-xs font-semibold uppercase text-slate-500">Pending games</p>
+                        <p class="mt-1 text-2xl font-semibold text-slate-950">{{ $matches->count() }}</p>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <section id="possible-dq" class="mt-6 scroll-mt-24 rounded-lg border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
+        <section class="grid gap-4 lg:grid-cols-4">
+            <a href="#possible-dq" data-ops-view-shortcut="possible-dq" class="ops-dashboard-card block rounded-lg border p-4 transition">
+                <p class="text-sm font-semibold text-slate-950">Possible DQ</p>
+                <p class="mt-2 text-2xl font-semibold text-slate-950">{{ $flaggedStudents->count() }}</p>
+                <p class="mt-2 text-sm leading-6 text-slate-500">Review students that need correction before scoring.</p>
+            </a>
+            <a href="#declare-sports" data-ops-view-shortcut="declare-sports" class="ops-dashboard-card block rounded-lg border p-4 transition">
+                <p class="text-sm font-semibold text-slate-950">Declare sports</p>
+                <p class="mt-2 text-2xl font-semibold text-slate-950">{{ $editionSports->count() }}</p>
+                <p class="mt-2 text-sm leading-6 text-slate-500">Choose winners using the active point system.</p>
+            </a>
+            <a href="#declared-results" data-ops-view-shortcut="declared-results" class="ops-dashboard-card block rounded-lg border p-4 transition">
+                <p class="text-sm font-semibold text-slate-950">Declared results</p>
+                <p class="mt-2 text-2xl font-semibold text-slate-950">{{ $editionSports->filter(fn ($editionSport) => $editionSport->sportResult)->count() }}</p>
+                <p class="mt-2 text-sm leading-6 text-slate-500">Audit posted placements and the standings table.</p>
+            </a>
+            <a href="#match-winners" data-ops-view-shortcut="match-winners" class="ops-dashboard-card block rounded-lg border p-4 transition">
+                <p class="text-sm font-semibold text-slate-950">Match winners</p>
+                <p class="mt-2 text-2xl font-semibold text-slate-950">{{ $matches->count() }}</p>
+                <p class="mt-2 text-sm leading-6 text-slate-500">Declare winners for generated match brackets.</p>
+            </a>
+        </section>
+    </section>
+
+    <section id="possible-dq" data-ops-view-panel="possible-dq" hidden class="ops-view-panel scroll-mt-24 rounded-lg border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
         <div class="flex flex-col justify-between gap-2 border-b border-slate-100 pb-4 sm:flex-row sm:items-end">
             <div>
                 <h2 class="text-base font-semibold text-slate-950">Possible DQ watchlist</h2>
@@ -56,14 +81,14 @@
         </div>
     </section>
 
-    <section id="declare-sports" class="mt-6 scroll-mt-24 rounded-lg border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
+    <section id="declare-sports" data-ops-view-panel="declare-sports" hidden class="ops-view-panel scroll-mt-24 rounded-lg border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
         <div class="flex flex-col justify-between gap-3 border-b border-slate-100 pb-4 lg:flex-row lg:items-end">
             <div>
                 <h2 class="text-base font-semibold text-slate-950">Declare sport winners</h2>
                 <p class="mt-1 text-sm text-slate-500">Choose a sport, select the placed teams, and standings will update from the admin point system.</p>
             </div>
             @if ($editionSports->isNotEmpty())
-                <form method="GET" action="{{ route('tabulator.dashboard') }}" class="flex flex-col gap-2 sm:flex-row sm:items-center">
+                <form method="GET" action="{{ route('tabulator.dashboard') }}#declare-sports" class="flex flex-col gap-2 sm:flex-row sm:items-center">
                     <select name="edition_sport_id" class="rounded-lg border-slate-300 py-2.5 text-sm focus:border-blue-600 focus:ring-blue-600" onchange="this.form.submit()">
                         @foreach ($editionSports as $editionSport)
                             <option value="{{ $editionSport->id }}" @selected($selectedSport?->id === $editionSport->id)>{{ $editionSport->sport?->name }}</option>
@@ -105,8 +130,8 @@
         @endif
     </section>
 
-    <section class="mt-6 grid gap-6 xl:grid-cols-2">
-        <div id="declared-results" class="scroll-mt-24 rounded-lg border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
+    <section id="declared-results" data-ops-view-panel="declared-results" hidden class="ops-view-panel grid gap-6 xl:grid-cols-2">
+        <div class="scroll-mt-24 rounded-lg border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
             <h2 class="text-base font-semibold text-slate-950">Declared results</h2>
             <div class="mt-4 divide-y divide-slate-100">
                 @forelse ($editionSports->filter(fn ($editionSport) => $editionSport->sportResult) as $editionSport)
@@ -148,7 +173,7 @@
         </div>
     </section>
 
-    <section id="match-winners" class="mt-6 scroll-mt-24 rounded-lg border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
+    <section id="match-winners" data-ops-view-panel="match-winners" hidden class="ops-view-panel scroll-mt-24 rounded-lg border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
         <h2 class="text-base font-semibold text-slate-950">Declare match winners</h2>
         <div class="mt-4 grid gap-3 lg:grid-cols-2">
             @forelse ($matches as $match)

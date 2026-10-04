@@ -9,36 +9,57 @@
         <div class="mb-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">{{ $errors->first() }}</div>
     @endif
 
-    <div class="ops-hero p-5 sm:p-7 lg:p-8">
-        <p class="ops-eyebrow">General Athletics Manager</p>
-        <div class="mt-2 flex flex-col justify-between gap-5 lg:flex-row lg:items-end">
-            <div class="min-w-0">
-                <h1 class="ops-display">Teams and rosters</h1>
-                <p class="mt-3 max-w-2xl text-sm leading-6 text-slate-600">{{ $edition?->name ?? 'No active intramurals edition is available yet.' }}</p>
-            </div>
-            <div class="flex flex-col gap-3 sm:flex-row sm:items-end">
-                <a href="{{ route('gam.rules.index') }}" class="inline-flex w-fit items-center justify-center rounded-lg border border-blue-200 bg-white px-4 py-2.5 text-sm font-semibold text-blue-800 shadow-sm transition hover:border-blue-300 hover:bg-blue-50">Rules & Guidelines</a>
-                @if ($selectedTeam)
-                    <div class="rounded-lg border border-white/15 bg-white/10 px-4 py-3 sm:min-w-72">
-                        <p class="text-xs font-semibold uppercase text-slate-500">Current team</p>
-                        <p class="mt-1 truncate text-lg font-semibold text-slate-950">{{ $selectedTeam->name }}</p>
-                        <p class="mt-1 text-sm text-slate-500">{{ $selectedTeam->members_count ?? $selectedTeam->members->count() }} players</p>
-                    </div>
-                @endif
+    <section data-ops-view-panel="dashboard-overview" class="ops-view-panel space-y-6">
+        <div class="ops-hero p-5 sm:p-7 lg:p-8">
+            <p class="ops-eyebrow">General Athletics Manager</p>
+            <div class="mt-2 flex flex-col justify-between gap-5 lg:flex-row lg:items-end">
+                <div class="min-w-0">
+                    <h1 class="ops-display">Teams and rosters</h1>
+                    <p class="mt-3 max-w-2xl text-sm leading-6 text-slate-600">{{ $edition?->name ?? 'No active intramurals edition is available yet.' }}</p>
+                </div>
+                <div class="flex flex-col gap-3 sm:flex-row sm:items-end">
+                    <a href="{{ route('gam.rules.index') }}" class="inline-flex w-fit items-center justify-center rounded-lg border border-blue-200 bg-white px-4 py-2.5 text-sm font-semibold text-blue-800 shadow-sm transition hover:border-blue-300 hover:bg-blue-50">Rules & Guidelines</a>
+                    @if ($selectedTeam)
+                        <div class="rounded-lg border border-white/15 bg-white/10 px-4 py-3 sm:min-w-72">
+                            <p class="text-xs font-semibold uppercase text-slate-500">Current team</p>
+                            <p class="mt-1 truncate text-lg font-semibold text-slate-950">{{ $selectedTeam->name }}</p>
+                            <p class="mt-1 text-sm text-slate-500">{{ $selectedTeam->members_count ?? $selectedTeam->members->count() }} players</p>
+                        </div>
+                    @endif
+                </div>
             </div>
         </div>
-    </div>
 
-    <section class="mt-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-        @foreach ($metrics as $metric)
-            <article class="ops-stat-card rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
-                <p class="text-sm font-medium text-slate-500">{{ $metric['label'] }}</p>
-                <p class="mt-3 text-2xl font-semibold tracking-tight text-slate-950">{{ $metric['value'] }}</p>
-            </article>
-        @endforeach
+        <section class="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+            @foreach ($metrics as $metric)
+                <article class="ops-stat-card rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
+                    <p class="text-sm font-medium text-slate-500">{{ $metric['label'] }}</p>
+                    <p class="mt-3 text-2xl font-semibold tracking-tight text-slate-950">{{ $metric['value'] }}</p>
+                </article>
+            @endforeach
+        </section>
+
+        <section class="grid gap-4 lg:grid-cols-4">
+            <a href="#roster-management" data-ops-view-shortcut="roster-management" class="ops-dashboard-card block rounded-lg border p-4 transition">
+                <p class="text-sm font-semibold text-slate-950">Roster management</p>
+                <p class="mt-2 text-sm leading-6 text-slate-500">Assign players, add new students, and review Possible DQ roster flags.</p>
+            </a>
+            <a href="#medical-certificates" data-ops-view-shortcut="medical-certificates" class="ops-dashboard-card block rounded-lg border p-4 transition">
+                <p class="text-sm font-semibold text-slate-950">Medical certificates</p>
+                <p class="mt-2 text-sm leading-6 text-slate-500">Verify clearances for physical events before tabulation.</p>
+            </a>
+            <a href="#team-standings" data-ops-view-shortcut="team-standings" class="ops-dashboard-card block rounded-lg border p-4 transition">
+                <p class="text-sm font-semibold text-slate-950">Team standings</p>
+                <p class="mt-2 text-sm leading-6 text-slate-500">Monitor current points, medals, and ranking position.</p>
+            </a>
+            <a href="#ready-matches" data-ops-view-shortcut="ready-matches" class="ops-dashboard-card block rounded-lg border p-4 transition">
+                <p class="text-sm font-semibold text-slate-950">Ready matches</p>
+                <p class="mt-2 text-sm leading-6 text-slate-500">Check scheduled matchups that are ready for play.</p>
+            </a>
+        </section>
     </section>
 
-    <section id="roster-management" class="mt-6 scroll-mt-24 rounded-lg border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
+    <section id="roster-management" data-ops-view-panel="roster-management" hidden class="ops-view-panel scroll-mt-24 rounded-lg border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
         <div class="flex flex-col justify-between gap-3 border-b border-slate-100 pb-4 lg:flex-row lg:items-end">
             <div>
                 <h2 class="text-base font-semibold text-slate-950">Roster management</h2>
@@ -47,7 +68,7 @@
                 </p>
             </div>
             @if ($teams->isNotEmpty())
-                <form method="GET" action="{{ route('gam.dashboard') }}" class="flex flex-col gap-2 sm:flex-row sm:items-center">
+                <form method="GET" action="{{ route('gam.dashboard') }}#roster-management" class="flex flex-col gap-2 sm:flex-row sm:items-center">
                     <select name="team_id" class="rounded-lg border-slate-300 py-2.5 text-sm focus:border-blue-600 focus:ring-blue-600" onchange="this.form.submit()">
                         @foreach ($teams as $team)
                             <option value="{{ $team->id }}" @selected($selectedTeam?->id === $team->id)>{{ $team->name }}</option>
@@ -143,7 +164,7 @@
         @endif
     </section>
 
-    <section id="medical-certificates" class="mt-6 scroll-mt-24 rounded-lg border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
+    <section id="medical-certificates" data-ops-view-panel="medical-certificates" hidden class="ops-view-panel scroll-mt-24 rounded-lg border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
         <div class="flex flex-col justify-between gap-2 border-b border-slate-100 pb-4 sm:flex-row sm:items-end">
             <div>
                 <h2 class="text-base font-semibold text-slate-950">Medical certificate verification</h2>
@@ -189,7 +210,7 @@
         </div>
     </section>
 
-    <section id="team-standings" class="mt-6 scroll-mt-24 rounded-lg border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
+    <section id="team-standings" data-ops-view-panel="team-standings" hidden class="ops-view-panel scroll-mt-24 rounded-lg border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
         <div class="flex flex-col justify-between gap-2 border-b border-slate-100 pb-4 sm:flex-row sm:items-end">
             <div>
                 <h2 class="text-base font-semibold text-slate-950">Team standings</h2>
@@ -218,7 +239,7 @@
         </div>
     </section>
 
-    <section id="ready-matches" class="mt-6 scroll-mt-24 rounded-lg border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
+    <section id="ready-matches" data-ops-view-panel="ready-matches" hidden class="ops-view-panel scroll-mt-24 rounded-lg border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
         <h2 class="text-base font-semibold text-slate-950">Ready matches</h2>
         <div class="mt-4 grid gap-3 lg:grid-cols-2">
             @forelse ($upcomingMatches as $match)

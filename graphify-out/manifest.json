@@ -1296,9 +1296,9 @@
     "semantic_hash": ""
   },
   "resources/views/layouts/coordinator.blade.php": {
-    "mtime": 1791095125.6138551,
-    "seen": 1791095195.9954028,
-    "ast_hash": "c6e6e8825b5ac5396b99f914039c35f5",
+    "mtime": 1791096027.916079,
+    "seen": 1791096213.2192707,
+    "ast_hash": "a89d2f77e830c8531e871ca27823da29",
     "semantic_hash": ""
   },
   "resources/views/layouts/guest.blade.php": {
@@ -2058,21 +2058,21 @@
     "semantic_hash": ""
   },
   "resources/views/gam/dashboard.blade.php": {
-    "mtime": 1791093926.830667,
-    "seen": 1791094017.7528608,
-    "ast_hash": "129838d371ef55fa95fca9f77fba42cb",
+    "mtime": 1791096098.4142666,
+    "seen": 1791096213.2192707,
+    "ast_hash": "261671e686c72f522b01f40b2451303d",
     "semantic_hash": ""
   },
   "resources/views/tabulator/dashboard.blade.php": {
-    "mtime": 1791092106.705578,
-    "seen": 1791092228.0177035,
-    "ast_hash": "8bfb791da748d4f60b51f3466f3e84d1",
+    "mtime": 1791096149.789379,
+    "seen": 1791096213.2192707,
+    "ast_hash": "ed901335704105cb1222faad6fa5781c",
     "semantic_hash": ""
   },
   "tests/Feature/OperationsRolesTest.php": {
-    "mtime": 1791095144.5511546,
-    "seen": 1791095195.9954028,
-    "ast_hash": "5a14b6305cd47e08330ba8f671e459bd",
+    "mtime": 1791096162.5387714,
+    "seen": 1791096213.2192707,
+    "ast_hash": "f19a53fbc1590b8c736b922360519065",
     "semantic_hash": ""
   },
   "app/Http/Controllers/Admin/OperationsAccountController.php": {

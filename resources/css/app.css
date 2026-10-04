@@ -123,6 +123,32 @@ textarea {
     color: #edf5ff;
 }
 
+.ops-view-panel[hidden] {
+    display: none !important;
+}
+
+.ops-view-panel {
+    animation: ops-view-in 160ms ease-out;
+}
+
+@keyframes ops-view-in {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .ops-view-panel {
+        animation: none;
+    }
+}
+
 .ops-hero {
     position: relative;
     overflow: hidden;
@@ -158,6 +184,30 @@ textarea {
     box-shadow: 0 16px 40px #0004, inset 0 1px 0 #ffffff12;
 }
 
+.ops-dashboard-card {
+    position: relative;
+    overflow: hidden;
+    border-color: #d8ecff2e !important;
+    color: #edf5ff;
+    background:
+        linear-gradient(180deg, #0b2440db, #06172ce8),
+        linear-gradient(90deg, #0c73451c, transparent 40%, #d9b87d14);
+    box-shadow: 0 16px 40px #0003, inset 0 1px 0 #ffffff12;
+}
+
+.ops-dashboard-card::before {
+    content: '';
+    position: absolute;
+    inset: 0 0 auto;
+    height: 3px;
+    background: linear-gradient(90deg, var(--ops-green), var(--ops-gold), var(--ops-green));
+}
+
+.ops-dashboard-card:hover {
+    border-color: #d9b87d99 !important;
+    transform: translateY(-1px);
+}
+
 .ops-dashboard .bg-slate-50 {
     background: #102d4b !important;
 }
@@ -169,9 +219,17 @@ textarea {
 .ops-dashboard span.rounded-full {
     display: inline-flex;
     width: max-content;
+    flex-shrink: 0;
     max-width: 100%;
     align-items: center;
     white-space: nowrap;
+    line-height: 1.1;
+}
+
+.ops-dashboard :is(.bg-red-600, .bg-green-50, .bg-amber-50).rounded-full {
+    max-width: none !important;
+    min-width: max-content;
+    justify-content: center;
 }
 
 .ops-dashboard :is(.text-slate-950, .text-slate-900, .text-blue-950) {

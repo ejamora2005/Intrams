@@ -82,6 +82,9 @@ test('GAM users are sent to the GAM dashboard', function () {
         ->assertSee('Medical Certificates')
         ->assertSee('Rules & Guidelines')
         ->assertSee('Teams and rosters')
+        ->assertSee('data-ops-view-panel="dashboard-overview"', false)
+        ->assertSee('data-ops-view-panel="roster-management"', false)
+        ->assertSee('data-ops-view-target="medical-certificates"', false)
         ->assertSee('Mighty Sea Dragons');
 });
 
@@ -270,6 +273,9 @@ test('multiple tabulators can access the tabulator dashboard', function () {
         ->assertSee('Possible DQ')
         ->assertSee('Declare Sports')
         ->assertSee('Rules & Guidelines')
+        ->assertSee('data-ops-view-panel="dashboard-overview"', false)
+        ->assertSee('data-ops-view-panel="declared-results"', false)
+        ->assertSee('data-ops-view-target="match-winners"', false)
         ->assertSee('Tabulator dashboard');
     $this->actingAs($secondTabulator)->get(route('tabulator.dashboard'))->assertOk()->assertSee('Tabulator dashboard');
 });

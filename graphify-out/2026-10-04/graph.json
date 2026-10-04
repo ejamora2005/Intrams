@@ -2032,7 +2032,7 @@
       "file_type": "code",
       "norm_label": "{closure#2}()",
       "source_file": "tests/Feature/AuthenticationTest.php",
-      "source_location": "L23"
+      "source_location": "L25"
     },
     {
       "id": "tests_feature_authenticationtest_closure_4",
@@ -2044,7 +2044,7 @@
       "file_type": "code",
       "norm_label": "{closure#4}()",
       "source_file": "tests/Feature/AuthenticationTest.php",
-      "source_location": "L111"
+      "source_location": "L115"
     },
     {
       "id": "tests_feature_authenticationtest_closure_5",
@@ -2056,7 +2056,7 @@
       "file_type": "code",
       "norm_label": "{closure#5}()",
       "source_file": "tests/Feature/AuthenticationTest.php",
-      "source_location": "L123"
+      "source_location": "L127"
     },
     {
       "id": "tests_feature_authenticationtest_closure_6",
@@ -2068,7 +2068,7 @@
       "file_type": "code",
       "norm_label": "{closure#6}()",
       "source_file": "tests/Feature/AuthenticationTest.php",
-      "source_location": "L134"
+      "source_location": "L138"
     },
     {
       "id": "tests_feature_authenticationtest_closure_7",
@@ -2080,7 +2080,7 @@
       "file_type": "code",
       "norm_label": "{closure#7}()",
       "source_file": "tests/Feature/AuthenticationTest.php",
-      "source_location": "L148"
+      "source_location": "L152"
     },
     {
       "id": "tests_feature_authenticationtest_closure_8",
@@ -2092,7 +2092,7 @@
       "file_type": "code",
       "norm_label": "{closure#8}()",
       "source_file": "tests/Feature/AuthenticationTest.php",
-      "source_location": "L168"
+      "source_location": "L174"
     },
     {
       "id": "tests_feature_authenticationtest_closure_9",
@@ -2104,7 +2104,7 @@
       "file_type": "code",
       "norm_label": "{closure#9}()",
       "source_file": "tests/Feature/AuthenticationTest.php",
-      "source_location": "L199"
+      "source_location": "L205"
     },
     {
       "id": "tests_feature_passwordconfirmationtest_closure_1",
@@ -8080,7 +8080,7 @@
       "file_type": "code",
       "norm_label": "{closure#3}()",
       "source_file": "tests/Feature/AuthenticationTest.php",
-      "source_location": "L33"
+      "source_location": "L37"
     },
     {
       "id": "tests_feature_bracketenginetest_bracketengineedition",
@@ -9268,7 +9268,7 @@
       "file_type": "code",
       "norm_label": "{closure#10}()",
       "source_file": "tests/Feature/OperationsRolesTest.php",
-      "source_location": "L328"
+      "source_location": "L332"
     },
     {
       "id": "tests_feature_operationsrolestest_closure_11",
@@ -9280,7 +9280,7 @@
       "file_type": "code",
       "norm_label": "{closure#11}()",
       "source_file": "tests/Feature/OperationsRolesTest.php",
-      "source_location": "L380"
+      "source_location": "L384"
     },
     {
       "id": "tests_feature_operationsrolestest_closure_12",
@@ -9292,7 +9292,7 @@
       "file_type": "code",
       "norm_label": "{closure#12}()",
       "source_file": "tests/Feature/OperationsRolesTest.php",
-      "source_location": "L407"
+      "source_location": "L411"
     },
     {
       "id": "tests_feature_operationsrolestest_closure_2",
@@ -9304,7 +9304,7 @@
       "file_type": "code",
       "norm_label": "{closure#2}()",
       "source_file": "tests/Feature/OperationsRolesTest.php",
-      "source_location": "L86"
+      "source_location": "L88"
     },
     {
       "id": "tests_feature_operationsrolestest_closure_3",
@@ -9316,7 +9316,7 @@
       "file_type": "code",
       "norm_label": "{closure#3}()",
       "source_file": "tests/Feature/OperationsRolesTest.php",
-      "source_location": "L109"
+      "source_location": "L111"
     },
     {
       "id": "tests_feature_operationsrolestest_closure_4",
@@ -9328,7 +9328,7 @@
       "file_type": "code",
       "norm_label": "{closure#4}()",
       "source_file": "tests/Feature/OperationsRolesTest.php",
-      "source_location": "L136"
+      "source_location": "L138"
     },
     {
       "id": "tests_feature_operationsrolestest_closure_5",
@@ -9340,7 +9340,7 @@
       "file_type": "code",
       "norm_label": "{closure#5}()",
       "source_file": "tests/Feature/OperationsRolesTest.php",
-      "source_location": "L152"
+      "source_location": "L154"
     },
     {
       "id": "tests_feature_operationsrolestest_closure_6",
@@ -9352,7 +9352,7 @@
       "file_type": "code",
       "norm_label": "{closure#6}()",
       "source_file": "tests/Feature/OperationsRolesTest.php",
-      "source_location": "L201"
+      "source_location": "L203"
     },
     {
       "id": "tests_feature_operationsrolestest_closure_7",
@@ -9364,7 +9364,7 @@
       "file_type": "code",
       "norm_label": "{closure#7}()",
       "source_file": "tests/Feature/OperationsRolesTest.php",
-      "source_location": "L229"
+      "source_location": "L231"
     },
     {
       "id": "tests_feature_operationsrolestest_closure_8",
@@ -9376,7 +9376,7 @@
       "file_type": "code",
       "norm_label": "{closure#8}()",
       "source_file": "tests/Feature/OperationsRolesTest.php",
-      "source_location": "L257"
+      "source_location": "L259"
     },
     {
       "id": "tests_feature_operationsrolestest_closure_9",
@@ -9388,7 +9388,7 @@
       "file_type": "code",
       "norm_label": "{closure#9}()",
       "source_file": "tests/Feature/OperationsRolesTest.php",
-      "source_location": "L273"
+      "source_location": "L277"
     },
     {
       "id": "tests_feature_operationsrolestest_operationsedition",
@@ -25457,7 +25457,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "tests/Feature/AuthenticationTest.php",
-      "source_location": "L37",
+      "source_location": "L41",
       "weight": 1.0
     },
     {
@@ -25469,7 +25469,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "tests/Feature/AuthenticationTest.php",
-      "source_location": "L44",
+      "source_location": "L48",
       "weight": 1.0
     },
     {
@@ -25481,7 +25481,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "tests/Feature/AuthenticationTest.php",
-      "source_location": "L45",
+      "source_location": "L49",
       "weight": 1.0
     },
     {
@@ -25493,7 +25493,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "tests/Feature/AuthenticationTest.php",
-      "source_location": "L52",
+      "source_location": "L56",
       "weight": 1.0
     },
     {
@@ -25505,7 +25505,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "tests/Feature/AuthenticationTest.php",
-      "source_location": "L56",
+      "source_location": "L60",
       "weight": 1.0
     },
     {
@@ -25517,7 +25517,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "tests/Feature/AuthenticationTest.php",
-      "source_location": "L57",
+      "source_location": "L61",
       "weight": 1.0
     },
     {
@@ -25529,7 +25529,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "tests/Feature/AuthenticationTest.php",
-      "source_location": "L58",
+      "source_location": "L62",
       "weight": 1.0
     },
     {
@@ -25541,7 +25541,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "tests/Feature/AuthenticationTest.php",
-      "source_location": "L67",
+      "source_location": "L71",
       "weight": 1.0
     },
     {
@@ -25553,7 +25553,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "tests/Feature/AuthenticationTest.php",
-      "source_location": "L112",
+      "source_location": "L116",
       "weight": 1.0
     },
     {
@@ -25565,7 +25565,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "tests/Feature/AuthenticationTest.php",
-      "source_location": "L124",
+      "source_location": "L128",
       "weight": 1.0
     },
     {
@@ -25577,7 +25577,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "tests/Feature/AuthenticationTest.php",
-      "source_location": "L135",
+      "source_location": "L139",
       "weight": 1.0
     },
     {
@@ -25589,7 +25589,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "tests/Feature/AuthenticationTest.php",
-      "source_location": "L149",
+      "source_location": "L153",
       "weight": 1.0
     },
     {
@@ -25601,7 +25601,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "tests/Feature/AuthenticationTest.php",
-      "source_location": "L200",
+      "source_location": "L206",
       "weight": 1.0
     },
     {
@@ -27677,48 +27677,12 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "tests/Feature/OperationsRolesTest.php",
-      "source_location": "L329",
+      "source_location": "L333",
       "weight": 1.0
     },
     {
       "source": "tests_feature_operationsrolestest_closure_10",
       "target": "tests_feature_operationsrolestest_operationsteam",
-      "relation": "calls",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "call",
-      "source_file": "tests/Feature/OperationsRolesTest.php",
-      "source_location": "L330",
-      "weight": 1.0
-    },
-    {
-      "source": "tests_feature_operationsrolestest_closure_10",
-      "target": "app_models_user_user",
-      "relation": "calls",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "call",
-      "source_file": "tests/Feature/OperationsRolesTest.php",
-      "source_location": "L331",
-      "weight": 1.0
-    },
-    {
-      "source": "tests_feature_operationsrolestest_closure_10",
-      "target": "tests_feature_operationsrolestest_operationssport",
-      "relation": "calls",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "call",
-      "source_file": "tests/Feature/OperationsRolesTest.php",
-      "source_location": "L332",
-      "weight": 1.0
-    },
-    {
-      "source": "tests_feature_operationsrolestest_closure_10",
-      "target": "app_models_student_student",
       "relation": "calls",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -27730,6 +27694,42 @@
     },
     {
       "source": "tests_feature_operationsrolestest_closure_10",
+      "target": "app_models_user_user",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "tests/Feature/OperationsRolesTest.php",
+      "source_location": "L335",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_feature_operationsrolestest_closure_10",
+      "target": "tests_feature_operationsrolestest_operationssport",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "tests/Feature/OperationsRolesTest.php",
+      "source_location": "L336",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_feature_operationsrolestest_closure_10",
+      "target": "app_models_student_student",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "tests/Feature/OperationsRolesTest.php",
+      "source_location": "L338",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_feature_operationsrolestest_closure_10",
       "target": "app_models_athleteentry_athleteentry",
       "relation": "calls",
       "_origin": "ast",
@@ -27737,7 +27737,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "tests/Feature/OperationsRolesTest.php",
-      "source_location": "L343",
+      "source_location": "L347",
       "weight": 1.0
     },
     {
@@ -27749,7 +27749,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "tests/Feature/OperationsRolesTest.php",
-      "source_location": "L381",
+      "source_location": "L385",
       "weight": 1.0
     },
     {
@@ -27761,7 +27761,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "tests/Feature/OperationsRolesTest.php",
-      "source_location": "L382",
+      "source_location": "L386",
       "weight": 1.0
     },
     {
@@ -27773,7 +27773,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "tests/Feature/OperationsRolesTest.php",
-      "source_location": "L384",
+      "source_location": "L388",
       "weight": 1.0
     },
     {
@@ -27785,7 +27785,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "tests/Feature/OperationsRolesTest.php",
-      "source_location": "L401",
+      "source_location": "L405",
       "weight": 1.0
     },
     {
@@ -27797,7 +27797,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "tests/Feature/OperationsRolesTest.php",
-      "source_location": "L408",
+      "source_location": "L412",
       "weight": 1.0
     },
     {
@@ -27809,7 +27809,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "tests/Feature/OperationsRolesTest.php",
-      "source_location": "L409",
+      "source_location": "L413",
       "weight": 1.0
     },
     {
@@ -27821,7 +27821,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "tests/Feature/OperationsRolesTest.php",
-      "source_location": "L411",
+      "source_location": "L415",
       "weight": 1.0
     },
     {
@@ -27833,7 +27833,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "tests/Feature/OperationsRolesTest.php",
-      "source_location": "L100",
+      "source_location": "L102",
       "weight": 1.0
     },
     {
@@ -27845,7 +27845,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "tests/Feature/OperationsRolesTest.php",
-      "source_location": "L87",
+      "source_location": "L89",
       "weight": 1.0
     },
     {
@@ -27857,7 +27857,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "tests/Feature/OperationsRolesTest.php",
-      "source_location": "L87",
+      "source_location": "L89",
       "weight": 1.0
     },
     {
@@ -27869,36 +27869,12 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "tests/Feature/OperationsRolesTest.php",
-      "source_location": "L88",
+      "source_location": "L90",
       "weight": 1.0
     },
     {
       "source": "tests_feature_operationsrolestest_closure_3",
       "target": "app_models_user_user",
-      "relation": "calls",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "call",
-      "source_file": "tests/Feature/OperationsRolesTest.php",
-      "source_location": "L110",
-      "weight": 1.0
-    },
-    {
-      "source": "tests_feature_operationsrolestest_closure_3",
-      "target": "tests_feature_operationsrolestest_operationsedition",
-      "relation": "calls",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "call",
-      "source_file": "tests/Feature/OperationsRolesTest.php",
-      "source_location": "L111",
-      "weight": 1.0
-    },
-    {
-      "source": "tests_feature_operationsrolestest_closure_3",
-      "target": "tests_feature_operationsrolestest_operationssport",
       "relation": "calls",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -27910,7 +27886,7 @@
     },
     {
       "source": "tests_feature_operationsrolestest_closure_3",
-      "target": "tests_feature_operationsrolestest_operationsteam",
+      "target": "tests_feature_operationsrolestest_operationsedition",
       "relation": "calls",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -27922,6 +27898,30 @@
     },
     {
       "source": "tests_feature_operationsrolestest_closure_3",
+      "target": "tests_feature_operationsrolestest_operationssport",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "tests/Feature/OperationsRolesTest.php",
+      "source_location": "L114",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_feature_operationsrolestest_closure_3",
+      "target": "tests_feature_operationsrolestest_operationsteam",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "tests/Feature/OperationsRolesTest.php",
+      "source_location": "L115",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_feature_operationsrolestest_closure_3",
       "target": "app_models_teamtally_teamtally",
       "relation": "calls",
       "_origin": "ast",
@@ -27929,36 +27929,12 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "tests/Feature/OperationsRolesTest.php",
-      "source_location": "L129",
+      "source_location": "L131",
       "weight": 1.0
     },
     {
       "source": "tests_feature_operationsrolestest_closure_4",
       "target": "app_models_user_user",
-      "relation": "calls",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "call",
-      "source_file": "tests/Feature/OperationsRolesTest.php",
-      "source_location": "L137",
-      "weight": 1.0
-    },
-    {
-      "source": "tests_feature_operationsrolestest_closure_4",
-      "target": "tests_feature_operationsrolestest_operationsedition",
-      "relation": "calls",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "call",
-      "source_file": "tests/Feature/OperationsRolesTest.php",
-      "source_location": "L138",
-      "weight": 1.0
-    },
-    {
-      "source": "tests_feature_operationsrolestest_closure_4",
-      "target": "tests_feature_operationsrolestest_operationssport",
       "relation": "calls",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -27970,7 +27946,7 @@
     },
     {
       "source": "tests_feature_operationsrolestest_closure_4",
-      "target": "tests_feature_operationsrolestest_operationsteam",
+      "target": "tests_feature_operationsrolestest_operationsedition",
       "relation": "calls",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -27981,6 +27957,30 @@
       "weight": 1.0
     },
     {
+      "source": "tests_feature_operationsrolestest_closure_4",
+      "target": "tests_feature_operationsrolestest_operationssport",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "tests/Feature/OperationsRolesTest.php",
+      "source_location": "L141",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_feature_operationsrolestest_closure_4",
+      "target": "tests_feature_operationsrolestest_operationsteam",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "tests/Feature/OperationsRolesTest.php",
+      "source_location": "L142",
+      "weight": 1.0
+    },
+    {
       "source": "tests_feature_operationsrolestest_closure_5",
       "target": "app_models_user_user",
       "relation": "calls",
@@ -27989,7 +27989,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "tests/Feature/OperationsRolesTest.php",
-      "source_location": "L153",
+      "source_location": "L155",
       "weight": 1.0
     },
     {
@@ -28001,7 +28001,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "tests/Feature/OperationsRolesTest.php",
-      "source_location": "L158",
+      "source_location": "L160",
       "weight": 1.0
     },
     {
@@ -28013,7 +28013,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "tests/Feature/OperationsRolesTest.php",
-      "source_location": "L159",
+      "source_location": "L161",
       "weight": 1.0
     },
     {
@@ -28025,7 +28025,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "tests/Feature/OperationsRolesTest.php",
-      "source_location": "L202",
+      "source_location": "L204",
       "weight": 1.0
     },
     {
@@ -28037,7 +28037,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "tests/Feature/OperationsRolesTest.php",
-      "source_location": "L203",
+      "source_location": "L205",
       "weight": 1.0
     },
     {
@@ -28049,36 +28049,12 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "tests/Feature/OperationsRolesTest.php",
-      "source_location": "L203",
+      "source_location": "L205",
       "weight": 1.0
     },
     {
       "source": "tests_feature_operationsrolestest_closure_8",
       "target": "tests_feature_operationsrolestest_operationsedition",
-      "relation": "calls",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "call",
-      "source_file": "tests/Feature/OperationsRolesTest.php",
-      "source_location": "L258",
-      "weight": 1.0
-    },
-    {
-      "source": "tests_feature_operationsrolestest_closure_8",
-      "target": "tests_feature_operationsrolestest_operationssport",
-      "relation": "calls",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "call",
-      "source_file": "tests/Feature/OperationsRolesTest.php",
-      "source_location": "L258",
-      "weight": 1.0
-    },
-    {
-      "source": "tests_feature_operationsrolestest_closure_8",
-      "target": "app_models_user_user",
       "relation": "calls",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -28089,6 +28065,30 @@
       "weight": 1.0
     },
     {
+      "source": "tests_feature_operationsrolestest_closure_8",
+      "target": "tests_feature_operationsrolestest_operationssport",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "tests/Feature/OperationsRolesTest.php",
+      "source_location": "L260",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_feature_operationsrolestest_closure_8",
+      "target": "app_models_user_user",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "tests/Feature/OperationsRolesTest.php",
+      "source_location": "L262",
+      "weight": 1.0
+    },
+    {
       "source": "tests_feature_operationsrolestest_closure_9",
       "target": "app_models_user_user",
       "relation": "calls",
@@ -28097,7 +28097,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "tests/Feature/OperationsRolesTest.php",
-      "source_location": "L274",
+      "source_location": "L278",
       "weight": 1.0
     },
     {
@@ -28109,7 +28109,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "tests/Feature/OperationsRolesTest.php",
-      "source_location": "L276",
+      "source_location": "L280",
       "weight": 1.0
     },
     {
@@ -28121,7 +28121,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "tests/Feature/OperationsRolesTest.php",
-      "source_location": "L277",
+      "source_location": "L281",
       "weight": 1.0
     },
     {
@@ -28133,7 +28133,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "tests/Feature/OperationsRolesTest.php",
-      "source_location": "L279",
+      "source_location": "L283",
       "weight": 1.0
     },
     {
@@ -28145,7 +28145,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "tests/Feature/OperationsRolesTest.php",
-      "source_location": "L282",
+      "source_location": "L286",
       "weight": 1.0
     },
     {
@@ -28157,7 +28157,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "tests/Feature/OperationsRolesTest.php",
-      "source_location": "L291",
+      "source_location": "L295",
       "weight": 1.0
     },
     {
@@ -28169,7 +28169,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "tests/Feature/OperationsRolesTest.php",
-      "source_location": "L299",
+      "source_location": "L303",
       "weight": 1.0
     },
     {
@@ -52965,7 +52965,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "tests/Feature/AuthenticationTest.php",
-      "source_location": "L111",
+      "source_location": "L115",
       "weight": 1.0
     },
     {
@@ -52976,7 +52976,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "tests/Feature/AuthenticationTest.php",
-      "source_location": "L123",
+      "source_location": "L127",
       "weight": 1.0
     },
     {
@@ -52987,18 +52987,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "tests/Feature/AuthenticationTest.php",
-      "source_location": "L134",
-      "weight": 1.0
-    },
-    {
-      "source": "tests_feature_authenticationtest",
-      "target": "tests_feature_authenticationtest_closure_7",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "tests/Feature/AuthenticationTest.php",
-      "source_location": "L148",
+      "source_location": "L138",
       "weight": 1.0
     },
     {
@@ -53014,13 +53003,24 @@
     },
     {
       "source": "tests_feature_authenticationtest",
+      "target": "tests_feature_authenticationtest_closure_7",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "tests/Feature/AuthenticationTest.php",
+      "source_location": "L152",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_feature_authenticationtest",
       "target": "tests_feature_authenticationtest_closure_8",
       "relation": "contains",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "tests/Feature/AuthenticationTest.php",
-      "source_location": "L168",
+      "source_location": "L174",
       "weight": 1.0
     },
     {
@@ -53031,7 +53031,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "tests/Feature/AuthenticationTest.php",
-      "source_location": "L199",
+      "source_location": "L205",
       "weight": 1.0
     },
     {
@@ -53042,7 +53042,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "tests/Feature/AuthenticationTest.php",
-      "source_location": "L23",
+      "source_location": "L25",
       "weight": 1.0
     },
     {
@@ -53053,7 +53053,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "tests/Feature/AuthenticationTest.php",
-      "source_location": "L33",
+      "source_location": "L37",
       "weight": 1.0
     },
     {
@@ -54043,7 +54043,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "tests/Feature/OperationsRolesTest.php",
-      "source_location": "L109",
+      "source_location": "L111",
       "weight": 1.0
     },
     {
@@ -54054,7 +54054,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "tests/Feature/OperationsRolesTest.php",
-      "source_location": "L136",
+      "source_location": "L138",
       "weight": 1.0
     },
     {
@@ -54065,7 +54065,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "tests/Feature/OperationsRolesTest.php",
-      "source_location": "L152",
+      "source_location": "L154",
       "weight": 1.0
     },
     {
@@ -54087,7 +54087,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "tests/Feature/OperationsRolesTest.php",
-      "source_location": "L201",
+      "source_location": "L203",
       "weight": 1.0
     },
     {
@@ -54098,7 +54098,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "tests/Feature/OperationsRolesTest.php",
-      "source_location": "L229",
+      "source_location": "L231",
       "weight": 1.0
     },
     {
@@ -54109,7 +54109,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "tests/Feature/OperationsRolesTest.php",
-      "source_location": "L257",
+      "source_location": "L259",
       "weight": 1.0
     },
     {
@@ -54120,7 +54120,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "tests/Feature/OperationsRolesTest.php",
-      "source_location": "L273",
+      "source_location": "L277",
       "weight": 1.0
     },
     {
@@ -54142,7 +54142,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "tests/Feature/OperationsRolesTest.php",
-      "source_location": "L328",
+      "source_location": "L332",
       "weight": 1.0
     },
     {
@@ -54153,7 +54153,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "tests/Feature/OperationsRolesTest.php",
-      "source_location": "L380",
+      "source_location": "L384",
       "weight": 1.0
     },
     {
@@ -54164,7 +54164,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "tests/Feature/OperationsRolesTest.php",
-      "source_location": "L407",
+      "source_location": "L411",
       "weight": 1.0
     },
     {
@@ -54197,7 +54197,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "tests/Feature/OperationsRolesTest.php",
-      "source_location": "L86",
+      "source_location": "L88",
       "weight": 1.0
     },
     {
