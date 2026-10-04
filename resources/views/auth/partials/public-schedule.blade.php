@@ -14,9 +14,9 @@
 <main class="schedule-page" style="--schedule-background: url('{{ asset(config('landing.background')) }}')">
     <div class="schedule-shell">
         <header class="schedule-nav">
-            <a class="schedule-brand" href="{{ url('/') }}" aria-label="INTRAMURAL MS home">
+            <a class="schedule-brand" href="{{ url('/') }}" aria-label="SLSU INTRAMURALS home">
                 <img src="{{ asset(config('landing.appLogo')) }}" alt="" class="schedule-seal" width="72" height="66" decoding="async">
-                <span>INTRAMURAL MS<small>Southern Leyte State University</small></span>
+                <span>SLSU INTRAMURALS<small>Southern Leyte State University</small></span>
             </a>
             <nav class="schedule-links" aria-label="Event navigation">
                 <a href="{{ url('/') }}" class="schedule-home" aria-label="Back to team standings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="m14 6-6 6 6 6M8 12h13" /></svg><span>Standings</span></a>
@@ -140,6 +140,6 @@
             </div>
             <footer class="schedule-board-footer"><p id="schedule-refresh-note">Updates appear as coordinator entries are published.</p><span>Schedule for today</span></footer>
         </section>
-        <footer class="schedule-footer"><span>SLSU Bontoc Campus</span><span>INTRAMURAL MS</span></footer>
+        <footer class="schedule-footer"><span>SLSU Bontoc Campus</span><span>SLSU INTRAMURALS</span></footer>
     </div>
 </main>

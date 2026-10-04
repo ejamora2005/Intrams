@@ -1,7 +1,7 @@
 {
     "id": "/?source=pwa",
-    "name": "INTRAMURAL MS",
-    "short_name": "INTRAMURAL MS",
+    "name": "SLSU INTRAMURALS",
+    "short_name": "SLSU INTRAMURALS",
     "description": "Operations portal for intramural schedules, teams, scoring, standings, GAM, and tabulator workflows.",
     "start_url": "/dashboard?source=pwa",
     "scope": "/",

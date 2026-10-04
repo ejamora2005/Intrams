@@ -51,10 +51,10 @@ const showInstallPanel = async mode => {
 
     if (installTitle && installCopy) {
         if (updateMode) {
-            installTitle.textContent = 'INTRAMURAL MS update ready';
+            installTitle.textContent = 'SLSU INTRAMURALS update ready';
             installCopy.textContent = 'Refresh once to use the newest app shell.';
         } else {
-            installTitle.textContent = 'Download INTRAMURAL MS';
+            installTitle.textContent = 'Download SLSU INTRAMURALS';
             installCopy.textContent = 'Open the system from your device app list with offline-ready assets.';
         }
     }

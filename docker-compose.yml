@@ -7,7 +7,7 @@ services:
     expose:
       - "80"
     environment:
-      APP_NAME: ${APP_NAME:-Intramurals Management}
+      APP_NAME: ${APP_NAME:-SLSU INTRAMURALS}
       APP_ENV: production
       APP_KEY: ${APP_KEY:?Set APP_KEY in Dokploy}
       APP_DEBUG: "false"

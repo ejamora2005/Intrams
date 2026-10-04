@@ -4,7 +4,7 @@
 ])
 
 @php
-    $appName = 'INTRAMURAL MS';
+    $appName = config('app.display_name', 'SLSU INTRAMURALS');
     $logoSource = asset(config('landing.appLogo'));
 @endphp
 
@@ -12,8 +12,8 @@
     <div {{ $attributes->class(['flex items-center gap-3']) }}>
         <img src="{{ $logoSource }}" alt="" width="56" height="52" class="h-12 w-12 shrink-0 object-contain drop-shadow-[0_8px_18px_rgba(0,0,0,0.35)]" decoding="async">
         <p class="text-xs font-semibold leading-tight tracking-wide text-white">
-            <span class="block">INTRAMURAL</span>
-            <span class="mt-0.5 block text-blue-200">MS</span>
+            <span class="block">SLSU</span>
+            <span class="mt-0.5 block text-blue-200">INTRAMURALS</span>
         </p>
     </div>
 @else

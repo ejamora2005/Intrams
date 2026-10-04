@@ -4,7 +4,7 @@
         <div class="flex gap-4 p-4">
             <img src="{{ asset(config('landing.appLogo')) }}" alt="" width="64" height="58" class="h-14 w-14 shrink-0 object-contain drop-shadow-[0_8px_18px_rgba(0,0,0,0.45)]" decoding="async">
             <div class="min-w-0 flex-1">
-                <p data-pwa-install-title class="text-sm font-semibold">Download INTRAMURAL MS</p>
+                <p data-pwa-install-title class="text-sm font-semibold">Download SLSU INTRAMURALS</p>
                 <p data-pwa-install-copy class="mt-1 text-sm leading-5 text-blue-100">Open the system from your device app list with offline-ready assets.</p>
                 <div class="mt-4 flex flex-wrap gap-2">
                     <button type="button" data-pwa-install-button class="rounded-lg bg-amber-200 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-amber-100">Download app</button>

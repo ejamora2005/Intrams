@@ -16,7 +16,9 @@ return [
     |
     */
 
-    'name' => env('APP_NAME', 'INTRAMURAL MS'),
+    'name' => env('APP_NAME', 'SLSU INTRAMURALS'),
+
+    'display_name' => 'SLSU INTRAMURALS',
 
     /*
     |--------------------------------------------------------------------------

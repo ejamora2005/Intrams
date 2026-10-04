@@ -4,7 +4,7 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
-        <title>{{ $title ?? 'Admin' }} | INTRAMURAL MS</title>
+        <title>{{ $title ?? 'Admin' }} | {{ config('app.display_name', 'SLSU INTRAMURALS') }}</title>
         <x-pwa-meta />
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700&display=swap" rel="stylesheet" />
@@ -21,7 +21,7 @@
 
             <aside id="admin-sidebar" data-admin-sidebar class="ops-sidebar fixed inset-y-0 left-0 z-50 flex w-[min(18rem,calc(100vw-3rem))] -translate-x-full flex-col overflow-hidden bg-blue-950 text-blue-100 shadow-2xl transition-transform duration-200 ease-out md:static md:z-auto md:h-screen md:w-64 md:translate-x-0 md:shadow-none" aria-label="Admin sidebar">
                 <div class="flex items-center border-b border-blue-900">
-                    <a href="{{ route('admin.dashboard') }}" aria-label="INTRAMURAL MS dashboard" class="min-w-0 flex-1 px-5 py-5 transition hover:bg-blue-900/60 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-400">
+                    <a href="{{ route('admin.dashboard') }}" aria-label="SLSU INTRAMURALS dashboard" class="min-w-0 flex-1 px-5 py-5 transition hover:bg-blue-900/60 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-400">
                         <x-intramurals-brand compact />
                     </a>
                     <button type="button" data-close-admin-sidebar class="mr-3 rounded-lg p-2 text-blue-200 transition hover:bg-blue-900 hover:text-white focus:outline-none focus:ring-2 focus:ring-blue-400 md:hidden" aria-label="Close navigation">

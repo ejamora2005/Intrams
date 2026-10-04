@@ -1,6 +1,6 @@
 <img
     src="{{ asset(config('landing.appLogo')) }}"
-    alt="INTRAMURAL MS"
+    alt="SLSU INTRAMURALS"
     width="144"
     height="132"
     decoding="async"
