@@ -41,6 +41,8 @@ test('default intramurals seeder adds the supplied roster without food committee
         'student_number' => '2310042-2',
         'first_name' => 'Jaylynne Gayle',
         'last_name' => 'Libodlibod',
+        'year_level' => '4th',
+        'section' => 'A',
     ]);
 
     expect(TeamMember::query()->where('team_id', $team->id)->count())->toBe(17);

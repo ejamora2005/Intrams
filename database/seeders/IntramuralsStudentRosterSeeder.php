@@ -38,8 +38,8 @@ class IntramuralsStudentRosterSeeder extends Seeder
                         'school_year' => $edition->school_year,
                         'course_id' => $team->course_id,
                         'gender' => $row['gender'],
-                        'year_level' => null,
-                        'section' => null,
+                        'year_level' => '4th',
+                        'section' => 'A',
                         'status' => 'active',
                     ],
                 );
