@@ -12,13 +12,13 @@
         <div class="mb-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">{{ $errors->first() }}</div>
     @endif
 
-    <section class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm" aria-labelledby="participants-heading">
+    <section class="overflow-visible rounded-xl border border-slate-200 bg-white shadow-sm" aria-labelledby="participants-heading">
         <header class="flex flex-col justify-between gap-3 border-b border-slate-200 px-5 py-4 sm:flex-row sm:items-center sm:px-6">
             <div>
                 <h2 id="participants-heading" class="text-lg font-semibold text-slate-900">Manage participants</h2>
                 <p class="mt-1 text-sm text-slate-500">{{ number_format($competitors->count()) }} registered {{ Str::plural('competitor', $competitors->count()) }} for {{ $sport->name }}.</p>
             </div>
-            <a href="{{ route('admin.sports.participants.assign', ['sport' => $sport, 'edition_id' => $edition->id]) }}" class="w-fit rounded-lg bg-blue-700 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-800">Add participants</a>
+            <a href="{{ route('admin.sports.participants.assign', ['sport' => $sport, 'edition_id' => $edition->id]) }}" class="relative z-10 w-fit shrink-0 rounded-lg bg-blue-700 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-800">Add participants</a>
         </header>
 
         @if (in_array($editionSport->participant_type, ['team', 'dual'], true))
@@ -62,13 +62,13 @@
                             <button type="submit" class="rounded-lg border border-red-200 bg-white px-3.5 py-2 text-sm font-semibold text-red-700 transition hover:border-red-300 hover:bg-red-50" onclick="return confirm('Remove the selected participant registrations?');">Remove selected</button>
                         </div>
 
-                        <div class="mt-4 min-h-0 flex-1 overflow-y-auto rounded-lg border border-slate-200">
+                        <div class="mt-4 min-h-0 flex-1 overflow-y-auto rounded-lg border border-slate-200 bg-white/5">
                             <table class="w-full table-fixed divide-y divide-slate-200 text-left text-sm">
                                 <thead class="sticky top-0 z-10 bg-slate-50 text-xs font-semibold uppercase tracking-wide text-slate-500"><tr><th class="w-12 px-4 py-3"><span class="sr-only">Select</span></th><th class="px-4 py-3">Student</th><th class="hidden w-44 px-4 py-3 sm:table-cell">Student number</th></tr></thead>
-                                <tbody class="divide-y divide-slate-100 bg-white">
+                                <tbody class="divide-y divide-slate-100">
                                     @foreach ($entries as $entry)
                                         @php($eligibility = $eligibilityByStudentId->get($entry->student_id))
-                                        <tr data-team-row data-search="{{ Str::lower($entry->student->full_name.' '.$entry->student->student_number) }}" @class(['bg-red-50/90' => $eligibility['possible_dq'] ?? false])>
+                                        <tr data-team-row data-search="{{ Str::lower($entry->student->full_name.' '.$entry->student->student_number) }}" @class(['bg-red-950/50' => $eligibility['possible_dq'] ?? false])>
                                             <td class="px-4 py-3 align-middle"><input name="athlete_entry_ids[]" value="{{ $entry->id }}" type="checkbox" class="team-entry-checkbox rounded border-slate-300 text-blue-700 focus:ring-blue-600" aria-label="Select {{ $entry->student->full_name }}"></td>
                                             <td class="px-4 py-3 align-middle">
                                                 <span class="flex flex-wrap items-center gap-2 font-medium text-slate-900">
@@ -84,7 +84,7 @@
                                                     @endif
                                                 </span>
                                                 @if ($eligibility['possible_dq'] ?? false)
-                                                    <span class="mt-1 block text-xs font-medium text-red-700">{{ implode(' ', $eligibility['issues']) }}</span>
+                                                    <span class="mt-1 block text-xs font-medium text-red-200">{{ implode(' ', $eligibility['issues']) }}</span>
                                                 @endif
                                             </td>
                                             <td class="hidden px-4 py-3 text-slate-500 sm:table-cell">{{ $entry->student->student_number }}</td>
@@ -107,13 +107,13 @@
                     <p class="text-sm font-semibold text-slate-700">Registered students</p>
                     <button type="submit" class="rounded-lg border border-red-200 bg-white px-3.5 py-2 text-sm font-semibold text-red-700 transition hover:border-red-300 hover:bg-red-50" onclick="return confirm('Remove the selected participant registrations?');">Remove selected</button>
                 </div>
-                <div class="mt-4 min-h-0 flex-1 overflow-y-auto rounded-lg border border-slate-200">
+                <div class="mt-4 min-h-0 flex-1 overflow-y-auto rounded-lg border border-slate-200 bg-white/5">
                     @forelse ($participants as $groupName => $entries)
                         <div class="border-b border-slate-100 last:border-b-0">
                             <h3 class="sticky top-0 bg-slate-50 px-5 py-3 text-sm font-semibold text-slate-700">{{ $groupName }}</h3>
                             @foreach ($entries as $entry)
                                 @php($eligibility = $eligibilityByStudentId->get($entry->student_id))
-                                <label @class(['flex cursor-pointer justify-between gap-4 px-5 py-3 text-sm transition hover:bg-slate-50', 'bg-red-50/90' => $eligibility['possible_dq'] ?? false])>
+                                <label @class(['flex cursor-pointer justify-between gap-4 px-5 py-3 text-sm transition hover:bg-white/10', 'bg-red-950/50 hover:bg-red-950/60' => $eligibility['possible_dq'] ?? false])>
                                     <span class="flex items-center gap-3">
                                         <input name="athlete_entry_ids[]" value="{{ $entry->id }}" type="checkbox" class="rounded border-slate-300 text-blue-700 focus:ring-blue-600">
                                         <span>
@@ -124,7 +124,7 @@
                                                 @endif
                                             </span>
                                             @if ($eligibility['possible_dq'] ?? false)
-                                                <span class="mt-1 block text-xs font-medium text-red-700">{{ implode(' ', $eligibility['issues']) }}</span>
+                                                <span class="mt-1 block text-xs font-medium text-red-200">{{ implode(' ', $eligibility['issues']) }}</span>
                                             @endif
                                         </span>
                                     </span>

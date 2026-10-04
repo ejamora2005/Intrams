@@ -75,7 +75,7 @@
                 <div class="grid divide-y divide-slate-200 md:grid-cols-2 md:divide-x md:divide-y-0">
                     @foreach ([0 => 'First pair member', 1 => 'Second pair member'] as $side => $heading)
                         <section data-pair-column data-side="{{ $side }}" aria-labelledby="pair-member-{{ $side }}-heading">
-                            <div class="sticky top-0 z-10 border-b border-slate-200 bg-white p-4">
+                            <div class="sticky top-0 z-10 border-b border-slate-200 bg-slate-50 p-4">
                                 <h3 id="pair-member-{{ $side }}-heading" class="text-sm font-semibold text-slate-900">{{ $heading }}</h3>
                                 <label for="pair-search-{{ $side }}" class="sr-only">Search {{ strtolower($heading) }}</label>
                                 <input id="pair-search-{{ $side }}" data-pair-search type="search" placeholder="Search name or student number" class="mt-3 block w-full rounded-lg border-slate-300 text-sm focus:border-blue-600 focus:ring-blue-600">
@@ -84,7 +84,7 @@
                                 @foreach ($students as $student)
                                     @php($eligibility = $eligibilityPreviewByStudentId->get($student->id))
                                     @php($blocked = $eligibility['possible_dq'] ?? false)
-                                    <label data-pair-row data-search="{{ Str::lower($student->full_name.' '.$student->student_number.' '.$student->course?->name) }}" @class(['flex cursor-pointer items-center gap-3 px-4 py-3 text-sm transition hover:bg-blue-50 has-[:checked]:bg-blue-50', 'border-l-4 border-red-500 bg-red-50 hover:bg-red-50' => $blocked])>
+                                    <label data-pair-row data-search="{{ Str::lower($student->full_name.' '.$student->student_number.' '.$student->course?->name) }}" @class(['flex cursor-pointer items-center gap-3 px-4 py-3 text-sm transition hover:bg-white/10 has-[:checked]:bg-white/10', 'border-l-4 border-red-400 bg-red-950/50 hover:bg-red-950/60' => $blocked])>
                                         <input name="student_ids[{{ $side }}]" value="{{ $student->id }}" type="radio" data-pair-radio data-student-name="{{ $student->full_name }}" @disabled($blocked) class="rounded-full border-slate-300 text-blue-700 focus:ring-blue-600 disabled:cursor-not-allowed disabled:bg-slate-200">
                                         <span class="min-w-0">
                                             <span class="flex flex-wrap items-center gap-2 font-medium text-slate-900">
@@ -95,7 +95,7 @@
                                             </span>
                                             <span class="block truncate text-xs text-slate-500">{{ $student->course?->name }} - {{ $student->student_number }}</span>
                                             @if ($blocked)
-                                                <span class="mt-1 block text-xs font-medium text-red-700">{{ implode(' ', $eligibility['issues']) }}</span>
+                                                <span class="mt-1 block text-xs font-medium text-red-200">{{ implode(' ', $eligibility['issues']) }}</span>
                                             @endif
                                         </span>
                                     </label>
@@ -116,7 +116,7 @@
                     @foreach ($students as $student)
                         @php($eligibility = $eligibilityPreviewByStudentId->get($student->id))
                         @php($blocked = $eligibility['possible_dq'] ?? false)
-                        <label @class(['flex cursor-pointer items-center gap-3 px-5 py-3 text-sm transition hover:bg-slate-50', 'border-l-4 border-red-500 bg-red-50 hover:bg-red-50' => $blocked])>
+                        <label @class(['flex cursor-pointer items-center gap-3 px-5 py-3 text-sm transition hover:bg-white/10', 'border-l-4 border-red-400 bg-red-950/50 hover:bg-red-950/60' => $blocked])>
                             <input name="student_ids[]" value="{{ $student->id }}" type="checkbox" @disabled($blocked) class="student-checkbox rounded border-slate-300 text-blue-700 focus:ring-blue-600 disabled:cursor-not-allowed disabled:bg-slate-200">
                             <span>
                                 <span class="flex flex-wrap items-center gap-2 font-medium text-slate-900">
@@ -127,7 +127,7 @@
                                 </span>
                                 <span class="text-xs text-slate-500">{{ $student->course?->name }} - {{ $student->student_number }}</span>
                                 @if ($blocked)
-                                    <span class="mt-1 block text-xs font-medium text-red-700">{{ implode(' ', $eligibility['issues']) }}</span>
+                                    <span class="mt-1 block text-xs font-medium text-red-200">{{ implode(' ', $eligibility['issues']) }}</span>
                                 @endif
                             </span>
                         </label>
