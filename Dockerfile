@@ -20,8 +20,7 @@ COPY database database
 COPY routes routes
 COPY resources resources
 
-RUN composer dump-autoload --no-dev --optimize \
-    && php artisan package:discover --ansi
+RUN composer dump-autoload --no-dev --optimize --no-scripts
 
 FROM node:20-alpine AS assets
 WORKDIR /app
