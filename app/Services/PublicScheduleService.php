@@ -4,11 +4,12 @@ namespace App\Services;
 
 use App\Models\CompetitionSchedule;
 use App\Models\IntramuralEdition;
+use App\Models\Team;
 use Illuminate\Support\Collection;
 
 class PublicScheduleService
 {
-    /** @return array{currentEdition: ?IntramuralEdition, todayLabel: string, todaySchedules: Collection<int, array<string, string>>} */
+    /** @return array{currentEdition: ?IntramuralEdition, todayLabel: string, todaySchedules: Collection<int, array<string, mixed>>} */
     public function today(): array
     {
         $now = now();
@@ -36,7 +37,7 @@ class PublicScheduleService
                         ->where('status', 'active')
                         ->orderBy('slot')
                         ->with([
-                            'team:id,name',
+                            'team:id,name,code',
                             'athleteEntry:id,student_id',
                             'athleteEntry.student:id,first_name,middle_name,last_name',
                         ]),
@@ -50,6 +51,17 @@ class PublicScheduleService
                         ->filter()
                         ->unique()
                         ->values();
+                    $competitorTeams = $schedule->participants
+                        ->pluck('team')
+                        ->filter()
+                        ->unique('id')
+                        ->values()
+                        ->map(fn (Team $team): array => [
+                            'name' => $team->name,
+                            'code' => $team->code,
+                            'logo_path' => $team->logo_path,
+                        ])
+                        ->all();
 
                     return [
                         'sport' => $schedule->editionSport->sport->name,
@@ -57,6 +69,7 @@ class PublicScheduleService
                         'time' => $schedule->starts_at->format('g:i A'),
                         'period' => $schedule->starts_at->hour < 12 ? 'Morning' : 'Afternoon',
                         'competitors' => $competitors->isEmpty() ? 'To be announced' : $competitors->implode(' VS '),
+                        'competitor_teams' => $competitorTeams,
                         'venue' => $schedule->venue ?: 'TBA',
                         'facilitator' => $schedule->coordinator?->name ?? 'Unassigned',
                     ];

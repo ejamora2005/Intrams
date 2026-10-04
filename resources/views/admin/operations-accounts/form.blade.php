@@ -12,6 +12,13 @@
                 <option value="{{ $team->id }}" @selected((int) old('managed_team_id', $account->managed_team_id) === $team->id)>{{ $team->name }} @if ($team->edition) / {{ $team->edition->name }} @endif</option>
             @endforeach
         </select>
+        @if ($teams->isNotEmpty())
+            <div class="mt-3 flex flex-wrap gap-2">
+                @foreach ($teams as $team)
+                    <x-team-badge :team="$team" size="xs" class="rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-semibold text-slate-700" />
+                @endforeach
+            </div>
+        @endif
         <p class="mt-1 text-xs text-slate-500">Leave blank for the default all-factions access. Choose a faction to limit a GAM account to one team or to label a tabulator account with a faction.</p>
         @error('managed_team_id')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
     </div>

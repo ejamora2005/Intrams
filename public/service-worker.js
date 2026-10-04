@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'intramurals-pwa-v1';
+const CACHE_VERSION = 'intramural-ms-pwa-v2';
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 const OFFLINE_URL = '/offline.html';
@@ -10,6 +10,7 @@ const PRECACHE_URLS = [
     '/icons/pwa-icon-192.png',
     '/icons/pwa-icon-512.png',
     '/icons/pwa-maskable-512.png',
+    '/images/logo/main_logo.png',
     '/images/landing_bg.png'
 ];
 

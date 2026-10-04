@@ -15,7 +15,7 @@
                 </svg>
             @endif
 
-            <div class="truncate">{{ $team->name }}</div>
+            <x-team-badge :team="$team" size="xs" class="truncate" />
         </div>
     </x-dynamic-component>
 </form>

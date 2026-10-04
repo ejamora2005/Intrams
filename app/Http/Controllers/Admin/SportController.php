@@ -217,7 +217,7 @@ class SportController extends Controller
         $this->bracketService->initialize($editionSport);
         $matches = BracketMatch::query()
             ->where('edition_sport_id', $editionSport->id)
-            ->with(['competitorOne', 'competitorTwo', 'winnerCompetitor', 'schedule'])
+            ->with(['competitorOne.team', 'competitorTwo.team', 'winnerCompetitor.team', 'schedule'])
             ->orderBy('bracket')
             ->orderBy('round_number')
             ->orderBy('match_number')

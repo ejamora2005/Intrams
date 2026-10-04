@@ -4,7 +4,7 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="theme-color" content="#06152c">
-        <title>Offline | Intramurals Management</title>
+        <title>Offline | INTRAMURAL MS</title>
         <link rel="manifest" href="/manifest.webmanifest">
         <link rel="icon" type="image/png" sizes="192x192" href="/icons/pwa-icon-192.png">
         <style>
@@ -35,16 +35,10 @@
             .content { padding: 28px; }
             .brand { display: flex; align-items: center; gap: 12px; }
             .mark {
-                display: grid;
-                place-items: center;
                 width: 48px;
                 height: 48px;
-                border-radius: 8px;
-                color: #08213c;
-                background: #fff;
-                font-size: 12px;
-                font-weight: 800;
-                letter-spacing: .04em;
+                object-fit: contain;
+                filter: drop-shadow(0 8px 18px #0008);
             }
             h1 { margin: 24px 0 0; font-size: clamp(28px, 8vw, 42px); line-height: 1; }
             p { margin: 12px 0 0; color: #b4c6dc; line-height: 1.6; }
@@ -68,8 +62,8 @@
             <div class="stripe" aria-hidden="true"></div>
             <div class="content">
                 <div class="brand">
-                    <div class="mark" aria-hidden="true">SLSU</div>
-                    <strong>INTRAMURALS MANAGEMENT</strong>
+                    <img class="mark" src="/images/logo/main_logo.png" alt="" width="56" height="52">
+                    <strong>INTRAMURAL MS</strong>
                 </div>
                 <h1>You are offline</h1>
                 <p>The app shell is available, but this screen needs a network connection for fresh intramurals data and protected account actions.</p>

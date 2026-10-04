@@ -21,7 +21,13 @@ class CompetitionController extends Controller
     public function index(): View
     {
         return view('admin.competition.index', [
-            'schedules' => CompetitionSchedule::with(['editionSport.edition', 'editionSport.sport', 'bracketMatch'])->orderBy('starts_at')->paginate(20),
+            'schedules' => CompetitionSchedule::with([
+                'editionSport.edition',
+                'editionSport.sport',
+                'bracketMatch',
+                'participants.team',
+                'participants.athleteEntry.student',
+            ])->orderBy('starts_at')->paginate(20),
             'scheduleStatuses' => self::SCHEDULE_STATUSES,
             'venueOptions' => $this->venueOptions(),
         ]);

@@ -19,6 +19,9 @@ test('public landing page uses the intramurals design system', function () {
         ->assertSee('Compete. Create. Lead. Connect. Express.')
         ->assertSee('Intramural Meet')
         ->assertSee('Schedule')
+        ->assertSee('images/logo/sea_dragons.png', false)
+        ->assertSee('images/logo/terraquatic_eagles.png', false)
+        ->assertSee('images/logo/trojan_warriors.png', false)
         ->assertSee('team-banner', false);
 });
 
@@ -26,8 +29,8 @@ test('login screen can be rendered', function () {
     $response = $this->get('/login');
 
     $response->assertStatus(200)
-        ->assertSee('SLSU')
-        ->assertSee('INTRAMURALS MANAGEMENT')
+        ->assertSee('INTRAMURAL MS')
+        ->assertSee('Download INTRAMURAL MS')
         ->assertSee('INTRAMURALS 2026: STUDENT FESTIVAL')
         ->assertSee('Compete. Create. Lead. Connect. Express.')
         ->assertSee('class="space-y-3 lg:hidden"', false)
@@ -156,12 +159,11 @@ test('administrators can access the admin dashboard and its sidebar modules', fu
 
     $response->assertOk()
         ->assertSee('Program overview')
-        ->assertSee('SLSU')
-        ->assertSee('INTRAMURALS')
-        ->assertSee('MANAGEMENT')
+        ->assertSee('INTRAMURAL')
+        ->assertSee('MS')
         ->assertSee('INTRAMURALS 2026: STUDENT FESTIVAL')
         ->assertSee('Compete. Create. Lead. Connect. Express.')
-        ->assertSee('INTRAMURALS MANAGEMENT dashboard')
+        ->assertSee('INTRAMURAL MS dashboard')
         ->assertSee('data-open-admin-sidebar', false)
         ->assertSee('data-admin-sidebar-backdrop', false)
         ->assertSee('aria-controls="admin-sidebar"', false)

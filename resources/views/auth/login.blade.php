@@ -89,6 +89,10 @@
                         <span>Sign in</span>
                         <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path stroke-linecap="round" d="M5 12h14m-5-5 5 5-5 5" /></svg>
                     </button>
+                    <button type="button" data-pwa-install-button hidden class="flex w-full items-center justify-center gap-2 rounded-xl border border-amber-300 bg-amber-100 px-4 py-3 text-sm font-semibold text-slate-950 shadow-sm transition hover:bg-amber-200 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2">
+                        <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v11m0 0 4-4m-4 4-4-4M5 17v1.5A2.5 2.5 0 0 0 7.5 21h9a2.5 2.5 0 0 0 2.5-2.5V17" /></svg>
+                        <span>Download INTRAMURAL MS</span>
+                    </button>
                 </form>
                 <p class="mt-6 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-center text-xs font-medium leading-5 text-slate-600">Access is limited to active intramurals operations accounts.</p>
             </div>

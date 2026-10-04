@@ -41,6 +41,13 @@
                 <button type="submit" class="rounded-lg border border-blue-200 bg-white px-4 py-2.5 text-sm font-semibold text-blue-800 transition hover:border-blue-300 hover:bg-blue-50">Apply filters</button>
             </div>
         </form>
+
+        @if ($teamId && ($selectedFilterTeam = $teams->firstWhere('id', $teamId)))
+            <div class="mt-4 rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm">
+                <p class="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500">Selected faction</p>
+                <x-team-badge :team="$selectedFilterTeam" size="md" class="font-semibold text-slate-900" />
+            </div>
+        @endif
     </section>
 
     <section class="mt-6 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm" aria-labelledby="eligible-students-heading">

@@ -45,7 +45,9 @@
                     <tbody class="divide-y divide-slate-100 text-slate-700">
                         @foreach ($teams as $team)
                             <tr class="transition hover:bg-slate-50">
-                                <td class="px-5 py-4"><p class="font-medium text-slate-900">{{ $team->name }}</p><p class="mt-0.5 font-mono text-xs text-slate-500">{{ $team->code }}</p></td>
+                                <td class="px-5 py-4">
+                                    <x-team-badge :team="$team" :subtitle="$team->code" class="font-medium text-slate-900" />
+                                </td>
                                 <td class="px-5 py-4"><p>{{ $team->edition->name }}</p><p class="mt-0.5 text-xs text-slate-500">{{ $team->edition->school_year }}</p></td>
                                 <td class="px-5 py-4">{{ $team->members_count }} athlete{{ $team->members_count === 1 ? '' : 's' }}</td>
                                 <td class="px-5 py-4">

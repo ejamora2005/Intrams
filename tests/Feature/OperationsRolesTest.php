@@ -85,7 +85,8 @@ test('GAM users are sent to the GAM dashboard', function () {
         ->assertSee('data-ops-view-panel="dashboard-overview"', false)
         ->assertSee('data-ops-view-panel="roster-management"', false)
         ->assertSee('data-ops-view-target="medical-certificates"', false)
-        ->assertSee('Mighty Sea Dragons');
+        ->assertSee('Mighty Sea Dragons')
+        ->assertSee('images/logo/sea_dragons.png', false);
 });
 
 test('GAM users can add players to their assigned faction', function () {

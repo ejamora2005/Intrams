@@ -104,6 +104,13 @@
             <form method="POST" action="{{ route('tabulator.sport-results.store') }}" class="mt-5">
                 @csrf
                 <input type="hidden" name="edition_sport_id" value="{{ $selectedSport->id }}">
+                @if ($teams->isNotEmpty())
+                    <div class="mb-4 flex flex-wrap gap-2">
+                        @foreach ($teams as $team)
+                            <x-team-badge :team="$team" size="xs" class="rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-semibold text-slate-700" />
+                        @endforeach
+                    </div>
+                @endif
                 <div class="grid gap-3 lg:grid-cols-3">
                     @foreach ($pointRules as $rule)
                         <label class="block rounded-lg border border-slate-200 p-4 text-sm font-medium text-slate-700">
@@ -139,7 +146,15 @@
                         <p class="font-semibold text-slate-950">{{ $editionSport->sport?->name }}</p>
                         <div class="mt-2 flex flex-wrap gap-2 text-sm text-slate-600">
                             @foreach ($editionSport->sportResult->placements_json ?? [] as $placement => $teamId)
-                                <span class="inline-flex max-w-full whitespace-nowrap rounded-full bg-slate-100 px-3 py-1">#{{ $placement }} {{ $teamsById->get((int) $teamId)?->name ?? 'Removed team' }}</span>
+                                @php($placedTeam = $teamsById->get((int) $teamId))
+                                <span class="inline-flex max-w-full items-center gap-2 rounded-full bg-slate-100 px-3 py-1">
+                                    <span>#{{ $placement }}</span>
+                                    @if ($placedTeam)
+                                        <x-team-badge :team="$placedTeam" size="xs" class="font-semibold text-slate-700" />
+                                    @else
+                                        <span>Removed team</span>
+                                    @endif
+                                </span>
                             @endforeach
                         </div>
                     </div>
@@ -160,7 +175,9 @@
                         @forelse ($standings as $row)
                             <tr>
                                 <td class="px-3 py-3 font-semibold text-slate-700">#{{ $row['rank'] }}</td>
-                                <td class="px-3 py-3 font-medium text-slate-950">{{ $row['team']->name }}</td>
+                                <td class="px-3 py-3 font-medium text-slate-950">
+                                    <x-team-badge :team="$row['team']" />
+                                </td>
                                 <td class="px-3 py-3 text-right font-semibold text-slate-950">{{ number_format((float) $row['tally']->points, 2) }}</td>
                                 <td class="px-3 py-3 text-right text-slate-600">{{ $row['tally']->gold_count }}G / {{ $row['tally']->silver_count }}S / {{ $row['tally']->bronze_count }}B</td>
                             </tr>
@@ -181,6 +198,19 @@
                     @csrf
                     <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">{{ $match->editionSport->sport->name }} / {{ ucfirst($match->bracket) }} round {{ $match->round_number }}</p>
                     <p class="mt-2 font-medium text-slate-950">Game {{ $match->match_number }}</p>
+                    <div class="mt-3 flex flex-wrap items-center gap-2 text-sm font-semibold text-slate-800">
+                        @if ($match->competitorOne?->team)
+                            <x-team-badge :team="$match->competitorOne->team" />
+                        @else
+                            <span>{{ $match->competitorOne?->label ?? 'TBD' }}</span>
+                        @endif
+                        <span class="text-xs uppercase text-slate-400">vs</span>
+                        @if ($match->competitorTwo?->team)
+                            <x-team-badge :team="$match->competitorTwo->team" />
+                        @else
+                            <span>{{ $match->competitorTwo?->label ?? 'TBD' }}</span>
+                        @endif
+                    </div>
                     <select name="winner_competitor_id" required class="mt-3 block w-full rounded-lg border-slate-300 text-sm focus:border-blue-600 focus:ring-blue-600">
                         <option value="">Choose winner</option>
                         <option value="{{ $match->competitorOne->id }}">{{ $match->competitorOne->label }}</option>

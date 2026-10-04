@@ -129,7 +129,12 @@
                                     @endforeach
                                     <article class="rounded-lg border-2 border-slate-900 bg-white p-4 text-center shadow-sm">
                                         <p class="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Winner</p>
-                                        <p class="mt-2 truncate text-base font-bold text-slate-900">{{ $champion?->label ?? 'To be decided' }}</p>
+                                        <p class="mt-2 flex min-w-0 items-center justify-center gap-2 text-base font-bold text-slate-900">
+                                            @if ($champion?->team)
+                                                <x-team-badge :team="$champion->team" size="xs" :logo-only="true" />
+                                            @endif
+                                            <span class="truncate">{{ $champion?->label ?? 'To be decided' }}</span>
+                                        </p>
                                     </article>
                                 </div>
                             </div>

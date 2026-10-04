@@ -7,7 +7,12 @@
         @foreach ([$match->competitorOne, $match->competitorTwo] as $competitor)
             @if ($competitor)
                 <button type="button" data-match="{{ $match->id }}" data-competitor-id="{{ $competitor->id }}" aria-pressed="false" class="bracket-team flex w-full items-center justify-between gap-3 px-3 py-2.5 text-left text-sm font-semibold {{ $match->winner_competitor_id === $competitor->id ? 'bg-green-50 text-green-800' : 'bg-white text-slate-800' }}" @disabled($match->status !== 'pending' || ! $match->competitor_one_id || ! $match->competitor_two_id)>
-                    <span class="truncate">{{ $competitor->label }}</span>
+                    <span class="flex min-w-0 items-center gap-2">
+                        @if ($competitor->team)
+                            <x-team-badge :team="$competitor->team" size="xs" :logo-only="true" />
+                        @endif
+                        <span class="truncate">{{ $competitor->label }}</span>
+                    </span>
                     <span class="flex shrink-0 items-center gap-2">
                         <span class="bracket-selection-indicator hidden rounded bg-blue-700 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white">Selected</span>
                         @if ($match->winner_competitor_id === $competitor->id)

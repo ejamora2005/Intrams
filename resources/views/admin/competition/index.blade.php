@@ -28,6 +28,7 @@
                         <th scope="col" class="px-5 py-3">Edition</th>
                         <th scope="col" class="px-5 py-3">Sport</th>
                         <th scope="col" class="px-5 py-3">Schedule item</th>
+                        <th scope="col" class="px-5 py-3">Teams / participants</th>
                         <th scope="col" class="px-5 py-3">Time</th>
                         <th scope="col" class="px-5 py-3">Venue</th>
                         <th scope="col" class="px-5 py-3">Status</th>
@@ -38,11 +39,33 @@
                     @forelse ($schedules as $schedule)
                         @php
                             $scheduleLabel = $schedule->title ?: ($schedule->bracketMatch ? 'Game '.$schedule->bracketMatch->match_number : 'Competition');
+                            $participantTeams = $schedule->participants->pluck('team')->filter()->unique('id')->values();
+                            $participantNames = $schedule->participants
+                                ->map(fn ($participant) => $participant->athleteEntry?->student?->full_name)
+                                ->filter()
+                                ->unique()
+                                ->values();
                         @endphp
                         <tr class="align-top">
                             <td class="px-5 py-4 font-medium text-slate-900">{{ $schedule->editionSport->edition->name }}</td>
                             <td class="px-5 py-4 text-slate-700">{{ $schedule->editionSport->sport->name }}</td>
                             <td class="px-5 py-4 text-slate-700">{{ $scheduleLabel }}</td>
+                            <td class="px-5 py-4 text-slate-700">
+                                @if ($participantTeams->isNotEmpty())
+                                    <div class="flex flex-wrap items-center gap-2">
+                                        @foreach ($participantTeams as $team)
+                                            <x-team-badge :team="$team" class="font-medium text-slate-900" />
+                                            @unless ($loop->last)
+                                                <span class="text-xs font-semibold uppercase text-slate-400">vs</span>
+                                            @endunless
+                                        @endforeach
+                                    </div>
+                                @elseif ($participantNames->isNotEmpty())
+                                    <span>{{ $participantNames->implode(' / ') }}</span>
+                                @else
+                                    <span class="text-slate-500">To be announced</span>
+                                @endif
+                            </td>
                             <td class="px-5 py-4 text-slate-700">
                                 <span class="block font-medium text-slate-900">{{ $schedule->starts_at->format('M j, Y g:i A') }}</span>
                                 @if ($schedule->ends_at)
@@ -104,7 +127,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7" class="px-5 py-10 text-center text-slate-500">No competitions are scheduled yet. Configure an edition sport, add eligible athletes or teams, then create its schedule.</td>
+                            <td colspan="8" class="px-5 py-10 text-center text-slate-500">No competitions are scheduled yet. Configure an edition sport, add eligible athletes or teams, then create its schedule.</td>
                         </tr>
                     @endforelse
                 </tbody>

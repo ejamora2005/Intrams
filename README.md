@@ -1,4 +1,4 @@
-# Intramurals Management System
+# INTRAMURAL MS
 
 A Laravel application for managing a school intramurals program. Its redesigned flow is edition-centered: configure edition sports, teams and team members, athlete sport participation, then schedules, live competition, results, tallies, and system activity history.
 
@@ -150,7 +150,7 @@ On the public daily board, bracket-scheduled matchups show their bracket game nu
 
 Feature coverage verifies both initial bracket scheduling and rescheduling without duplicate competition records.
 
-The guest browser title uses `INTRAMURALS MANAGEMENT`, keeping the public board and login modal aligned with the application branding.
+The guest browser title uses `INTRAMURAL MS`, keeping the public board and login modal aligned with the application branding.
 
 The application uses one shared `/login` page for both administrators and coordinators. It uses the system-wide slate-blue interface and accepts only an email address and password—users do not choose a role on the form.
 
@@ -186,7 +186,7 @@ The feature test suite uses `RefreshDatabase`; if you run tests against the loca
 
 ## Admin landing page and navigation
 
-Active administrators are redirected from `/dashboard` to `/admin/dashboard`. The login screen and admin sidebar share one reusable brand component, displaying the `SLSU` mark and `INTRAMURALS MANAGEMENT` name consistently. The admin shell keeps its fixed sidebar and independently scrolling content panel on desktop. On phones and tablets, the sidebar becomes a vertically scrollable off-canvas menu with a backdrop, close control, Escape-key support, and body-scroll locking; the dashboard cards, buttons, spacing, and headings reflow for narrow screens.
+Active administrators are redirected from `/dashboard` to `/admin/dashboard`. The login screen and admin sidebar share one reusable brand component, displaying the Intramurals 2026 emblem and `INTRAMURAL MS` name consistently. The admin shell keeps its fixed sidebar and independently scrolling content panel on desktop. On phones and tablets, the sidebar becomes a vertically scrollable off-canvas menu with a backdrop, close control, Escape-key support, and body-scroll locking; the dashboard cards, buttons, spacing, and headings reflow for narrow screens.
 
 The slate-blue palette sidebar contains:
 

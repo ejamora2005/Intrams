@@ -1,8 +1,8 @@
 {
     "id": "/?source=pwa",
-    "name": "Intramurals Management System",
-    "short_name": "Intramurals",
-    "description": "Operations portal for intramurals schedules, teams, scoring, standings, GAM, and tabulator workflows.",
+    "name": "INTRAMURAL MS",
+    "short_name": "INTRAMURAL MS",
+    "description": "Operations portal for intramural schedules, teams, scoring, standings, GAM, and tabulator workflows.",
     "start_url": "/dashboard?source=pwa",
     "scope": "/",
     "display": "standalone",

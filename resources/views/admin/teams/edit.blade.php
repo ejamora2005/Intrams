@@ -14,7 +14,11 @@
         <section class="h-fit rounded-xl border border-slate-200 bg-white shadow-sm" aria-labelledby="roster-heading">
             <div class="border-b border-slate-200 px-6 py-5">
                 <h2 id="roster-heading" class="font-semibold text-slate-900">Add athletes to roster</h2>
-                <p class="mt-1 text-sm text-slate-500">This assigns athletes to {{ $team->name }} for {{ $team->edition->name }}, not to a specific sport.</p>
+                <p class="mt-1 flex flex-wrap items-center gap-1 text-sm text-slate-500">
+                    <span>This assigns athletes to</span>
+                    <x-team-badge :team="$team" size="xs" class="font-semibold text-slate-700" />
+                    <span>for {{ $team->edition->name }}, not to a specific sport.</span>
+                </p>
             </div>
             <div class="p-6">
                 @if ($team->status !== 'active')

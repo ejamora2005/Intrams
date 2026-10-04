@@ -22,7 +22,9 @@
                     @if ($selectedTeam)
                         <div class="rounded-lg border border-white/15 bg-white/10 px-4 py-3 sm:min-w-72">
                             <p class="text-xs font-semibold uppercase text-slate-500">Current team</p>
-                            <p class="mt-1 truncate text-lg font-semibold text-slate-950">{{ $selectedTeam->name }}</p>
+                            <p class="mt-1 text-lg font-semibold text-slate-950">
+                                <x-team-badge :team="$selectedTeam" size="md" />
+                            </p>
                             <p class="mt-1 text-sm text-slate-500">{{ $selectedTeam->members_count ?? $selectedTeam->members->count() }} players</p>
                         </div>
                     @endif
@@ -84,7 +86,9 @@
                 <div class="min-w-0">
                     <div class="flex flex-col justify-between gap-2 sm:flex-row sm:items-end">
                         <div>
-                            <h3 class="font-semibold text-slate-950">{{ $selectedTeam->name }}</h3>
+                            <h3 class="font-semibold text-slate-950">
+                                <x-team-badge :team="$selectedTeam" size="md" />
+                            </h3>
                             <p class="mt-1 text-sm text-slate-500">{{ $selectedTeam->course?->name ?? 'Unassigned department' }} / {{ $selectedTeam->members->count() }} players</p>
                         </div>
                     </div>
@@ -183,7 +187,14 @@
                         <tr>
                             <td class="px-4 py-3 align-top">
                                 <p class="font-medium text-slate-950">{{ $entry->student?->full_name ?? 'Removed student' }}</p>
-                                <p class="text-xs text-slate-500">{{ $entry->team?->name ?? 'No team' }} / {{ $entry->student?->student_number ?? '-' }}</p>
+                                <p class="mt-1 flex flex-wrap items-center gap-1 text-xs text-slate-500">
+                                    @if ($entry->team)
+                                        <x-team-badge :team="$entry->team" size="xs" class="font-medium text-slate-600" />
+                                    @else
+                                        <span>No team</span>
+                                    @endif
+                                    <span>/ {{ $entry->student?->student_number ?? '-' }}</span>
+                                </p>
                             </td>
                             <td class="px-4 py-3 align-top text-slate-600">{{ $entry->editionSport->sport?->name }}</td>
                             <td class="px-4 py-3 align-top">
@@ -226,7 +237,9 @@
                     @forelse ($standings as $row)
                         <tr>
                             <td class="px-3 py-3 font-semibold text-slate-700">#{{ $row['rank'] }}</td>
-                            <td class="px-3 py-3 font-medium text-slate-950">{{ $row['team']->name }}</td>
+                            <td class="px-3 py-3 font-medium text-slate-950">
+                                <x-team-badge :team="$row['team']" />
+                            </td>
                             <td class="px-3 py-3 text-slate-600">{{ $row['team']->course?->name ?? 'Unassigned' }}</td>
                             <td class="px-3 py-3 text-right font-semibold text-slate-950">{{ number_format((float) $row['tally']->points, 2) }}</td>
                             <td class="px-3 py-3 text-right text-slate-600">{{ $row['tally']->gold_count }}G / {{ $row['tally']->silver_count }}S / {{ $row['tally']->bronze_count }}B</td>
@@ -245,7 +258,19 @@
             @forelse ($upcomingMatches as $match)
                 <article class="rounded-lg border border-slate-200 p-4">
                     <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">{{ $match->editionSport->sport->name }} / {{ ucfirst($match->bracket) }} round {{ $match->round_number }}</p>
-                    <p class="mt-2 font-medium text-slate-950">{{ $match->competitorOne?->label ?? 'TBD' }} vs {{ $match->competitorTwo?->label ?? 'TBD' }}</p>
+                    <p class="mt-2 flex flex-wrap items-center gap-2 font-medium text-slate-950">
+                        @if ($match->competitorOne?->team)
+                            <x-team-badge :team="$match->competitorOne->team" />
+                        @else
+                            <span>{{ $match->competitorOne?->label ?? 'TBD' }}</span>
+                        @endif
+                        <span class="text-xs font-semibold uppercase text-slate-400">vs</span>
+                        @if ($match->competitorTwo?->team)
+                            <x-team-badge :team="$match->competitorTwo->team" />
+                        @else
+                            <span>{{ $match->competitorTwo?->label ?? 'TBD' }}</span>
+                        @endif
+                    </p>
                     <p class="mt-1 text-sm text-slate-500">{{ $match->schedule?->starts_at?->format('M j, Y g:i A') ?? 'Not scheduled' }}</p>
                 </article>
             @empty

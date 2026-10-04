@@ -12,9 +12,10 @@
             <div class="min-w-0">
                 <h1 class="ops-display">Rules & Guidelines</h1>
                 <p class="mt-3 max-w-2xl text-sm leading-6 text-slate-600">
-                    {{ $edition?->name ?? 'No active intramurals edition is available yet.' }}
+                    <span>{{ $edition?->name ?? 'No active intramurals edition is available yet.' }}</span>
                     @if ($managedTeam ?? null)
-                        / {{ $managedTeam->name }}
+                        <span class="mx-1">/</span>
+                        <x-team-badge :team="$managedTeam" size="xs" class="font-semibold text-slate-700" />
                     @endif
                 </p>
             </div>

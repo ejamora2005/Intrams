@@ -123,7 +123,7 @@ class DashboardController extends Controller
             'upcomingMatches' => $editionSportIds->isEmpty()
                 ? collect()
                 : BracketMatch::query()
-                    ->with(['editionSport.sport', 'competitorOne', 'competitorTwo', 'schedule'])
+                    ->with(['editionSport.sport', 'competitorOne.team', 'competitorTwo.team', 'schedule'])
                     ->whereIn('edition_sport_id', $editionSportIds)
                     ->where('status', 'pending')
                     ->orderBy('bracket')

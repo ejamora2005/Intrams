@@ -1,8 +1,8 @@
 const serviceWorkerUrl = '/service-worker.js';
 const installPanel = document.querySelector('[data-pwa-install]');
-const installButton = document.querySelector('[data-pwa-install-button]');
-const dismissButton = document.querySelector('[data-pwa-dismiss]');
-const refreshButton = document.querySelector('[data-pwa-refresh]');
+const installButtons = Array.from(document.querySelectorAll('[data-pwa-install-button]'));
+const dismissButtons = Array.from(document.querySelectorAll('[data-pwa-dismiss]'));
+const refreshButtons = Array.from(document.querySelectorAll('[data-pwa-refresh]'));
 const installTitle = document.querySelector('[data-pwa-install-title]');
 const installCopy = document.querySelector('[data-pwa-install-copy]');
 
@@ -12,56 +12,94 @@ let waitingWorker = null;
 const isStandalone = () => window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
 const canUseServiceWorker = () => 'serviceWorker' in navigator && (window.isSecureContext || location.hostname === 'localhost' || location.hostname === '127.0.0.1');
 
-const showInstallPanel = mode => {
-    if (!installPanel || (mode !== 'update' && isStandalone())) return;
+const setInstallButtonsVisible = visible => {
+    installButtons.forEach(button => {
+        button.hidden = !visible;
+    });
+};
 
-    installPanel.hidden = false;
-    refreshButton?.toggleAttribute('hidden', mode !== 'update');
-    installButton?.toggleAttribute('hidden', mode === 'update');
+const setRefreshButtonsVisible = visible => {
+    refreshButtons.forEach(button => {
+        button.hidden = !visible;
+    });
+};
+
+const relatedAppInstalled = async () => {
+    if (!('getInstalledRelatedApps' in navigator)) return false;
+
+    try {
+        const relatedApps = await navigator.getInstalledRelatedApps();
+        return relatedApps.some(app => app.platform === 'webapp' || app.url?.includes('manifest.webmanifest'));
+    } catch {
+        return false;
+    }
+};
+
+const appIsInstalled = async () => isStandalone() || await relatedAppInstalled();
+
+const showInstallPanel = async mode => {
+    if (mode !== 'update' && await appIsInstalled()) {
+        hideInstallControls();
+        return;
+    }
+
+    if (installPanel) installPanel.hidden = false;
+
+    const updateMode = mode === 'update';
+    setRefreshButtonsVisible(updateMode);
+    setInstallButtonsVisible(!updateMode && Boolean(installPrompt));
 
     if (installTitle && installCopy) {
-        if (mode === 'update') {
-            installTitle.textContent = 'Intramurals update ready';
+        if (updateMode) {
+            installTitle.textContent = 'INTRAMURAL MS update ready';
             installCopy.textContent = 'Refresh once to use the newest app shell.';
         } else {
-            installTitle.textContent = 'Install Intramurals Management';
+            installTitle.textContent = 'Download INTRAMURAL MS';
             installCopy.textContent = 'Open the system from your device app list with offline-ready assets.';
         }
     }
 };
 
-const hideInstallPanel = () => {
+const hideInstallControls = () => {
     if (installPanel) installPanel.hidden = true;
+    setInstallButtonsVisible(false);
+    setRefreshButtonsVisible(false);
 };
 
 window.addEventListener('beforeinstallprompt', event => {
     event.preventDefault();
     installPrompt = event;
-    showInstallPanel('install');
+    void showInstallPanel('install');
 });
 
 window.addEventListener('appinstalled', () => {
     installPrompt = null;
-    hideInstallPanel();
+    hideInstallControls();
 });
 
-installButton?.addEventListener('click', async () => {
-    if (!installPrompt) return;
+installButtons.forEach(button => {
+    button.addEventListener('click', async () => {
+        if (!installPrompt) return;
 
-    installPrompt.prompt();
-    await installPrompt.userChoice;
-    installPrompt = null;
-    hideInstallPanel();
+        installPrompt.prompt();
+        await installPrompt.userChoice;
+        installPrompt = null;
+        hideInstallControls();
+    });
 });
 
-dismissButton?.addEventListener('click', hideInstallPanel);
+dismissButtons.forEach(button => {
+    button.addEventListener('click', hideInstallControls);
+});
 
-refreshButton?.addEventListener('click', () => {
-    if (waitingWorker) {
-        waitingWorker.postMessage({ type: 'SKIP_WAITING' });
-    } else {
-        window.location.reload();
-    }
+refreshButtons.forEach(button => {
+    button.addEventListener('click', () => {
+        if (waitingWorker) {
+            waitingWorker.postMessage({ type: 'SKIP_WAITING' });
+        } else {
+            window.location.reload();
+        }
+    });
 });
 
 if (canUseServiceWorker()) {
@@ -71,7 +109,7 @@ if (canUseServiceWorker()) {
 
             if (registration.waiting) {
                 waitingWorker = registration.waiting;
-                showInstallPanel('update');
+                void showInstallPanel('update');
             }
 
             registration.addEventListener('updatefound', () => {
@@ -81,7 +119,7 @@ if (canUseServiceWorker()) {
                 worker.addEventListener('statechange', () => {
                     if (worker.state === 'installed' && navigator.serviceWorker.controller) {
                         waitingWorker = worker;
-                        showInstallPanel('update');
+                        void showInstallPanel('update');
                     }
                 });
             });
@@ -93,4 +131,8 @@ if (canUseServiceWorker()) {
     navigator.serviceWorker.addEventListener('controllerchange', () => {
         window.location.reload();
     });
+}
+
+if (isStandalone()) {
+    hideInstallControls();
 }

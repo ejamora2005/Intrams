@@ -9,7 +9,7 @@
 .schedule-nav { display: flex; align-items: center; justify-content: space-between; gap: 24px; min-height: 96px; border-bottom: 1px solid #c6d5e51f; }
 .schedule-brand { display: flex; align-items: center; gap: 14px; color: #f3f6fb; font-size: 13px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; }
 .schedule-brand small { display: block; margin-top: 4px; color: #abc0d8; font-size: 10px; letter-spacing: .18em; }
-.schedule-seal { width: 56px; height: 56px; border-radius: 50%; flex-shrink: 0; object-fit: contain; filter: drop-shadow(0 3px 12px #0005); }
+.schedule-seal { width: 72px; height: 66px; flex-shrink: 0; object-fit: contain; filter: drop-shadow(0 3px 12px #0005); }
 .schedule-links { display: flex; align-items: center; gap: 24px; }
 .schedule-links a, .schedule-login, .schedule-refresh { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; font-size: 13px; font-weight: 600; }
 .schedule-links svg, .schedule-refresh svg { width: 18px; height: 18px; flex-shrink: 0; }
@@ -32,6 +32,7 @@
 .schedule-teams { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; margin: 0 0 25px; padding: 0; list-style: none; }
 .schedule-teams li { display: flex; align-items: center; gap: 13px; padding: 14px 18px; border-top: 2px solid var(--team-highlight); background: linear-gradient(100deg, color-mix(in srgb, var(--team-color) 38%, #07172d), #07172d99); }
 .schedule-team-pennant { width: 21px; height: 32px; flex-shrink: 0; background: linear-gradient(110deg, var(--team-highlight), var(--team-color)); clip-path: polygon(0 0,100% 0,100% 78%,50% 100%,0 78%); }
+.schedule-team-logo { width: 44px; height: 44px; flex-shrink: 0; object-fit: contain; filter: drop-shadow(0 7px 10px #0006); }
 .schedule-teams li > span:last-child { font-family: 'Schedule Condensed', sans-serif; font-size: 21px; line-height: 1.1; font-weight: 700; text-transform: uppercase; }
 .schedule-teams small { display: block; margin-top: 6px; color: #c2d1e4; font-family: 'Schedule Barlow', sans-serif; font-size: 9px; font-weight: 400; letter-spacing: .075em; }
 .schedule-board { position: relative; overflow: hidden; border: 1px solid #839cbd45; border-top: 2px solid #d9b87d; border-radius: 12px; background: #091d36ed; box-shadow: 0 18px 50px #0005; }
@@ -54,6 +55,11 @@
 .schedule-session--afternoon { color: #aecff7; background: #72a8e51c; }
 .schedule-game { display: block; margin-bottom: 7px; color: #99b4d3; font-size: 10px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; }
 .schedule-competitors { font-size: 16px; font-weight: 600; line-height: 1.6; overflow-wrap: anywhere; }
+.schedule-competitor-list { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; min-width: 0; color: #f7fbff; font-size: 15px; font-weight: 600; line-height: 1.35; }
+.schedule-team-badge { min-width: 0; max-width: 100%; color: inherit; }
+.schedule-team-badge img { width: 34px; height: 34px; }
+.schedule-team-badge span { min-width: 0; }
+.schedule-versus { flex-shrink: 0; border-radius: 999px; border: 1px solid #f0d49c66; padding: 3px 7px; color: #f0d49c; background: #d9b87d1c; font-size: 10px; line-height: 1; }
 .schedule-facilitator { font-size: 13px; color: #bacbdf; }
 .schedule-empty { display: flex; flex-direction: column; align-items: center; text-align: center; padding: 45px 20px 52px; }
 .schedule-empty-icon { display: grid; place-items: center; width: 72px; height: 72px; margin-bottom: 20px; background: #d7b87d0c; border: 1px solid #d7b87d45; border-radius: 50%; color: #dcc28e; }
@@ -87,10 +93,11 @@
     .schedule-nav { min-height: 86px; gap: 12px; }
     .schedule-brand { gap: 8px; font-size: 9px; letter-spacing: .025em; max-width: 210px; }
     .schedule-brand small { font-size: 8px; letter-spacing: .08em; }
-    .schedule-seal { width: 40px; height: 40px; }
+    .schedule-seal { width: 48px; height: 44px; }
     .schedule-teams { gap: 7px; margin-bottom: 18px; }
     .schedule-teams li { padding: 11px 7px; gap: 0; align-items: flex-start; }
     .schedule-team-pennant { display: none; }
+    .schedule-team-logo { width: 34px; height: 34px; }
     .schedule-teams li > span:last-child { font-size: clamp(13px, 3.7vw, 20px); }
     .schedule-teams small { font-size: 8px; line-height: 1.4; letter-spacing: 0; }
     .schedule-links { gap: 0; }
@@ -190,9 +197,6 @@
 }
 
 .schedule-seal {
-    padding: 3px;
-    border: 1px solid #f0d49c66;
-    background: linear-gradient(145deg, #f7e2b6, #0f5a3b);
     filter: drop-shadow(0 6px 16px #0008);
 }
 
@@ -367,6 +371,10 @@
 
 .schedule-team-pennant {
     filter: drop-shadow(0 5px 8px #0005);
+}
+
+.schedule-team-logo {
+    filter: drop-shadow(0 7px 12px #0008);
 }
 
 .schedule-teams li > span:last-child {
@@ -654,8 +662,8 @@
     }
 
     .schedule-seal {
-        width: 42px;
-        height: 42px;
+        width: 48px;
+        height: 44px;
     }
 
     .schedule-links {
@@ -714,6 +722,7 @@
 
     .schedule-teams li {
         padding: 12px;
+        gap: 10px;
     }
 
     .schedule-teams li > span:last-child {

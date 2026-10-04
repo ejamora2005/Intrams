@@ -17,6 +17,13 @@
         <input type="hidden" name="edition_id" value="{{ $edition->id }}" />
 
         <div class="mx-auto mb-4 grid max-w-4xl gap-3 rounded-xl border border-blue-100 bg-blue-50 p-4 sm:grid-cols-2">
+            @if ($teams->isNotEmpty())
+                <div class="flex flex-wrap gap-2 sm:col-span-2">
+                    @foreach ($teams as $team)
+                        <x-team-badge :team="$team" size="xs" class="rounded-full border border-blue-100 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700" />
+                    @endforeach
+                </div>
+            @endif
             @foreach (['home' => 'Home', 'visitor' => 'Visitor'] as $side => $label)
                 <div>
                     <label class="text-sm font-semibold text-slate-700">Prefill {{ $label }} Team

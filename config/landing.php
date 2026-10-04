@@ -2,17 +2,24 @@
 
 return [
     'background' => 'images/landing_bg.png',
+    'appLogo' => 'images/logo/main_logo.png',
     // Set a separate logo path here, or use the crest in the supplied background.
     'universityLogo' => null,
     // Static starting values until official scoring is connected.
     'preview' => true,
     'updatedAt' => null,
+    'teamLogos' => [
+        'mighty-sea-dragons' => 'images/logo/sea_dragons.png',
+        'sea-dragons' => 'images/logo/sea_dragons.png',
+        'terraquatic-eagles' => 'images/logo/terraquatic_eagles.png',
+        'trojan-warriors' => 'images/logo/trojan_warriors.png',
+    ],
     // Set image to a public PNG, WebP, SVG, etc. Transparent logos are never cropped.
     'teams' => [
         [
             'name' => 'Mighty Sea Dragons',
             'department' => 'Marine Biology',
-            'image' => null,
+            'image' => 'images/logo/sea_dragons.png',
             // Replace these transparent files with real object cutouts; see their README.
             'objects' => [
                 ['image' => 'images/landing-objects/marine-biology/microscope.png', 'placement' => 'upper-left'],
@@ -28,7 +35,7 @@ return [
         [
             'name' => 'Terraquatic Eagles',
             'department' => 'Fisheries & Agriculture',
-            'image' => null,
+            'image' => 'images/logo/terraquatic_eagles.png',
             'objects' => [
                 ['image' => 'images/landing-objects/fisheries-agriculture/rice-stalks.png', 'placement' => 'upper-left'],
                 ['image' => 'images/landing-objects/fisheries-agriculture/fish.png', 'placement' => 'right'],
@@ -43,7 +50,7 @@ return [
         [
             'name' => 'Trojan Warriors',
             'department' => 'Information Technology',
-            'image' => null,
+            'image' => 'images/logo/trojan_warriors.png',
             'objects' => [
                 ['image' => 'images/landing-objects/information-technology/motherboard.png', 'placement' => 'upper-left'],
                 ['image' => 'images/landing-objects/information-technology/mouse.png', 'placement' => 'right'],

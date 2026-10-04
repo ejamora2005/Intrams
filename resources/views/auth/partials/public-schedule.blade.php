@@ -14,13 +14,9 @@
 <main class="schedule-page" style="--schedule-background: url('{{ asset(config('landing.background')) }}')">
     <div class="schedule-shell">
         <header class="schedule-nav">
-            <a class="schedule-brand" href="{{ url('/') }}" aria-label="SLSU Bontoc intramurals home">
-                @if (config('landing.universityLogo'))
-                    <img src="{{ asset(config('landing.universityLogo')) }}" alt="" class="schedule-seal" width="44" height="44">
-                @else
-                    <svg class="schedule-seal" viewBox="736 104 640 640" aria-hidden="true"><image href="{{ asset(config('landing.background')) }}" width="1672" height="941" /></svg>
-                @endif
-                <span>Southern Leyte State University<small>Bontoc Campus · Intramurals</small></span>
+            <a class="schedule-brand" href="{{ url('/') }}" aria-label="INTRAMURAL MS home">
+                <img src="{{ asset(config('landing.appLogo')) }}" alt="" class="schedule-seal" width="72" height="66" decoding="async">
+                <span>INTRAMURAL MS<small>Southern Leyte State University</small></span>
             </a>
             <nav class="schedule-links" aria-label="Event navigation">
                 <a href="{{ url('/') }}" class="schedule-home" aria-label="Back to team standings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="m14 6-6 6 6 6M8 12h13" /></svg><span>Standings</span></a>
@@ -50,7 +46,11 @@
         <ul class="schedule-teams" aria-label="Campus teams">
             @foreach (config('landing.teams') as $team)
                 <li style="--team-color: {{ $team['primaryColor'] }}; --team-highlight: {{ $team['secondaryColor'] }}">
-                    <span class="schedule-team-pennant" aria-hidden="true"></span>
+                    @if ($team['image'] ?? null)
+                        <img class="schedule-team-logo" src="{{ asset($team['image']) }}" alt="" width="44" height="44" decoding="async">
+                    @else
+                        <span class="schedule-team-pennant" aria-hidden="true"></span>
+                    @endif
                     <span>{{ $team['name'] }}<small>{{ $team['department'] }}</small></span>
                 </li>
             @endforeach
@@ -83,7 +83,18 @@
                                     </td>
                                     <td class="schedule-match">
                                         @if ($schedule['game'])<span class="schedule-game">{{ $schedule['game'] }}</span>@endif
-                                        <span class="schedule-competitors">{{ $schedule['competitors'] }}</span>
+                                        @if (! empty($schedule['competitor_teams']))
+                                            <span class="schedule-competitor-list" aria-label="{{ $schedule['competitors'] }}">
+                                                @foreach ($schedule['competitor_teams'] as $team)
+                                                    <x-team-badge :team="$team" class="schedule-team-badge" />
+                                                    @unless ($loop->last)
+                                                        <span class="schedule-versus">VS</span>
+                                                    @endunless
+                                                @endforeach
+                                            </span>
+                                        @else
+                                            <span class="schedule-competitors">{{ $schedule['competitors'] }}</span>
+                                        @endif
                                     </td>
                                     <td class="schedule-facilitator">{{ $schedule['venue'] }}</td>
                                     @if (! $sharedFacilitator || $loop->first)
@@ -107,7 +118,18 @@
                         </header>
                         <div class="schedule-mobile-match">
                             @if ($schedule['game'])<span class="schedule-game">{{ $schedule['game'] }}</span>@endif
-                            <p class="schedule-competitors">{{ $schedule['competitors'] }}</p>
+                            @if (! empty($schedule['competitor_teams']))
+                                <p class="schedule-competitor-list" aria-label="{{ $schedule['competitors'] }}">
+                                    @foreach ($schedule['competitor_teams'] as $team)
+                                        <x-team-badge :team="$team" class="schedule-team-badge" />
+                                        @unless ($loop->last)
+                                            <span class="schedule-versus">VS</span>
+                                        @endunless
+                                    @endforeach
+                                </p>
+                            @else
+                                <p class="schedule-competitors">{{ $schedule['competitors'] }}</p>
+                            @endif
                         </div>
                         <dl><dt>Venue</dt><dd>{{ $schedule['venue'] }}</dd></dl>
                         <dl><dt>Facilitator</dt><dd>{{ $schedule['facilitator'] }}</dd></dl>
@@ -118,6 +140,6 @@
             </div>
             <footer class="schedule-board-footer"><p id="schedule-refresh-note">Updates appear as coordinator entries are published.</p><span>Schedule for today</span></footer>
         </section>
-        <footer class="schedule-footer"><span>SLSU Bontoc Campus</span><span>Intramurals Management System</span></footer>
+        <footer class="schedule-footer"><span>SLSU Bontoc Campus</span><span>INTRAMURAL MS</span></footer>
     </div>
 </main>

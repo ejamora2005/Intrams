@@ -27,7 +27,10 @@
                 <div class="overflow-x-auto pb-1" aria-label="Faction filters">
                     <div class="flex min-w-max gap-2">
                         @foreach ($teamGroups as $group)
-                            <button type="button" data-team-tab data-team-id="{{ $group->team->id }}" aria-controls="team-panel-{{ $group->team->id }}" aria-selected="{{ $loop->first ? 'true' : 'false' }}" class="rounded-lg border px-4 py-2 text-sm font-semibold transition {{ $loop->first ? 'border-blue-700 bg-blue-700 text-white' : 'border-slate-300 bg-white text-slate-700 hover:border-blue-300 hover:bg-blue-50' }}">{{ $group->team->name }} <span class="ml-1 opacity-75">{{ $group->entries->count() }}</span></button>
+                            <button type="button" data-team-tab data-team-id="{{ $group->team->id }}" aria-controls="team-panel-{{ $group->team->id }}" aria-selected="{{ $loop->first ? 'true' : 'false' }}" class="inline-flex items-center gap-2 rounded-lg border px-4 py-2 text-sm font-semibold transition {{ $loop->first ? 'border-blue-700 bg-blue-700 text-white' : 'border-slate-300 bg-white text-slate-700 hover:border-blue-300 hover:bg-blue-50' }}">
+                                <x-team-badge :team="$group->team" size="xs" class="pointer-events-none" />
+                                <span class="rounded-full px-1.5 py-0.5 text-xs opacity-80">{{ $group->entries->count() }}</span>
+                            </button>
                         @endforeach
                     </div>
                 </div>
@@ -44,7 +47,9 @@
                         <input type="hidden" name="edition_id" value="{{ $edition->id }}">
                         <div class="flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
                             <div>
-                                <h3 class="text-base font-semibold text-slate-900">{{ $team->name }}</h3>
+                                <h3 class="text-base font-semibold text-slate-900">
+                                    <x-team-badge :team="$team" size="md" />
+                                </h3>
                                 <p class="mt-1 text-sm text-slate-500">{{ $entries->count() }} registered {{ Str::plural('student', $entries->count()) }}</p>
                             </div>
                             <label class="block sm:w-80" for="team-search-{{ $team->id }}">
