@@ -10,6 +10,7 @@ use App\Models\Student;
 use App\Models\Team;
 use App\Models\TeamMember;
 use App\Models\User;
+use Illuminate\Support\Str;
 
 function bulkAssignmentAdmin(): User
 {
@@ -150,6 +151,80 @@ test('an admin can bulk-remove selected participant registrations without affect
     $this->assertDatabaseMissing('athlete_entries', ['id' => $secondEntry->id]);
     $this->assertDatabaseHas('athlete_entries', ['id' => $otherTeamEntry->id, 'team_id' => $secondTeam->id]);
     expect(DB::table('audit_logs')->where('action', 'athlete_entry.removed')->count())->toBe(2);
+});
+
+test('participant management shows all active factions before registrations exist', function () {
+    $admin = bulkAssignmentAdmin();
+    $edition = bulkAssignmentEdition();
+    $editionSport = bulkAssignmentSport($edition, 'dual');
+
+    foreach (['Mighty Sea Dragons', 'Terraquatic Eagles', 'Trojan Warriors'] as $teamName) {
+        Team::query()->create([
+            'edition_id' => $edition->id,
+            'name' => $teamName,
+            'code' => Str::slug($teamName),
+            'status' => 'active',
+        ]);
+    }
+
+    $this->actingAs($admin)
+        ->get(route('admin.sports.participants', ['sport' => $editionSport->sport, 'edition_id' => $edition->id]))
+        ->assertOk()
+        ->assertSee('Faction filter')
+        ->assertSee('Mighty Sea Dragons')
+        ->assertSee('Terraquatic Eagles')
+        ->assertSee('Trojan Warriors')
+        ->assertSee('No registered players for this sport in this faction yet.');
+});
+
+test('participant management groups individual entries by roster faction and shows medical status', function () {
+    $admin = bulkAssignmentAdmin();
+    $edition = bulkAssignmentEdition();
+    $sport = Sport::query()->create(['name' => 'Shot Put', 'code' => 'SHOT-PUT', 'status' => 'active']);
+    $editionSport = EditionSport::query()->create([
+        'edition_id' => $edition->id,
+        'sport_id' => $sport->id,
+        'participant_type' => 'individual',
+        'game_mechanic' => 'custom',
+        'status' => 'active',
+    ]);
+    $team = Team::query()->create([
+        'edition_id' => $edition->id,
+        'name' => 'Trojan Warriors',
+        'code' => 'trojan-warriors',
+        'status' => 'active',
+    ]);
+    $student = Student::factory()->create([
+        'status' => 'active',
+        'first_name' => 'Danilo',
+        'middle_name' => null,
+        'last_name' => 'Dumagat',
+    ]);
+
+    TeamMember::query()->create([
+        'edition_id' => $edition->id,
+        'team_id' => $team->id,
+        'student_id' => $student->id,
+        'assigned_by' => $admin->id,
+        'assigned_at' => now(),
+    ]);
+
+    AthleteEntry::query()->create([
+        'edition_sport_id' => $editionSport->id,
+        'student_id' => $student->id,
+        'team_id' => null,
+        'status' => 'active',
+        'medical_certificate_status' => 'pending',
+        'assigned_by' => $admin->id,
+        'assigned_at' => now(),
+    ]);
+
+    $this->actingAs($admin)
+        ->get(route('admin.sports.participants', ['sport' => $sport, 'edition_id' => $edition->id]))
+        ->assertOk()
+        ->assertSee('Trojan Warriors')
+        ->assertSee('Danilo Dumagat')
+        ->assertSee('Med cert pending');
 });
 
 test('a sport has a separate bracket page from participant management', function () {

@@ -11,6 +11,11 @@
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
     <body class="ops-body bg-blue-950 font-sans text-slate-900 antialiased" style="--ops-background: url('{{ asset(config('landing.background')) }}')">
+        @php
+            $themeTitle = config('intramurals.theme.title');
+            $themeTagline = config('intramurals.theme.tagline');
+        @endphp
+
         <div class="min-h-screen md:flex md:h-screen md:overflow-hidden">
             <div data-admin-sidebar-backdrop class="fixed inset-0 z-40 hidden bg-slate-950/55 backdrop-blur-sm md:hidden" aria-hidden="true"></div>
 
@@ -70,9 +75,13 @@
                         <button type="button" data-open-admin-sidebar class="shrink-0 rounded-lg border border-slate-200 bg-white p-2 text-slate-700 shadow-sm transition hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-600 md:hidden" aria-controls="admin-sidebar" aria-expanded="false" aria-label="Open navigation">
                             <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" d="M4 7h16M4 12h16M4 17h16" /></svg>
                         </button>
-                        <div class="min-w-0">
+                        <div class="min-w-0 flex-1">
                             <h1 class="truncate text-lg font-semibold tracking-tight text-white sm:text-xl">{{ $title ?? 'Admin' }}</h1>
                             @isset($subtitle)<p class="mt-0.5 truncate text-xs text-blue-100 sm:mt-1 sm:text-sm">{{ $subtitle }}</p>@endisset
+                        </div>
+                        <div class="ml-auto hidden max-w-sm shrink-0 text-right lg:block">
+                            <p class="truncate text-xs font-semibold uppercase text-amber-100">{{ $themeTitle }}</p>
+                            <p class="mt-0.5 truncate text-xs text-blue-100">{{ $themeTagline }}</p>
                         </div>
                     </div>
                 </header>

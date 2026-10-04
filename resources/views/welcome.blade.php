@@ -4,8 +4,8 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <x-pwa-meta theme="#06152c" />
-        <meta name="description" content="Southern Leyte State University — Bontoc Campus. Intramural Meet 2026 team standings and event schedule.">
-        <title>Intramural Meet 2026 | SLSU Bontoc Campus</title>
+        <meta name="description" content="{{ config('intramurals.theme.title') }} - {{ config('intramurals.theme.tagline') }} Southern Leyte State University Bontoc Campus standings and event schedule.">
+        <title>{{ config('intramurals.theme.title') }} | SLSU Bontoc Campus</title>
         <link rel="preload" as="image" href="{{ asset(config('landing.background')) }}">
         @vite(['resources/css/landing.css', 'resources/js/landing.js'])
     </head>
@@ -28,8 +28,8 @@
                         <p class="campus-name">Bontoc Campus</p>
                     </div>
                 </div>
-                <h1>Intramural Meet <span>2026</span></h1>
-                <p class="system-name"><span></span> Intramurals Management System <span></span></p>
+                <h1>{{ config('intramurals.theme.title') }}</h1>
+                <p class="system-name"><span></span> {{ config('intramurals.theme.tagline') }} <span></span></p>
             </header>
             <section class="standings" aria-labelledby="standings-heading">
                 <div class="standings-heading">

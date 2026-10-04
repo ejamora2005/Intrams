@@ -7,6 +7,8 @@
     $sportCount = $todaySchedules->pluck('sport')->unique()->count();
     $morningCount = $todaySchedules->where('period', 'Morning')->count();
     $afternoonCount = $todaySchedules->where('period', 'Afternoon')->count();
+    $themeTitle = config('intramurals.theme.title');
+    $themeTagline = config('intramurals.theme.tagline');
 @endphp
 
 <main class="schedule-page" style="--schedule-background: url('{{ asset(config('landing.background')) }}')">
@@ -28,9 +30,9 @@
 
         <section class="schedule-hero" aria-labelledby="schedule-heading">
             <div class="schedule-intro">
-                <p class="schedule-eyebrow">Southern Leyte State University · Bontoc Campus</p>
+                <p class="schedule-eyebrow">{{ $themeTitle }}</p>
                 <h1 id="schedule-heading">Today's match <span>schedule</span></h1>
-                <p class="schedule-description">Official match board for the SLSU Bontoc Intramural Meet.</p>
+                <p class="schedule-description">{{ $themeTagline }} Official match board for the SLSU Bontoc Intramural Meet.</p>
                 <p class="schedule-edition"><span aria-hidden="true"></span>{{ $currentEdition?->name ?? 'No active intramurals edition' }}</p>
                 <ul class="schedule-metrics" aria-label="Schedule summary">
                     <li><strong>{{ $scheduleCount }}</strong><span>Matches</span></li>

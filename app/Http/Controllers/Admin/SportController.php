@@ -132,14 +132,38 @@ class SportController extends Controller
         $editionSport = EditionSport::query()
             ->where('edition_id', $edition->id)
             ->where('sport_id', $sport->id)
-            ->with(['athleteEntries.student', 'athleteEntries.team'])
+            ->with([
+                'athleteEntries.student.course',
+                'athleteEntries.student.teamMembers' => fn ($query) => $query->where('edition_id', $edition->id),
+                'athleteEntries.team',
+            ])
             ->firstOrFail();
-        $activeEntries = $editionSport->athleteEntries->where('status', 'active')->values();
-        $teamGroups = $activeEntries
-            ->filter(fn ($entry) => $entry->team !== null)
-            ->groupBy('team_id')
-            ->sortBy(fn ($entries) => $entries->first()->team->name)
+        $activeEntries = $editionSport->athleteEntries
+            ->where('status', 'active')
+            ->map(function (AthleteEntry $entry): AthleteEntry {
+                $entry->setAttribute('effective_medical_certificate_status', $this->eligibilityService->medicalCertificateStatusFor($entry));
+
+                return $entry;
+            })
             ->values();
+        $activeTeams = Team::query()
+            ->where('edition_id', $edition->id)
+            ->where('status', 'active')
+            ->orderBy('name')
+            ->get();
+        $entryTeamId = fn (AthleteEntry $entry): ?int => $this->resolvedEntryTeamId($entry, $edition->id);
+        $entriesByTeamId = $activeEntries
+            ->filter(fn (AthleteEntry $entry): bool => $entryTeamId($entry) !== null)
+            ->groupBy(fn (AthleteEntry $entry): int => $entryTeamId($entry));
+        $teamGroups = $activeTeams
+            ->map(fn (Team $team): object => (object) [
+                'team' => $team,
+                'entries' => ($entriesByTeamId->get($team->id) ?? collect())
+                    ->sortBy(fn (AthleteEntry $entry): string => $entry->student?->last_name.' '.$entry->student?->first_name)
+                    ->values(),
+            ])
+            ->values();
+        $registeredTeamGroups = $teamGroups->filter(fn (object $group): bool => $group->entries->isNotEmpty())->values();
         $participants = $activeEntries->groupBy(fn ($entry) => $entry->team?->name ?? 'Individual participants');
         $eligibilityByStudentId = $activeEntries
             ->pluck('student')
@@ -150,7 +174,7 @@ class SportController extends Controller
             ]);
 
         $competitors = match ($editionSport->participant_type) {
-            'team' => $teamGroups->map(fn ($entries) => ['name' => $entries->first()->team->name, 'detail' => $entries->count().' registered athlete(s)'])->values(),
+            'team' => $registeredTeamGroups->map(fn (object $group): array => ['name' => $group->team->name, 'detail' => $group->entries->count().' registered athlete(s)'])->values(),
             'dual' => $activeEntries->groupBy(fn ($entry) => $entry->pair_key ?: 'entry-'.$entry->id)->map(fn ($entries) => ['name' => $entries->pluck('student.full_name')->implode(' / '), 'detail' => $entries->count().' paired athlete(s)'])->values(),
             default => $activeEntries->map(fn ($entry) => ['name' => $entry->student->full_name, 'detail' => $entry->student->student_number])->values(),
         };
@@ -168,6 +192,18 @@ class SportController extends Controller
         }
 
         return view('admin.sports.participants', compact('sport', 'edition', 'editionSport', 'participants', 'teamGroups', 'competitors', 'bracketRounds', 'eligibilityByStudentId'));
+    }
+
+    private function resolvedEntryTeamId(AthleteEntry $entry, int $editionId): ?int
+    {
+        if ($entry->team_id) {
+            return (int) $entry->team_id;
+        }
+
+        $teamMember = $entry->student?->teamMembers
+            ->first(fn (TeamMember $member): bool => (int) $member->edition_id === $editionId);
+
+        return $teamMember?->team_id ? (int) $teamMember->team_id : null;
     }
 
     public function bracket(Request $request, Sport $sport): View

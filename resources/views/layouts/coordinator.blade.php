@@ -15,6 +15,8 @@
             $homeRoute = $homeRoute ?? 'coordinator.dashboard';
             $workspaceLabel = $workspaceLabel ?? 'Coordinator workspace';
             $workspaceRole = auth()->user()?->role;
+            $themeTitle = config('intramurals.theme.title');
+            $themeTagline = config('intramurals.theme.tagline');
             $navigation = $navigation ?? match ($workspaceRole) {
                 'gam' => [
                     ['label' => 'Dashboard', 'route' => 'gam.dashboard', 'match' => 'gam/dashboard', 'active' => true],
@@ -87,13 +89,17 @@
                         <button type="button" data-open-ops-sidebar class="shrink-0 rounded-lg border border-slate-200 bg-white p-2 text-slate-700 shadow-sm transition hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-600 md:hidden" aria-controls="ops-sidebar" aria-expanded="false" aria-label="Open navigation">
                             <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" d="M4 7h16M4 12h16M4 17h16" /></svg>
                         </button>
-                        <div class="min-w-0">
+                        <div class="min-w-0 flex-1">
                             <h1 class="truncate text-lg font-semibold tracking-tight text-white sm:text-xl">{{ $title ?? 'Coordinator' }}</h1>
                             @isset($subtitle)
                                 <p class="mt-0.5 truncate text-xs text-blue-100 sm:mt-1 sm:text-sm">{{ $subtitle }}</p>
                             @else
                                 <p class="mt-0.5 truncate text-xs text-blue-100 sm:mt-1 sm:text-sm">{{ $workspaceLabel }}</p>
                             @endisset
+                        </div>
+                        <div class="ml-auto hidden max-w-sm shrink-0 text-right lg:block">
+                            <p class="truncate text-xs font-semibold uppercase text-amber-100">{{ $themeTitle }}</p>
+                            <p class="mt-0.5 truncate text-xs text-blue-100">{{ $themeTagline }}</p>
                         </div>
                     </div>
                 </header>

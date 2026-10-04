@@ -1,6 +1,11 @@
 <x-guest-layout :livewire="false">
     @include('auth.partials.public-schedule')
 
+    @php
+        $themeTitle = config('intramurals.theme.title');
+        $themeTagline = config('intramurals.theme.tagline');
+    @endphp
+
     <dialog data-login-modal data-open="{{ $errors->any() || session('status') ? 'true' : 'false' }}" aria-labelledby="login-heading" class="m-auto max-h-[calc(100dvh-1rem)] w-[calc(100%-1rem)] max-w-4xl overflow-y-auto overscroll-contain rounded-2xl border border-white/70 bg-white p-0 shadow-2xl shadow-slate-950/30 backdrop:bg-slate-950/45 backdrop:backdrop-blur-md sm:max-h-[calc(100dvh-2rem)] sm:w-[calc(100%-2rem)]">
         <section class="relative grid overflow-hidden md:min-h-[34rem] md:grid-cols-[0.92fr_1.08fr]">
             <button type="button" data-close-login aria-label="Close login" class="absolute right-4 top-4 z-10 inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white/90 text-slate-500 shadow-sm transition hover:border-slate-300 hover:bg-white hover:text-slate-950 focus:outline-none focus:ring-2 focus:ring-blue-600">
@@ -13,7 +18,8 @@
                     <x-intramurals-brand compact class="text-white" />
                     <div class="mt-10">
                         <p class="text-sm font-semibold uppercase tracking-[0.22em] text-blue-200">Operations portal</p>
-                        <h2 class="mt-3 text-3xl font-semibold leading-tight tracking-tight">Secure access for intramurals staff.</h2>
+                        <h2 class="mt-3 text-3xl font-semibold leading-tight tracking-tight">{{ $themeTitle }}</h2>
+                        <p class="mt-4 text-sm font-semibold leading-6 text-amber-100">{{ $themeTagline }}</p>
                         <p class="mt-4 text-sm leading-6 text-blue-100">Manage standings, rosters, events, and live operations from a protected workspace.</p>
                     </div>
                 </div>
@@ -39,7 +45,7 @@
                     </div>
                     <p class="mt-6 hidden text-sm font-semibold uppercase tracking-[0.16em] text-blue-700 md:block">Welcome back</p>
                     <h1 id="login-heading" class="mt-3 text-2xl font-semibold tracking-tight text-slate-950">Sign in to continue</h1>
-                    <p class="mt-2 text-sm leading-6 text-slate-600">Use your administrator, GAM, Tabulator, or coordinator account.</p>
+                    <p class="mt-2 text-sm leading-6 text-slate-600">{{ $themeTagline }} Use your administrator, GAM, Tabulator, or coordinator account.</p>
                 </div>
 
                 <x-validation-errors class="mb-5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700" />

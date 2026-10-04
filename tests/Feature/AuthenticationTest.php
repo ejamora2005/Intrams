@@ -15,6 +15,8 @@ use Illuminate\Support\Carbon;
 test('public landing page uses the intramurals design system', function () {
     $this->get('/')
         ->assertOk()
+        ->assertSee('INTRAMURALS 2026: STUDENT FESTIVAL')
+        ->assertSee('Compete. Create. Lead. Connect. Express.')
         ->assertSee('Intramural Meet')
         ->assertSee('Schedule')
         ->assertSee('team-banner', false);
@@ -26,6 +28,8 @@ test('login screen can be rendered', function () {
     $response->assertStatus(200)
         ->assertSee('SLSU')
         ->assertSee('INTRAMURALS MANAGEMENT')
+        ->assertSee('INTRAMURALS 2026: STUDENT FESTIVAL')
+        ->assertSee('Compete. Create. Lead. Connect. Express.')
         ->assertSee('class="space-y-3 lg:hidden"', false)
         ->assertSee('max-h-[calc(100dvh-1rem)]', false);
 });
@@ -155,6 +159,8 @@ test('administrators can access the admin dashboard and its sidebar modules', fu
         ->assertSee('SLSU')
         ->assertSee('INTRAMURALS')
         ->assertSee('MANAGEMENT')
+        ->assertSee('INTRAMURALS 2026: STUDENT FESTIVAL')
+        ->assertSee('Compete. Create. Lead. Connect. Express.')
         ->assertSee('INTRAMURALS MANAGEMENT dashboard')
         ->assertSee('data-open-admin-sidebar', false)
         ->assertSee('data-admin-sidebar-backdrop', false)

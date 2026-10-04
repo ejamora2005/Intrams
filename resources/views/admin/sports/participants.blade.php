@@ -21,27 +21,23 @@
             <a href="{{ route('admin.sports.participants.assign', ['sport' => $sport, 'edition_id' => $edition->id]) }}" class="relative z-10 w-fit shrink-0 rounded-lg bg-blue-700 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-800">Add participants</a>
         </header>
 
-        @if (in_array($editionSport->participant_type, ['team', 'dual'], true))
+        @if ($teamGroups->isNotEmpty())
             <div class="border-b border-slate-200 bg-slate-50 px-5 py-3 sm:px-6">
-                <p class="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500">Team filter</p>
-                <div class="overflow-x-auto pb-1" aria-label="Registered team filters">
+                <p class="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500">Faction filter</p>
+                <div class="overflow-x-auto pb-1" aria-label="Faction filters">
                     <div class="flex min-w-max gap-2">
-                        @forelse ($teamGroups as $entries)
-                            @php
-                                $team = $entries->first()->team;
-                            @endphp
-                            <button type="button" data-team-tab data-team-id="{{ $team->id }}" aria-controls="team-panel-{{ $team->id }}" aria-selected="{{ $loop->first ? 'true' : 'false' }}" class="rounded-lg border px-4 py-2 text-sm font-semibold transition {{ $loop->first ? 'border-blue-700 bg-blue-700 text-white' : 'border-slate-300 bg-white text-slate-700 hover:border-blue-300 hover:bg-blue-50' }}">{{ $team->name }} <span class="ml-1 opacity-75">{{ $entries->count() }}</span></button>
-                        @empty
-                            <span class="text-sm text-slate-500">No teams have registered athletes for this sport yet.</span>
-                        @endforelse
+                        @foreach ($teamGroups as $group)
+                            <button type="button" data-team-tab data-team-id="{{ $group->team->id }}" aria-controls="team-panel-{{ $group->team->id }}" aria-selected="{{ $loop->first ? 'true' : 'false' }}" class="rounded-lg border px-4 py-2 text-sm font-semibold transition {{ $loop->first ? 'border-blue-700 bg-blue-700 text-white' : 'border-slate-300 bg-white text-slate-700 hover:border-blue-300 hover:bg-blue-50' }}">{{ $group->team->name }} <span class="ml-1 opacity-75">{{ $group->entries->count() }}</span></button>
+                        @endforeach
                     </div>
                 </div>
             </div>
 
             <div class="h-[34rem] p-5 sm:p-6">
-                @forelse ($teamGroups as $entries)
+                @foreach ($teamGroups as $group)
                     @php
-                        $team = $entries->first()->team;
+                        $team = $group->team;
+                        $entries = $group->entries;
                     @endphp
                     <form method="POST" action="{{ route('admin.sports.participants.bulk-remove', $sport) }}" id="team-panel-{{ $team->id }}" data-team-panel data-team-id="{{ $team->id }}" class="flex h-full flex-col{{ $loop->first ? '' : ' hidden' }}">
                         @csrf
@@ -59,7 +55,7 @@
 
                         <div class="mt-4 flex items-center justify-between gap-3 border-y border-slate-200 bg-slate-50 px-4 py-3">
                             <label class="flex w-fit items-center gap-2 text-sm font-semibold text-slate-700"><input type="checkbox" data-team-select-all class="rounded border-slate-300 text-blue-700 focus:ring-blue-600"> Select visible students</label>
-                            <button type="submit" class="rounded-lg border border-red-200 bg-white px-3.5 py-2 text-sm font-semibold text-red-700 transition hover:border-red-300 hover:bg-red-50" onclick="return confirm('Remove the selected participant registrations?');">Remove selected</button>
+                            <button type="submit" @disabled($entries->isEmpty()) class="rounded-lg border border-red-200 bg-white px-3.5 py-2 text-sm font-semibold text-red-700 transition hover:border-red-300 hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-60" onclick="return confirm('Remove the selected participant registrations?');">Remove selected</button>
                         </div>
 
                         <div class="mt-4 min-h-0 flex-1 overflow-y-auto rounded-lg border border-slate-200 bg-white/5">
@@ -67,7 +63,16 @@
                                 <thead class="sticky top-0 z-10 bg-slate-50 text-xs font-semibold uppercase tracking-wide text-slate-500"><tr><th class="w-12 px-4 py-3"><span class="sr-only">Select</span></th><th class="px-4 py-3">Student</th><th class="hidden w-44 px-4 py-3 sm:table-cell">Student number</th></tr></thead>
                                 <tbody class="divide-y divide-slate-100">
                                     @foreach ($entries as $entry)
-                                        @php($eligibility = $eligibilityByStudentId->get($entry->student_id))
+                                        @php
+                                            $eligibility = $eligibilityByStudentId->get($entry->student_id);
+                                            $medicalStatus = $entry->effective_medical_certificate_status ?? 'not_required';
+                                            $medicalBadge = match ($medicalStatus) {
+                                                'pending' => ['label' => 'Med cert pending', 'class' => 'border-amber-200 bg-amber-50 text-amber-800'],
+                                                'verified' => ['label' => 'Med cert verified', 'class' => 'border-green-200 bg-green-50 text-green-800'],
+                                                'rejected' => ['label' => 'Med cert rejected', 'class' => 'border-red-200 bg-red-50 text-red-800'],
+                                                default => ['label' => 'No med cert required', 'class' => 'border-slate-200 bg-slate-50 text-slate-600'],
+                                            };
+                                        @endphp
                                         <tr data-team-row data-search="{{ Str::lower($entry->student->full_name.' '.$entry->student->student_number) }}" @class(['bg-red-950/50' => $eligibility['possible_dq'] ?? false])>
                                             <td class="px-4 py-3 align-middle"><input name="athlete_entry_ids[]" value="{{ $entry->id }}" type="checkbox" class="team-entry-checkbox rounded border-slate-300 text-blue-700 focus:ring-blue-600" aria-label="Select {{ $entry->student->full_name }}"></td>
                                             <td class="px-4 py-3 align-middle">
@@ -83,6 +88,7 @@
                                                         <span class="ml-1">&middot; Dual pair</span>
                                                     @endif
                                                 </span>
+                                                <span class="mt-2 inline-flex max-w-full whitespace-nowrap rounded-full border px-2 py-0.5 text-[11px] font-semibold {{ $medicalBadge['class'] }}">{{ $medicalBadge['label'] }}</span>
                                                 @if ($eligibility['possible_dq'] ?? false)
                                                     <span class="mt-1 block text-xs font-medium text-red-200">{{ implode(' ', $eligibility['issues']) }}</span>
                                                 @endif
@@ -90,14 +96,12 @@
                                             <td class="hidden px-4 py-3 text-slate-500 sm:table-cell">{{ $entry->student->student_number }}</td>
                                         </tr>
                                     @endforeach
-                                    <tr data-team-empty hidden><td colspan="3" class="px-4 py-8 text-center text-sm text-slate-500">No matching students.</td></tr>
+                                    <tr data-team-empty @if ($entries->isNotEmpty()) hidden @endif><td colspan="3" class="px-4 py-8 text-center text-sm text-slate-500">{{ $entries->isEmpty() ? 'No registered players for this sport in this faction yet.' : 'No matching students.' }}</td></tr>
                                 </tbody>
                             </table>
                         </div>
                     </form>
-                @empty
-                    <div class="flex h-full items-center justify-center rounded-lg border border-dashed border-slate-300 bg-slate-50 p-8 text-center text-sm text-slate-500">Add participants to a team to view its roster here.</div>
-                @endforelse
+                @endforeach
             </div>
         @else
             <form method="POST" action="{{ route('admin.sports.participants.bulk-remove', $sport) }}" class="flex h-[34rem] flex-col p-5 sm:p-6">

@@ -158,6 +158,11 @@ $defaultEdition = [
     ],
 ];
 
+$theme = [
+    'title' => env('INTRAMURALS_THEME_TITLE', 'INTRAMURALS 2026: STUDENT FESTIVAL'),
+    'tagline' => env('INTRAMURALS_THEME_TAGLINE', 'Compete. Create. Lead. Connect. Express.'),
+];
+
 $venues = [
     'TBA',
     'MPCC',
@@ -183,6 +188,8 @@ $medicalCertificate = [
 
 return [
     'default_edition' => $defaultEdition,
+
+    'theme' => $theme,
 
     'venues' => $venues,
 

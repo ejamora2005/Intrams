@@ -58,9 +58,9 @@ a { color: inherit; }
 .university-name { text-align: left; text-transform: uppercase; }
 .university-name > p:first-child { font-size: clamp(9px, 1.1dvh, 12px); font-weight: 600; letter-spacing: .17em; }
 .campus-name { margin-top: 3px; color: #cbd7e7; font-size: clamp(8px, .95dvh, 10px); font-weight: 500; letter-spacing: .33em; }
-.meet-header h1 { margin-top: 5px; font-family: var(--display-font); font-size: clamp(35px, 4.9dvh, 53px); font-weight: 700; line-height: 1; text-transform: uppercase; letter-spacing: .035em; text-shadow: 0 3px 20px #00113280; }
+.meet-header h1 { max-width: min(100%, 920px); margin: 5px auto 0; font-family: var(--display-font); font-size: clamp(31px, 4.35dvh, 48px); font-weight: 700; line-height: .98; text-wrap: balance; text-transform: uppercase; letter-spacing: .035em; text-shadow: 0 3px 20px #00113280; }
 .meet-header h1 span { color: #e1c08b; }
-.system-name { display: flex; align-items: center; justify-content: center; gap: 12px; margin-top: 5px; color: #b8c8de; font-size: clamp(8px, 1dvh, 10px); font-weight: 500; letter-spacing: .27em; text-transform: uppercase; }
+.system-name { display: flex; align-items: center; justify-content: center; gap: 12px; margin-top: 7px; color: #d9c392; font-size: clamp(9px, 1.05dvh, 12px); font-weight: 600; letter-spacing: .12em; text-transform: uppercase; }
 .system-name > span { width: 22px; height: 1px; background: #d7b97a80; }
 
 .standings { --banner-height: 69dvh; --banner-gap: clamp(28px, 3vw, 50px); display: flex; flex-direction: column; min-height: 0; width: min(100%, 1380px, calc(var(--banner-height) * 1.92 + var(--banner-gap) * 2 + 26px)); justify-self: center; align-self: start; }
@@ -159,7 +159,7 @@ a { color: inherit; }
 @media (max-height: 740px) {
     .meet-landing { gap: 10px; padding-top: 14px; padding-bottom: 12px; }
     .university-seal { width: 36px; height: 36px; }
-    .meet-header h1 { font-size: 35px; margin-top: 5px; }
+    .meet-header h1 { font-size: 31px; margin-top: 5px; }
     .system-name { margin-top: 6px; }
     .team-banners { margin-top: 12px; }
     .banner-content { padding-top: 18px; padding-bottom: 11%; }
@@ -187,8 +187,8 @@ a { color: inherit; }
     .university-seal { width: 36px; height: 36px; }
     .university-name > p:first-child { font-size: 9px; letter-spacing: .08em; }
     .campus-name { font-size: 8px; letter-spacing: .18em; }
-    .meet-header h1 { margin-top: 9px; font-size: clamp(30px, 8.2vw, 42px); }
-    .system-name { font-size: 8px; letter-spacing: .14em; gap: 7px; }
+    .meet-header h1 { margin-top: 9px; font-size: clamp(27px, 7.4vw, 38px); }
+    .system-name { max-width: 92vw; margin-inline: auto; font-size: 8px; letter-spacing: .07em; gap: 7px; line-height: 1.5; text-wrap: balance; }
     .system-name > span { width: 12px; }
     .standings { width: 100%; max-height: 100%; align-self: center; }
     .standings-heading { flex-shrink: 0; padding: 0 3px; gap: 8px; }
