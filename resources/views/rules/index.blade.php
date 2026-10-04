@@ -26,7 +26,9 @@
         <div class="rounded-lg border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
             <div class="border-b border-slate-100 pb-4">
                 <h2 class="text-base font-semibold text-slate-950">Participation rules</h2>
-                <p class="mt-1 text-sm text-slate-500">Each student can be registered in a maximum of {{ $maxEvents }} events.</p>
+                <p class="mt-1 text-sm text-slate-500">
+                    Students with a major or minor event can join up to {{ $maxEvents }} events. Students with no major or minor event can join up to {{ $individualDualOnlyMaxEvents }} individual/dual events.
+                </p>
             </div>
             <div class="mt-4 grid gap-3 sm:grid-cols-2">
                 @foreach ($allowedCombinations as $combination)

@@ -5,6 +5,7 @@ use App\Models\IntramuralEdition;
 use App\Models\Student;
 use App\Models\Team;
 use App\Models\TeamMember;
+use App\Services\EligibilityService;
 use Database\Seeders\DefaultIntramuralsSeeder;
 
 test('default intramurals seeder adds the supplied roster without food committee only entries', function () {
@@ -74,4 +75,22 @@ test('default intramurals roster maps student event names to configured sports a
     $assertEntry('2310018-1', 'SHOT-PUT', 'pending');
     $assertEntry('2310018-1', 'DISCUS-THROW', 'pending');
     $assertEntry('2310018-1', 'JAVELIN-THROW', 'pending');
+});
+
+test('default Trojan Warriors roster follows participation rule exceptions', function () {
+    $this->seed(DefaultIntramuralsSeeder::class);
+
+    $edition = IntramuralEdition::query()->where('name', 'SLSUBC INTRAMURALS 2026')->firstOrFail();
+    $eligibility = app(EligibilityService::class);
+    $danilo = Student::query()->where('student_number', '2310018-1')->firstOrFail();
+    $clarice = Student::query()->where('student_number', '2310005-2')->firstOrFail();
+
+    $daniloEvaluation = $eligibility->evaluateStudent($danilo, $edition);
+    $clariceEvaluation = $eligibility->evaluateStudent($clarice, $edition);
+
+    expect($daniloEvaluation['possible_dq'])->toBeFalse()
+        ->and($daniloEvaluation['counts'][EligibilityService::SLOT_INDIVIDUAL_DUAL])->toBe(3)
+        ->and($clariceEvaluation['possible_dq'])->toBeFalse()
+        ->and($clariceEvaluation['counts'][EligibilityService::SLOT_MAJOR])->toBe(1)
+        ->and($clariceEvaluation['counts'][EligibilityService::SLOT_MINOR])->toBe(1);
 });

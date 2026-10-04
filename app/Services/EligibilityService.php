@@ -29,6 +29,11 @@ class EligibilityService
         return (int) config('intramurals.participation_rules.max_events_per_student', 2);
     }
 
+    public function individualDualOnlyMaxEvents(): int
+    {
+        return (int) config('intramurals.participation_rules.individual_dual_only_max_events', $this->maxEvents());
+    }
+
     public function slotFor(EditionSport $editionSport): string
     {
         $pointSystem = $this->pointSystemKey($editionSport);
@@ -200,7 +205,8 @@ class EligibilityService
 
         $issues = [];
         $total = $items->count();
-        $maxEvents = $this->maxEvents();
+        $hasMajorOrMinor = $counts[self::SLOT_MAJOR] > 0 || $counts[self::SLOT_MINOR] > 0;
+        $maxEvents = $hasMajorOrMinor ? $this->maxEvents() : $this->individualDualOnlyMaxEvents();
 
         if ($total > $maxEvents) {
             $issues[] = 'More than '.$maxEvents.' events registered.';

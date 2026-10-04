@@ -166,6 +166,14 @@ textarea {
     background: #ffffff12 !important;
 }
 
+.ops-dashboard span.rounded-full {
+    display: inline-flex;
+    width: max-content;
+    max-width: 100%;
+    align-items: center;
+    white-space: nowrap;
+}
+
 .ops-dashboard :is(.text-slate-950, .text-slate-900, .text-blue-950) {
     color: #f7fbff !important;
 }
@@ -265,9 +273,10 @@ textarea {
 
 .ops-dashboard .bg-white:not(section):not(article):not(form):not(div):not(.ops-stat-card) {
     background: #f8fafc !important;
+    color: #0f172a !important;
 }
 
-.ops-dashboard :is(a, button).bg-white:not(.ops-stat-card) {
+.ops-dashboard :is(span, a, button).bg-white:not(.ops-stat-card) {
     color: #0f172a !important;
     border-color: #b6c9df !important;
 }

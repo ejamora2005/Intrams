@@ -43,6 +43,7 @@ class RulesController extends Controller
             'workspaceLabel' => $workspaceLabel,
             'edition' => $edition,
             'maxEvents' => $this->eligibilityService->maxEvents(),
+            'individualDualOnlyMaxEvents' => $this->eligibilityService->individualDualOnlyMaxEvents(),
             'allowedCombinations' => $this->eligibilityService->rulesForDisplay(),
             'medicalCertificateExemptions' => config('intramurals.medical_certificate.exempt_sport_codes', []),
             'managedTeam' => $managedTeam,

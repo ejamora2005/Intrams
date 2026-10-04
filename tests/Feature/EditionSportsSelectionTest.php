@@ -56,6 +56,37 @@ test('re-seeding default sports synchronizes them to existing editions and sport
         ->assertDontSee('First Edition Only');
 });
 
+test('re-seeding default sports moves basketball 3x3 to the minor point system', function () {
+    $edition = IntramuralEdition::query()->create([
+        'name' => 'Legacy 3x3 Edition',
+        'school_year' => '2026-2027',
+        'starts_on' => '2026-10-01',
+        'ends_on' => '2026-10-05',
+        'status' => 'draft',
+    ]);
+    $basketball3x3 = Sport::query()->create([
+        'name' => 'Basketball 3x3',
+        'code' => 'BASKET-3X3',
+        'status' => 'active',
+        'is_system' => true,
+    ]);
+    $configuration = EditionSport::query()->create([
+        'edition_id' => $edition->id,
+        'sport_id' => $basketball3x3->id,
+        'participant_type' => 'team',
+        'game_mechanic' => 'single_elimination',
+        'scoring_rules' => [
+            'point_system' => 'sports_major',
+            'placements' => config('intramurals.point_systems.sports_major.placements'),
+        ],
+        'status' => 'preparation',
+    ]);
+
+    app(DefaultSportsSeeder::class)->run();
+
+    expect($configuration->fresh()->scoring_rules['point_system'])->toBe('sports_minor');
+});
+
 test('proposal defaults seed scoring groups and cultural schedule items', function () {
     $admin = editionSportsAdmin();
 
@@ -77,12 +108,14 @@ test('proposal defaults seed scoring groups and cultural schedule items', functi
         ->and(EditionSport::query()->where('edition_id', $edition->id)->whereHas('sport', fn ($query) => $query->whereIn('code', $expectedCodes))->count())->toBe(count($expectedCodes))
         ->and(CompetitionSchedule::query()->whereIn('edition_sport_id', $edition->editionSports()->select('id'))->whereNotNull('title')->count())->toBe(count(config('intramurals.default_schedules')));
 
+    $basketball3x3 = EditionSport::query()->where('edition_id', $edition->id)->whereHas('sport', fn ($query) => $query->where('code', 'BASKET-3X3'))->firstOrFail();
     $basketball = EditionSport::query()->where('edition_id', $edition->id)->whereHas('sport', fn ($query) => $query->where('code', 'BASKET-5X5'))->firstOrFail();
     $chess = EditionSport::query()->where('edition_id', $edition->id)->whereHas('sport', fn ($query) => $query->where('code', 'CHESS'))->firstOrFail();
     $festivalDance = EditionSport::query()->where('edition_id', $edition->id)->whereHas('sport', fn ($query) => $query->where('code', 'CULT-FEST-DANCE'))->firstOrFail();
     $festivalProgram = EditionSport::query()->where('edition_id', $edition->id)->whereHas('sport', fn ($query) => $query->where('code', 'CULT-FESTIVAL-PROGRAM'))->firstOrFail();
 
-    expect($basketball->scoring_rules['point_system'])->toBe('sports_major')
+    expect($basketball3x3->scoring_rules['point_system'])->toBe('sports_minor')
+        ->and($basketball->scoring_rules['point_system'])->toBe('sports_major')
         ->and((float) $basketball->scoring_rules['placements'][0]['points'])->toBe(25.0)
         ->and($chess->scoring_rules['point_system'])->toBe('sports_minor')
         ->and($festivalDance->scoring_rules['point_system'])->toBe('cultural_festival_dance')

@@ -5,7 +5,7 @@ $pointSystems = [
         'label' => 'Sports Major Events',
         'category' => 'sports',
         'description' => 'Major athletic events from the Intramurals 2026 proposal.',
-        'codes' => ['BASKET-3X3', 'BASKET-5X5', 'VOLLEYBALL', 'BASEBALL', 'SOFTBALL', 'RUSSIAN-SOFTBALL', 'ESPORT-ML'],
+        'codes' => ['BASKET-5X5', 'VOLLEYBALL', 'BASEBALL', 'SOFTBALL', 'RUSSIAN-SOFTBALL', 'ESPORT-ML'],
         'placements' => [
             ['placement' => 1, 'label' => 'Champion', 'points' => 25.0, 'medal' => 'gold'],
             ['placement' => 2, 'label' => '1st Placer', 'points' => 20.0, 'medal' => 'silver'],
@@ -16,7 +16,7 @@ $pointSystems = [
         'label' => 'Sports Minor Events',
         'category' => 'sports',
         'description' => 'Minor athletic events listed in the proposal.',
-        'codes' => ['CHESS', 'BADMINTON', 'TABLE-TENNIS', 'BEACH-VOLLEYBALL'],
+        'codes' => ['BASKET-3X3', 'CHESS', 'BADMINTON', 'TABLE-TENNIS', 'BEACH-VOLLEYBALL'],
         'placements' => [
             ['placement' => 1, 'label' => 'Champion', 'points' => 20.0, 'medal' => 'gold'],
             ['placement' => 2, 'label' => '1st Placer', 'points' => 15.0, 'medal' => 'silver'],
@@ -168,11 +168,12 @@ $venues = [
 
 $participationRules = [
     'max_events_per_student' => 2,
+    'individual_dual_only_max_events' => 3,
     'allowed_combinations' => [
         ['label' => '1 minor + 1 major', 'major' => 1, 'minor' => 1, 'individual_or_dual' => 0],
         ['label' => '1 minor + 1 individual/dual', 'major' => 0, 'minor' => 1, 'individual_or_dual' => 1],
         ['label' => '1 major + 1 individual/dual', 'major' => 1, 'minor' => 0, 'individual_or_dual' => 1],
-        ['label' => 'No major/minor: up to 2 individual/dual events', 'major' => 0, 'minor' => 0, 'individual_or_dual' => 2],
+        ['label' => 'No major/minor: up to 3 individual/dual events', 'major' => 0, 'minor' => 0, 'individual_or_dual' => 3],
     ],
 ];
 
@@ -192,7 +193,7 @@ return [
     'point_systems' => $pointSystems,
 
     'default_competitions' => [
-        ['name' => 'Basketball 3x3', 'code' => 'BASKET-3X3', 'scoring_rules' => $rules('sports_major')],
+        ['name' => 'Basketball 3x3', 'code' => 'BASKET-3X3', 'scoring_rules' => $rules('sports_minor')],
         ['name' => 'Basketball 5x5', 'code' => 'BASKET-5X5', 'scoring_rules' => $rules('sports_major')],
         ['name' => 'Volleyball', 'code' => 'VOLLEYBALL', 'scoring_rules' => $rules('sports_major')],
         ['name' => 'Baseball', 'code' => 'BASEBALL', 'scoring_rules' => $rules('sports_major')],

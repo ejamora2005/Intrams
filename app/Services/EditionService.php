@@ -73,6 +73,8 @@ class EditionService
                     $configuration->update(['scoring_rules' => $defaults['scoring_rules']]);
                 } elseif ($this->usesLegacyDefaultScoring($configuration->scoring_rules)) {
                     $configuration->update(['scoring_rules' => $defaults['scoring_rules']]);
+                } elseif ($this->usesOutdatedPointSystem($configuration->scoring_rules, $defaults['scoring_rules'])) {
+                    $configuration->update(['scoring_rules' => $defaults['scoring_rules']]);
                 }
 
                 continue;
@@ -154,6 +156,22 @@ class EditionService
         }
 
         return json_encode($scoringRules['placements'] ?? []) === json_encode(StandingsService::DEFAULT_PLACEMENTS);
+    }
+
+    /** @param array<string, mixed> $defaultScoringRules */
+    private function usesOutdatedPointSystem(mixed $scoringRules, array $defaultScoringRules): bool
+    {
+        if (! is_array($scoringRules)) {
+            return true;
+        }
+
+        $currentPointSystem = $scoringRules['point_system'] ?? null;
+        $defaultPointSystem = $defaultScoringRules['point_system'] ?? null;
+
+        return is_string($defaultPointSystem)
+            && $defaultPointSystem !== ''
+            && is_string($currentPointSystem)
+            && $currentPointSystem !== $defaultPointSystem;
     }
 
     private function ensureNoOtherActiveEdition(string $status, ?IntramuralEdition $except = null): void
