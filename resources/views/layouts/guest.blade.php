@@ -26,6 +26,8 @@
         </div>
 
         @if ($livewire) @livewireScripts @endif
-        <x-pwa-install />
+        @unless (request()->routeIs('login'))
+            <x-pwa-install />
+        @endunless
     </body>
 </html>

@@ -52,6 +52,11 @@
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="4" y="5" width="16" height="16" rx="2"/><path d="M8 3v4m8-4v4M4 11h16m-11 4h2m2 0h2m-6 3h2"/></svg>
                         <span>Schedule</span>
                     </a>
+                    <button type="button" data-pwa-install-button data-pwa-inline-install-button hidden class="landing-button schedule-button">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v11m0 0 4-4m-4 4-4-4M5 17v1.5A2.5 2.5 0 0 0 7.5 21h9a2.5 2.5 0 0 0 2.5-2.5V17"/></svg>
+                        <span>Download app</span>
+                    </button>
+                    <p data-pwa-install-status hidden aria-live="polite" class="landing-install-status"></p>
                 </nav>
                 <div class="results-control">
                     <button class="landing-button results-toggle" type="button" data-results-toggle aria-label="Partial results information" aria-expanded="false" aria-controls="results-popover">
@@ -70,6 +75,5 @@
                 </div>
             </aside>
         </main>
-        <x-pwa-install />
     </body>
 </html>

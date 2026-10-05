@@ -1,17 +1,17 @@
 # Graph Report - Intrams  (2026-10-05)
 
 ## Corpus Check
-- 353 files · ~754,195 words
+- 354 files · ~754,599 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 34 file(s) not represented in the graph (top: (none) 18, .woff2 5, .css 3)
 
 ## Summary
-- 1911 nodes · 3570 edges · 279 communities (86 shown, 193 thin omitted)
+- 1920 nodes · 3578 edges · 284 communities (90 shown, 194 thin omitted)
 - Extraction: 99% EXTRACTED · 1% INFERRED · 0% AMBIGUOUS · INFERRED: 29 edges (avg confidence: 0.94)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `ae02f58f`
+- Built from commit: `95935a2a`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -113,7 +113,7 @@
 - pwa.js
 - Controller
 - Q: replace the basketball score sheet with this, but inheret the function autofill name based on the team, and lisence replaced with course.
-- Illuminate\Support\Str
+- Livewire\Livewire
 - Illuminate\Support\ServiceProvider
 - Student
 - IntramuralEdition
@@ -132,15 +132,16 @@
 - TeamController.php
 - SystemLogController.php
 - AuditService
-- AssignTeamMemberRequest
+- EditionSportsSelectionTest.php
 - bracket.blade.php
 - CoordinatorService
 - PasswordResetTest.php
 - Illuminate\Database\Schema\Blueprint
 - StandingsService
 - editions/sports/create.blade.php
+- CoordinatorController.php
 - BracketService.php
-- Event
+- StudentController.php
 - Gam/DashboardController.php
 - Q: inheret the format from preview to the download
 - CoordinatorManagementTest.php
@@ -157,7 +158,7 @@
 - 2026_09_20_170000_add_course_to_teams.php
 - 2026_09_21_170000_add_universal_competitors_to_brackets.php
 - 2026_09_28_000000_link_competition_schedules_to_bracket_matches.php
-- UserFactory
+- UserFactory.php
 - TeamMember
 - StoreStudentRequest
 - OperationsRolesTest.php
@@ -179,10 +180,10 @@
 - Illuminate\Support\Facades\Schema
 - Illuminate\Foundation\Http\FormRequest
 - tabulator/dashboard.blade.php
-- CoordinatorDevice
+- Illuminate\Support\Str
 - landing-objects/README.md
 - TeamManagementTest.php
-- BracketCompetitor
+- web.php
 - operations-accounts/create.blade.php
 - operations-accounts/edit.blade.php
 - SportService
@@ -192,24 +193,29 @@
 - CoordinatorController
 - StoreRegistrationRequest
 - 2026_10_04_000001_add_title_to_competition_schedules.php
-- EventService
-- ResultService.php
+- Event
+- Illuminate\Database\Seeder
 - Authenticate.php
 - RemoveTeamMembersRequest
 - Illuminate\View\View
-- ScheduleParticipant
+- EventController.php
 - CompetitionController.php
 - 2019_08_19_000000_create_failed_jobs_table.php
-- .update
-- StoreSportRequest
+- pwa-install.test.js
+- EditionManagementTest.php
 - TrustProxies.php
-- StoreCoordinatorChangeRequest
+- UpdateSportRequest
+- IntramuralsStudentRosterSeeder
 - .update
 - service-worker.js
 - 2026_10_04_000003_add_managed_team_id_to_users_table.php
 - 2026_10_03_000001_create_sport_results_table.php
 - 2014_10_12_000000_create_users_table.php
 - ScoreSheetImageOfficeService.php
+- SportsEventManagementTest.php
+- VolleyballScoreSheetTest.php
+- StoreEventRequest
+- StoreParticipationRuleRequest
 
 ## God Nodes (most connected - your core abstractions)
 1. `User` - 145 edges
@@ -238,11 +244,11 @@
 ## Import Cycles
 - None detected.
 
-## Communities (279 total, 193 thin omitted)
+## Communities (284 total, 194 thin omitted)
 
 ### Community 0 - "RegistrationController.php"
-Cohesion: 0.09
-Nodes (5): RegistrationController, StoreParticipationRuleRequest, EventRegistration, ParticipationRule, ParticipationService
+Cohesion: 0.12
+Nodes (4): RegistrationController, EventRegistration, ParticipationRule, ParticipationService
 
 ### Community 3 - "Illuminate\Support\Facades\Hash"
 Cohesion: 0.11
@@ -269,15 +275,15 @@ Cohesion: 0.04
 Nodes (44): 🚦 Development Order, ⭐ Most Important Rule for the Junior Developer, PHASE 11 — Coordinator Permissions, PHASE 12 — Event Status, PHASE 13 — Competition Results, PHASE 14 — Sport-Specific Scoring, PHASE 15 — Score Submission Workflow, PHASE 16 — Disqualification System (+36 more)
 
 ### Community 9 - "SportController.php"
-Cohesion: 0.05
-Nodes (10): {closure#10}(), {closure#11}(), {closure#12}(), {closure#13}(), {closure#14}(), {closure#37}(), {closure#40}(), {closure#9}() (+2 more)
+Cohesion: 0.06
+Nodes (8): {closure#10}(), {closure#11}(), {closure#12}(), {closure#14}(), {closure#37}(), {closure#40}(), {closure#9}(), AthleteEntry
 
 ### Community 10 - "User"
 Cohesion: 0.11
 Nodes (11): User, {closure#1}(), {closure#2}(), {closure#3}(), {closure#1}(), {closure#2}(), {closure#1}(), {closure#2}() (+3 more)
 
 ### Community 11 - "Illuminate\Database\Eloquent\Model"
-Cohesion: 0.15
+Cohesion: 0.14
 Nodes (3): AuditLog, CompetitionResult, TeamFlag
 
 ### Community 12 - "What You Must Do When Invoked"
@@ -288,9 +294,13 @@ Nodes (24): For /graphify add and --watch, For /graphify query, For the commit h
 Cohesion: 0.25
 Nodes (7): Database schema, 3.1 Identity and reference data, 3.2 Registration, rules, and staffing, 3.3 Competition and scoring, 3.4 Compliance and history, 3.5 Required indexes and integrity rules, 3. Database schema
 
+### Community 14 - "BracketService"
+Cohesion: 0.18
+Nodes (6): {closure#30}(), {closure#32}(), BracketCompetitor, BracketService, {closure#3}(), {closure#10}()
+
 ### Community 15 - "Team"
 Cohesion: 0.08
-Nodes (11): Team, {closure#1}(), {closure#2}(), {closure#4}(), {closure#5}(), {closure#7}(), TeamService, {closure#10}() (+3 more)
+Nodes (12): {closure#13}(), DashboardController, Team, {closure#1}(), {closure#2}(), {closure#4}(), {closure#5}(), {closure#7}() (+4 more)
 
 ### Community 16 - "Illuminate\Http\Request"
 Cohesion: 0.17
@@ -385,39 +395,39 @@ Cohesion: 0.67
 Nodes (3): PHASE 2 — Database Design, TODO 2.1 — Create users table, TODO 2.2 — Students/Athletes
 
 ### Community 163 - "pwa.js"
-Cohesion: 0.11
+Cohesion: 0.10
 Nodes (25): bannerCloths, resultsControl, resultsPopover, resultsToggle, appIsInstalled(), canUseServiceWorker(), dismissButtons, hideInstallControls() (+17 more)
 
 ### Community 164 - "Controller"
-Cohesion: 0.08
-Nodes (6): DashboardController, EditionSportController, ModuleController, Controller, DashboardController, GET /user()
+Cohesion: 0.17
+Nodes (4): EditionSportController, ModuleController, Controller, DashboardController
 
 ### Community 165 - "Q: replace the basketball score sheet with this, but inheret the function autofill name based on the team, and lisence replaced with course."
 Cohesion: 0.40
 Nodes (4): Answer, Outcome, Q: replace the basketball score sheet with this, but inheret the function autofill name based on the team, and lisence replaced with course., Source Nodes
 
-### Community 166 - "Illuminate\Support\Str"
-Cohesion: 0.08
-Nodes (7): {closure#2}(), {closure#1}(), {closure#1}(), {closure#1}(), {closure#1}(), {closure#3}(), {closure#1}()
+### Community 166 - "Livewire\Livewire"
+Cohesion: 0.11
+Nodes (6): {closure#1}(), {closure#1}(), {closure#1}(), {closure#1}(), {closure#3}(), {closure#1}()
 
 ### Community 167 - "Illuminate\Support\ServiceProvider"
-Cohesion: 0.09
+Cohesion: 0.07
 Nodes (5): DeleteUser, AppServiceProvider, BroadcastServiceProvider, FortifyServiceProvider, JetstreamServiceProvider
 
 ### Community 168 - "Student"
 Cohesion: 0.12
-Nodes (13): {closure#17}(), Student, {closure#5}(), {closure#1}(), {closure#2}(), {closure#4}(), {closure#5}(), StudentService (+5 more)
+Nodes (8): {closure#17}(), Student, {closure#5}(), {closure#1}(), {closure#2}(), {closure#4}(), {closure#5}(), StudentService
 
 ### Community 169 - "IntramuralEdition"
-Cohesion: 0.06
-Nodes (30): IntramuralEdition, {closure#1}(), {closure#2}(), {closure#3}(), EditionService, DatabaseSeeder, DefaultIntramuralsSeeder, {closure#1}() (+22 more)
+Cohesion: 0.22
+Nodes (6): IntramuralEdition, {closure#1}(), {closure#2}(), {closure#3}(), EditionService, {closure#1}()
 
 ### Community 171 - "CompetitionSchedule"
 Cohesion: 0.15
 Nodes (4): CompetitionSchedule, {closure#2}(), {closure#4}(), PublicScheduleService
 
 ### Community 172 - "EmailVerificationTest.php"
-Cohesion: 0.08
+Cohesion: 0.11
 Nodes (6): {closure#1}(), {closure#3}(), {closure#5}(), {closure#1}(), {closure#3}(), {closure#5}()
 
 ### Community 174 - "Q: swap the competition and team b, make this changes in both the preview and downloadable"
@@ -425,20 +435,24 @@ Cohesion: 0.40
 Nodes (4): Answer, Outcome, Q: swap the competition and team b, make this changes in both the preview and downloadable, Source Nodes
 
 ### Community 176 - "EditionSport"
-Cohesion: 0.16
-Nodes (4): {closure#1}(), {closure#2}(), EditionSport, {closure#1}()
+Cohesion: 0.13
+Nodes (7): {closure#1}(), {closure#2}(), EditionSport, {closure#1}(), {closure#1}(), {closure#2}(), {closure#3}()
 
 ### Community 178 - "BracketEngineTest.php"
-Cohesion: 0.42
-Nodes (8): bracketEngineEdition(), bracketEngineSport(), {closure#1}(), {closure#11}(), {closure#12}(), {closure#2}(), {closure#9}(), finishReadyBracketMatches()
+Cohesion: 0.22
+Nodes (10): ScheduleParticipant, {closure#3}(), bracketEngineEdition(), bracketEngineSport(), {closure#1}(), {closure#11}(), {closure#12}(), {closure#2}() (+2 more)
 
 ### Community 179 - "Symfony\Component\HttpFoundation\Response"
 Cohesion: 0.24
 Nodes (3): EnsureUserHasRole, RedirectIfAuthenticated, ReturnAdminSavesToModuleIndex
 
 ### Community 185 - "AuditService"
-Cohesion: 0.20
-Nodes (4): ResultSubmission, AuditService, ResultService, 4. Application services and key functions
+Cohesion: 0.14
+Nodes (6): Fixture, ResultSubmission, AuditService, {closure#1}(), ResultService, 4. Application services and key functions
+
+### Community 186 - "EditionSportsSelectionTest.php"
+Cohesion: 0.18
+Nodes (5): {closure#1}(), {closure#2}(), {closure#5}(), {closure#6}(), editionSportsAdmin()
 
 ### Community 188 - "CoordinatorService"
 Cohesion: 0.17
@@ -461,16 +475,16 @@ Cohesion: 0.14
 Nodes (10): {closure#1}(), {closure#10}(), {closure#12}(), {closure#2}(), {closure#4}(), {closure#5}(), {closure#6}(), {closure#7}() (+2 more)
 
 ### Community 196 - "Gam/DashboardController.php"
-Cohesion: 0.12
-Nodes (5): {closure#10}(), {closure#12}(), {closure#6}(), {closure#9}(), DashboardController
+Cohesion: 0.15
+Nodes (4): {closure#10}(), {closure#12}(), {closure#6}(), {closure#9}()
 
 ### Community 197 - "Q: inheret the format from preview to the download"
 Cohesion: 0.40
 Nodes (4): Answer, Outcome, Q: inheret the format from preview to the download, Source Nodes
 
 ### Community 198 - "CoordinatorManagementTest.php"
-Cohesion: 0.32
-Nodes (8): CoordinatorAssignment, {closure#1}(), {closure#2}(), {closure#3}(), {closure#4}(), {closure#6}(), coordinatorModuleAdmin(), coordinatorModuleEvent()
+Cohesion: 0.18
+Nodes (9): CoordinatorAssignment, CoordinatorRequest, {closure#1}(), {closure#2}(), {closure#3}(), {closure#4}(), {closure#6}(), coordinatorModuleAdmin() (+1 more)
 
 ### Community 204 - "BracketMatch"
 Cohesion: 0.12
@@ -492,13 +506,13 @@ Nodes (3): {closure#10}(), {closure#12}(), {closure#2}()
 Cohesion: 0.29
 Nodes (3): {closure#1}(), {closure#2}(), {closure#4}()
 
-### Community 216 - "TeamMember"
-Cohesion: 0.19
-Nodes (6): {closure#22}(), TeamMember, {closure#2}(), {closure#3}(), {closure#4}(), {closure#2}()
+### Community 215 - "UserFactory.php"
+Cohesion: 0.21
+Nodes (3): StudentFactory, {closure#2}(), UserFactory
 
-### Community 217 - "StoreStudentRequest"
-Cohesion: 0.15
-Nodes (3): SanitizesStudentInput, StoreStudentRequest, UpdateStudentRequest
+### Community 216 - "TeamMember"
+Cohesion: 0.10
+Nodes (9): {closure#22}(), TeamMember, {closure#2}(), {closure#3}(), {closure#4}(), {closure#2}(), {closure#1}(), {closure#4}() (+1 more)
 
 ### Community 218 - "OperationsRolesTest.php"
 Cohesion: 0.34
@@ -507,10 +521,6 @@ Nodes (14): {closure#1}(), {closure#10}(), {closure#11}(), {closure#12}(), {clos
 ### Community 220 - "StudentManagementTest.php"
 Cohesion: 0.47
 Nodes (8): activeAdmin(), {closure#1}(), {closure#2}(), {closure#3}(), {closure#4}(), {closure#5}(), {closure#6}(), validStudentData()
-
-### Community 221 - "Illuminate\Http\RedirectResponse"
-Cohesion: 0.09
-Nodes (4): CourseController, StudentController, TeamController, Course
 
 ### Community 222 - "require-dev"
 Cohesion: 0.22
@@ -553,20 +563,16 @@ Cohesion: 0.15
 Nodes (3): {closure#1}(), {closure#1}(), {closure#1}()
 
 ### Community 237 - "Illuminate\Foundation\Http\FormRequest"
-Cohesion: 0.15
-Nodes (4): ReviewCoordinatorRequest, StoreCoordinatorAssignmentRequest, StoreEventRequest, UpdateEventRequest
+Cohesion: 0.14
+Nodes (4): StoreCoordinatorAssignmentRequest, StoreCoordinatorChangeRequest, StoreSportRequest, UpdateEventRequest
 
-### Community 241 - "CoordinatorDevice"
-Cohesion: 0.32
+### Community 241 - "Illuminate\Support\Str"
+Cohesion: 0.20
 Nodes (4): CoordinatorDevice, {closure#1}(), {closure#2}(), {closure#5}()
 
 ### Community 244 - "TeamManagementTest.php"
 Cohesion: 0.51
 Nodes (12): {closure#1}(), {closure#2}(), {closure#3}(), {closure#4}(), {closure#5}(), {closure#6}(), {closure#7}(), {closure#8}() (+4 more)
-
-### Community 245 - "BracketCompetitor"
-Cohesion: 0.20
-Nodes (5): {closure#30}(), {closure#32}(), DashboardController, BracketCompetitor, {closure#10}()
 
 ### Community 248 - "SportService"
 Cohesion: 0.20
@@ -576,18 +582,34 @@ Nodes (3): {closure#2}(), {closure#4}(), SportService
 Cohesion: 0.50
 Nodes (3): Deployment, Dokploy Setup, Notes
 
-### Community 256 - "EventService"
-Cohesion: 0.33
-Nodes (3): {closure#1}(), {closure#2}(), EventService
+### Community 256 - "Event"
+Cohesion: 0.18
+Nodes (4): Event, {closure#1}(), {closure#2}(), EventService
+
+### Community 258 - "Illuminate\Database\Seeder"
+Cohesion: 0.23
+Nodes (4): DatabaseSeeder, DefaultIntramuralsSeeder, DefaultSportsSeeder, TestIntramuralsDataSeeder
 
 ### Community 261 - "Illuminate\View\View"
-Cohesion: 0.12
-Nodes (4): EventController, SportModuleController, AppLayout, GuestLayout
+Cohesion: 0.11
+Nodes (6): CourseController, DashboardController, SportModuleController, Course, AppLayout, GuestLayout
+
+### Community 266 - "EditionManagementTest.php"
+Cohesion: 0.57
+Nodes (7): {closure#1}(), {closure#2}(), {closure#3}(), {closure#4}(), {closure#5}(), editionModuleAdmin(), validEditionData()
+
+### Community 279 - "SportsEventManagementTest.php"
+Cohesion: 0.80
+Nodes (4): {closure#1}(), {closure#2}(), sportsAdmin(), sportsEdition()
+
+### Community 280 - "VolleyballScoreSheetTest.php"
+Cohesion: 0.70
+Nodes (4): {closure#1}(), {closure#2}(), {closure#3}(), volleyballScoreSheetScenario()
 
 ## Knowledge Gaps
-- **314 isolated node(s):** `name`, `type`, `description`, `keywords`, `license` (+309 more)
-  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 866 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
-- **193 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **315 isolated node(s):** `name`, `type`, `description`, `keywords`, `license` (+310 more)
+  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 874 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
+- **194 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Work-memory lessons
 
@@ -597,17 +619,17 @@ Nodes (4): EventController, SportModuleController, AppLayout, GuestLayout
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `User` connect `User` to `CoordinatorDeviceService`, `Illuminate\Support\Facades\Hash`, `AuthenticationTest.php`, `FortifyServiceProvider.php`, `ScheduleParticipant`, `Illuminate\Support\Str`, `Illuminate\Support\ServiceProvider`, `Student`, `IntramuralEdition`, `EmailVerificationTest.php`, `StoreCoordinatorRequest`, `BracketEngineTest.php`, `SystemLogController.php`, `CoordinatorService`, `PasswordResetTest.php`, `StandingsService`, `CoordinatorController.php`, `Event`, `Gam/DashboardController.php`, `CoordinatorManagementTest.php`, `OperationsAccountController.php`, `TeamMember`, `OperationsRolesTest.php`, `StudentManagementTest.php`, `BulkSportAssignmentTest.php`, `CoordinatorDevice`, `TeamManagementTest.php`, `CoordinatorController`?**
-  _High betweenness centrality (0.107) - this node is a cross-community bridge._
-- **Why does `IntramuralEdition` connect `IntramuralEdition` to `RegistrationController.php`, `EventService`, `Illuminate\View\View`, `AuthenticationTest.php`, `ScheduleParticipant`, `.update`, `SportController.php`, `Illuminate\Database\Eloquent\Model`, `3. Database schema`, `Team`, `Illuminate\Http\Request`, `Controller`, `Student`, `EditionController.php`, `CompetitionSchedule`, `BracketEngineTest.php`, `TeamController.php`, `StandingsService`, `BracketService.php`, `EligibilityService.php`, `TeamMember`, `OperationsRolesTest.php`, `StudentManagementTest.php`, `Illuminate\Http\RedirectResponse`, `BulkSportAssignmentTest.php`, `TeamManagementTest.php`?**
-  _High betweenness centrality (0.056) - this node is a cross-community bridge._
-- **Why does `Team` connect `Team` to `RegistrationController.php`, `RemoveTeamMembersRequest`, `AuthenticationTest.php`, `ScheduleParticipant`, `SportController.php`, `Illuminate\Database\Eloquent\Model`, `.update`, `Illuminate\Support\Str`, `Student`, `IntramuralEdition`, `CompetitionSchedule`, `EditionSport`, `BracketEngineTest.php`, `TeamController.php`, `AssignTeamMemberRequest`, `StandingsService`, `BracketService.php`, `Gam/DashboardController.php`, `OperationsAccountController.php`, `EligibilityService.php`, `UserFactory`, `TeamMember`, `OperationsRolesTest.php`, `Illuminate\Http\RedirectResponse`, `BulkSportAssignmentTest.php`, `TeamManagementTest.php`, `BracketCompetitor`, `StoreRegistrationRequest`?**
-  _High betweenness centrality (0.037) - this node is a cross-community bridge._
+- **Why does `User` connect `User` to `CoordinatorDeviceService`, `Illuminate\Support\Facades\Hash`, `AuthenticationTest.php`, `FortifyServiceProvider.php`, `EditionManagementTest.php`, `IntramuralsStudentRosterSeeder`, `Team`, `SportsEventManagementTest.php`, `VolleyballScoreSheetTest.php`, `Livewire\Livewire`, `Illuminate\Support\ServiceProvider`, `EmailVerificationTest.php`, `StoreCoordinatorRequest`, `EditionSport`, `BracketEngineTest.php`, `SystemLogController.php`, `EditionSportsSelectionTest.php`, `CoordinatorService`, `PasswordResetTest.php`, `StandingsService`, `CoordinatorController.php`, `Gam/DashboardController.php`, `CoordinatorManagementTest.php`, `OperationsAccountController.php`, `UserFactory.php`, `TeamMember`, `OperationsRolesTest.php`, `StudentManagementTest.php`, `BulkSportAssignmentTest.php`, `Illuminate\Support\Str`, `TeamManagementTest.php`, `CoordinatorController`?**
+  _High betweenness centrality (0.130) - this node is a cross-community bridge._
+- **Why does `IntramuralEdition` connect `IntramuralEdition` to `RegistrationController.php`, `Event`, `Illuminate\Database\Seeder`, `Illuminate\View\View`, `EventController.php`, `AuthenticationTest.php`, `SportController.php`, `EditionManagementTest.php`, `Illuminate\Database\Eloquent\Model`, `3. Database schema`, `IntramuralsStudentRosterSeeder`, `Illuminate\Http\Request`, `SportsEventManagementTest.php`, `Illuminate\Validation\Rule`, `VolleyballScoreSheetTest.php`, `Controller`, `Student`, `EditionController.php`, `CompetitionSchedule`, `EditionSport`, `BracketEngineTest.php`, `TeamController.php`, `EditionSportsSelectionTest.php`, `StandingsService`, `BracketService.php`, `StudentController.php`, `EligibilityService.php`, `TeamMember`, `OperationsRolesTest.php`, `StudentManagementTest.php`, `Illuminate\Http\RedirectResponse`, `BulkSportAssignmentTest.php`, `TeamManagementTest.php`?**
+  _High betweenness centrality (0.047) - this node is a cross-community bridge._
+- **Why does `Team` connect `Team` to `RegistrationController.php`, `Illuminate\Database\Seeder`, `RemoveTeamMembersRequest`, `AuthenticationTest.php`, `SportController.php`, `Illuminate\Database\Eloquent\Model`, `IntramuralsStudentRosterSeeder`, `.update`, `VolleyballScoreSheetTest.php`, `Student`, `CompetitionSchedule`, `EditionSport`, `BracketEngineTest.php`, `TeamController.php`, `StandingsService`, `BracketService.php`, `Gam/DashboardController.php`, `OperationsAccountController.php`, `EligibilityService.php`, `UserFactory.php`, `TeamMember`, `OperationsRolesTest.php`, `Illuminate\Http\RedirectResponse`, `BulkSportAssignmentTest.php`, `TeamManagementTest.php`, `web.php`?**
+  _High betweenness centrality (0.039) - this node is a cross-community bridge._
 - **What connects `name`, `type`, `description` to the rest of the system?**
-  _314 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _315 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `RegistrationController.php` be split into smaller, more focused modules?**
-  _Cohesion score 0.09113300492610837 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.11857707509881422 - nodes in this community are weakly interconnected._
 - **Should `Illuminate\Support\Facades\Hash` be split into smaller, more focused modules?**
-  _Cohesion score 0.1076923076923077 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.11 - nodes in this community are weakly interconnected._
 - **Should `FortifyServiceProvider.php` be split into smaller, more focused modules?**
   _Cohesion score 0.11695906432748537 - nodes in this community are weakly interconnected._

@@ -128,7 +128,9 @@ a { color: inherit; }
 
 .preview-label { flex-shrink: 0; font-size: 7px; font-weight: 500; text-transform: uppercase; letter-spacing: .09em; padding: 2px 6px; border-radius: 3px; border: 1px solid #b8c6d933; color: #a2b3ca; }
 .utility-rail { position: absolute; top: 14px; right: 24px; z-index: 5; display: flex; align-items: center; gap: 10px; }
-.landing-actions { display: block; }
+.landing-actions { position: relative; display: flex; align-items: center; gap: 8px; }
+.landing-actions [hidden] { display: none !important; }
+.landing-install-status { position: absolute; top: calc(100% + 8px); right: 0; width: min(320px, calc(100vw - 24px)); padding: 12px 14px; border: 1px solid #9eb8dc4a; border-radius: 7px; background: #071a30f2; color: #e5edf8; box-shadow: 0 12px 35px #0007; font-size: 12px; line-height: 1.5; text-align: left; }
 .landing-button { display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 8px; border: 0; background: transparent; color: #bdcce0; font-family: inherit; text-decoration: none; font-size: 11px; font-weight: 500; letter-spacing: .025em; cursor: pointer; transition: color .2s; }
 .landing-button span { display: block; white-space: nowrap; }
 .landing-button svg { width: 18px; height: 18px; flex-shrink: 0; color: #a9bfdc; }
@@ -175,6 +177,12 @@ a { color: inherit; }
     .standings { --banner-height: min(74dvh, calc(100dvh - 168px)); }
 }
 
+@media (min-width: 761px) and (max-width: 1100px) {
+    .meet-landing { grid-template-rows: auto auto minmax(0, 1fr); gap: 12px; }
+    .utility-rail { position: relative; top: auto; right: auto; grid-row: 2; justify-self: center; }
+    .standings { grid-row: 3; --banner-height: min(60dvh, calc(100dvh - 230px)); }
+}
+
 @media (max-width: 760px) {
     .meet-landing {
         grid-template-rows: auto minmax(0, 1fr) auto;
@@ -218,10 +226,17 @@ a { color: inherit; }
     .utility-rail { position: relative; top: auto; right: auto; justify-self: center; justify-content: center; gap: 14px; }
     .landing-button { min-width: 44px; padding: 10px; gap: 8px; font-size: 12px; }
     .landing-button svg { width: 18px; height: 18px; }
+    .landing-install-status { top: auto; bottom: calc(100% + 8px); }
     .results-control { position: static; }
     .results-control[data-open]::after { content: ''; position: absolute; bottom: 100%; left: 0; right: 0; height: 12px; }
     .results-popover { top: auto; bottom: calc(100% + 12px); left: 50%; right: auto; width: min(330px, calc(100vw - 32px)); max-height: calc(100dvh - 110px - env(safe-area-inset-bottom)); overflow-y: auto; transform: translateX(-50%); }
     .results-popover::after { display: none; }
+}
+
+@media (max-width: 380px) {
+    .utility-rail { gap: 6px; }
+    .landing-actions { gap: 4px; }
+    .landing-button { gap: 5px; padding: 6px; font-size: 11px; }
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -24,20 +24,11 @@
                     </div>
                 </div>
 
-                <div class="space-y-4">
-                    <div class="grid grid-cols-2 gap-2 text-xs font-semibold">
-                        <span class="rounded-lg border border-white/15 bg-white/10 px-3 py-2 text-blue-50">Admin</span>
-                        <span class="rounded-lg border border-white/15 bg-white/10 px-3 py-2 text-blue-50">GAM</span>
-                        <span class="rounded-lg border border-white/15 bg-white/10 px-3 py-2 text-blue-50">Tabulator</span>
-                        <span class="rounded-lg border border-white/15 bg-white/10 px-3 py-2 text-blue-50">Coordinator</span>
-                    </div>
-                    <div class="hidden md:block">
-                        <button type="button" data-pwa-install-button data-pwa-inline-install-button hidden class="flex w-full items-center justify-center gap-2 rounded-xl border border-white/20 bg-white px-4 py-3 text-sm font-semibold text-slate-900 shadow-lg shadow-slate-950/15 transition hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-white/70 focus:ring-offset-2 focus:ring-offset-blue-950">
-                            <svg class="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v11m0 0 4-4m-4 4-4-4M5 17v1.5A2.5 2.5 0 0 0 7.5 21h9a2.5 2.5 0 0 0 2.5-2.5V17" /></svg>
-                            <span>Download SLSU INTRAMURALS App</span>
-                        </button>
-                        <p data-pwa-install-status hidden class="mt-3 rounded-lg border border-white/15 bg-white/10 px-3 py-2 text-xs font-medium leading-5 text-blue-50"></p>
-                    </div>
+                <div class="grid grid-cols-2 gap-2 text-xs font-semibold">
+                    <span class="rounded-lg border border-white/15 bg-white/10 px-3 py-2 text-blue-50">Admin</span>
+                    <span class="rounded-lg border border-white/15 bg-white/10 px-3 py-2 text-blue-50">GAM</span>
+                    <span class="rounded-lg border border-white/15 bg-white/10 px-3 py-2 text-blue-50">Tabulator</span>
+                    <span class="rounded-lg border border-white/15 bg-white/10 px-3 py-2 text-blue-50">Coordinator</span>
                 </div>
             </aside>
 
@@ -93,13 +84,6 @@
                             <span>Sign in</span>
                             <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path stroke-linecap="round" d="M5 12h14m-5-5 5 5-5 5" /></svg>
                         </button>
-                        <div class="md:hidden">
-                            <button type="button" data-pwa-install-button data-pwa-inline-install-button hidden style="margin-top: 1.5rem;" class="flex w-full items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm font-semibold text-slate-800 shadow-sm transition hover:border-slate-400 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2">
-                                <svg class="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v11m0 0 4-4m-4 4-4-4M5 17v1.5A2.5 2.5 0 0 0 7.5 21h9a2.5 2.5 0 0 0 2.5-2.5V17" /></svg>
-                                <span>Download SLSU INTRAMURALS App</span>
-                            </button>
-                            <p data-pwa-install-status hidden class="mt-3 rounded-lg border border-blue-100 bg-blue-50 px-3 py-2 text-xs font-medium leading-5 text-blue-900"></p>
-                        </div>
                     </div>
                 </form>
                 <p class="mt-6 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-center text-xs font-medium leading-5 text-slate-600">Access is limited to active intramurals operations accounts.</p>

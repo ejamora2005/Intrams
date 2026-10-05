@@ -2136,15 +2136,15 @@
     "semantic_hash": ""
   },
   "public/service-worker.js": {
-    "mtime": 1791172899.7961655,
-    "seen": 1791172957.5763042,
-    "ast_hash": "5fb040f2941815c5830264c9b4afa405",
+    "mtime": 1791173515.374947,
+    "seen": 1791173717.1971028,
+    "ast_hash": "d56ac24e62011b03679c39559c35ebd3",
     "semantic_hash": ""
   },
   "resources/js/pwa.js": {
-    "mtime": 1791173037.5932672,
-    "seen": 1791173097.6967804,
-    "ast_hash": "3c9c44680a9522f33eaef51048f2df60",
+    "mtime": 1791173589.3420475,
+    "seen": 1791173717.1971028,
+    "ast_hash": "8842afd396cd998117026d3ce5ac3bad",
     "semantic_hash": ""
   },
   "resources/views/components/pwa-install.blade.php": {
@@ -2295,6 +2295,12 @@
     "mtime": 1791172847.3483,
     "seen": 1791172957.5773025,
     "ast_hash": "a2929cbdd4047bb2e4acdf15110cef2b",
+    "semantic_hash": ""
+  },
+  "tests/Js/pwa-install.test.js": {
+    "mtime": 1791173665.0078423,
+    "seen": 1791173717.198118,
+    "ast_hash": "463a8ff0590178be8e7f8a957714f47b",
     "semantic_hash": ""
   }
 }
