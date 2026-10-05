@@ -22,15 +22,6 @@ const secureInstallUrl = () => {
 
     return url.toString();
 };
-const manualInstallInstructions = () => {
-    const isAppleMobile = /iPad|iPhone|iPod/.test(navigator.userAgent)
-        || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-
-    if (isAppleMobile) return 'Open this page in Safari, tap Share, then Add to Home Screen.';
-    if (/Android/.test(navigator.userAgent)) return 'Open the browser menu and tap Install app or Add to Home screen.';
-
-    return 'Open the browser menu and choose Install SLSU INTRAMURALS or Install this site as an app.';
-};
 
 const setInstallButtonsVisible = visible => {
     installButtons.forEach(button => {
@@ -114,7 +105,7 @@ const showInlineInstallAction = async () => {
         return;
     }
 
-    setInlineInstallButtonsVisible(true);
+    setInlineInstallButtonsVisible(Boolean(installPrompt) || needsSecureInstallContext());
 };
 
 window.addEventListener('beforeinstallprompt', event => {
@@ -140,12 +131,7 @@ installButtons.forEach(button => {
                 return;
             }
 
-            if (await appIsInstalled()) {
-                hideInstallControls();
-                return;
-            }
-
-            setInstallStatus(manualInstallInstructions());
+            hideInstallControls();
             return;
         }
 
@@ -163,11 +149,9 @@ installButtons.forEach(button => {
 
             if (accepted) {
                 setInstallStatus('Installing SLSU INTRAMURALS App...');
-            } else {
-                setInstallStatus(manualInstallInstructions());
             }
-        } catch {
-            setInstallStatus(manualInstallInstructions());
+        } catch (error) {
+            console.warn('PWA install prompt failed.', error);
         } finally {
             installPromptInProgress = false;
             setInstallButtonsDisabled(false);
@@ -175,8 +159,7 @@ installButtons.forEach(button => {
             if (accepted) {
                 setInstallButtonsVisible(false);
             } else {
-                if (installPanel) installPanel.hidden = true;
-                setInlineInstallButtonsVisible(true);
+                hideInstallControls();
             }
         }
     });

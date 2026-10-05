@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'slsu-intramurals-pwa-v5';
+const CACHE_VERSION = 'slsu-intramurals-pwa-v6';
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 const OFFLINE_URL = '/offline.html';
@@ -7,11 +7,11 @@ const PRECACHE_URLS = [
     OFFLINE_URL,
     '/manifest.webmanifest',
     '/favicon.ico',
-    '/icons/favicon-16.png',
-    '/icons/favicon-32.png',
-    '/icons/pwa-icon-192.png',
-    '/icons/pwa-icon-512.png',
-    '/icons/pwa-maskable-512.png',
+    '/app-icons/favicon-16.png',
+    '/app-icons/favicon-32.png',
+    '/app-icons/pwa-icon-192.png',
+    '/app-icons/pwa-icon-512.png',
+    '/app-icons/pwa-maskable-512.png',
     '/images/logo/main_logo.png',
     '/images/landing_bg.png'
 ];

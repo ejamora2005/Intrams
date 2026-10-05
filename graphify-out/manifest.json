@@ -2136,15 +2136,15 @@
     "semantic_hash": ""
   },
   "public/service-worker.js": {
-    "mtime": 1791173515.374947,
-    "seen": 1791173717.1971028,
-    "ast_hash": "d56ac24e62011b03679c39559c35ebd3",
+    "mtime": 1791174705.5733464,
+    "seen": 1791174758.8677728,
+    "ast_hash": "eae29ba06515185794dbe3c5e6b9486e",
     "semantic_hash": ""
   },
   "resources/js/pwa.js": {
-    "mtime": 1791173589.3420475,
-    "seen": 1791173717.1971028,
-    "ast_hash": "8842afd396cd998117026d3ce5ac3bad",
+    "mtime": 1791174705.5773556,
+    "seen": 1791174758.8677728,
+    "ast_hash": "af89d0e015307173c1c96cd499bfd425",
     "semantic_hash": ""
   },
   "resources/views/components/pwa-install.blade.php": {
@@ -2154,15 +2154,15 @@
     "semantic_hash": ""
   },
   "resources/views/components/pwa-meta.blade.php": {
-    "mtime": 1791172885.7166514,
-    "seen": 1791172957.5773025,
-    "ast_hash": "1ef5510c3faeafe7bd886ca3b0ee6156",
+    "mtime": 1791174705.5753567,
+    "seen": 1791174758.8677728,
+    "ast_hash": "5f3ddd7e1cc411a6b9424aed312d1bca",
     "semantic_hash": ""
   },
   "public/offline.html": {
-    "mtime": 1791172894.974064,
-    "seen": 1791172957.5773025,
-    "ast_hash": "2dbd914b2c17ec452f22420b922eca8e",
+    "mtime": 1791174705.5733464,
+    "seen": 1791174758.8677728,
+    "ast_hash": "ae034776d7ce3668883588e67acc1448",
     "semantic_hash": ""
   },
   "public/icons/pwa-icon-192.png": {
@@ -2298,9 +2298,39 @@
     "semantic_hash": ""
   },
   "tests/Js/pwa-install.test.js": {
-    "mtime": 1791173665.0078423,
-    "seen": 1791173717.198118,
-    "ast_hash": "463a8ff0590178be8e7f8a957714f47b",
+    "mtime": 1791174726.473727,
+    "seen": 1791174758.8677728,
+    "ast_hash": "2881a2beca1ab58dcf56a89247c24c3d",
+    "semantic_hash": ""
+  },
+  "public/app-icons/favicon-16.png": {
+    "mtime": 1791172847.2359996,
+    "seen": 1791174758.8677728,
+    "ast_hash": "46e229de43db63388da6fb11c98f8672",
+    "semantic_hash": ""
+  },
+  "public/app-icons/favicon-32.png": {
+    "mtime": 1791172847.3483,
+    "seen": 1791174758.8677728,
+    "ast_hash": "a2929cbdd4047bb2e4acdf15110cef2b",
+    "semantic_hash": ""
+  },
+  "public/app-icons/pwa-icon-192.png": {
+    "mtime": 1791098158.693671,
+    "seen": 1791174758.8677728,
+    "ast_hash": "58555650a87e0fa20d540d1e987b6ab6",
+    "semantic_hash": ""
+  },
+  "public/app-icons/pwa-icon-512.png": {
+    "mtime": 1791098158.9510593,
+    "seen": 1791174758.8677728,
+    "ast_hash": "2193ffbe52ac5fc363a1956ec5e6b13d",
+    "semantic_hash": ""
+  },
+  "public/app-icons/pwa-maskable-512.png": {
+    "mtime": 1791098159.1353447,
+    "seen": 1791174758.8677728,
+    "ast_hash": "c9a70a1fdeb243d586528a77c1823b72",
     "semantic_hash": ""
   }
 }

@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { test } from 'node:test';
 import { runInNewContext } from 'node:vm';
 
@@ -79,20 +79,20 @@ test('install button opens the browser install prompt and hides after installati
     assert.equal(page.status.hidden, true);
 });
 
-test('install button gives browser instructions when no prompt is offered', async () => {
+test('install button stays hidden when no prompt is offered', async () => {
     const page = await setup();
 
-    assert.equal(page.button.hidden, false);
+    assert.equal(page.button.hidden, true);
     await page.buttonListeners.get('click')();
 
-    assert.equal(page.button.hidden, false);
-    assert.match(page.status.textContent, /browser menu/);
-    assert.equal(page.status.hidden, false);
+    assert.equal(page.button.hidden, true);
+    assert.equal(page.status.hidden, true);
 });
 
 test('install button opens HTTPS from an insecure page', async () => {
     const page = await setup({ secure: false });
 
+    assert.equal(page.button.hidden, false);
     await page.buttonListeners.get('click')();
 
     assert.equal(page.location.assigned, 'https://slsubc.tech/login');
@@ -102,4 +102,13 @@ test('install button stays hidden when the app is already installed', async () =
     const page = await setup({ installed: true });
 
     assert.equal(page.button.hidden, true);
+});
+
+test('manifest icons exist outside Apache reserved paths', () => {
+    const manifest = JSON.parse(readFileSync(new URL('../../public/manifest.webmanifest', import.meta.url), 'utf8'));
+
+    for (const icon of manifest.icons) {
+        assert.match(icon.src, /^\/app-icons\//);
+        assert.ok(existsSync(new URL(`../../public${icon.src}`, import.meta.url)), icon.src);
+    }
 });

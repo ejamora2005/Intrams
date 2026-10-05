@@ -5,10 +5,10 @@
 @php
     $iconVersion = @filemtime(public_path('favicon.ico')) ?: '20261005';
     $favicon = asset('favicon.ico').'?v='.$iconVersion;
-    $favicon16 = asset('icons/favicon-16.png').'?v='.$iconVersion;
-    $favicon32 = asset('icons/favicon-32.png').'?v='.$iconVersion;
-    $appleTouchIcon = asset('icons/pwa-icon-192.png').'?v='.$iconVersion;
-    $faviconLarge = asset('icons/pwa-icon-512.png').'?v='.$iconVersion;
+    $favicon16 = asset('app-icons/favicon-16.png').'?v='.$iconVersion;
+    $favicon32 = asset('app-icons/favicon-32.png').'?v='.$iconVersion;
+    $appleTouchIcon = asset('app-icons/pwa-icon-192.png').'?v='.$iconVersion;
+    $faviconLarge = asset('app-icons/pwa-icon-512.png').'?v='.$iconVersion;
 @endphp
 
 <meta name="theme-color" content="{{ $theme }}">
