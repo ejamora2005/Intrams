@@ -2136,9 +2136,9 @@
     "semantic_hash": ""
   },
   "public/service-worker.js": {
-    "mtime": 1791099661.156784,
-    "seen": 1791099851.1126928,
-    "ast_hash": "6523b5034e1446bae9a5089cf73d87b5",
+    "mtime": 1791172899.7961655,
+    "seen": 1791172957.5763042,
+    "ast_hash": "5fb040f2941815c5830264c9b4afa405",
     "semantic_hash": ""
   },
   "resources/js/pwa.js": {
@@ -2154,15 +2154,15 @@
     "semantic_hash": ""
   },
   "resources/views/components/pwa-meta.blade.php": {
-    "mtime": 1791099742.3314805,
-    "seen": 1791099851.1126928,
-    "ast_hash": "6e5ca21a7e9d14aacdfd5d946b9979ff",
+    "mtime": 1791172885.7166514,
+    "seen": 1791172957.5773025,
+    "ast_hash": "1ef5510c3faeafe7bd886ca3b0ee6156",
     "semantic_hash": ""
   },
   "public/offline.html": {
-    "mtime": 1791099636.7618554,
-    "seen": 1791099851.1126928,
-    "ast_hash": "e152e13935b147f647459c156db8942a",
+    "mtime": 1791172894.974064,
+    "seen": 1791172957.5773025,
+    "ast_hash": "2dbd914b2c17ec452f22420b922eca8e",
     "semantic_hash": ""
   },
   "public/icons/pwa-icon-192.png": {
@@ -2283,6 +2283,18 @@
     "mtime": 1791097163.5201924,
     "seen": 1791100711.6692815,
     "ast_hash": "e206e50415d79f602cda1031f485bbc4",
+    "semantic_hash": ""
+  },
+  "public/icons/favicon-16.png": {
+    "mtime": 1791172847.2359996,
+    "seen": 1791172957.5773025,
+    "ast_hash": "46e229de43db63388da6fb11c98f8672",
+    "semantic_hash": ""
+  },
+  "public/icons/favicon-32.png": {
+    "mtime": 1791172847.3483,
+    "seen": 1791172957.5773025,
+    "ast_hash": "a2929cbdd4047bb2e4acdf15110cef2b",
     "semantic_hash": ""
   }
 }

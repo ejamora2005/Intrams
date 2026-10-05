@@ -68,22 +68,6 @@ const relatedAppInstalled = async () => {
 
 const appIsInstalled = async () => isStandalone() || await relatedAppInstalled();
 
-const unavailableInstallMessage = async () => {
-    if (await appIsInstalled()) {
-        return 'SLSU INTRAMURALS is already installed on this device. Use the browser Open in app button, or remove the installed app first if you want to download it again.';
-    }
-
-    if (!('serviceWorker' in navigator)) {
-        return 'This browser does not support app installation for this system. Please use the latest Chrome, Edge, or another PWA-capable browser.';
-    }
-
-    if (needsSecureInstallContext()) {
-        return 'App download requires a secure HTTPS connection. Open the system using https://slsubc.tech, then try Download SLSU INTRAMURALS App again.';
-    }
-
-    return 'Chrome has not offered the install prompt yet. If the address bar shows Open in app, the app is already installed. Otherwise refresh this page and try again.';
-};
-
 const showInstallPanel = async mode => {
     if (mode !== 'update' && await appIsInstalled()) {
         hideInstallControls();
@@ -115,8 +99,8 @@ const hideInstallControls = () => {
     setRefreshButtonsVisible(false);
 };
 
-const showInlineInstallFallback = async () => {
-    if (installPrompt || await appIsInstalled()) return;
+const showSecureInstallRedirect = async () => {
+    if (!needsSecureInstallContext() || await appIsInstalled()) return;
 
     setInlineInstallButtonsVisible(true);
 };
@@ -143,7 +127,7 @@ installButtons.forEach(button => {
                 return;
             }
 
-            setInstallStatus(await unavailableInstallMessage());
+            hideInstallControls();
             return;
         }
 
@@ -165,7 +149,7 @@ installButtons.forEach(button => {
                 setInstallStatus('Install was dismissed. Refresh this page if Chrome offers the install prompt again.');
             }
         } catch {
-            setInstallStatus(await unavailableInstallMessage());
+            hideInstallControls();
         } finally {
             installPromptInProgress = false;
             setInstallButtonsDisabled(false);
@@ -175,7 +159,6 @@ installButtons.forEach(button => {
             } else {
                 if (installPanel) installPanel.hidden = true;
                 setInstallButtonsVisible(false);
-                setInlineInstallButtonsVisible(true);
             }
         }
     });
@@ -228,7 +211,7 @@ if (canUseServiceWorker()) {
 
 window.addEventListener('load', () => {
     window.setTimeout(() => {
-        void showInlineInstallFallback();
+        void showSecureInstallRedirect();
     }, 1500);
 });
 
