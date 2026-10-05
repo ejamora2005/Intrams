@@ -437,8 +437,6 @@ class SportController extends Controller
             abort_unless($students->every(fn ($student) => $roster->contains($student->id)), 422, 'Each selected student must be on the chosen team roster.');
         }
 
-        $this->eligibilityService->assertStudentsCanJoin($students, $edition, $editionSport);
-
         abort_if(
             BracketMatch::query()->where('edition_sport_id', $editionSport->id)->where('status', 'completed')->exists(),
             422,

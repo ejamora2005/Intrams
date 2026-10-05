@@ -94,3 +94,19 @@ test('default Trojan Warriors roster follows participation rule exceptions', fun
         ->and($clariceEvaluation['counts'][EligibilityService::SLOT_MAJOR])->toBe(1)
         ->and($clariceEvaluation['counts'][EligibilityService::SLOT_MINOR])->toBe(1);
 });
+
+test('rerunning the roster seeder keeps faction transfers and medical reviews', function () {
+    $this->seed(DefaultIntramuralsSeeder::class);
+
+    $student = Student::query()->where('student_number', '2310018-1')->firstOrFail();
+    $member = TeamMember::query()->where('student_id', $student->id)->firstOrFail();
+    $otherTeam = Team::query()->where('edition_id', $member->edition_id)->where('id', '!=', $member->team_id)->firstOrFail();
+    $entry = AthleteEntry::query()->where('student_id', $student->id)->firstOrFail();
+    $member->update(['team_id' => $otherTeam->id]);
+    $entry->update(['medical_certificate_status' => 'verified']);
+
+    $this->seed(DefaultIntramuralsSeeder::class);
+
+    $this->assertDatabaseHas('team_members', ['id' => $member->id, 'team_id' => $otherTeam->id]);
+    $this->assertDatabaseHas('athlete_entries', ['id' => $entry->id, 'medical_certificate_status' => 'verified']);
+});

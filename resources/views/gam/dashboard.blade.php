@@ -174,47 +174,57 @@
                 <h2 class="text-base font-semibold text-slate-950">Medical certificate verification</h2>
                 <p class="mt-1 text-sm text-slate-500">Review physical sports entries that require clearance. Chess and E-Sport (ML) are excluded.</p>
             </div>
-            <span class="inline-flex w-max whitespace-nowrap rounded-full bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-800">{{ $medicalCertificateEntries->where('effective_medical_certificate_status', 'pending')->count() }} pending</span>
+            @php($pendingStudents = $medicalCertificateEntries->where('effective_medical_certificate_status', 'pending')->groupBy('student_id')->count())
+            <span class="inline-flex w-max whitespace-nowrap rounded-full bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-800">{{ $pendingStudents }} {{ Str::plural('student', $pendingStudents) }} pending</span>
         </div>
         <div class="mt-4 overflow-x-auto">
             <table class="min-w-full text-left text-sm">
                 <thead class="border-b border-slate-100 bg-slate-50 text-xs font-semibold uppercase tracking-wide text-slate-500">
-                    <tr><th class="px-4 py-3">Student</th><th class="px-4 py-3">Event</th><th class="px-4 py-3">Status</th><th class="px-4 py-3">Review</th></tr>
+                    <tr><th class="px-4 py-3">Student</th><th class="px-4 py-3">Events requiring clearance</th><th class="px-4 py-3">Review</th></tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100">
-                    @forelse ($medicalCertificateEntries as $entry)
-                        @php($status = $entry->effective_medical_certificate_status)
+                    @forelse ($medicalCertificateGroups as $studentEntries)
+                        @php($entry = $studentEntries->first())
+                        @php($rosterTeam = $entry->student?->teamMembers?->first()?->team ?? $entry->team)
                         <tr>
                             <td class="px-4 py-3 align-top">
                                 <p class="font-medium text-slate-950">{{ $entry->student?->full_name ?? 'Removed student' }}</p>
                                 <p class="mt-1 flex flex-wrap items-center gap-1 text-xs text-slate-500">
-                                    @if ($entry->team)
-                                        <x-team-badge :team="$entry->team" size="xs" class="font-medium text-slate-600" />
+                                    @if ($rosterTeam)
+                                        <x-team-badge :team="$rosterTeam" size="xs" class="font-medium text-slate-600" />
                                     @else
                                         <span>No team</span>
                                     @endif
                                     <span>/ {{ $entry->student?->student_number ?? '-' }}</span>
                                 </p>
                             </td>
-                            <td class="px-4 py-3 align-top text-slate-600">{{ $entry->editionSport->sport?->name }}</td>
                             <td class="px-4 py-3 align-top">
-                                <span class="{{ $status === 'pending' ? 'bg-amber-50 text-amber-800' : ($status === 'verified' ? 'bg-green-50 text-green-700' : 'bg-red-600 text-white') }} inline-flex w-max whitespace-nowrap rounded-full px-2.5 py-1 text-xs font-semibold">{{ Str::headline($status) }}</span>
+                                <ul class="space-y-2">
+                                    @foreach ($studentEntries as $studentEntry)
+                                        @php($status = $studentEntry->effective_medical_certificate_status)
+                                        <li class="flex flex-wrap items-center gap-2 text-slate-700">
+                                            <span>{{ $studentEntry->editionSport->sport?->name }}</span>
+                                            <span class="{{ $status === 'pending' ? 'bg-amber-50 text-amber-800' : ($status === 'verified' ? 'bg-green-50 text-green-700' : 'bg-red-600 text-white') }} inline-flex w-max whitespace-nowrap rounded-full px-2.5 py-1 text-xs font-semibold">{{ Str::headline($status) }}</span>
+                                        </li>
+                                    @endforeach
+                                </ul>
                             </td>
                             <td class="px-4 py-3 align-top">
-                                <form method="POST" action="{{ route('gam.medical-certificates.update', $entry) }}" class="grid gap-2 sm:grid-cols-[9rem_minmax(12rem,1fr)_auto]">
+                                <form method="POST" action="{{ route('gam.medical-certificates.students.update', $entry->student) }}" class="grid min-w-[15rem] gap-2">
                                     @csrf
-                                    <select name="medical_certificate_status" class="rounded-lg border-slate-300 py-2 text-sm focus:border-blue-600 focus:ring-blue-600">
-                                        <option value="pending" @selected($status === 'pending')>Pending</option>
-                                        <option value="verified" @selected($status === 'verified')>Verified</option>
-                                        <option value="rejected" @selected($status === 'rejected')>Rejected</option>
+                                    <select name="medical_certificate_status" required aria-label="Medical certificate status for {{ $entry->student?->full_name }}" class="rounded-lg border-slate-300 py-2 text-sm focus:border-blue-600 focus:ring-blue-600">
+                                        <option value="">Choose status</option>
+                                        <option value="pending">Pending</option>
+                                        <option value="verified">Verified</option>
+                                        <option value="rejected">Rejected</option>
                                     </select>
-                                    <input name="medical_certificate_notes" value="{{ old('medical_certificate_notes', $entry->medical_certificate_notes) }}" placeholder="Notes" class="rounded-lg border-slate-300 px-3 py-2 text-sm focus:border-blue-600 focus:ring-blue-600">
-                                    <button class="rounded-lg bg-blue-700 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-800">Save</button>
+                                    <input name="medical_certificate_notes" placeholder="Notes" aria-label="Medical certificate notes for {{ $entry->student?->full_name }}" class="rounded-lg border-slate-300 px-3 py-2 text-sm focus:border-blue-600 focus:ring-blue-600">
+                                    <button class="w-fit rounded-lg bg-blue-700 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-800">Save</button>
                                 </form>
                             </td>
                         </tr>
                     @empty
-                        <tr><td colspan="4" class="px-4 py-10 text-center text-sm text-slate-500">No medical certificate reviews are required yet.</td></tr>
+                        <tr><td colspan="3" class="px-4 py-10 text-center text-sm text-slate-500">No medical certificate reviews are required yet.</td></tr>
                     @endforelse
                 </tbody>
             </table>

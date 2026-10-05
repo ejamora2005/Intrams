@@ -8,14 +8,16 @@ use App\Http\Requests\UpdateStudentRequest;
 use App\Models\Student;
 use App\Models\Course;
 use App\Models\IntramuralEdition;
+use App\Models\Team;
 use App\Services\StudentService;
+use App\Services\TeamService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class StudentController extends Controller
 {
-    public function __construct(private readonly StudentService $studentService)
+    public function __construct(private readonly StudentService $studentService, private readonly TeamService $teamService)
     {
     }
 
@@ -24,7 +26,7 @@ class StudentController extends Controller
         $status = $request->string('status')->value() ?: 'active';
         $search = $request->string('search')->value();
         $courseId = $request->integer('course_id') ?: null;
-        $activeEditionId = IntramuralEdition::query()->where('status', 'active')->value('id');
+        $activeEditionId = IntramuralEdition::query()->where('status', 'active')->orderByDesc('starts_on')->orderByDesc('id')->value('id');
 
         $students = Student::query()
             ->when($status === 'archived', fn ($query) => $query->onlyTrashed())
@@ -41,6 +43,9 @@ class StudentController extends Controller
             ->when($courseId, fn ($query) => $query->where('course_id', $courseId))
             ->with([
                 'course',
+                'teamMembers' => fn ($query) => $query
+                    ->when($activeEditionId, fn ($memberQuery) => $memberQuery->where('edition_id', $activeEditionId), fn ($memberQuery) => $memberQuery->whereRaw('1 = 0'))
+                    ->with('team'),
                 'athleteEntries' => function ($query) use ($activeEditionId): void {
                     $query
                         ->with('editionSport.sport')
@@ -71,7 +76,16 @@ class StudentController extends Controller
 
     public function edit(Student $student): View
     {
-        return view('admin.students.edit', ['student' => $student, 'courses' => Course::query()->where('status', 'active')->orderBy('name')->get()]);
+        $edition = IntramuralEdition::query()->where('status', 'active')->orderByDesc('starts_on')->orderByDesc('id')->first();
+        $currentTeam = $edition ? $student->teamMembers()->with('team')->where('edition_id', $edition->id)->first()?->team : null;
+
+        return view('admin.students.edit', [
+            'student' => $student,
+            'courses' => Course::query()->where('status', 'active')->orderBy('name')->get(),
+            'edition' => $edition,
+            'currentTeam' => $currentTeam,
+            'teams' => $edition ? Team::query()->where('edition_id', $edition->id)->where('status', 'active')->orderBy('name')->get() : collect(),
+        ]);
     }
 
     public function update(UpdateStudentRequest $request, Student $student): RedirectResponse
@@ -79,6 +93,17 @@ class StudentController extends Controller
         $student = $this->studentService->update($student, $request->validated());
 
         return redirect()->route('admin.students.index')->with('success', "{$student->full_name} was updated.");
+    }
+
+    public function transferTeam(Request $request, Student $student): RedirectResponse
+    {
+        $data = $request->validate(['team_id' => ['required', 'integer', 'exists:teams,id']]);
+        $edition = IntramuralEdition::query()->where('status', 'active')->orderByDesc('starts_on')->orderByDesc('id')->firstOrFail();
+        $team = Team::query()->where('edition_id', $edition->id)->where('status', 'active')->findOrFail($data['team_id']);
+
+        $this->teamService->transferStudent($team, $student);
+
+        return redirect()->route('admin.students.edit', $student)->with('success', $student->full_name.' is now assigned to '.$team->name.'.');
     }
 
     public function destroy(Student $student): RedirectResponse

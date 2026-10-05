@@ -316,19 +316,24 @@ test('participation rules flag possible dq students across operations dashboards
         'assigned_at' => now(),
     ]);
 
+    $this->actingAs($admin)->get(route('admin.sports.participants.assign', [
+        'sport' => $volleyball->sport,
+        'edition_id' => $edition->id,
+        'team_id' => $team->id,
+    ]))->assertOk()
+        ->assertSee('Possible DQ')
+        ->assertSee('name="student_ids[]" value="'.$student->id.'" type="checkbox" class="student-checkbox', false);
+
     $this->actingAs($admin)->post(route('admin.sports.participants.store', $volleyball->sport), [
         'edition_id' => $edition->id,
         'team_id' => $team->id,
         'student_ids' => [$student->id],
-    ])->assertSessionHasErrors('student_ids');
+    ])->assertRedirect(route('admin.sports.participants', ['sport' => $volleyball->sport, 'edition_id' => $edition->id]));
 
-    AthleteEntry::query()->create([
+    $this->assertDatabaseHas('athlete_entries', [
         'edition_sport_id' => $volleyball->id,
         'student_id' => $student->id,
-        'team_id' => $team->id,
-        'status' => 'active',
-        'assigned_by' => $admin->id,
-        'assigned_at' => now(),
+        'medical_certificate_status' => 'pending',
     ]);
 
     $this->actingAs($admin)->get(route('admin.rules.index'))->assertOk()->assertSee('Possible DQ')->assertSee('Riley Cruz');
@@ -386,6 +391,69 @@ test('GAM users can verify required medical certificates but exempt sports stay 
         'medical_certificate_reviewed_by' => $gam->id,
         'medical_certificate_notes' => 'Cleared',
     ]);
+});
+
+test('GAM medical review groups individual events by student and uses the roster faction', function () {
+    $edition = operationsEdition();
+    $team = operationsTeam($edition, 'Trojan Warriors', 'trojan-warriors', 'Information Technology', 'IT');
+    $gam = User::factory()->create(['role' => 'gam', 'status' => 'active', 'managed_team_id' => $team->id]);
+    $student = Student::query()->create([
+        'student_number' => '2310018-1',
+        'first_name' => 'Danilo',
+        'middle_name' => 'M.',
+        'last_name' => 'Dumagat',
+        'school_year' => $edition->school_year,
+        'course_id' => $team->course_id,
+        'status' => 'active',
+    ]);
+    TeamMember::query()->create([
+        'edition_id' => $edition->id,
+        'team_id' => $team->id,
+        'student_id' => $student->id,
+        'assigned_by' => $gam->id,
+        'assigned_at' => now(),
+    ]);
+
+    foreach (['Shot Put' => 'SHOT-PUT', 'Discus Throw' => 'DISCUS-THROW', 'Javelin Throw' => 'JAVELIN-THROW'] as $name => $code) {
+        $sport = operationsSport($edition, $name, $code);
+        $sport->update(['participant_type' => 'individual']);
+        AthleteEntry::query()->create([
+            'edition_sport_id' => $sport->id,
+            'student_id' => $student->id,
+            'team_id' => null,
+            'status' => 'active',
+            'medical_certificate_status' => 'pending',
+            'assigned_at' => now(),
+        ]);
+    }
+
+    $response = $this->actingAs($gam)->get(route('gam.dashboard'));
+    $response->assertOk();
+    preg_match('/<section id="medical-certificates".*?<\/section>/s', $response->getContent(), $matches);
+    $section = $matches[0] ?? '';
+    expect(substr_count($section, '>Danilo M. Dumagat</p>'))->toBe(1)
+        ->and($section)->toContain('Trojan Warriors', 'Shot Put', 'Discus Throw', 'Javelin Throw')
+        ->not->toContain('No team');
+
+    $this->actingAs($gam)->post(route('gam.medical-certificates.students.update', $student), [
+        'medical_certificate_status' => 'verified',
+        'medical_certificate_notes' => 'Cleared',
+    ])->assertRedirect();
+
+    expect(AthleteEntry::query()->where('student_id', $student->id)->where('medical_certificate_status', 'verified')->count())->toBe(3);
+
+    $otherTeam = operationsTeam($edition, 'Mighty Sea Dragons', 'mighty-sea-dragons', 'Marine Biology', 'MB');
+    $otherGam = User::factory()->create(['role' => 'gam', 'status' => 'active', 'managed_team_id' => $otherTeam->id]);
+    $this->actingAs($otherGam)->post(route('gam.medical-certificates.students.update', $student), [
+        'medical_certificate_status' => 'rejected',
+    ])->assertNotFound();
+
+    TeamMember::query()->where('student_id', $student->id)->update(['team_id' => $otherTeam->id]);
+    $this->actingAs($gam)->post(route('gam.medical-certificates.update', AthleteEntry::query()->where('student_id', $student->id)->firstOrFail()), [
+        'medical_certificate_status' => 'rejected',
+    ])->assertNotFound();
+    $this->actingAs($otherGam)->get(route('gam.dashboard'))
+        ->assertOk()->assertSee('Danilo M. Dumagat');
 });
 
 test('unassigned GAM users can manage all active factions', function () {

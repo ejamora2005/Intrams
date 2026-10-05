@@ -61,7 +61,11 @@ class StudentService
         }
 
         Team::query()->where('course_id', $student->course_id)->where('status', 'active')->each(
-            fn (Team $team) => $this->teamService->assignStudent($team, $student)
+            function (Team $team) use ($student): void {
+                if (! $student->teamMembers()->where('edition_id', $team->edition_id)->exists()) {
+                    $this->teamService->assignStudent($team, $student);
+                }
+            }
         );
     }
 }

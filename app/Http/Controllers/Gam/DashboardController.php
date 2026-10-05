@@ -72,7 +72,12 @@ class DashboardController extends Controller
         $medicalCertificateEntries = $editionSportIds->isEmpty()
             ? collect()
             : AthleteEntry::query()
-                ->with(['student.course', 'team', 'editionSport.sport'])
+                ->with([
+                    'student.course',
+                    'student.teamMembers' => fn ($query) => $query->where('edition_id', $edition->id)->with('team'),
+                    'team',
+                    'editionSport.sport',
+                ])
                 ->where('status', 'active')
                 ->whereIn('edition_sport_id', $editionSportIds)
                 ->where(function ($query) use ($edition, $managedTeamId, $hasAllFactionAccess): void {
@@ -86,11 +91,12 @@ class DashboardController extends Controller
                         return;
                     }
 
-                    $query
-                        ->where('team_id', $managedTeamId)
-                        ->orWhereHas('student.teamMembers', fn ($memberQuery) => $memberQuery
-                            ->where('edition_id', $edition->id)
-                            ->where('team_id', $managedTeamId));
+                    $query->whereHas('student.teamMembers', fn ($memberQuery) => $memberQuery
+                        ->where('edition_id', $edition->id)
+                        ->where('team_id', $managedTeamId))
+                        ->orWhere(fn ($entryQuery) => $entryQuery
+                            ->where('team_id', $managedTeamId)
+                            ->whereDoesntHave('student.teamMembers', fn ($memberQuery) => $memberQuery->where('edition_id', $edition->id)));
                 })
                 ->latest('assigned_at')
                 ->get()
@@ -112,13 +118,14 @@ class DashboardController extends Controller
             'availableStudents' => $availableStudents,
             'eligibilityByStudentId' => $eligibilityByStudentId,
             'medicalCertificateEntries' => $medicalCertificateEntries,
+            'medicalCertificateGroups' => $medicalCertificateEntries->groupBy('student_id'),
             'courses' => Course::query()->where('status', 'active')->orderBy('name')->get(),
             'metrics' => [
                 ['label' => 'Default teams', 'value' => $teams->count()],
                 ['label' => 'Rostered players', 'value' => $teams->sum('members_count')],
                 ['label' => 'Total points declared', 'value' => number_format($standings->sum(fn (array $row): float => (float) $row['tally']->points), 2)],
                 ['label' => 'Scheduled games', 'value' => $editionSportIds->isEmpty() ? 0 : CompetitionSchedule::query()->whereIn('edition_sport_id', $editionSportIds)->count()],
-                ['label' => 'Pending med certs', 'value' => $medicalCertificateEntries->where('effective_medical_certificate_status', 'pending')->count()],
+                ['label' => 'Students pending med certs', 'value' => $medicalCertificateEntries->where('effective_medical_certificate_status', 'pending')->groupBy('student_id')->count()],
             ],
             'upcomingMatches' => $editionSportIds->isEmpty()
                 ? collect()
@@ -207,6 +214,44 @@ class DashboardController extends Controller
         return back()->with('success', 'Medical certificate status updated for '.$entry->student?->full_name.'.');
     }
 
+    public function updateStudentMedicalCertificates(Request $request, Student $student): RedirectResponse
+    {
+        $edition = $this->standingsService->activeEdition();
+        abort_unless($edition !== null, 404);
+
+        $data = $request->validate([
+            'medical_certificate_status' => ['required', 'in:pending,verified,rejected'],
+            'medical_certificate_notes' => ['nullable', 'string', 'max:1000'],
+        ]);
+
+        $entries = AthleteEntry::query()
+            ->with(['editionSport.sport', 'student'])
+            ->where('student_id', $student->id)
+            ->where('status', 'active')
+            ->whereHas('editionSport', fn ($query) => $query->where('edition_id', $edition->id))
+            ->get()
+            ->filter(fn (AthleteEntry $entry): bool => $entry->editionSport !== null && $this->eligibilityService->requiresMedicalCertificate($entry->editionSport));
+
+        abort_if($entries->isEmpty(), 404);
+        abort_unless($entries->every(fn (AthleteEntry $entry): bool => $this->userCanManageEntry($request->user(), $entry)), 404);
+
+        $reviewed = in_array($data['medical_certificate_status'], ['verified', 'rejected'], true);
+
+        DB::transaction(function () use ($entries, $data, $reviewed, $request): void {
+            foreach ($entries as $entry) {
+                $entry->update([
+                    'medical_certificate_status' => $data['medical_certificate_status'],
+                    'medical_certificate_notes' => $data['medical_certificate_notes'] ?? null,
+                    'medical_certificate_reviewed_by' => $reviewed ? $request->user()?->id : null,
+                    'medical_certificate_reviewed_at' => $reviewed ? now() : null,
+                ]);
+            }
+        });
+
+        return redirect()->to(route('gam.dashboard').'#medical-certificates')
+            ->with('success', 'Medical certificate status updated for '.$student->full_name.' across '.$entries->count().' events.');
+    }
+
     private function ensureActiveTeam(Team $team): void
     {
         $team->loadMissing('edition');
@@ -236,14 +281,13 @@ class DashboardController extends Controller
 
         $managedTeamId = (int) $user->managed_team_id;
 
-        if ((int) $entry->team_id === $managedTeamId) {
-            return true;
-        }
-
-        return TeamMember::query()
+        $membership = TeamMember::query()
             ->where('edition_id', $entry->editionSport?->edition_id)
-            ->where('team_id', $managedTeamId)
             ->where('student_id', $entry->student_id)
-            ->exists();
+            ->first();
+
+        return $membership
+            ? (int) $membership->team_id === $managedTeamId
+            : (int) $entry->team_id === $managedTeamId;
     }
 }

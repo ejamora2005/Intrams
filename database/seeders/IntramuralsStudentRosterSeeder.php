@@ -29,7 +29,7 @@ class IntramuralsStudentRosterSeeder extends Seeder
 
         DB::transaction(function () use ($edition, $team, $assignedBy, $editionSports, $eligibility): void {
             foreach ($this->students() as $row) {
-                $student = Student::withTrashed()->updateOrCreate(
+                $student = Student::withTrashed()->firstOrCreate(
                     ['student_number' => $row['student_number']],
                     [
                         'first_name' => $row['first_name'],
@@ -48,7 +48,7 @@ class IntramuralsStudentRosterSeeder extends Seeder
                     $student->restore();
                 }
 
-                TeamMember::query()->updateOrCreate(
+                $membership = TeamMember::query()->firstOrCreate(
                     [
                         'edition_id' => $edition->id,
                         'student_id' => $student->id,
@@ -71,13 +71,13 @@ class IntramuralsStudentRosterSeeder extends Seeder
 
                     $requiresTeam = in_array($editionSport->participant_type, ['team', 'dual'], true);
 
-                    AthleteEntry::query()->updateOrCreate(
+                    AthleteEntry::query()->firstOrCreate(
                         [
                             'edition_sport_id' => $editionSport->id,
                             'student_id' => $student->id,
                         ],
                         [
-                            'team_id' => $requiresTeam ? $team->id : null,
+                            'team_id' => $requiresTeam ? $membership->team_id : null,
                             'status' => 'active',
                             'medical_certificate_status' => $eligibility->requiresMedicalCertificate($editionSport) ? 'pending' : 'not_required',
                             'assigned_by' => $assignedBy,

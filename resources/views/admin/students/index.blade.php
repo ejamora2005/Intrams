@@ -38,6 +38,7 @@
                         <tr>
                             <th scope="col" class="px-5 py-3">Student</th>
                             <th scope="col" class="px-5 py-3">Student number</th>
+                            <th scope="col" class="px-5 py-3">Faction</th>
                             <th scope="col" class="px-5 py-3">Joined sports/events</th>
                             <th scope="col" class="px-5 py-3">Year & section</th>
                             <th scope="col" class="px-5 py-3">Status</th>
@@ -49,6 +50,13 @@
                             <tr class="transition hover:bg-slate-50">
                                 <td class="px-5 py-4 font-medium text-slate-900">{{ $student->full_name }}</td>
                                 <td class="px-5 py-4 font-mono text-xs text-slate-600">{{ $student->student_number }}</td>
+                                <td class="px-5 py-4">
+                                    @if ($team = $student->teamMembers->first()?->team)
+                                        <x-team-badge :team="$team" size="xs" class="font-medium text-slate-700" />
+                                    @else
+                                        <span class="text-slate-500">Unassigned</span>
+                                    @endif
+                                </td>
                                 <td class="px-5 py-4">
                                     @php
                                         $joinedEvents = $student->athleteEntries

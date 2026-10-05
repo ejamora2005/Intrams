@@ -85,6 +85,7 @@ Route::middleware([
         Route::post('/students', [StudentController::class, 'store'])->name('students.store');
         Route::get('/students/{student}/edit', [StudentController::class, 'edit'])->name('students.edit');
         Route::put('/students/{student}', [StudentController::class, 'update'])->name('students.update');
+        Route::put('/students/{student}/team', [StudentController::class, 'transferTeam'])->name('students.team.update');
         Route::delete('/students/{student}', [StudentController::class, 'destroy'])->name('students.destroy');
         Route::post('/students/{student}/restore', [StudentController::class, 'restore'])->name('students.restore');
         Route::get('/teams', [TeamController::class, 'index'])->name('teams.index');
@@ -156,6 +157,7 @@ Route::middleware([
         Route::get('/rules-guidelines', [RulesController::class, 'gam'])->name('rules.index');
         Route::post('/teams/{team}/players', [GamDashboardController::class, 'storePlayer'])->name('teams.players.store');
         Route::post('/teams/{team}/players/assign', [GamDashboardController::class, 'assignExistingPlayer'])->name('teams.players.assign');
+        Route::post('/medical-certificates/students/{student}', [GamDashboardController::class, 'updateStudentMedicalCertificates'])->name('medical-certificates.students.update');
         Route::post('/medical-certificates/{entry}', [GamDashboardController::class, 'updateMedicalCertificate'])->name('medical-certificates.update');
     });
 

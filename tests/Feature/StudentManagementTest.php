@@ -3,7 +3,10 @@
 use App\Models\AthleteEntry;
 use App\Models\IntramuralEdition;
 use App\Models\Sport;
+use App\Models\SportResult;
 use App\Models\Student;
+use App\Models\Team;
+use App\Models\TeamMember;
 use App\Models\User;
 
 function activeAdmin(): User
@@ -126,6 +129,49 @@ test('admin can update, archive, and restore a student without a permanent delet
     $this->actingAs($admin)->post(route('admin.students.restore', $student->id))->assertRedirect(route('admin.students.index', ['status' => 'archived']));
     $this->assertDatabaseHas('students', ['id' => $student->id, 'deleted_at' => null]);
     $this->assertDatabaseHas('audit_logs', ['action' => 'student.restored']);
+});
+
+test('admin sees the active faction and can transfer a student without losing event registration', function () {
+    $admin = activeAdmin();
+    $edition = IntramuralEdition::query()->create([
+        'name' => 'Transfer Edition',
+        'school_year' => '2026-2027',
+        'starts_on' => '2026-10-01',
+        'ends_on' => '2026-10-06',
+        'status' => 'active',
+    ]);
+    $trojan = Team::query()->create(['edition_id' => $edition->id, 'name' => 'Trojan Warriors', 'code' => 'trojan-warriors', 'status' => 'active']);
+    $eagles = Team::query()->create(['edition_id' => $edition->id, 'name' => 'Terraquatic Eagles', 'code' => 'terraquatic-eagles', 'status' => 'active']);
+    $student = Student::factory()->create(['student_number' => '2310018-1', 'first_name' => 'Danilo', 'last_name' => 'Dumagat', 'status' => 'active']);
+    TeamMember::query()->create(['edition_id' => $edition->id, 'team_id' => $trojan->id, 'student_id' => $student->id, 'assigned_by' => $admin->id, 'assigned_at' => now()]);
+    $volleyball = Sport::query()->create(['name' => 'Volleyball', 'code' => 'VOLLEYBALL', 'status' => 'active']);
+    $editionSport = $edition->editionSports()->create(['sport_id' => $volleyball->id, 'participant_type' => 'team', 'game_mechanic' => 'custom', 'status' => 'active']);
+    $entry = AthleteEntry::query()->create(['edition_sport_id' => $editionSport->id, 'student_id' => $student->id, 'team_id' => $trojan->id, 'status' => 'active', 'assigned_at' => now()]);
+
+    $this->actingAs($admin)->get(route('admin.students.index', ['search' => 'Danilo']))
+        ->assertOk()->assertSee('Faction')->assertSee('Trojan Warriors');
+    $this->actingAs($admin)->get(route('admin.students.edit', $student))
+        ->assertOk()->assertSee('Transfer student')->assertSee('Terraquatic Eagles');
+
+    $this->actingAs($admin)->put(route('admin.students.team.update', $student), ['team_id' => $eagles->id])
+        ->assertRedirect(route('admin.students.edit', $student));
+
+    $this->assertDatabaseHas('team_members', ['student_id' => $student->id, 'edition_id' => $edition->id, 'team_id' => $eagles->id]);
+    $this->assertDatabaseHas('athlete_entries', ['id' => $entry->id, 'team_id' => $eagles->id]);
+    $this->assertDatabaseHas('audit_logs', ['action' => 'team.member.transferred']);
+
+    $this->actingAs($admin)->put(route('admin.students.update', $student), validStudentData(['student_number' => $student->student_number]))
+        ->assertRedirect(route('admin.students.index'));
+    $this->assertDatabaseHas('team_members', ['student_id' => $student->id, 'edition_id' => $edition->id, 'team_id' => $eagles->id]);
+
+    SportResult::query()->create(['edition_sport_id' => $editionSport->id, 'submitted_by' => $admin->id, 'placements_json' => [], 'points_json' => [], 'submitted_at' => now()]);
+    $this->actingAs($admin)->put(route('admin.students.team.update', $student), ['team_id' => $trojan->id])
+        ->assertStatus(422);
+    $this->assertDatabaseHas('team_members', ['student_id' => $student->id, 'edition_id' => $edition->id, 'team_id' => $eagles->id]);
+
+    $this->actingAs(User::factory()->create(['role' => 'gam', 'status' => 'active']))
+        ->put(route('admin.students.team.update', $student), ['team_id' => $trojan->id])
+        ->assertForbidden();
 });
 
 test('coordinators cannot manage student records', function () {

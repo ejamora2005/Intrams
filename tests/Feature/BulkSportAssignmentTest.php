@@ -83,6 +83,58 @@ test('the universal assignment page filters students by the selected team', func
         ->assertDontSee($excluded->full_name);
 });
 
+test('admin can select students when medical certificates are not required or were verified for another event', function () {
+    $admin = bulkAssignmentAdmin();
+    $edition = bulkAssignmentEdition();
+    $chess = Sport::query()->create(['name' => 'Chess', 'code' => 'CHESS', 'status' => 'active']);
+    $chessEditionSport = EditionSport::query()->create([
+        'edition_id' => $edition->id,
+        'sport_id' => $chess->id,
+        'participant_type' => 'individual',
+        'game_mechanic' => 'custom',
+        'status' => 'active',
+    ]);
+    $volleyball = Sport::query()->create(['name' => 'Volleyball', 'code' => 'VOLLEYBALL', 'status' => 'active']);
+    $volleyballEditionSport = EditionSport::query()->create([
+        'edition_id' => $edition->id,
+        'sport_id' => $volleyball->id,
+        'participant_type' => 'team',
+        'game_mechanic' => 'custom',
+        'status' => 'active',
+    ]);
+    $withoutCertificate = Student::factory()->create(['status' => 'active']);
+    $verifiedCertificate = Student::factory()->create(['status' => 'active']);
+    AthleteEntry::query()->create([
+        'edition_sport_id' => $volleyballEditionSport->id,
+        'student_id' => $verifiedCertificate->id,
+        'status' => 'active',
+        'medical_certificate_status' => 'verified',
+        'assigned_by' => $admin->id,
+        'assigned_at' => now(),
+    ]);
+
+    $this->actingAs($admin)
+        ->get(route('admin.sports.participants.assign', ['sport' => $chess, 'edition_id' => $edition->id]))
+        ->assertOk()
+        ->assertSee('name="student_ids[]" value="'.$withoutCertificate->id.'" type="checkbox" class="student-checkbox', false)
+        ->assertSee('name="student_ids[]" value="'.$verifiedCertificate->id.'" type="checkbox" class="student-checkbox', false);
+
+    $this->actingAs($admin)
+        ->post(route('admin.sports.participants.store', $chess), [
+            'edition_id' => $edition->id,
+            'student_ids' => [$withoutCertificate->id, $verifiedCertificate->id],
+        ])
+        ->assertRedirect(route('admin.sports.participants', ['sport' => $chess, 'edition_id' => $edition->id]));
+
+    foreach ([$withoutCertificate, $verifiedCertificate] as $student) {
+        $this->assertDatabaseHas('athlete_entries', [
+            'edition_sport_id' => $chessEditionSport->id,
+            'student_id' => $student->id,
+            'medical_certificate_status' => 'not_required',
+        ]);
+    }
+});
+
 test('an admin can create multiple tied dual pairs for one team', function () {
     $admin = bulkAssignmentAdmin();
     $edition = bulkAssignmentEdition();
