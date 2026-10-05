@@ -11,6 +11,13 @@
     "background_color": "#06152c",
     "theme_color": "#06152c",
     "categories": ["education", "sports", "productivity"],
+    "related_applications": [
+        {
+            "platform": "webapp",
+            "url": "/manifest.webmanifest",
+            "id": "https://slsubc.tech/?source=pwa"
+        }
+    ],
     "icons": [
         {
             "src": "/icons/pwa-icon-192.png",

@@ -22,6 +22,15 @@ const secureInstallUrl = () => {
 
     return url.toString();
 };
+const manualInstallInstructions = () => {
+    const isAppleMobile = /iPad|iPhone|iPod/.test(navigator.userAgent)
+        || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+
+    if (isAppleMobile) return 'Open this page in Safari, tap Share, then Add to Home Screen.';
+    if (/Android/.test(navigator.userAgent)) return 'Open the browser menu and tap Install app or Add to Home screen.';
+
+    return 'Open the browser menu and choose Install SLSU INTRAMURALS or Install this site as an app.';
+};
 
 const setInstallButtonsVisible = visible => {
     installButtons.forEach(button => {
@@ -99,8 +108,11 @@ const hideInstallControls = () => {
     setRefreshButtonsVisible(false);
 };
 
-const showSecureInstallRedirect = async () => {
-    if (!needsSecureInstallContext() || await appIsInstalled()) return;
+const showInlineInstallAction = async () => {
+    if (await appIsInstalled()) {
+        hideInstallControls();
+        return;
+    }
 
     setInlineInstallButtonsVisible(true);
 };
@@ -108,6 +120,7 @@ const showSecureInstallRedirect = async () => {
 window.addEventListener('beforeinstallprompt', event => {
     event.preventDefault();
     installPrompt = event;
+    void showInlineInstallAction();
     void showInstallPanel('install');
 });
 
@@ -127,7 +140,12 @@ installButtons.forEach(button => {
                 return;
             }
 
-            hideInstallControls();
+            if (await appIsInstalled()) {
+                hideInstallControls();
+                return;
+            }
+
+            setInstallStatus(manualInstallInstructions());
             return;
         }
 
@@ -139,17 +157,17 @@ installButtons.forEach(button => {
         let accepted = false;
 
         try {
-            prompt.prompt();
+            await prompt.prompt();
             const choice = await prompt.userChoice;
             accepted = choice.outcome === 'accepted';
 
             if (accepted) {
                 setInstallStatus('Installing SLSU INTRAMURALS App...');
             } else {
-                setInstallStatus('Install was dismissed. Refresh this page if Chrome offers the install prompt again.');
+                setInstallStatus(manualInstallInstructions());
             }
         } catch {
-            hideInstallControls();
+            setInstallStatus(manualInstallInstructions());
         } finally {
             installPromptInProgress = false;
             setInstallButtonsDisabled(false);
@@ -158,7 +176,7 @@ installButtons.forEach(button => {
                 setInstallButtonsVisible(false);
             } else {
                 if (installPanel) installPanel.hidden = true;
-                setInstallButtonsVisible(false);
+                setInlineInstallButtonsVisible(true);
             }
         }
     });
@@ -209,12 +227,8 @@ if (canUseServiceWorker()) {
     });
 }
 
-window.addEventListener('load', () => {
-    window.setTimeout(() => {
-        void showSecureInstallRedirect();
-    }, 1500);
-});
-
 if (isStandalone()) {
     hideInstallControls();
+} else {
+    void showInlineInstallAction();
 }

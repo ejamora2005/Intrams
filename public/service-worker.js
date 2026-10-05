@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'slsu-intramurals-pwa-v4';
+const CACHE_VERSION = 'slsu-intramurals-pwa-v5';
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 const OFFLINE_URL = '/offline.html';

@@ -42,6 +42,12 @@ textarea {
     display: none;
 }
 
+[data-pwa-shell] [hidden],
+[data-pwa-inline-install-button][hidden],
+[data-pwa-install-status][hidden] {
+    display: none !important;
+}
+
 @font-face {
     font-family: 'Ops Barlow';
     font-style: normal;
