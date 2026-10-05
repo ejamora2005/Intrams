@@ -11752,7 +11752,7 @@
       "file_type": "code",
       "norm_label": "stalewhilerevalidate()",
       "source_file": "public/service-worker.js",
-      "source_location": "L67"
+      "source_location": "L69"
     },
     {
       "id": "database_migrations_2026_10_04_000003_add_managed_team_id_to_users_table_closure_1",
@@ -29666,7 +29666,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "public/service-worker.js",
-      "source_location": "L67",
+      "source_location": "L69",
       "weight": 1.0
     },
     {
@@ -63802,5 +63802,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "624efa51374c64b7aef1ed2db86ed380a098c888"
+  "built_at_commit": "bc6caba9fc629eea90bfb6b061ed886e94dd1a4b"
 }

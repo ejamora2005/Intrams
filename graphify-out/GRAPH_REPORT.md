@@ -1,7 +1,7 @@
 # Graph Report - Intrams  (2026-10-05)
 
 ## Corpus Check
-- 353 files · ~754,152 words
+- 353 files · ~754,320 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 34 file(s) not represented in the graph (top: (none) 18, .woff2 5, .css 3)
 
@@ -11,7 +11,7 @@
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `624efa51`
+- Built from commit: `bc6caba9`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
