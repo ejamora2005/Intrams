@@ -1,0 +1,1406 @@
+{
+  "communities": {
+    "0": [
+      "app_http_controllers_admin_registrationcontroller",
+      "app_http_controllers_admin_registrationcontroller_registrationcontroller",
+      "app_http_controllers_admin_registrationcontroller_registrationcontroller_construct",
+      "app_http_controllers_admin_registrationcontroller_registrationcontroller_create",
+      "app_http_controllers_admin_registrationcontroller_registrationcontroller_index",
+      "app_http_controllers_admin_registrationcontroller_registrationcontroller_rules",
+      "app_http_controllers_admin_registrationcontroller_registrationcontroller_withdraw",
+      "app_http_controllers_admin_teamcontroller",
+      "app_http_controllers_admin_teamcontroller_teamcontroller",
+      "app_http_controllers_admin_teamcontroller_teamcontroller_assignmember",
+      "app_http_controllers_admin_teamcontroller_teamcontroller_construct",
+      "app_http_controllers_admin_teamcontroller_teamcontroller_create",
+      "app_http_controllers_admin_teamcontroller_teamcontroller_destroy",
+      "app_http_controllers_admin_teamcontroller_teamcontroller_edit",
+      "app_http_controllers_admin_teamcontroller_teamcontroller_index",
+      "app_http_controllers_admin_teamcontroller_teamcontroller_removemember",
+      "app_http_controllers_admin_teamcontroller_teamcontroller_restore",
+      "app_http_controllers_admin_teamcontroller_teamcontroller_store",
+      "app_http_controllers_admin_teamcontroller_teamcontroller_update",
+      "app_http_requests_assignteammemberrequest",
+      "app_http_requests_assignteammemberrequest_assignteammemberrequest",
+      "app_http_requests_assignteammemberrequest_assignteammemberrequest_authorize",
+      "app_http_requests_assignteammemberrequest_assignteammemberrequest_rules",
+      "app_http_requests_storeteamrequest_storeteamrequest",
+      "app_http_requests_storeteamrequest_storeteamrequest_authorize",
+      "app_http_requests_storeteamrequest_storeteamrequest_rules",
+      "app_http_requests_updateteamrequest",
+      "app_http_requests_updateteamrequest_updateteamrequest",
+      "app_http_requests_updateteamrequest_updateteamrequest_authorize",
+      "app_http_requests_updateteamrequest_updateteamrequest_rules",
+      "app_models_eventregistration",
+      "app_models_eventregistration_eventregistration",
+      "app_models_eventregistration_eventregistration_event",
+      "app_models_eventregistration_eventregistration_student",
+      "app_models_eventregistration_eventregistration_team",
+      "app_models_participationrule",
+      "app_models_participationrule_participationrule",
+      "app_models_participationrule_participationrule_edition",
+      "app_models_team_team",
+      "app_models_team_team_edition",
+      "app_models_team_team_members",
+      "app_models_teammember",
+      "app_models_teammember_teammember",
+      "app_models_teammember_teammember_student",
+      "app_models_teammember_teammember_team",
+      "app_services_participationservice",
+      "app_services_participationservice_participationservice",
+      "app_services_participationservice_participationservice_createrule",
+      "app_services_participationservice_participationservice_register",
+      "app_services_participationservice_participationservice_withdraw",
+      "app_services_teamservice",
+      "app_services_teamservice_teamservice",
+      "app_services_teamservice_teamservice_archive",
+      "app_services_teamservice_teamservice_assignstudent",
+      "app_services_teamservice_teamservice_construct",
+      "app_services_teamservice_teamservice_create",
+      "app_services_teamservice_teamservice_removestudent",
+      "app_services_teamservice_teamservice_restore",
+      "app_services_teamservice_teamservice_update"
+    ],
+    "1": [
+      "app_http_controllers_admin_coordinatorcontroller_coordinatorcontroller_construct",
+      "app_models_coordinatorassignment",
+      "app_models_coordinatorassignment_coordinatorassignment",
+      "app_models_coordinatorassignment_coordinatorassignment_coordinator",
+      "app_models_coordinatorassignment_coordinatorassignment_event",
+      "app_models_coordinatordevice",
+      "app_models_coordinatorrequest",
+      "app_models_coordinatorrequest_coordinatorrequest",
+      "app_models_coordinatorrequest_coordinatorrequest_coordinator",
+      "app_models_coordinatorrequest_coordinatorrequest_event",
+      "app_models_coordinatorrequest_coordinatorrequest_sourceevent",
+      "app_models_course",
+      "app_models_editionsport",
+      "app_models_editionsport_editionsport",
+      "app_models_editionsport_editionsport_edition",
+      "app_models_editionsport_editionsport_sport",
+      "app_models_event",
+      "app_models_intramuraledition",
+      "app_models_resultsubmission",
+      "app_models_resultsubmission_resultsubmission",
+      "app_models_resultsubmission_resultsubmission_fixture",
+      "app_models_sport",
+      "app_models_student",
+      "app_models_team",
+      "app_models_teamtally",
+      "app_models_teamtally_teamtally",
+      "app_models_teamtally_teamtally_team",
+      "app_services_auditservice_auditservice",
+      "app_services_auditservice_auditservice_record",
+      "app_services_coordinatorservice",
+      "app_services_coordinatorservice_coordinatorservice",
+      "app_services_coordinatorservice_coordinatorservice_assign",
+      "app_services_coordinatorservice_coordinatorservice_construct",
+      "app_services_coordinatorservice_coordinatorservice_create",
+      "app_services_coordinatorservice_coordinatorservice_requestchange",
+      "app_services_coordinatorservice_coordinatorservice_resetdevice",
+      "app_services_coordinatorservice_coordinatorservice_reviewrequest",
+      "app_services_coordinatorservice_coordinatorservice_revoke",
+      "app_services_coordinatorservice_coordinatorservice_safevalues",
+      "app_services_coordinatorservice_coordinatorservice_update",
+      "app_services_editionservice_editionservice_construct",
+      "app_services_eventservice_eventservice_construct",
+      "app_services_participationservice_participationservice_construct",
+      "app_services_resultservice",
+      "app_services_resultservice_resultservice",
+      "app_services_resultservice_resultservice_approve",
+      "app_services_resultservice_resultservice_construct",
+      "app_services_resultservice_resultservice_reject",
+      "app_services_sportservice_sportservice_construct",
+      "app_services_studentservice_studentservice_construct",
+      "illuminate_database_eloquent_factories_hasfactory",
+      "illuminate_database_eloquent_model",
+      "illuminate_database_eloquent_softdeletes",
+      "illuminate_support_arr"
+    ],
+    "2": [
+      "database_migrations_2014_10_12_000000_create_users_table",
+      "database_migrations_2014_10_12_000000_create_users_table_down",
+      "database_migrations_2014_10_12_000000_create_users_table_up",
+      "database_migrations_2014_10_12_100000_create_password_reset_tokens_table",
+      "database_migrations_2014_10_12_100000_create_password_reset_tokens_table_down",
+      "database_migrations_2014_10_12_100000_create_password_reset_tokens_table_up",
+      "database_migrations_2014_10_12_200000_add_two_factor_columns_to_users_table",
+      "database_migrations_2014_10_12_200000_add_two_factor_columns_to_users_table_down",
+      "database_migrations_2014_10_12_200000_add_two_factor_columns_to_users_table_up",
+      "database_migrations_2019_08_19_000000_create_failed_jobs_table",
+      "database_migrations_2019_08_19_000000_create_failed_jobs_table_down",
+      "database_migrations_2019_08_19_000000_create_failed_jobs_table_up",
+      "database_migrations_2019_12_14_000001_create_personal_access_tokens_table",
+      "database_migrations_2019_12_14_000001_create_personal_access_tokens_table_down",
+      "database_migrations_2019_12_14_000001_create_personal_access_tokens_table_up",
+      "database_migrations_2026_09_18_151340_create_sessions_table",
+      "database_migrations_2026_09_18_151340_create_sessions_table_down",
+      "database_migrations_2026_09_18_151340_create_sessions_table_up",
+      "database_migrations_2026_09_18_160000_add_intramurals_access_fields_to_users_table",
+      "database_migrations_2026_09_18_160000_add_intramurals_access_fields_to_users_table_down",
+      "database_migrations_2026_09_18_160000_add_intramurals_access_fields_to_users_table_up",
+      "database_migrations_2026_09_18_160100_create_intramurals_master_tables",
+      "database_migrations_2026_09_18_160100_create_intramurals_master_tables_down",
+      "database_migrations_2026_09_18_160100_create_intramurals_master_tables_up",
+      "database_migrations_2026_09_18_160200_create_intramurals_operations_tables",
+      "database_migrations_2026_09_18_160200_create_intramurals_operations_tables_down",
+      "database_migrations_2026_09_18_160200_create_intramurals_operations_tables_up",
+      "database_migrations_2026_09_19_090000_add_activity_context_to_audit_logs_table",
+      "database_migrations_2026_09_19_090000_add_activity_context_to_audit_logs_table_down",
+      "database_migrations_2026_09_19_090000_add_activity_context_to_audit_logs_table_up",
+      "database_migrations_2026_09_20_100000_add_source_event_to_coordinator_requests_table",
+      "database_migrations_2026_09_20_100000_add_source_event_to_coordinator_requests_table_down",
+      "database_migrations_2026_09_20_100000_add_source_event_to_coordinator_requests_table_up",
+      "database_migrations_2026_09_20_110000_create_team_members_table",
+      "database_migrations_2026_09_20_110000_create_team_members_table_down",
+      "database_migrations_2026_09_20_110000_create_team_members_table_up",
+      "database_migrations_2026_09_20_120000_add_school_year_to_students_table",
+      "database_migrations_2026_09_20_120000_add_school_year_to_students_table_down",
+      "database_migrations_2026_09_20_120000_add_school_year_to_students_table_up",
+      "database_migrations_2026_09_20_130000_create_courses_and_add_course_to_students_table",
+      "database_migrations_2026_09_20_130000_create_courses_and_add_course_to_students_table_down",
+      "database_migrations_2026_09_20_130000_create_courses_and_add_course_to_students_table_up",
+      "database_migrations_2026_09_20_140000_add_is_system_to_sports_table",
+      "database_migrations_2026_09_20_140000_add_is_system_to_sports_table_down",
+      "database_migrations_2026_09_20_140000_add_is_system_to_sports_table_up",
+      "database_migrations_2026_09_20_150000_create_edition_sports_table",
+      "database_migrations_2026_09_20_150000_create_edition_sports_table_down",
+      "database_migrations_2026_09_20_150000_create_edition_sports_table_up",
+      "illuminate_database_migrations_migration",
+      "illuminate_database_schema_blueprint",
+      "illuminate_support_facades_schema"
+    ],
+    "3": [
+      "app_http_controllers_admin_sportcontroller",
+      "app_http_controllers_admin_sportcontroller_sportcontroller",
+      "app_http_controllers_admin_sportcontroller_sportcontroller_construct",
+      "app_http_controllers_admin_sportcontroller_sportcontroller_create",
+      "app_http_controllers_admin_sportcontroller_sportcontroller_currentedition",
+      "app_http_controllers_admin_sportcontroller_sportcontroller_destroy",
+      "app_http_controllers_admin_sportcontroller_sportcontroller_edit",
+      "app_http_controllers_admin_sportcontroller_sportcontroller_events",
+      "app_http_controllers_admin_sportcontroller_sportcontroller_index",
+      "app_http_controllers_admin_sportcontroller_sportcontroller_restore",
+      "app_http_controllers_admin_sportcontroller_sportcontroller_store",
+      "app_http_controllers_admin_sportcontroller_sportcontroller_update",
+      "app_http_requests_storesportrequest",
+      "app_http_requests_storesportrequest_storesportrequest",
+      "app_http_requests_storesportrequest_storesportrequest_authorize",
+      "app_http_requests_storesportrequest_storesportrequest_prepareforvalidation",
+      "app_http_requests_storesportrequest_storesportrequest_rules",
+      "app_http_requests_updatesportrequest",
+      "app_http_requests_updatesportrequest_updatesportrequest",
+      "app_http_requests_updatesportrequest_updatesportrequest_authorize",
+      "app_http_requests_updatesportrequest_updatesportrequest_prepareforvalidation",
+      "app_http_requests_updatesportrequest_updatesportrequest_rules",
+      "app_models_sport_sport",
+      "app_models_sport_sport_editionsports",
+      "app_models_sport_sport_events",
+      "app_services_auditservice",
+      "app_services_coordinatordeviceservice",
+      "app_services_eventservice",
+      "app_services_sportservice",
+      "app_services_sportservice_sportservice",
+      "app_services_sportservice_sportservice_archive",
+      "app_services_sportservice_sportservice_create",
+      "app_services_sportservice_sportservice_restore",
+      "app_services_sportservice_sportservice_update",
+      "config_cache",
+      "config_database",
+      "config_session",
+      "database_seeders_databaseseeder",
+      "database_seeders_databaseseeder_databaseseeder",
+      "database_seeders_databaseseeder_databaseseeder_run",
+      "database_seeders_defaultsportsseeder",
+      "database_seeders_defaultsportsseeder_defaultsportsseeder",
+      "database_seeders_defaultsportsseeder_defaultsportsseeder_run",
+      "illuminate_database_seeder",
+      "illuminate_support_facades_cookie",
+      "illuminate_support_facades_db",
+      "illuminate_support_str",
+      "tests_feature_systemlogtest"
+    ],
+    "4": [
+      "composer",
+      "composer_allow_plugins_pestphp_pest_plugin",
+      "composer_allow_plugins_php_http_discovery",
+      "composer_autoload",
+      "composer_autoload_dev",
+      "composer_autoload_dev_psr_4",
+      "composer_autoload_psr_4",
+      "composer_config",
+      "composer_config_allow_plugins",
+      "composer_config_optimize_autoloader",
+      "composer_config_preferred_install",
+      "composer_config_sort_packages",
+      "composer_description",
+      "composer_extra",
+      "composer_extra_laravel",
+      "composer_keywords",
+      "composer_laravel_dont_discover",
+      "composer_license",
+      "composer_minimum_stability",
+      "composer_name",
+      "composer_prefer_stable",
+      "composer_psr_4_app",
+      "composer_psr_4_database_factories",
+      "composer_psr_4_database_seeders",
+      "composer_psr_4_tests",
+      "composer_require",
+      "composer_require_dev",
+      "composer_require_dev_fakerphp_faker",
+      "composer_require_dev_laravel_pint",
+      "composer_require_dev_laravel_sail",
+      "composer_require_dev_mockery_mockery",
+      "composer_require_dev_nunomaduro_collision",
+      "composer_require_dev_pestphp_pest",
+      "composer_require_dev_pestphp_pest_plugin_laravel",
+      "composer_require_dev_spatie_laravel_ignition",
+      "composer_require_guzzlehttp_guzzle",
+      "composer_require_laravel_framework",
+      "composer_require_laravel_jetstream",
+      "composer_require_laravel_sanctum",
+      "composer_require_laravel_tinker",
+      "composer_require_livewire_livewire",
+      "composer_require_php",
+      "composer_scripts",
+      "composer_scripts_post_autoload_dump",
+      "composer_scripts_post_create_project_cmd",
+      "composer_scripts_post_root_package_install",
+      "composer_scripts_post_update_cmd",
+      "composer_type"
+    ],
+    "5": [
+      "app_http_controllers_admin_studentcontroller",
+      "app_http_controllers_admin_studentcontroller_studentcontroller",
+      "app_http_controllers_admin_studentcontroller_studentcontroller_construct",
+      "app_http_controllers_admin_studentcontroller_studentcontroller_create",
+      "app_http_controllers_admin_studentcontroller_studentcontroller_destroy",
+      "app_http_controllers_admin_studentcontroller_studentcontroller_edit",
+      "app_http_controllers_admin_studentcontroller_studentcontroller_index",
+      "app_http_controllers_admin_studentcontroller_studentcontroller_restore",
+      "app_http_controllers_admin_studentcontroller_studentcontroller_store",
+      "app_http_controllers_admin_studentcontroller_studentcontroller_update",
+      "app_http_requests_concerns_sanitizesstudentinput",
+      "app_http_requests_concerns_sanitizesstudentinput_sanitizesstudentinput",
+      "app_http_requests_concerns_sanitizesstudentinput_sanitizesstudentinput_sanitizestudentinput",
+      "app_http_requests_storestudentrequest",
+      "app_http_requests_storestudentrequest_storestudentrequest",
+      "app_http_requests_storestudentrequest_storestudentrequest_authorize",
+      "app_http_requests_storestudentrequest_storestudentrequest_prepareforvalidation",
+      "app_http_requests_storestudentrequest_storestudentrequest_rules",
+      "app_http_requests_updatestudentrequest",
+      "app_http_requests_updatestudentrequest_updatestudentrequest",
+      "app_http_requests_updatestudentrequest_updatestudentrequest_authorize",
+      "app_http_requests_updatestudentrequest_updatestudentrequest_prepareforvalidation",
+      "app_http_requests_updatestudentrequest_updatestudentrequest_rules",
+      "app_models_course_course",
+      "app_models_course_course_students",
+      "app_models_student_student",
+      "app_models_student_student_course",
+      "app_models_student_student_getfullnameattribute",
+      "app_models_student_student_teammembers",
+      "app_services_studentservice",
+      "app_services_studentservice_studentservice",
+      "app_services_studentservice_studentservice_archive",
+      "app_services_studentservice_studentservice_create",
+      "app_services_studentservice_studentservice_restore",
+      "app_services_studentservice_studentservice_update"
+    ],
+    "6": [
+      "app_http_controllers_admin_editioncontroller",
+      "app_http_controllers_admin_editioncontroller_editioncontroller",
+      "app_http_controllers_admin_editioncontroller_editioncontroller_construct",
+      "app_http_controllers_admin_editioncontroller_editioncontroller_create",
+      "app_http_controllers_admin_editioncontroller_editioncontroller_destroy",
+      "app_http_controllers_admin_editioncontroller_editioncontroller_edit",
+      "app_http_controllers_admin_editioncontroller_editioncontroller_index",
+      "app_http_controllers_admin_editioncontroller_editioncontroller_store",
+      "app_http_controllers_admin_editioncontroller_editioncontroller_update",
+      "app_http_requests_updateeditionrequest_updateeditionrequest",
+      "app_http_requests_updateeditionrequest_updateeditionrequest_authorize",
+      "app_http_requests_updateeditionrequest_updateeditionrequest_rules",
+      "app_models_intramuraledition_intramuraledition",
+      "app_models_intramuraledition_intramuraledition_editionsports",
+      "app_models_intramuraledition_intramuraledition_teams",
+      "app_services_editionservice",
+      "app_services_editionservice_editionservice",
+      "app_services_editionservice_editionservice_archive",
+      "app_services_editionservice_editionservice_create",
+      "app_services_editionservice_editionservice_ensurenootheractiveedition",
+      "app_services_editionservice_editionservice_update",
+      "tests_feature_sportseventmanagementtest",
+      "tests_feature_sportseventmanagementtest_sportsadmin",
+      "tests_feature_sportseventmanagementtest_sportsedition",
+      "tests_feature_teammanagementtest",
+      "tests_feature_teammanagementtest_teammoduleadmin",
+      "tests_feature_teammanagementtest_teammoduleedition",
+      "tests_feature_teammanagementtest_teammodulestudent",
+      "tests_feature_teammanagementtest_validteamdata"
+    ],
+    "7": [
+      "package",
+      "package_devdependencies",
+      "package_devdependencies_autoprefixer",
+      "package_devdependencies_axios",
+      "package_devdependencies_laravel_vite_plugin",
+      "package_devdependencies_postcss",
+      "package_devdependencies_tailwindcss",
+      "package_devdependencies_tailwindcss_forms",
+      "package_devdependencies_tailwindcss_typography",
+      "package_devdependencies_vite",
+      "package_private",
+      "package_scripts",
+      "package_scripts_build",
+      "package_scripts_dev",
+      "package_type",
+      "ref_autoprefixer",
+      "ref_axios",
+      "ref_laravel_vite_plugin",
+      "ref_postcss",
+      "ref_tailwindcss",
+      "ref_tailwindcss_forms",
+      "ref_tailwindcss_typography",
+      "ref_vite",
+      "resources_js_app",
+      "resources_js_bootstrap",
+      "tailwind_config",
+      "tailwindcss",
+      "vite_config"
+    ],
+    "8": [
+      "app_providers_eventserviceprovider",
+      "app_providers_eventserviceprovider_eventserviceprovider",
+      "app_providers_eventserviceprovider_eventserviceprovider_boot",
+      "app_providers_eventserviceprovider_eventserviceprovider_shoulddiscoverevents",
+      "app_providers_routeserviceprovider",
+      "app_providers_routeserviceprovider_routeserviceprovider",
+      "app_providers_routeserviceprovider_routeserviceprovider_boot",
+      "config_fortify",
+      "illuminate_auth_events_registered",
+      "illuminate_auth_events_verified",
+      "illuminate_auth_listeners_sendemailverificationnotification",
+      "illuminate_auth_notifications_resetpassword",
+      "illuminate_cache_ratelimiting_limit",
+      "illuminate_foundation_support_providers_eventserviceprovider",
+      "illuminate_foundation_support_providers_routeserviceprovider",
+      "illuminate_support_facades_event",
+      "illuminate_support_facades_notification",
+      "illuminate_support_facades_ratelimiter",
+      "illuminate_support_facades_url",
+      "laravel_fortify_features",
+      "tests_feature_authenticationtest",
+      "tests_feature_emailverificationtest",
+      "tests_feature_passwordresettest",
+      "tests_feature_registrationtest"
+    ],
+    "9": [
+      "app_actions_jetstream_deleteuser",
+      "app_actions_jetstream_deleteuser_deleteuser",
+      "app_actions_jetstream_deleteuser_deleteuser_delete",
+      "app_providers_appserviceprovider",
+      "app_providers_appserviceprovider_appserviceprovider",
+      "app_providers_appserviceprovider_appserviceprovider_boot",
+      "app_providers_appserviceprovider_appserviceprovider_register",
+      "app_providers_broadcastserviceprovider",
+      "app_providers_broadcastserviceprovider_broadcastserviceprovider",
+      "app_providers_broadcastserviceprovider_broadcastserviceprovider_boot",
+      "app_providers_jetstreamserviceprovider",
+      "app_providers_jetstreamserviceprovider_jetstreamserviceprovider",
+      "app_providers_jetstreamserviceprovider_jetstreamserviceprovider_boot",
+      "app_providers_jetstreamserviceprovider_jetstreamserviceprovider_configurepermissions",
+      "app_providers_jetstreamserviceprovider_jetstreamserviceprovider_register",
+      "config_app",
+      "illuminate_support_facades_broadcast",
+      "illuminate_support_facades_facade",
+      "illuminate_support_serviceprovider",
+      "laravel_jetstream_contracts_deletesusers",
+      "laravel_jetstream_jetstream",
+      "routes_channels"
+    ],
+    "10": [
+      "app_models_user",
+      "app_models_user_user",
+      "app_models_user_user_canuseintramuralslogin",
+      "app_models_user_user_coordinatorassignments",
+      "app_models_user_user_coordinatordevices",
+      "app_models_user_user_coordinatorrequests",
+      "database_seeders_adminuserseeder",
+      "database_seeders_adminuserseeder_adminuserseeder",
+      "database_seeders_adminuserseeder_adminuserseeder_run",
+      "illuminate_database_eloquent_relations_hasmany",
+      "illuminate_foundation_auth_user",
+      "illuminate_notifications_notifiable",
+      "laravel_fortify_twofactorauthenticatable",
+      "laravel_jetstream_hasprofilephoto",
+      "laravel_sanctum_hasapitokens",
+      "tests_feature_editionmanagementtest",
+      "tests_feature_editionmanagementtest_editionmoduleadmin",
+      "tests_feature_editionmanagementtest_valideditiondata",
+      "tests_feature_studentmanagementtest",
+      "tests_feature_studentmanagementtest_activeadmin",
+      "tests_feature_studentmanagementtest_validstudentdata"
+    ],
+    "11": [
+      "app_http_controllers_admin_registrationcontroller_registrationcontroller_storerule",
+      "app_http_requests_storeeditionrequest",
+      "app_http_requests_storeeditionrequest_storeeditionrequest",
+      "app_http_requests_storeeditionrequest_storeeditionrequest_authorize",
+      "app_http_requests_storeeditionrequest_storeeditionrequest_rules",
+      "app_http_requests_storeparticipationrulerequest",
+      "app_http_requests_storeparticipationrulerequest_storeparticipationrulerequest",
+      "app_http_requests_storeparticipationrulerequest_storeparticipationrulerequest_authorize",
+      "app_http_requests_storeparticipationrulerequest_storeparticipationrulerequest_rules",
+      "app_http_requests_storeteamrequest",
+      "app_http_requests_updatecoordinatorrequest",
+      "app_http_requests_updatecoordinatorrequest_updatecoordinatorrequest",
+      "app_http_requests_updatecoordinatorrequest_updatecoordinatorrequest_authorize",
+      "app_http_requests_updatecoordinatorrequest_updatecoordinatorrequest_rules",
+      "app_http_requests_updateeditionrequest",
+      "illuminate_foundation_http_formrequest",
+      "illuminate_validation_rule"
+    ],
+    "12": [
+      "config_jetstream",
+      "laravel_jetstream_features",
+      "laravel_jetstream_http_livewire_apitokenmanager",
+      "laravel_jetstream_http_livewire_deleteuserform",
+      "laravel_jetstream_http_livewire_logoutotherbrowsersessionsform",
+      "laravel_jetstream_http_livewire_twofactorauthenticationform",
+      "laravel_jetstream_http_livewire_updateprofileinformationform",
+      "laravel_jetstream_http_middleware_authenticatesession",
+      "livewire_livewire",
+      "tests_feature_apitokenpermissionstest",
+      "tests_feature_browsersessionstest",
+      "tests_feature_createapitokentest",
+      "tests_feature_deleteaccounttest",
+      "tests_feature_deleteapitokentest",
+      "tests_feature_passwordconfirmationtest",
+      "tests_feature_profileinformationtest",
+      "tests_feature_twofactorauthenticationsettingstest"
+    ],
+    "13": [
+      "app_http_controllers_admin_eventcontroller",
+      "app_http_controllers_admin_eventcontroller_eventcontroller_update",
+      "app_http_requests_storeeventrequest",
+      "app_http_requests_storeeventrequest_storeeventrequest",
+      "app_http_requests_storeeventrequest_storeeventrequest_authorize",
+      "app_http_requests_storeeventrequest_storeeventrequest_rules",
+      "app_http_requests_updateeventrequest",
+      "app_http_requests_updateeventrequest_updateeventrequest",
+      "app_http_requests_updateeventrequest_updateeventrequest_authorize",
+      "app_http_requests_updateeventrequest_updateeventrequest_rules",
+      "app_models_event_event",
+      "app_models_event_event_coordinatorassignments",
+      "app_models_event_event_edition",
+      "app_models_event_event_fixtures",
+      "app_models_event_event_registrations",
+      "app_models_event_event_sport"
+    ],
+    "14": [
+      "app_actions_fortify_ensurecoordinatordevice",
+      "app_actions_fortify_ensurecoordinatordevice_ensurecoordinatordevice",
+      "app_actions_fortify_ensurecoordinatordevice_ensurecoordinatordevice_construct",
+      "app_actions_fortify_ensurecoordinatordevice_ensurecoordinatordevice_handle",
+      "app_models_coordinatordevice_coordinatordevice",
+      "app_models_coordinatordevice_coordinatordevice_coordinator",
+      "app_services_coordinatordeviceservice_coordinatordeviceservice",
+      "app_services_coordinatordeviceservice_coordinatordeviceservice_isallowedforlogin",
+      "app_services_coordinatordeviceservice_coordinatordeviceservice_registerauthenticateddevice",
+      "app_services_coordinatordeviceservice_coordinatordeviceservice_reset",
+      "illuminate_contracts_auth_statefulguard",
+      "laravel_fortify_fortify",
+      "tests_feature_coordinatormanagementtest",
+      "tests_feature_coordinatormanagementtest_coordinatormoduleadmin",
+      "tests_feature_coordinatormanagementtest_coordinatormoduleevent"
+    ],
+    "15": [
+      "app_http_controllers_admin_coordinatorcontroller_coordinatorcontroller_index",
+      "app_http_controllers_admin_coursecontroller",
+      "app_http_controllers_admin_coursecontroller_coursecontroller",
+      "app_http_controllers_admin_coursecontroller_coursecontroller_index",
+      "app_http_controllers_admin_coursecontroller_coursecontroller_store",
+      "app_http_middleware_authenticate",
+      "app_http_middleware_authenticate_authenticate",
+      "app_http_middleware_authenticate_authenticate_redirectto",
+      "app_http_middleware_trustproxies",
+      "app_http_middleware_trustproxies_trustproxies",
+      "illuminate_auth_middleware_authenticate",
+      "illuminate_contracts_http_kernel",
+      "illuminate_http_middleware_trustproxies",
+      "illuminate_http_request",
+      "public_index"
+    ],
+    "16": [
+      "app_actions_fortify_passwordvalidationrules_passwordvalidationrules",
+      "app_actions_fortify_passwordvalidationrules_passwordvalidationrules_passwordrules",
+      "app_actions_fortify_resetuserpassword",
+      "app_actions_fortify_resetuserpassword_resetuserpassword",
+      "app_actions_fortify_resetuserpassword_resetuserpassword_reset",
+      "app_actions_fortify_updateuserpassword",
+      "app_actions_fortify_updateuserpassword_updateuserpassword",
+      "app_actions_fortify_updateuserpassword_updateuserpassword_update",
+      "illuminate_support_facades_hash",
+      "illuminate_validation_validationexception",
+      "laravel_fortify_contracts_resetsuserpasswords",
+      "laravel_fortify_contracts_updatesuserpasswords",
+      "laravel_jetstream_http_livewire_updatepasswordform",
+      "tests_feature_updatepasswordtest"
+    ],
+    "17": [
+      "app_http_controllers_admin_competitioncontroller",
+      "app_http_controllers_admin_competitioncontroller_competitioncontroller",
+      "app_http_controllers_admin_competitioncontroller_competitioncontroller_index",
+      "app_http_controllers_admin_competitioncontroller_competitioncontroller_reviewflag",
+      "app_http_controllers_admin_competitioncontroller_competitioncontroller_storefixture",
+      "app_models_fixture",
+      "app_models_fixture_fixture",
+      "app_models_fixture_fixture_event",
+      "app_models_teamflag",
+      "app_models_teamflag_teamflag",
+      "app_models_teamflag_teamflag_event",
+      "app_models_teamflag_teamflag_team"
+    ],
+    "18": [
+      "app_http_controllers_admin_coordinatorcontroller",
+      "app_http_requests_reviewcoordinatorrequest",
+      "app_http_requests_reviewcoordinatorrequest_reviewcoordinatorrequest",
+      "app_http_requests_reviewcoordinatorrequest_reviewcoordinatorrequest_authorize",
+      "app_http_requests_reviewcoordinatorrequest_reviewcoordinatorrequest_rules",
+      "app_http_requests_storecoordinatorassignmentrequest",
+      "app_http_requests_storecoordinatorassignmentrequest_storecoordinatorassignmentrequest",
+      "app_http_requests_storecoordinatorassignmentrequest_storecoordinatorassignmentrequest_authorize",
+      "app_http_requests_storecoordinatorassignmentrequest_storecoordinatorassignmentrequest_rules",
+      "app_http_requests_storecoordinatorrequest_storecoordinatorrequest",
+      "app_http_requests_storecoordinatorrequest_storecoordinatorrequest_authorize",
+      "app_http_requests_storecoordinatorrequest_storecoordinatorrequest_rules"
+    ],
+    "19": [
+      "app_http_controllers_admin_sportmodulecontroller",
+      "app_http_controllers_admin_sportmodulecontroller_sportmodulecontroller",
+      "app_http_controllers_admin_sportmodulecontroller_sportmodulecontroller_index",
+      "app_http_controllers_admin_sportmodulecontroller_sportmodulecontroller_show",
+      "app_view_components_applayout",
+      "app_view_components_applayout_applayout",
+      "app_view_components_applayout_applayout_render",
+      "app_view_components_guestlayout",
+      "app_view_components_guestlayout_guestlayout",
+      "app_view_components_guestlayout_guestlayout_render",
+      "illuminate_view_component",
+      "illuminate_view_view"
+    ],
+    "20": [
+      "app_http_controllers_admin_coordinatorcontroller_coordinatorcontroller",
+      "app_http_controllers_admin_coordinatorcontroller_coordinatorcontroller_assign",
+      "app_http_controllers_admin_coordinatorcontroller_coordinatorcontroller_create",
+      "app_http_controllers_admin_coordinatorcontroller_coordinatorcontroller_edit",
+      "app_http_controllers_admin_coordinatorcontroller_coordinatorcontroller_ensurecoordinator",
+      "app_http_controllers_admin_coordinatorcontroller_coordinatorcontroller_resetdevice",
+      "app_http_controllers_admin_coordinatorcontroller_coordinatorcontroller_reviewrequest",
+      "app_http_controllers_admin_coordinatorcontroller_coordinatorcontroller_revoke",
+      "app_http_controllers_admin_coordinatorcontroller_coordinatorcontroller_store",
+      "app_http_controllers_admin_coordinatorcontroller_coordinatorcontroller_update",
+      "illuminate_http_redirectresponse"
+    ],
+    "21": [
+      "app_http_controllers_admin_dashboardcontroller",
+      "app_http_controllers_admin_dashboardcontroller_dashboardcontroller",
+      "app_http_controllers_admin_dashboardcontroller_dashboardcontroller_index",
+      "app_http_controllers_admin_modulecontroller",
+      "app_http_controllers_admin_modulecontroller_modulecontroller",
+      "app_http_controllers_admin_modulecontroller_modulecontroller_show",
+      "app_http_controllers_controller",
+      "app_http_controllers_controller_controller",
+      "illuminate_foundation_auth_access_authorizesrequests",
+      "illuminate_foundation_validation_validatesrequests",
+      "illuminate_routing_controller"
+    ],
+    "22": [
+      "illuminate_contracts_console_kernel",
+      "illuminate_foundation_application",
+      "illuminate_foundation_testing_refreshdatabase",
+      "illuminate_foundation_testing_testcase",
+      "tests_createsapplication",
+      "tests_createsapplication_createsapplication",
+      "tests_createsapplication_createsapplication_createapplication",
+      "tests_pest",
+      "tests_pest_something",
+      "tests_testcase",
+      "tests_testcase_testcase"
+    ],
+    "23": [
+      "app_http_middleware_ensureuserhasrole",
+      "app_http_middleware_ensureuserhasrole_ensureuserhasrole",
+      "app_http_middleware_ensureuserhasrole_ensureuserhasrole_handle",
+      "app_http_middleware_ensureuserhasrole_php_response",
+      "app_http_middleware_redirectifauthenticated",
+      "app_http_middleware_redirectifauthenticated_redirectifauthenticated",
+      "app_http_middleware_redirectifauthenticated_redirectifauthenticated_handle",
+      "closure",
+      "illuminate_support_facades_auth",
+      "symfony_component_httpfoundation_response"
+    ],
+    "24": [
+      "database_factories_studentfactory",
+      "database_factories_studentfactory_studentfactory",
+      "database_factories_studentfactory_studentfactory_definition",
+      "database_factories_userfactory",
+      "database_factories_userfactory_userfactory",
+      "database_factories_userfactory_userfactory_definition",
+      "database_factories_userfactory_userfactory_unverified",
+      "database_factories_userfactory_userfactory_withpersonalteam",
+      "illuminate_database_eloquent_factories_factory",
+      "static"
+    ],
+    "25": [
+      "app_providers_fortifyserviceprovider",
+      "app_providers_fortifyserviceprovider_fortifyserviceprovider",
+      "app_providers_fortifyserviceprovider_fortifyserviceprovider_boot",
+      "app_providers_fortifyserviceprovider_fortifyserviceprovider_register",
+      "laravel_fortify_actions_attempttoauthenticate",
+      "laravel_fortify_actions_canonicalizeusername",
+      "laravel_fortify_actions_ensureloginisnotthrottled",
+      "laravel_fortify_actions_prepareauthenticatedsession",
+      "laravel_fortify_actions_redirectiftwofactorauthenticatable"
+    ],
+    "26": [
+      "app_actions_fortify_updateuserprofileinformation",
+      "app_actions_fortify_updateuserprofileinformation_updateuserprofileinformation",
+      "app_actions_fortify_updateuserprofileinformation_updateuserprofileinformation_update",
+      "app_actions_fortify_updateuserprofileinformation_updateuserprofileinformation_updateverifieduser",
+      "illuminate_contracts_auth_mustverifyemail",
+      "illuminate_support_facades_validator",
+      "laravel_fortify_contracts_updatesuserprofileinformation"
+    ],
+    "27": [
+      "app_http_controllers_coordinator_dashboardcontroller",
+      "app_http_controllers_coordinator_dashboardcontroller_dashboardcontroller",
+      "app_http_controllers_coordinator_dashboardcontroller_dashboardcontroller_construct",
+      "app_http_controllers_coordinator_dashboardcontroller_dashboardcontroller_index",
+      "illuminate_support_facades_route",
+      "routes_api",
+      "routes_web"
+    ],
+    "28": [
+      "confirmapitokendeletion_token_id",
+      "deleteapitoken",
+      "manageapitokenpermissions_token_id",
+      "resources_views_api_api_token_manager_blade",
+      "resources_views_api_api_token_manager_blade_php_toggle",
+      "set",
+      "updateapitoken"
+    ],
+    "29": [
+      "app_console_kernel",
+      "app_console_kernel_kernel",
+      "app_console_kernel_kernel_commands",
+      "app_console_kernel_kernel_schedule",
+      "illuminate_console_scheduling_schedule",
+      "illuminate_foundation_console_kernel"
+    ],
+    "30": [
+      "app_http_controllers_admin_eventcontroller_eventcontroller",
+      "app_http_controllers_admin_eventcontroller_eventcontroller_construct",
+      "app_http_controllers_admin_eventcontroller_eventcontroller_create",
+      "app_http_controllers_admin_eventcontroller_eventcontroller_edit",
+      "app_http_controllers_admin_eventcontroller_eventcontroller_index",
+      "app_http_controllers_admin_eventcontroller_eventcontroller_store"
+    ],
+    "31": [
+      "app_http_controllers_admin_systemlogcontroller",
+      "app_http_controllers_admin_systemlogcontroller_systemlogcontroller",
+      "app_http_controllers_admin_systemlogcontroller_systemlogcontroller_index",
+      "app_models_auditlog",
+      "app_models_auditlog_auditlog",
+      "app_models_auditlog_auditlog_user"
+    ],
+    "32": [
+      "app_services_eventservice_eventservice",
+      "app_services_eventservice_eventservice_create",
+      "app_services_eventservice_eventservice_ensurereferences",
+      "app_services_eventservice_eventservice_ensuretransition",
+      "app_services_eventservice_eventservice_eventname",
+      "app_services_eventservice_eventservice_update"
+    ],
+    "33": [
+      "app_exceptions_handler",
+      "app_exceptions_handler_handler",
+      "app_exceptions_handler_handler_register",
+      "illuminate_foundation_exceptions_handler",
+      "throwable"
+    ],
+    "34": [
+      "app_http_controllers_admin_registrationcontroller_registrationcontroller_store",
+      "app_http_requests_storeregistrationrequest",
+      "app_http_requests_storeregistrationrequest_storeregistrationrequest",
+      "app_http_requests_storeregistrationrequest_storeregistrationrequest_authorize",
+      "app_http_requests_storeregistrationrequest_storeregistrationrequest_rules"
+    ],
+    "35": [
+      "app_http_controllers_coordinator_dashboardcontroller_dashboardcontroller_storerequest",
+      "app_http_requests_storecoordinatorchangerequest",
+      "app_http_requests_storecoordinatorchangerequest_storecoordinatorchangerequest",
+      "app_http_requests_storecoordinatorchangerequest_storecoordinatorchangerequest_authorize",
+      "app_http_requests_storecoordinatorchangerequest_storecoordinatorchangerequest_rules"
+    ],
+    "36": [
+      "config_logging",
+      "monolog_handler_nullhandler",
+      "monolog_handler_streamhandler",
+      "monolog_handler_syslogudphandler",
+      "monolog_processor_psrlogmessageprocessor"
+    ],
+    "37": [
+      "app_actions_fortify_createnewuser",
+      "app_actions_fortify_createnewuser_createnewuser",
+      "app_actions_fortify_createnewuser_createnewuser_create",
+      "laravel_fortify_contracts_createsnewusers"
+    ],
+    "38": [
+      "app_actions_fortify_passwordvalidationrules",
+      "app_http_requests_storecoordinatorrequest",
+      "illuminate_contracts_validation_rule",
+      "illuminate_validation_rules_password"
+    ],
+    "39": [
+      "app_http_middleware_trusthosts",
+      "app_http_middleware_trusthosts_trusthosts",
+      "app_http_middleware_trusthosts_trusthosts_hosts",
+      "illuminate_http_middleware_trusthosts"
+    ],
+    "40": [
+      "app_providers_authserviceprovider",
+      "app_providers_authserviceprovider_authserviceprovider",
+      "app_providers_authserviceprovider_authserviceprovider_boot",
+      "illuminate_foundation_support_providers_authserviceprovider"
+    ],
+    "41": [
+      "confirmlogout",
+      "logoutotherbrowsersessions",
+      "resources_views_profile_logout_other_browser_sessions_form_blade",
+      "resources_views_profile_logout_other_browser_sessions_form_blade_php_toggle"
+    ],
+    "42": [
+      "confirmuserdeletion",
+      "deleteuser",
+      "resources_views_profile_delete_user_form_blade",
+      "resources_views_profile_delete_user_form_blade_php_toggle"
+    ],
+    "43": [
+      "app_http_kernel",
+      "app_http_kernel_kernel",
+      "illuminate_foundation_http_kernel"
+    ],
+    "44": [
+      "app_http_middleware_encryptcookies",
+      "app_http_middleware_encryptcookies_encryptcookies",
+      "illuminate_cookie_middleware_encryptcookies"
+    ],
+    "45": [
+      "app_http_middleware_preventrequestsduringmaintenance",
+      "app_http_middleware_preventrequestsduringmaintenance_preventrequestsduringmaintenance",
+      "illuminate_foundation_http_middleware_preventrequestsduringmaintenance"
+    ],
+    "46": [
+      "app_http_middleware_trimstrings",
+      "app_http_middleware_trimstrings_trimstrings",
+      "illuminate_foundation_http_middleware_trimstrings"
+    ],
+    "47": [
+      "app_http_middleware_validatesignature",
+      "app_http_middleware_validatesignature_validatesignature",
+      "illuminate_routing_middleware_validatesignature"
+    ],
+    "48": [
+      "app_http_middleware_verifycsrftoken",
+      "app_http_middleware_verifycsrftoken_verifycsrftoken",
+      "illuminate_foundation_http_middleware_verifycsrftoken"
+    ],
+    "49": [
+      "confirmpassword",
+      "resources_views_components_confirms_password_blade",
+      "stopconfirmingpassword"
+    ],
+    "50": [
+      "illuminate_foundation_inspiring",
+      "illuminate_support_facades_artisan",
+      "routes_console"
+    ],
+    "51": [
+      "config_sanctum",
+      "laravel_sanctum_sanctum"
+    ],
+    "52": [
+      "deleteprofilephoto",
+      "resources_views_profile_update_profile_information_form_blade"
+    ],
+    "53": [
+      "resources_views_admin_coordinators_create_blade",
+      "resources_views_admin_coordinators_create_blade_php_admin_coordinators_form"
+    ],
+    "54": [
+      "resources_views_admin_coordinators_edit_blade",
+      "resources_views_admin_coordinators_edit_blade_php_admin_coordinators_form"
+    ],
+    "55": [
+      "resources_views_admin_editions_create_blade",
+      "resources_views_admin_editions_create_blade_php_admin_editions_form"
+    ],
+    "56": [
+      "resources_views_admin_editions_edit_blade",
+      "resources_views_admin_editions_edit_blade_php_admin_editions_form"
+    ],
+    "57": [
+      "resources_views_admin_events_create_blade",
+      "resources_views_admin_events_create_blade_php_admin_events_form"
+    ],
+    "58": [
+      "resources_views_admin_events_edit_blade",
+      "resources_views_admin_events_edit_blade_php_admin_events_form"
+    ],
+    "59": [
+      "resources_views_admin_sports_create_blade",
+      "resources_views_admin_sports_create_blade_php_admin_sports_form"
+    ],
+    "60": [
+      "resources_views_admin_sports_edit_blade",
+      "resources_views_admin_sports_edit_blade_php_admin_sports_form"
+    ],
+    "61": [
+      "resources_views_admin_students_create_blade",
+      "resources_views_admin_students_create_blade_php_admin_students_form"
+    ],
+    "62": [
+      "resources_views_admin_students_edit_blade",
+      "resources_views_admin_students_edit_blade_php_admin_students_form"
+    ],
+    "63": [
+      "resources_views_admin_teams_create_blade",
+      "resources_views_admin_teams_create_blade_php_admin_teams_form"
+    ],
+    "64": [
+      "resources_views_admin_teams_edit_blade",
+      "resources_views_admin_teams_edit_blade_php_admin_teams_form"
+    ],
+    "65": [
+      "bootstrap_app"
+    ],
+    "66": [
+      "config_auth"
+    ],
+    "67": [
+      "config_broadcasting"
+    ],
+    "68": [
+      "config_cors"
+    ],
+    "69": [
+      "config_filesystems"
+    ],
+    "70": [
+      "config_hashing"
+    ],
+    "71": [
+      "config_mail"
+    ],
+    "72": [
+      "config_queue"
+    ],
+    "73": [
+      "config_services"
+    ],
+    "74": [
+      "config_view"
+    ],
+    "75": [
+      "postcss_config"
+    ],
+    "76": [
+      "resources_views_admin_competition_index_blade"
+    ],
+    "77": [
+      "resources_views_admin_coordinators_form_blade"
+    ],
+    "78": [
+      "resources_views_admin_coordinators_index_blade"
+    ],
+    "79": [
+      "resources_views_admin_courses_index_blade"
+    ],
+    "80": [
+      "resources_views_admin_dashboard_blade"
+    ],
+    "81": [
+      "resources_views_admin_editions_form_blade"
+    ],
+    "82": [
+      "resources_views_admin_editions_index_blade"
+    ],
+    "83": [
+      "resources_views_admin_events_form_blade"
+    ],
+    "84": [
+      "resources_views_admin_events_index_blade"
+    ],
+    "85": [
+      "resources_views_admin_module_blade"
+    ],
+    "86": [
+      "resources_views_admin_registrations_create_blade"
+    ],
+    "87": [
+      "resources_views_admin_registrations_index_blade"
+    ],
+    "88": [
+      "resources_views_admin_registrations_rules_blade"
+    ],
+    "89": [
+      "resources_views_admin_sport_modules_index_blade"
+    ],
+    "90": [
+      "resources_views_admin_sport_modules_show_blade"
+    ],
+    "91": [
+      "resources_views_admin_sports_events_blade"
+    ],
+    "92": [
+      "resources_views_admin_sports_form_blade"
+    ],
+    "93": [
+      "resources_views_admin_sports_index_blade"
+    ],
+    "94": [
+      "resources_views_admin_students_form_blade"
+    ],
+    "95": [
+      "resources_views_admin_students_index_blade"
+    ],
+    "96": [
+      "resources_views_admin_system_logs_index_blade"
+    ],
+    "97": [
+      "resources_views_admin_teams_form_blade"
+    ],
+    "98": [
+      "resources_views_admin_teams_index_blade"
+    ],
+    "99": [
+      "resources_views_api_index_blade"
+    ],
+    "100": [
+      "resources_views_auth_confirm_password_blade"
+    ],
+    "101": [
+      "resources_views_auth_forgot_password_blade"
+    ],
+    "102": [
+      "resources_views_auth_login_blade"
+    ],
+    "103": [
+      "resources_views_auth_register_blade"
+    ],
+    "104": [
+      "resources_views_auth_reset_password_blade"
+    ],
+    "105": [
+      "resources_views_auth_two_factor_challenge_blade"
+    ],
+    "106": [
+      "resources_views_auth_verify_email_blade"
+    ],
+    "107": [
+      "resources_views_components_action_message_blade"
+    ],
+    "108": [
+      "resources_views_components_action_section_blade"
+    ],
+    "109": [
+      "resources_views_components_application_logo_blade"
+    ],
+    "110": [
+      "resources_views_components_application_mark_blade"
+    ],
+    "111": [
+      "resources_views_components_authentication_card_blade"
+    ],
+    "112": [
+      "resources_views_components_authentication_card_logo_blade"
+    ],
+    "113": [
+      "resources_views_components_banner_blade"
+    ],
+    "114": [
+      "resources_views_components_button_blade"
+    ],
+    "115": [
+      "resources_views_components_checkbox_blade"
+    ],
+    "116": [
+      "resources_views_components_confirmation_modal_blade"
+    ],
+    "117": [
+      "resources_views_components_danger_button_blade"
+    ],
+    "118": [
+      "resources_views_components_dialog_modal_blade"
+    ],
+    "119": [
+      "resources_views_components_dropdown_blade"
+    ],
+    "120": [
+      "resources_views_components_dropdown_link_blade"
+    ],
+    "121": [
+      "resources_views_components_form_section_blade"
+    ],
+    "122": [
+      "resources_views_components_input_blade"
+    ],
+    "123": [
+      "resources_views_components_input_error_blade"
+    ],
+    "124": [
+      "resources_views_components_label_blade"
+    ],
+    "125": [
+      "resources_views_components_modal_blade"
+    ],
+    "126": [
+      "resources_views_components_nav_link_blade"
+    ],
+    "127": [
+      "resources_views_components_responsive_nav_link_blade"
+    ],
+    "128": [
+      "resources_views_components_secondary_button_blade"
+    ],
+    "129": [
+      "resources_views_components_section_border_blade"
+    ],
+    "130": [
+      "resources_views_components_section_title_blade"
+    ],
+    "131": [
+      "resources_views_components_switchable_team_blade"
+    ],
+    "132": [
+      "resources_views_components_validation_errors_blade"
+    ],
+    "133": [
+      "resources_views_components_welcome_blade"
+    ],
+    "134": [
+      "resources_views_coordinator_dashboard_blade"
+    ],
+    "135": [
+      "resources_views_dashboard_blade"
+    ],
+    "136": [
+      "resources_views_emails_team_invitation_blade"
+    ],
+    "137": [
+      "resources_views_layouts_admin_blade"
+    ],
+    "138": [
+      "resources_views_layouts_app_blade"
+    ],
+    "139": [
+      "resources_views_layouts_coordinator_blade"
+    ],
+    "140": [
+      "resources_views_layouts_guest_blade"
+    ],
+    "141": [
+      "resources_views_navigation_menu_blade"
+    ],
+    "142": [
+      "resources_views_policy_blade"
+    ],
+    "143": [
+      "resources_views_profile_show_blade"
+    ],
+    "144": [
+      "resources_views_profile_two_factor_authentication_form_blade"
+    ],
+    "145": [
+      "resources_views_profile_update_password_form_blade"
+    ],
+    "146": [
+      "resources_views_terms_blade"
+    ],
+    "147": [
+      "resources_views_welcome_blade"
+    ],
+    "148": [
+      "tests_feature_exampletest"
+    ],
+    "149": [
+      "tests_unit_exampletest"
+    ]
+  },
+  "cohesion": {
+    "0": 0.055523085914669784,
+    "1": 0.061495457721872815,
+    "2": 0.06274509803921569,
+    "3": 0.06648936170212766,
+    "4": 0.041666666666666664,
+    "5": 0.0907563025210084,
+    "6": 0.11330049261083744,
+    "7": 0.07936507936507936,
+    "8": 0.09420289855072464,
+    "9": 0.11255411255411256,
+    "10": 0.14761904761904762,
+    "11": 0.16176470588235295,
+    "12": 0.15441176470588236,
+    "13": 0.14166666666666666,
+    "14": 0.2,
+    "15": 0.17142857142857143,
+    "16": 0.18681318681318682,
+    "17": 0.21212121212121213,
+    "18": 0.16666666666666666,
+    "19": 0.2727272727272727,
+    "20": 0.38181818181818183,
+    "21": 0.2727272727272727,
+    "22": 0.21818181818181817,
+    "23": 0.3111111111111111,
+    "24": 0.26666666666666666,
+    "25": 0.2222222222222222,
+    "26": 0.38095238095238093,
+    "27": 0.2857142857142857,
+    "28": 0.2857142857142857,
+    "29": 0.4666666666666667,
+    "30": 0.4,
+    "31": 0.4,
+    "32": 0.6666666666666666,
+    "33": 0.5,
+    "34": 0.4,
+    "35": 0.4,
+    "36": 0.4,
+    "37": 0.6666666666666666,
+    "38": 0.5,
+    "39": 0.6666666666666666,
+    "40": 0.6666666666666666,
+    "41": 0.5,
+    "42": 0.5,
+    "43": 1.0,
+    "44": 1.0,
+    "45": 1.0,
+    "46": 1.0,
+    "47": 1.0,
+    "48": 1.0,
+    "49": 0.6666666666666666,
+    "50": 0.6666666666666666,
+    "51": 1.0,
+    "52": 1.0,
+    "53": 1.0,
+    "54": 1.0,
+    "55": 1.0,
+    "56": 1.0,
+    "57": 1.0,
+    "58": 1.0,
+    "59": 1.0,
+    "60": 1.0,
+    "61": 1.0,
+    "62": 1.0,
+    "63": 1.0,
+    "64": 1.0,
+    "65": 1.0,
+    "66": 1.0,
+    "67": 1.0,
+    "68": 1.0,
+    "69": 1.0,
+    "70": 1.0,
+    "71": 1.0,
+    "72": 1.0,
+    "73": 1.0,
+    "74": 1.0,
+    "75": 1.0,
+    "76": 1.0,
+    "77": 1.0,
+    "78": 1.0,
+    "79": 1.0,
+    "80": 1.0,
+    "81": 1.0,
+    "82": 1.0,
+    "83": 1.0,
+    "84": 1.0,
+    "85": 1.0,
+    "86": 1.0,
+    "87": 1.0,
+    "88": 1.0,
+    "89": 1.0,
+    "90": 1.0,
+    "91": 1.0,
+    "92": 1.0,
+    "93": 1.0,
+    "94": 1.0,
+    "95": 1.0,
+    "96": 1.0,
+    "97": 1.0,
+    "98": 1.0,
+    "99": 1.0,
+    "100": 1.0,
+    "101": 1.0,
+    "102": 1.0,
+    "103": 1.0,
+    "104": 1.0,
+    "105": 1.0,
+    "106": 1.0,
+    "107": 1.0,
+    "108": 1.0,
+    "109": 1.0,
+    "110": 1.0,
+    "111": 1.0,
+    "112": 1.0,
+    "113": 1.0,
+    "114": 1.0,
+    "115": 1.0,
+    "116": 1.0,
+    "117": 1.0,
+    "118": 1.0,
+    "119": 1.0,
+    "120": 1.0,
+    "121": 1.0,
+    "122": 1.0,
+    "123": 1.0,
+    "124": 1.0,
+    "125": 1.0,
+    "126": 1.0,
+    "127": 1.0,
+    "128": 1.0,
+    "129": 1.0,
+    "130": 1.0,
+    "131": 1.0,
+    "132": 1.0,
+    "133": 1.0,
+    "134": 1.0,
+    "135": 1.0,
+    "136": 1.0,
+    "137": 1.0,
+    "138": 1.0,
+    "139": 1.0,
+    "140": 1.0,
+    "141": 1.0,
+    "142": 1.0,
+    "143": 1.0,
+    "144": 1.0,
+    "145": 1.0,
+    "146": 1.0,
+    "147": 1.0,
+    "148": 1.0,
+    "149": 1.0
+  },
+  "gods": [
+    {
+      "id": "app_models_user_user",
+      "label": "User",
+      "degree": 72
+    },
+    {
+      "id": "app_models_event_event",
+      "label": "Event",
+      "degree": 34
+    },
+    {
+      "id": "app_models_intramuraledition_intramuraledition",
+      "label": "IntramuralEdition",
+      "degree": 34
+    },
+    {
+      "id": "app_http_controllers_controller_controller",
+      "label": "Controller",
+      "degree": 32
+    },
+    {
+      "id": "app_models_student_student",
+      "label": "Student",
+      "degree": 31
+    },
+    {
+      "id": "app_models_sport_sport",
+      "label": "Sport",
+      "degree": 28
+    },
+    {
+      "id": "app_models_team_team",
+      "label": "Team",
+      "degree": 26
+    },
+    {
+      "id": "app_services_auditservice_auditservice",
+      "label": "AuditService",
+      "degree": 18
+    },
+    {
+      "id": "app_services_coordinatorservice_coordinatorservice",
+      "label": "CoordinatorService",
+      "degree": 18
+    },
+    {
+      "id": "app_http_controllers_admin_coordinatorcontroller_coordinatorcontroller",
+      "label": "CoordinatorController",
+      "degree": 15
+    }
+  ],
+  "surprises": [
+    {
+      "source": "coordinatorModuleEvent()",
+      "target": "Event",
+      "source_files": [
+        "tests/Feature/CoordinatorManagementTest.php",
+        "app/Models/Event.php"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "references",
+      "why": "connects across different repos/directories; bridges separate communities; peripheral node `coordinatorModuleEvent()` unexpectedly reaches hub `Event`"
+    },
+    {
+      "source": "teamModuleStudent()",
+      "target": "Student",
+      "source_files": [
+        "tests/Feature/TeamManagementTest.php",
+        "app/Models/Student.php"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "references",
+      "why": "connects across different repos/directories; bridges separate communities; peripheral node `teamModuleStudent()` unexpectedly reaches hub `Student`"
+    },
+    {
+      "source": "coordinatorModuleAdmin()",
+      "target": "User",
+      "source_files": [
+        "tests/Feature/CoordinatorManagementTest.php",
+        "app/Models/User.php"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "references",
+      "why": "connects across different repos/directories; bridges separate communities; peripheral node `coordinatorModuleAdmin()` unexpectedly reaches hub `User`"
+    },
+    {
+      "source": "sportsAdmin()",
+      "target": "User",
+      "source_files": [
+        "tests/Feature/SportsEventManagementTest.php",
+        "app/Models/User.php"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "references",
+      "why": "connects across different repos/directories; bridges separate communities; peripheral node `sportsAdmin()` unexpectedly reaches hub `User`"
+    },
+    {
+      "source": "teamModuleAdmin()",
+      "target": "User",
+      "source_files": [
+        "tests/Feature/TeamManagementTest.php",
+        "app/Models/User.php"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "references",
+      "why": "connects across different repos/directories; bridges separate communities; peripheral node `teamModuleAdmin()` unexpectedly reaches hub `User`"
+    }
+  ],
+  "tokens": {
+    "input": 0,
+    "output": 0
+  }
+}

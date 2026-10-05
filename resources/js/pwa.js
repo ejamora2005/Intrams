@@ -1,6 +1,7 @@
 const serviceWorkerUrl = '/service-worker.js';
 const installPanel = document.querySelector('[data-pwa-install]');
 const installButtons = Array.from(document.querySelectorAll('[data-pwa-install-button]'));
+const inlineInstallButtons = Array.from(document.querySelectorAll('[data-pwa-inline-install-button]'));
 const dismissButtons = Array.from(document.querySelectorAll('[data-pwa-dismiss]'));
 const refreshButtons = Array.from(document.querySelectorAll('[data-pwa-refresh]'));
 const installTitle = document.querySelector('[data-pwa-install-title]');
@@ -9,14 +10,35 @@ const installStatuses = Array.from(document.querySelectorAll('[data-pwa-install-
 
 let installPrompt = null;
 let waitingWorker = null;
-const installUnavailableMessage = 'Chrome cannot open the install prompt right now. If the address bar shows Open in app, SLSU INTRAMURALS is already installed on this device. Remove the installed app first if you want the download button to appear again.';
+let installPromptInProgress = false;
 
 const isStandalone = () => window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
-const canUseServiceWorker = () => 'serviceWorker' in navigator && (window.isSecureContext || location.hostname === 'localhost' || location.hostname === '127.0.0.1');
+const isLocalhost = () => ['localhost', '127.0.0.1'].includes(location.hostname);
+const canUseServiceWorker = () => 'serviceWorker' in navigator && (window.isSecureContext || isLocalhost());
+const needsSecureInstallContext = () => !window.isSecureContext && !isLocalhost();
+const secureInstallUrl = () => {
+    const url = new URL(window.location.href);
+    url.protocol = 'https:';
+
+    return url.toString();
+};
 
 const setInstallButtonsVisible = visible => {
     installButtons.forEach(button => {
         button.hidden = !visible;
+    });
+};
+
+const setInlineInstallButtonsVisible = visible => {
+    inlineInstallButtons.forEach(button => {
+        button.hidden = !visible;
+    });
+};
+
+const setInstallButtonsDisabled = disabled => {
+    installButtons.forEach(button => {
+        button.disabled = disabled;
+        button.setAttribute('aria-disabled', disabled ? 'true' : 'false');
     });
 };
 
@@ -45,6 +67,22 @@ const relatedAppInstalled = async () => {
 };
 
 const appIsInstalled = async () => isStandalone() || await relatedAppInstalled();
+
+const unavailableInstallMessage = async () => {
+    if (await appIsInstalled()) {
+        return 'SLSU INTRAMURALS is already installed on this device. Use the browser Open in app button, or remove the installed app first if you want to download it again.';
+    }
+
+    if (!('serviceWorker' in navigator)) {
+        return 'This browser does not support app installation for this system. Please use the latest Chrome, Edge, or another PWA-capable browser.';
+    }
+
+    if (needsSecureInstallContext()) {
+        return 'App download requires a secure HTTPS connection. Open the system using https://slsubc.tech, then try Download SLSU INTRAMURALS App again.';
+    }
+
+    return 'Chrome has not offered the install prompt yet. If the address bar shows Open in app, the app is already installed. Otherwise refresh this page and try again.';
+};
 
 const showInstallPanel = async mode => {
     if (mode !== 'update' && await appIsInstalled()) {
@@ -77,6 +115,12 @@ const hideInstallControls = () => {
     setRefreshButtonsVisible(false);
 };
 
+const showInlineInstallFallback = async () => {
+    if (installPrompt || await appIsInstalled()) return;
+
+    setInlineInstallButtonsVisible(true);
+};
+
 window.addEventListener('beforeinstallprompt', event => {
     event.preventDefault();
     installPrompt = event;
@@ -90,27 +134,49 @@ window.addEventListener('appinstalled', () => {
 
 installButtons.forEach(button => {
     button.addEventListener('click', async () => {
+        if (installPromptInProgress) return;
+
         if (!installPrompt) {
-            setInstallStatus(installUnavailableMessage);
+            if (needsSecureInstallContext()) {
+                setInstallStatus('Opening the secure SLSU INTRAMURALS page so Chrome can download the app...');
+                window.location.assign(secureInstallUrl());
+                return;
+            }
+
+            setInstallStatus(await unavailableInstallMessage());
             return;
         }
 
         const prompt = installPrompt;
         installPrompt = null;
+        installPromptInProgress = true;
+        setInstallButtonsDisabled(true);
+
+        let accepted = false;
 
         try {
             prompt.prompt();
             const choice = await prompt.userChoice;
+            accepted = choice.outcome === 'accepted';
 
-            if (choice.outcome === 'accepted') {
+            if (accepted) {
                 setInstallStatus('Installing SLSU INTRAMURALS App...');
             } else {
                 setInstallStatus('Install was dismissed. Refresh this page if Chrome offers the install prompt again.');
             }
         } catch {
-            setInstallStatus(installUnavailableMessage);
+            setInstallStatus(await unavailableInstallMessage());
         } finally {
-            setInstallButtonsVisible(false);
+            installPromptInProgress = false;
+            setInstallButtonsDisabled(false);
+
+            if (accepted) {
+                setInstallButtonsVisible(false);
+            } else {
+                if (installPanel) installPanel.hidden = true;
+                setInstallButtonsVisible(false);
+                setInlineInstallButtonsVisible(true);
+            }
         }
     });
 });
@@ -159,6 +225,12 @@ if (canUseServiceWorker()) {
         window.location.reload();
     });
 }
+
+window.addEventListener('load', () => {
+    window.setTimeout(() => {
+        void showInlineInstallFallback();
+    }, 1500);
+});
 
 if (isStandalone()) {
     hideInstallControls();
