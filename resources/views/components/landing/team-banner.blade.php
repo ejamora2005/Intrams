@@ -31,7 +31,9 @@
                     <span class="score-rule" aria-hidden="true"></span>
                     <strong>{{ $team['score'] ?? 0 }}</strong>
                     <span class="score-unit">PTS</span>
-                    <span class="rank-label">Rank {{ isset($team['rank']) ? str_pad($team['rank'], 2, '0', STR_PAD_LEFT) : '—' }}</span>
+                    @if (isset($team['rank']) && $team['rank'] !== null)
+                        <span class="rank-label">Rank {{ str_pad($team['rank'], 2, '0', STR_PAD_LEFT) }}</span>
+                    @endif
                 </div>
             </div>
         </div>

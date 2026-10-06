@@ -68,6 +68,18 @@ function operationsSport(
     ]);
 }
 
+test('public landing keeps ranks blank until results are declared', function () {
+    $edition = operationsEdition();
+    operationsTeam($edition);
+    operationsTeam($edition, 'Terraquatic Eagles', 'terraquatic-eagles', 'Fisheries & Agriculture', 'FA');
+    operationsTeam($edition, 'Trojan Warriors', 'trojan-warriors', 'Information Technology', 'IT');
+
+    $this->get('/')
+        ->assertOk()
+        ->assertSee('Awaiting results')
+        ->assertDontSee('Rank 01');
+});
+
 test('GAM users are sent to the GAM dashboard', function () {
     $team = operationsTeam(operationsEdition());
     $gam = User::factory()->create(['role' => 'gam', 'status' => 'active', 'managed_team_id' => $team->id]);

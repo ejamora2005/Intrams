@@ -99,10 +99,10 @@ class StandingsService
 
         return [
             'teams' => $configuredTeams
-                ->map(function (array $configuredTeam) use ($standingByName): array {
+                ->map(function (array $configuredTeam) use ($standingByName, $updatedAt): array {
                     $standing = $standingByName->get(Str::lower($configuredTeam['name'] ?? ''));
 
-                    if ($standing !== null) {
+                    if ($standing !== null && $updatedAt !== null) {
                         $configuredTeam['score'] = (float) $standing['tally']->points;
                         $configuredTeam['rank'] = $standing['rank'];
                     }
