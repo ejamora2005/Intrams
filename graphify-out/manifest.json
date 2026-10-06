@@ -1991,12 +1991,6 @@
     "ast_hash": "96c0adf66ea64b8f2a1ae7aa36f2df76",
     "semantic_hash": ""
   },
-  "public/images/landing-objects/information-technology/keyboard.png": {
-    "mtime": 1790789504.9016337,
-    "seen": 1790822935.7412884,
-    "ast_hash": "2bdf42b7ccf2d3abf416c5c95e6a0978",
-    "semantic_hash": ""
-  },
   "public/images/landing-objects/information-technology/motherboard.png": {
     "mtime": 1790789502.5477226,
     "seen": 1790822935.7412884,
@@ -2016,8 +2010,8 @@
     "semantic_hash": ""
   },
   "public/images/landing-objects/marine-biology/diving-goggles.png": {
-    "mtime": 1790789496.9984994,
-    "seen": 1790822935.7412884,
+    "mtime": 1791252327.0629137,
+    "seen": 1791252371.4126933,
     "ast_hash": "104b26f0d5639a0dd30fb3ac3c970f44",
     "semantic_hash": ""
   },
