@@ -1992,15 +1992,15 @@
     "semantic_hash": ""
   },
   "public/images/landing-objects/information-technology/motherboard.png": {
-    "mtime": 1790789502.5477226,
-    "seen": 1790822935.7412884,
-    "ast_hash": "bac0a943a7537e29b0410111278a2874",
+    "mtime": 1791252707.594739,
+    "seen": 1791253748.1798024,
+    "ast_hash": "7bfa54694c992f6abdd745020a8bef0b",
     "semantic_hash": ""
   },
   "public/images/landing-objects/information-technology/mouse.png": {
-    "mtime": 1790789503.587412,
-    "seen": 1790822935.7412884,
-    "ast_hash": "23968a560240cb375409e7c234e4ad1a",
+    "mtime": 1791252708.337428,
+    "seen": 1791253748.1798024,
+    "ast_hash": "692304bfddfe573eb6db58a924393992",
     "semantic_hash": ""
   },
   "public/images/landing-objects/marine-biology/coral.png": {
@@ -2010,9 +2010,9 @@
     "semantic_hash": ""
   },
   "public/images/landing-objects/marine-biology/diving-goggles.png": {
-    "mtime": 1791252327.0629137,
-    "seen": 1791252371.4126933,
-    "ast_hash": "104b26f0d5639a0dd30fb3ac3c970f44",
+    "mtime": 1791250236.7777534,
+    "seen": 1791253748.1798024,
+    "ast_hash": "20276a0f7ae9789487ab3982bcec9e21",
     "semantic_hash": ""
   },
   "public/images/landing-objects/marine-biology/microscope.png": {
@@ -2325,6 +2325,12 @@
     "mtime": 1791098159.1353447,
     "seen": 1791174758.8677728,
     "ast_hash": "c9a70a1fdeb243d586528a77c1823b72",
+    "semantic_hash": ""
+  },
+  "public/images/landing-objects/information-technology/keyboard.png": {
+    "mtime": 1791252711.5956554,
+    "seen": 1791253748.1798024,
+    "ast_hash": "098520ce12eb9f2157c10491d86a4166",
     "semantic_hash": ""
   }
 }
