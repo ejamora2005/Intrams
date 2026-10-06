@@ -29,6 +29,9 @@
 .schedule-date p { color: #abc0d8; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .15em; }
 .schedule-date strong { display: block; margin-top: 5px; font-size: 23px; font-weight: 600; white-space: nowrap; }
 .schedule-date div > span { display: block; margin-top: 6px; font-size: 12px; color: #a7bcd4; }
+.schedule-date-picker { display: flex; align-items: center; gap: 8px; margin-top: 12px; }
+.schedule-date-picker label { color: #9db2cb; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .08em; }
+.schedule-date-picker select { min-height: 32px; border: 1px solid #7894b54d; border-radius: 5px; padding: 4px 8px; color: #e5edf8; background: #0b223ee8; font: inherit; font-size: 11px; }
 .schedule-teams { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; margin: 0 0 25px; padding: 0; list-style: none; }
 .schedule-teams li { display: flex; align-items: center; gap: 13px; padding: 14px 18px; border-top: 2px solid var(--team-highlight); background: linear-gradient(100deg, color-mix(in srgb, var(--team-color) 38%, #07172d), #07172d99); }
 .schedule-team-pennant { width: 21px; height: 32px; flex-shrink: 0; background: linear-gradient(110deg, var(--team-highlight), var(--team-color)); clip-path: polygon(0 0,100% 0,100% 78%,50% 100%,0 78%); }

@@ -32,7 +32,7 @@
                     <strong>{{ $team['score'] ?? 0 }}</strong>
                     <span class="score-unit">PTS</span>
                     @if (isset($team['rank']) && $team['rank'] !== null)
-                        <span class="rank-label">Rank {{ str_pad($team['rank'], 2, '0', STR_PAD_LEFT) }}</span>
+                        <span class="rank-label"><x-landing.ranking-medal :rank="$team['rank']" /></span>
                     @endif
                 </div>
             </div>

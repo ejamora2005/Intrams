@@ -79,6 +79,7 @@ class DashboardController extends Controller
 
         $editionSport = EditionSport::query()->with(['edition', 'sport'])->findOrFail($data['edition_sport_id']);
         abort_unless($editionSport->edition?->status === 'active', 404);
+        $allowRepeatedWinners = count($this->standingsService->pointRulesFor($editionSport)) > 3;
 
         $selectedTeamIds = collect($data['placements'] ?? [])
             ->filter(fn ($teamId): bool => filled($teamId))
@@ -91,19 +92,20 @@ class DashboardController extends Controller
             ]);
         }
 
-        if ($selectedTeamIds->unique()->count() !== $selectedTeamIds->count()) {
+        if (! $allowRepeatedWinners && $selectedTeamIds->unique()->count() !== $selectedTeamIds->count()) {
             throw ValidationException::withMessages([
-                'placements' => 'A team can only appear once in the same sport result.',
+                'placements' => 'A faction can only appear once in a top-three sport result.',
             ]);
         }
 
+        $uniqueTeamIds = $selectedTeamIds->unique()->values();
         $validTeamCount = Team::query()
             ->where('edition_id', $editionSport->edition_id)
             ->where('status', 'active')
-            ->whereIn('id', $selectedTeamIds)
+            ->whereIn('id', $uniqueTeamIds)
             ->count();
 
-        if ($validTeamCount !== $selectedTeamIds->count()) {
+        if ($validTeamCount !== $uniqueTeamIds->count()) {
             throw ValidationException::withMessages([
                 'placements' => 'Choose teams from the active intramurals edition.',
             ]);

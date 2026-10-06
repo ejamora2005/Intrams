@@ -43,7 +43,7 @@ class FortifyServiceProvider extends ServiceProvider
         Fortify::updateUserPasswordsUsing(UpdateUserPassword::class);
         Fortify::resetUserPasswordsUsing(ResetUserPassword::class);
         Fortify::redirectUserForTwoFactorAuthenticationUsing(RedirectIfTwoFactorAuthenticatable::class);
-        Fortify::loginView(fn () => view('auth.login', app(PublicScheduleService::class)->today()));
+        Fortify::loginView(fn (Request $request) => view('auth.login', app(PublicScheduleService::class)->today($request->query('date'))));
         Fortify::authenticateUsing(function (Request $request): ?User {
             $user = User::query()->where('email', $request->string('email'))->first();
 

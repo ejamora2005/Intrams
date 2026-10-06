@@ -9,6 +9,7 @@
     $afternoonCount = $todaySchedules->where('period', 'Afternoon')->count();
     $themeTitle = config('intramurals.theme.title');
     $themeTagline = config('intramurals.theme.tagline');
+    $selectedDate = $selectedDate ?? now()->format('Y-m-d');
 @endphp
 
 <main class="schedule-page" style="--schedule-background: url('{{ asset(config('landing.background')) }}')">
@@ -39,7 +40,21 @@
             </div>
             <div class="schedule-date">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M7 3v4m10-4v4M3 11h18m-13 4h3m2 0h3"/></svg>
-                <div><p>SLSU schedule desk</p><strong>{{ $todayLabel }}</strong><span>Morning &amp; afternoon competitions</span></div>
+                <div>
+                    <p>SLSU schedule desk</p>
+                    <strong>{{ $todayLabel }}</strong>
+                    <span>Morning &amp; afternoon competitions</span>
+                    @if (! empty($availableDates))
+                        <form method="GET" action="{{ route('login') }}" class="schedule-date-picker">
+                            <label for="schedule-date">View date</label>
+                            <select id="schedule-date" name="date" onchange="this.form.submit()">
+                                @foreach ($availableDates as $availableDate)
+                                    <option value="{{ $availableDate }}" @selected($availableDate === $selectedDate)>{{ \Carbon\Carbon::parse($availableDate)->format('M j, Y') }}</option>
+                                @endforeach
+                            </select>
+                        </form>
+                    @endif
+                </div>
             </div>
         </section>
 
@@ -59,7 +74,7 @@
         <section class="schedule-board" aria-label="Today's competitions">
             <div class="schedule-toolbar">
                 <div><p class="schedule-section-label">Match schedule</p><h2>On the schedule today <span class="schedule-count">{{ $scheduleCount }}</span></h2></div>
-                <a class="schedule-refresh" href="{{ route('login') }}#schedule-heading"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M20 7v5h-5M4 17v-5h5M6 7a7 7 0 0 1 12-1l2 6M4 12l2 6a7 7 0 0 0 12-1"/></svg><span>Refresh schedule</span></a>
+                <a class="schedule-refresh" href="{{ route('login', ['date' => $selectedDate]) }}#schedule-heading"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M20 7v5h-5M4 17v-5h5M6 7a7 7 0 0 1 12-1l2 6M4 12l2 6a7 7 0 0 0 12-1"/></svg><span>Refresh schedule</span></a>
             </div>
 
             <div class="schedule-table-wrap hidden lg:block">

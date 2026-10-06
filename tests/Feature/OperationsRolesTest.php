@@ -148,7 +148,60 @@ test('tabulators declare sport winners and standings use admin point rules', fun
     expect((float) TeamTally::query()->where('team_id', $runnerUp->id)->value('points'))->toBe(7.0);
     expect((float) TeamTally::query()->where('team_id', $third->id)->value('points'))->toBe(5.0);
 
-    $this->get('/')->assertOk()->assertSee('10')->assertSee('Rank 01');
+    $this->get('/')->assertOk()->assertSee('10')->assertSee('🥇');
+});
+
+test('a team can win multiple sports but only one placement in each sport', function () {
+    $tabulator = User::factory()->create(['role' => 'tabulator', 'status' => 'active']);
+    $edition = operationsEdition();
+    $volleyball = operationsSport($edition, 'Volleyball', 'VOLLEYBALL');
+    $basketball = operationsSport($edition, 'Basketball 3x3', 'BASKET-3X3');
+    $champion = operationsTeam($edition);
+    $runnerUp = operationsTeam($edition, 'Terraquatic Eagles', 'terraquatic-eagles', 'Fisheries & Agriculture', 'FA');
+
+    $this->actingAs($tabulator)->post(route('tabulator.sport-results.store'), [
+        'edition_sport_id' => $volleyball->id,
+        'placements' => [1 => $champion->id, 2 => $champion->id],
+        'tabulator_password' => 'password',
+    ])->assertSessionHasErrors('placements');
+
+    $this->actingAs($tabulator)->post(route('tabulator.sport-results.store'), [
+        'edition_sport_id' => $volleyball->id,
+        'placements' => [1 => $champion->id, 2 => $runnerUp->id],
+        'tabulator_password' => 'password',
+    ])->assertRedirect();
+
+    $this->actingAs($tabulator)->post(route('tabulator.sport-results.store'), [
+        'edition_sport_id' => $basketball->id,
+        'placements' => [1 => $champion->id],
+        'tabulator_password' => 'password',
+    ])->assertRedirect();
+
+    expect(App\Models\SportResult::query()->count())->toBe(2);
+});
+
+test('sports with more than three placements allow repeated factions', function () {
+    $tabulator = User::factory()->create(['role' => 'tabulator', 'status' => 'active']);
+    $edition = operationsEdition();
+    $athletics = operationsSport($edition, 'Athletics', 'ATHLETICS');
+    $athletics->update(['scoring_rules' => [
+        'point_system' => 'sports_athletics',
+        'placements' => [
+            ['placement' => 1, 'label' => '1st Place', 'points' => 5, 'medal' => 'gold'],
+            ['placement' => 2, 'label' => '2nd Place', 'points' => 3, 'medal' => 'silver'],
+            ['placement' => 3, 'label' => '3rd Place', 'points' => 2, 'medal' => 'bronze'],
+            ['placement' => 4, 'label' => '4th Place', 'points' => 1, 'medal' => null],
+        ],
+    ]]);
+    $team = operationsTeam($edition);
+
+    $this->actingAs($tabulator)->post(route('tabulator.sport-results.store'), [
+        'edition_sport_id' => $athletics->id,
+        'placements' => [1 => $team->id, 2 => $team->id, 3 => $team->id, 4 => $team->id],
+        'tabulator_password' => 'password',
+    ])->assertRedirect();
+
+    expect(App\Models\SportResult::query()->where('edition_sport_id', $athletics->id)->exists())->toBeTrue();
 });
 
 test('tabulator sport changes require the tabulator password', function () {

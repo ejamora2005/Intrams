@@ -246,7 +246,7 @@
                 <tbody class="divide-y divide-slate-100">
                     @forelse ($standings as $row)
                         <tr>
-                            <td class="px-3 py-3 font-semibold text-slate-700">#{{ $row['rank'] }}</td>
+                            <td class="px-3 py-3 font-semibold text-slate-700"><x-landing.ranking-medal :rank="$row['rank']" /></td>
                             <td class="px-3 py-3 font-medium text-slate-950">
                                 <x-team-badge :team="$row['team']" />
                             </td>

@@ -5,27 +5,38 @@ namespace App\Services;
 use App\Models\CompetitionSchedule;
 use App\Models\IntramuralEdition;
 use App\Models\Team;
+use Carbon\Carbon;
 use Illuminate\Support\Collection;
 
 class PublicScheduleService
 {
-    /** @return array{currentEdition: ?IntramuralEdition, todayLabel: string, todaySchedules: Collection<int, array<string, mixed>>} */
-    public function today(): array
+    /** @return array{currentEdition: ?IntramuralEdition, todayLabel: string, selectedDate: string, availableDates: array<int, string>, todaySchedules: Collection<int, array<string, mixed>>} */
+    public function today(?string $requestedDate = null): array
     {
         $now = now();
+        $selectedDate = $this->parseDate($requestedDate) ?? $now->copy();
         $currentEdition = IntramuralEdition::query()
             ->where('status', 'active')
-            ->whereDate('starts_on', '<=', $now)
-            ->whereDate('ends_on', '>=', $now)
             ->latest('starts_on')
             ->first();
         $todaySchedules = collect();
+        $availableDates = [];
 
         if ($currentEdition) {
+            $availableDates = CompetitionSchedule::query()
+                ->whereIn('edition_sport_id', $currentEdition->editionSports()->select('id'))
+                ->whereNotIn('status', ['cancelled', 'canceled'])
+                ->orderBy('starts_at')
+                ->get(['starts_at'])
+                ->map(fn (CompetitionSchedule $schedule): string => $schedule->starts_at->format('Y-m-d'))
+                ->unique()
+                ->values()
+                ->all();
+
             $todaySchedules = CompetitionSchedule::query()
                 ->select(['id', 'edition_sport_id', 'bracket_match_id', 'title', 'starts_at', 'venue', 'coordinator_id', 'status'])
                 ->whereIn('edition_sport_id', $currentEdition->editionSports()->select('id'))
-                ->whereBetween('starts_at', [$now->copy()->startOfDay(), $now->copy()->endOfDay()])
+                ->whereDate('starts_at', $selectedDate->toDateString())
                 ->whereNotIn('status', ['cancelled', 'canceled'])
                 ->with([
                     'editionSport:id,edition_id,sport_id',
@@ -78,8 +89,23 @@ class PublicScheduleService
 
         return [
             'currentEdition' => $currentEdition,
-            'todayLabel' => $now->format('F j, Y'),
+            'todayLabel' => $selectedDate->format('F j, Y'),
+            'selectedDate' => $selectedDate->toDateString(),
+            'availableDates' => $availableDates,
             'todaySchedules' => $todaySchedules,
         ];
+    }
+
+    private function parseDate(?string $date): ?Carbon
+    {
+        if (! is_string($date) || ! preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)) {
+            return null;
+        }
+
+        try {
+            return Carbon::createFromFormat('!Y-m-d', $date);
+        } catch (\Throwable) {
+            return null;
+        }
     }
 }
