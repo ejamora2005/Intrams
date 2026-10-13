@@ -389,7 +389,7 @@ test('multiple tabulators can access the tabulator dashboard', function () {
     $this->actingAs($secondTabulator)->get(route('tabulator.dashboard'))->assertOk()->assertSee('Tabulator dashboard');
 });
 
-test('participation rules flag possible dq students across operations dashboards', function () {
+test('participation rules prevent invalid sport assignments and flag legacy registrations across operations dashboards', function () {
     $admin = User::factory()->create(['role' => 'admin', 'status' => 'active']);
     $tabulator = User::factory()->create(['role' => 'tabulator', 'status' => 'active']);
     $edition = operationsEdition();
@@ -430,13 +430,29 @@ test('participation rules flag possible dq students across operations dashboards
         'team_id' => $team->id,
     ]))->assertOk()
         ->assertSee('Possible DQ')
-        ->assertSee('name="student_ids[]" value="'.$student->id.'" type="checkbox" class="student-checkbox', false);
+        ->assertSee('Students who would exceed the participation rules are unavailable.')
+        ->assertSee('disabled', false);
 
     $this->actingAs($admin)->post(route('admin.sports.participants.store', $volleyball->sport), [
         'edition_id' => $edition->id,
         'team_id' => $team->id,
         'student_ids' => [$student->id],
-    ])->assertRedirect(route('admin.sports.participants', ['sport' => $volleyball->sport, 'edition_id' => $edition->id]));
+    ])->assertSessionHasErrors('student_ids');
+
+    $this->assertDatabaseMissing('athlete_entries', [
+        'edition_sport_id' => $volleyball->id,
+        'student_id' => $student->id,
+    ]);
+
+    AthleteEntry::query()->create([
+        'edition_sport_id' => $volleyball->id,
+        'student_id' => $student->id,
+        'team_id' => $team->id,
+        'status' => 'active',
+        'medical_certificate_status' => 'pending',
+        'assigned_by' => $admin->id,
+        'assigned_at' => now(),
+    ]);
 
     $this->assertDatabaseHas('athlete_entries', [
         'edition_sport_id' => $volleyball->id,
@@ -447,6 +463,69 @@ test('participation rules flag possible dq students across operations dashboards
     $this->actingAs($admin)->get(route('admin.rules.index'))->assertOk()->assertSee('Possible DQ')->assertSee('Riley Cruz');
     $this->actingAs($gam)->get(route('gam.dashboard', ['team_id' => $team->id]))->assertOk()->assertSee('Possible DQ')->assertSee('Riley Cruz');
     $this->actingAs($tabulator)->get(route('tabulator.dashboard'))->assertOk()->assertSee('Possible DQ')->assertSee('Riley Cruz');
+});
+
+test('administrators can remove duplicate and rule-breaking registrations from the rules watchlist', function () {
+    $admin = User::factory()->create(['role' => 'admin', 'status' => 'active']);
+    $edition = operationsEdition();
+    $team = operationsTeam($edition);
+    $openChess = operationsSport($edition, 'Chess', 'CHESS');
+    $mensChessSport = Sport::query()->create([
+        'name' => 'Chess (Men)',
+        'code' => 'CHESS-MEN',
+        'participant_category' => 'male',
+        'status' => 'active',
+    ]);
+    $mensChess = EditionSport::query()->create([
+        'edition_id' => $edition->id,
+        'sport_id' => $mensChessSport->id,
+        'participant_type' => 'individual',
+        'game_mechanic' => 'single_elimination',
+        'scoring_rules' => ['point_system' => 'sports_minor'],
+        'status' => 'preparation',
+    ]);
+    $student = Student::query()->create([
+        'student_number' => 'CHESS-DUPLICATE-001',
+        'first_name' => 'Jules',
+        'last_name' => 'Reyes',
+        'gender' => 'Male',
+        'school_year' => $edition->school_year,
+        'course_id' => $team->course_id,
+        'status' => 'active',
+    ]);
+
+    $openEntry = AthleteEntry::query()->create([
+        'edition_sport_id' => $openChess->id,
+        'student_id' => $student->id,
+        'status' => 'active',
+        'assigned_at' => now()->subMinute(),
+    ]);
+    AthleteEntry::query()->create([
+        'edition_sport_id' => $mensChess->id,
+        'student_id' => $student->id,
+        'status' => 'active',
+        'assigned_at' => now(),
+    ]);
+
+    $this->actingAs($admin)->get(route('admin.rules.index'))
+        ->assertOk()
+        ->assertSee('Jules Reyes')
+        ->assertSee('Remove invalid registrations');
+
+    $this->actingAs($admin)->post(route('admin.rules.repair-registrations'), [
+        'confirmation' => 'REPAIR',
+    ])->assertRedirect(route('admin.rules.index'));
+
+    $this->assertDatabaseMissing('athlete_entries', ['id' => $openEntry->id]);
+    $this->assertDatabaseHas('athlete_entries', [
+        'edition_sport_id' => $mensChess->id,
+        'student_id' => $student->id,
+        'status' => 'active',
+    ]);
+    $this->actingAs($admin)->get(route('admin.rules.index'))
+        ->assertOk()
+        ->assertDontSee('Jules Reyes')
+        ->assertSee('No Possible DQ students found');
 });
 
 test('GAM users can verify required medical certificates but exempt sports stay hidden', function () {

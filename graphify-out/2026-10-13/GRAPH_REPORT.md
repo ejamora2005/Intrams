@@ -1,7 +1,7 @@
 # Graph Report - Intrams  (2026-10-13)
 
 ## Corpus Check
-- 366 files · ~793,145 words
+- 366 files · ~793,157 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 34 file(s) not represented in the graph (top: (none) 18, .woff2 5, .css 3)
 

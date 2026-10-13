@@ -118,6 +118,7 @@ Route::middleware([
         Route::get('/sports-points', [SportPointController::class, 'index'])->name('sports-points.index');
         Route::put('/sports-points/{system}', [SportPointController::class, 'update'])->where('system', '[A-Za-z0-9_-]+')->name('sports-points.update');
         Route::get('/rules-guidelines', [RulesController::class, 'admin'])->name('rules.index');
+        Route::post('/rules-guidelines/repair-registrations', [RulesController::class, 'repair'])->name('rules.repair-registrations');
         Route::get('/sports/{sport}/bracket', [SportController::class, 'bracket'])->name('sports.bracket');
         Route::get('/sports/{sport}/basketball-score-sheet', [SportController::class, 'basketballScoreSheet'])->name('sports.basketball-score-sheet');
         Route::post('/sports/{sport}/basketball-score-sheet/download', [SportController::class, 'downloadBasketballScoreSheet'])->name('sports.basketball-score-sheet.download');

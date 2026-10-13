@@ -4926,7 +4926,7 @@
       "file_type": "code",
       "norm_label": "{closure#5}()",
       "source_file": "app/Services/AthleteEntryService.php",
-      "source_location": "L105"
+      "source_location": "L111"
     },
     {
       "id": "app_services_bracketservice_bracketservice_initialize",
@@ -45036,7 +45036,7 @@
       "confidence_score": 1.0,
       "context": "parameter_type",
       "source_file": "app/Services/AthleteEntryService.php",
-      "source_location": "L105",
+      "source_location": "L111",
       "weight": 1.0
     },
     {
@@ -49068,7 +49068,7 @@
       "confidence_score": 1.0,
       "context": "return_type",
       "source_file": "app/Services/AthleteEntryService.php",
-      "source_location": "L105",
+      "source_location": "L111",
       "weight": 1.0
     },
     {
@@ -52623,7 +52623,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "app/Services/AthleteEntryService.php",
-      "source_location": "L105",
+      "source_location": "L111",
       "weight": 1.0
     },
     {
