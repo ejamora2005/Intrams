@@ -30,7 +30,7 @@ test('Trojan Warriors roster seeder imports the supplied sports and pair assignm
 
     $pairKeys = AthleteEntry::query()
         ->whereIn('student_id', [$romel->id, $earl->id])
-        ->whereHas('editionSport.sport', fn ($query) => $query->where('code', 'TABLE-TENNIS-DOUBLES'))
+        ->whereHas('editionSport.sport', fn ($query) => $query->where('code', 'TABLE-TENNIS-DOUBLES-MEN'))
         ->pluck('pair_key')
         ->unique();
 

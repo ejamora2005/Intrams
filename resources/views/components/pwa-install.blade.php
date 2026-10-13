@@ -1,4 +1,4 @@
-<div data-pwa-shell class="pointer-events-none fixed inset-x-0 bottom-0 z-[90] space-y-3 p-3 sm:p-5">
+<div data-pwa-shell data-pwa-session-key="{{ auth()->check() ? auth()->id().'-'.hash('sha256', session()->getId()) : 'guest' }}" class="pointer-events-none fixed inset-x-0 bottom-0 z-[90] space-y-3 p-3 sm:p-5">
     <section data-pwa-install hidden aria-live="polite" class="pointer-events-auto mx-auto max-w-xl overflow-hidden rounded-lg border border-white/15 bg-slate-950 text-white shadow-2xl shadow-slate-950/40">
         <div class="h-1 bg-[linear-gradient(90deg,#0c7345,#d9b87d,#0c7345)]"></div>
         <div class="flex gap-4 p-4">

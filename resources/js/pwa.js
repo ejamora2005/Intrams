@@ -1,5 +1,8 @@
 const serviceWorkerUrl = '/service-worker.js';
 const installPanel = document.querySelector('[data-pwa-install]');
+const pwaShell = document.querySelector('[data-pwa-shell]');
+const installSessionKey = pwaShell?.dataset.pwaSessionKey || 'guest';
+const installShownStorageKey = `slsu:pwa-install-shown:${installSessionKey}`;
 const installButtons = Array.from(document.querySelectorAll('[data-pwa-install-button]'));
 const inlineInstallButtons = Array.from(document.querySelectorAll('[data-pwa-inline-install-button]'));
 const dismissButtons = Array.from(document.querySelectorAll('[data-pwa-dismiss]'));
@@ -11,6 +14,27 @@ const installStatuses = Array.from(document.querySelectorAll('[data-pwa-install-
 let installPrompt = null;
 let waitingWorker = null;
 let installPromptInProgress = false;
+let installPromptShown = false;
+
+const hasShownInstallPrompt = () => {
+    if (installPromptShown) return true;
+
+    try {
+        return window.localStorage?.getItem(installShownStorageKey) === '1';
+    } catch {
+        return false;
+    }
+};
+
+const markInstallPromptShown = () => {
+    installPromptShown = true;
+
+    try {
+        window.localStorage?.setItem(installShownStorageKey, '1');
+    } catch {
+        // Storage can be unavailable in private browsing or restricted contexts.
+    }
+};
 
 const isStandalone = () => window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
 const isLocalhost = () => ['localhost', '127.0.0.1'].includes(location.hostname);
@@ -72,6 +96,15 @@ const showInstallPanel = async mode => {
     if (mode !== 'update' && await appIsInstalled()) {
         hideInstallControls();
         return;
+    }
+
+    if (mode !== 'update' && hasShownInstallPrompt()) {
+        hideInstallControls();
+        return;
+    }
+
+    if (mode !== 'update') {
+        markInstallPromptShown();
     }
 
     if (installPanel) installPanel.hidden = false;

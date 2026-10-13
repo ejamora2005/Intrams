@@ -62,11 +62,10 @@ class Sport extends Model
                 'VOLLEYBALL', 'VOLLEYBALL-MEN', 'VOLLEYBALL-WOMEN', 'MIXED-VOLLEYBALL',
                 'BEACH-VOLLEYBALL', 'BEACH-VOLLEYBALL-MEN', 'BEACH-VOLLEYBALL-WOMEN', 'ESPORT-ML',
             ], true) => 'team',
-            in_array($code, [
-                'BADMINTON', 'BADMINTON-TEAM', 'BADMINTON-DOUBLES', 'BADMINTON-SINGLES',
-                'TABLE-TENNIS', 'TABLE-TENNIS-TEAM', 'TABLE-TENNIS-DOUBLES', 'TABLE-TENNIS-SINGLES',
-                'CHESS',
-            ], true) => 'individual',
+            in_array($code, ['BADMINTON', 'TABLE-TENNIS', 'CHESS'], true)
+            || str_starts_with($code, 'BADMINTON-')
+            || str_starts_with($code, 'TABLE-TENNIS-')
+            || str_starts_with($code, 'CHESS-') => 'individual',
             in_array($code, [
                 'RUNS', '100M-RUN', '200M-RUN', '400M-RUN', 'RELAY-4X100', 'RELAY-4X400',
                 'THROWS', 'SHOT-PUT', 'DISCUS-THROW', 'JAVELIN-THROW',

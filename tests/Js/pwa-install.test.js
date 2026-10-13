@@ -5,14 +5,18 @@ import { runInNewContext } from 'node:vm';
 
 const source = readFileSync(new URL('../../resources/js/pwa.js', import.meta.url), 'utf8');
 
-const setup = async ({ secure = true, installed = false } = {}) => {
+const setup = async ({ secure = true, installed = false, sessionKey = 'login-1', storage = new Map() } = {}) => {
     const buttonListeners = new Map();
+    const dismissButtonListeners = new Map();
     const windowListeners = new Map();
     const button = {
         hidden: true,
         disabled: false,
         addEventListener: (name, listener) => buttonListeners.set(name, listener),
         setAttribute() {},
+    };
+    const dismissButton = {
+        addEventListener: (name, listener) => dismissButtonListeners.set(name, listener),
     };
     const status = { hidden: true, textContent: '' };
     const panel = { hidden: true };
@@ -36,19 +40,26 @@ const setup = async ({ secure = true, installed = false } = {}) => {
     const groups = {
         '[data-pwa-install-button]': [button],
         '[data-pwa-inline-install-button]': [button],
+        '[data-pwa-dismiss]': [dismissButton],
         '[data-pwa-install-status]': [status],
     };
     const window = {
         isSecureContext: secure,
         location,
         navigator,
+        localStorage: {
+            getItem: key => storage.get(key) ?? null,
+            setItem: (key, value) => storage.set(key, String(value)),
+        },
         matchMedia: () => ({ matches: false }),
         addEventListener: (name, listener) => windowListeners.set(name, listener),
     };
 
+    const shell = { dataset: { pwaSessionKey: sessionKey } };
+
     runInNewContext(source, {
         document: {
-            querySelector: selector => elements[selector] ?? null,
+            querySelector: selector => selector === '[data-pwa-shell]' ? shell : elements[selector] ?? null,
             querySelectorAll: selector => groups[selector] ?? [],
         },
         window,
@@ -59,7 +70,7 @@ const setup = async ({ secure = true, installed = false } = {}) => {
     });
     await new Promise(resolve => setImmediate(resolve));
 
-    return { button, status, panel, location, buttonListeners, windowListeners };
+    return { button, dismissButton, status, panel, location, buttonListeners, dismissButtonListeners, windowListeners };
 };
 
 test('install button opens the browser install prompt and hides after installation', async () => {
@@ -102,6 +113,42 @@ test('install button stays hidden when the app is already installed', async () =
     const page = await setup({ installed: true });
 
     assert.equal(page.button.hidden, true);
+});
+
+test('Later suppresses the install panel for the current login', async () => {
+    const storage = new Map();
+    const page = await setup({ storage });
+    const promptEvent = {
+        preventDefault() {},
+        prompt: async () => {},
+        userChoice: Promise.resolve({ outcome: 'dismissed' }),
+    };
+
+    page.windowListeners.get('beforeinstallprompt')(promptEvent);
+    await new Promise(resolve => setImmediate(resolve));
+    assert.equal(page.panel.hidden, false);
+
+    await page.dismissButtonListeners.get('click')();
+    assert.equal(page.panel.hidden, true);
+
+    page.windowListeners.get('beforeinstallprompt')(promptEvent);
+    assert.equal(page.panel.hidden, true);
+});
+
+test('a new login can see the install panel again', async () => {
+    const storage = new Map();
+    const firstLogin = await setup({ storage, sessionKey: 'login-1' });
+    const promptEvent = { preventDefault() {}, prompt: async () => {}, userChoice: Promise.resolve({ outcome: 'dismissed' }) };
+
+    firstLogin.windowListeners.get('beforeinstallprompt')(promptEvent);
+    await new Promise(resolve => setImmediate(resolve));
+    await firstLogin.dismissButtonListeners.get('click')();
+
+    const nextLogin = await setup({ storage, sessionKey: 'login-2' });
+    nextLogin.windowListeners.get('beforeinstallprompt')(promptEvent);
+    await new Promise(resolve => setImmediate(resolve));
+
+    assert.equal(nextLogin.panel.hidden, false);
 });
 
 test('manifest icons exist outside Apache reserved paths', () => {

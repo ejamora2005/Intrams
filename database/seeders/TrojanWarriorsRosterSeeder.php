@@ -213,14 +213,14 @@ class TrojanWarriorsRosterSeeder extends Seeder
             $add($first, $last, 'Male', ['BASKET-3X3']);
         }
 
-        $add('Christian', 'Trimucha', 'Male', ['TABLE-TENNIS-SINGLES']);
-        $add('Ryan', 'Baslot', 'Male', ['TABLE-TENNIS-SINGLES']);
-        $add('Romel', 'Pitong', 'Male', [['code' => 'TABLE-TENNIS-DOUBLES', 'pair_key' => 'trojan-tt-men-doubles-1']]);
-        $add('Earl Lorence', 'Maraña', 'Male', [['code' => 'TABLE-TENNIS-DOUBLES', 'pair_key' => 'trojan-tt-men-doubles-1']]);
-        $add('Bea', 'Galares', 'Female', ['TABLE-TENNIS-SINGLES']);
-        $add('Charlene', 'Makilang', 'Female', ['TABLE-TENNIS-SINGLES']);
-        $add('Eva Mae', 'Cabilic', 'Female', [['code' => 'TABLE-TENNIS-DOUBLES', 'pair_key' => 'trojan-tt-women-doubles-1']]);
-        $add('Joanna Mae', 'Maraña', 'Female', [['code' => 'TABLE-TENNIS-DOUBLES', 'pair_key' => 'trojan-tt-women-doubles-1']]);
+        $add('Christian', 'Trimucha', 'Male', ['TABLE-TENNIS-SINGLES-MEN']);
+        $add('Ryan', 'Baslot', 'Male', ['TABLE-TENNIS-SINGLES-MEN']);
+        $add('Romel', 'Pitong', 'Male', [['code' => 'TABLE-TENNIS-DOUBLES-MEN', 'pair_key' => 'trojan-tt-men-doubles-1']]);
+        $add('Earl Lorence', 'Maraña', 'Male', [['code' => 'TABLE-TENNIS-DOUBLES-MEN', 'pair_key' => 'trojan-tt-men-doubles-1']]);
+        $add('Bea', 'Galares', 'Female', ['TABLE-TENNIS-SINGLES-WOMEN']);
+        $add('Charlene', 'Makilang', 'Female', ['TABLE-TENNIS-SINGLES-WOMEN']);
+        $add('Eva Mae', 'Cabilic', 'Female', [['code' => 'TABLE-TENNIS-DOUBLES-WOMEN', 'pair_key' => 'trojan-tt-women-doubles-1']]);
+        $add('Joanna Mae', 'Maraña', 'Female', [['code' => 'TABLE-TENNIS-DOUBLES-WOMEN', 'pair_key' => 'trojan-tt-women-doubles-1']]);
 
         $add('Nico', 'Piloton', 'Male', ['SHOT-PUT', 'DISCUS-THROW']);
         $add('Danilo', 'Dumagat', 'Male', ['DISCUS-THROW', 'JAVELIN-THROW']);
@@ -264,10 +264,10 @@ class TrojanWarriorsRosterSeeder extends Seeder
         foreach ([
             ['Ronell', 'Morillo'], ['Jonh Rogiel Mades', 'Tumanda'], ['Jhon Kristian', 'Cundangan'], ['Jhon Loyd', 'Diamada'],
         ] as [$first, $last]) {
-            $add($first, $last, 'Male', ['CHESS']);
+            $add($first, $last, 'Male', ['CHESS-MEN']);
         }
         foreach ([['Daisy', 'Orosia'], ['Jemimah Samuelle', 'Señora'], ['Hannah Mae', 'Orias'], ['Joana', 'Cabal']] as [$first, $last]) {
-            $add($first, $last, 'Female', ['CHESS']);
+            $add($first, $last, 'Female', ['CHESS-WOMEN']);
         }
 
         return $rows;
