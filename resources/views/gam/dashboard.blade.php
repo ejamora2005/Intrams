@@ -143,7 +143,6 @@
                         @csrf
                         <h3 class="font-semibold text-slate-950">Add new player</h3>
                         <div class="mt-4 grid gap-3 sm:grid-cols-2">
-                            <p class="rounded-lg border border-dashed border-slate-300 bg-slate-50 px-3 py-2.5 text-sm text-slate-500 sm:col-span-2">Student ID is generated automatically from the player’s name.</p>
                             <select name="course_id" class="rounded-lg border-slate-300 py-2.5 text-sm focus:border-blue-600 focus:ring-blue-600">
                                 <option value="">Course</option>
                                 @foreach ($courses as $course)

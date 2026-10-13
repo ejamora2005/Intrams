@@ -1,16 +1,13 @@
 @csrf
 
 <div class="grid gap-5 sm:grid-cols-2">
-    <div>
-        <label class="text-sm font-medium text-slate-700">Student ID</label>
-        @if ($student->exists)
+    @if ($student->exists)
+        <div>
+            <label class="text-sm font-medium text-slate-700">Student ID</label>
             <div class="mt-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2.5 font-mono text-sm text-slate-700">{{ $student->student_number }}</div>
             <p class="mt-1 text-xs text-slate-500">Automatically generated and used as the student’s identifier.</p>
-        @else
-            <div class="mt-2 rounded-lg border border-dashed border-slate-300 bg-slate-50 px-3 py-2.5 text-sm text-slate-500">Generated automatically after saving</div>
-            <p class="mt-1 text-xs text-slate-500">The ID is created from the student’s name and made unique.</p>
-        @endif
-    </div>
+        </div>
+    @endif
     <div>
         <label for="status" class="text-sm font-medium text-slate-700">Status</label>
         <select id="status" name="status" class="mt-2 block w-full rounded-lg border-slate-300 py-2.5 text-sm shadow-sm focus:border-blue-600 focus:ring-blue-600">
