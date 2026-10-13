@@ -465,7 +465,7 @@ test('participation rules prevent invalid sport assignments and flag legacy regi
     $this->actingAs($tabulator)->get(route('tabulator.dashboard'))->assertOk()->assertSee('Possible DQ')->assertSee('Riley Cruz');
 });
 
-test('administrators can remove duplicate and rule-breaking registrations from the rules watchlist', function () {
+test('administrators can remove only duplicate open registrations from the rules watchlist', function () {
     $admin = User::factory()->create(['role' => 'admin', 'status' => 'active']);
     $edition = operationsEdition();
     $team = operationsTeam($edition);
@@ -493,6 +493,16 @@ test('administrators can remove duplicate and rule-breaking registrations from t
         'course_id' => $team->course_id,
         'status' => 'active',
     ]);
+    $majorOne = operationsSport($edition, 'Volleyball', 'VOLLEYBALL');
+    $majorTwo = operationsSport($edition, 'Basketball 5x5', 'BASKET-5X5');
+    $ruleViolationStudent = Student::query()->create([
+        'student_number' => 'RULE-VIOLATION-001',
+        'first_name' => 'Rowan',
+        'last_name' => 'Cruz',
+        'school_year' => $edition->school_year,
+        'course_id' => $team->course_id,
+        'status' => 'active',
+    ]);
 
     $openEntry = AthleteEntry::query()->create([
         'edition_sport_id' => $openChess->id,
@@ -506,11 +516,24 @@ test('administrators can remove duplicate and rule-breaking registrations from t
         'status' => 'active',
         'assigned_at' => now(),
     ]);
+    AthleteEntry::query()->create([
+        'edition_sport_id' => $majorOne->id,
+        'student_id' => $ruleViolationStudent->id,
+        'status' => 'active',
+        'assigned_at' => now(),
+    ]);
+    $secondMajorEntry = AthleteEntry::query()->create([
+        'edition_sport_id' => $majorTwo->id,
+        'student_id' => $ruleViolationStudent->id,
+        'status' => 'active',
+        'assigned_at' => now(),
+    ]);
 
     $this->actingAs($admin)->get(route('admin.rules.index'))
         ->assertOk()
         ->assertSee('Jules Reyes')
-        ->assertSee('Remove invalid registrations');
+        ->assertSee('Rowan Cruz')
+        ->assertSee('Remove duplicate open registrations');
 
     $this->actingAs($admin)->post(route('admin.rules.repair-registrations'), [
         'confirmation' => 'REPAIR',
@@ -522,10 +545,11 @@ test('administrators can remove duplicate and rule-breaking registrations from t
         'student_id' => $student->id,
         'status' => 'active',
     ]);
+    $this->assertDatabaseHas('athlete_entries', ['id' => $secondMajorEntry->id]);
     $this->actingAs($admin)->get(route('admin.rules.index'))
         ->assertOk()
         ->assertDontSee('Jules Reyes')
-        ->assertSee('No Possible DQ students found');
+        ->assertSee('Rowan Cruz');
 });
 
 test('GAM users can verify required medical certificates but exempt sports stay hidden', function () {

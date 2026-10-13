@@ -37,13 +37,13 @@ class RulesController extends Controller
         $edition = $this->standingsService->activeEdition();
         abort_unless($edition, 422, 'No active intramurals edition is available.');
 
-        $removed = $this->eligibilityService->removeInvalidRegistrations($edition);
+        $removed = $this->eligibilityService->removeDuplicateOpenRegistrations($edition);
 
         return redirect()
             ->route('admin.rules.index')
             ->with('success', $removed === 0
-                ? 'No invalid registrations needed to be removed.'
-                : $removed.' invalid registration(s) removed and affected brackets reset.');
+                ? 'No duplicate open registrations needed to be removed.'
+                : $removed.' duplicate open registration(s) removed and affected brackets reset.');
     }
 
     private function show(string $layout, string $homeRoute, string $workspaceLabel, $managedTeam = null, bool $requireManagedTeam = false): View
@@ -66,6 +66,9 @@ class RulesController extends Controller
             'managedTeam' => $managedTeam,
             'flaggedStudents' => $flaggedStudents,
             'canRepairRegistrations' => request()->user()?->role === 'admin',
+            'duplicateOpenRegistrationCount' => $edition && request()->user()?->role === 'admin'
+                ? $this->eligibilityService->duplicateOpenRegistrationCount($edition)
+                : 0,
         ]);
     }
 }

@@ -211,42 +211,13 @@ class EligibilityService
     }
 
     /**
-     * Remove active registrations that break the participation rules.
-     *
-     * Registrations are kept in their original order, except that a correctly
-     * gendered version of the same discipline is preferred over its legacy
-     * open version (for example, Chess (Men) over Chess).
+     * Remove only the legacy open registration when the same student already
+     * has the matching Men or Women registration for that discipline.
      */
-    public function removeInvalidRegistrations(IntramuralEdition $edition): int
+    public function removeDuplicateOpenRegistrations(IntramuralEdition $edition): int
     {
         return DB::transaction(function () use ($edition): int {
-            $students = Student::query()
-                ->whereHas('athleteEntries', fn ($query) => $query
-                    ->where('status', 'active')
-                    ->whereHas('editionSport', fn ($editionSportQuery) => $editionSportQuery->where('edition_id', $edition->id)))
-                ->with(['athleteEntries' => fn ($query) => $query
-                    ->where('status', 'active')
-                    ->whereHas('editionSport', fn ($editionSportQuery) => $editionSportQuery->where('edition_id', $edition->id))
-                    ->with('editionSport.sport')])
-                ->get();
-
-            $entriesToRemove = collect();
-
-            foreach ($students as $student) {
-                $acceptedEntries = collect();
-
-                foreach ($this->orderedEntriesForRepair($student, $student->athleteEntries) as $entry) {
-                    if ($this->evaluateEntries($acceptedEntries, $entry->editionSport)['possible_dq']) {
-                        $entriesToRemove->push($entry);
-
-                        continue;
-                    }
-
-                    $acceptedEntries->push($entry);
-                }
-            }
-
-            $entriesToRemove = $this->includeDualPartners($entriesToRemove)->unique('id')->values();
+            $entriesToRemove = $this->includeDualPartners($this->duplicateOpenEntries($edition))->unique('id')->values();
             if ($entriesToRemove->isEmpty()) {
                 return 0;
             }
@@ -272,6 +243,11 @@ class EligibilityService
 
             return $entriesToRemove->count();
         });
+    }
+
+    public function duplicateOpenRegistrationCount(IntramuralEdition $edition): int
+    {
+        return $this->duplicateOpenEntries($edition)->count();
     }
 
     /**
@@ -350,23 +326,24 @@ class EligibilityService
     }
 
     /** @return Collection<int, AthleteEntry> */
-    private function orderedEntriesForRepair(Student $student, Collection $entries): Collection
+    private function duplicateOpenEntries(IntramuralEdition $edition): Collection
     {
-        return $entries->sort(function (AthleteEntry $first, AthleteEntry $second) use ($student): int {
-            $sameDiscipline = $this->disciplineKey($first) === $this->disciplineKey($second);
+        return AthleteEntry::query()
+            ->with(['student', 'editionSport.sport'])
+            ->where('status', 'active')
+            ->whereHas('editionSport', fn ($query) => $query->where('edition_id', $edition->id))
+            ->get()
+            ->groupBy('student_id')
+            ->flatMap(function (Collection $entries): Collection {
+                $genderedDisciplines = $entries
+                    ->filter(fn (AthleteEntry $entry): bool => $entry->student instanceof Student && $this->isGenderMatchedEntry($entry->student, $entry))
+                    ->map(fn (AthleteEntry $entry): string => $this->disciplineKey($entry))
+                    ->unique();
 
-            if ($sameDiscipline) {
-                $firstIsGenderMatch = $this->isGenderMatchedEntry($student, $first);
-                $secondIsGenderMatch = $this->isGenderMatchedEntry($student, $second);
-
-                if ($firstIsGenderMatch !== $secondIsGenderMatch) {
-                    return $firstIsGenderMatch ? -1 : 1;
-                }
-            }
-
-            return [$first->assigned_at?->getTimestamp() ?? PHP_INT_MAX, $first->id]
-                <=> [$second->assigned_at?->getTimestamp() ?? PHP_INT_MAX, $second->id];
-        })->values();
+                return $entries->filter(fn (AthleteEntry $entry): bool => $this->isOpenEntry($entry)
+                    && $genderedDisciplines->contains($this->disciplineKey($entry)));
+            })
+            ->values();
     }
 
     /** @return Collection<int, AthleteEntry> */
@@ -402,6 +379,11 @@ class EligibilityService
     {
         return in_array($entry->editionSport?->sport?->participant_category, ['male', 'female'], true)
             && strcasecmp((string) $student->gender, (string) $entry->editionSport->sport->participant_category) === 0;
+    }
+
+    private function isOpenEntry(AthleteEntry $entry): bool
+    {
+        return ! in_array($entry->editionSport?->sport?->participant_category, ['male', 'female'], true);
     }
 
     private function matchesAllowedCombination(array $counts): bool

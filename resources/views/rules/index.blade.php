@@ -62,17 +62,17 @@
             </div>
             <div class="flex flex-wrap items-center gap-3">
                 <span class="inline-flex w-max whitespace-nowrap rounded-full bg-red-600 px-3 py-1 text-xs font-semibold text-white">{{ $flaggedStudents->count() }} flagged</span>
-                @if ($canRepairRegistrations && $flaggedStudents->isNotEmpty())
+                @if ($canRepairRegistrations && $duplicateOpenRegistrationCount > 0)
                     <form method="POST" action="{{ route('admin.rules.repair-registrations') }}">
                         @csrf
                         <input type="hidden" name="confirmation" value="REPAIR">
-                        <button type="submit" class="rounded-lg bg-red-600 px-3 py-2 text-xs font-semibold text-white transition hover:bg-red-700">Remove invalid registrations</button>
+                        <button type="submit" class="rounded-lg bg-red-600 px-3 py-2 text-xs font-semibold text-white transition hover:bg-red-700">Remove duplicate open registrations</button>
                     </form>
                 @endif
             </div>
         </div>
-        @if ($canRepairRegistrations && $flaggedStudents->isNotEmpty())
-            <p class="border-b border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900 sm:px-6">This removes registrations that exceed the rules, keeps the earlier allowed selections, and prefers the matching gendered event over a duplicate open event such as Chess (Men) over Chess. Any affected, unfinished brackets are reset.</p>
+        @if ($canRepairRegistrations && $duplicateOpenRegistrationCount > 0)
+            <p class="border-b border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900 sm:px-6">This removes only a duplicate open registration when the student is already registered in the matching Men or Women event, such as removing Chess while keeping Chess (Men). Other rule violations are left unchanged. Any affected, unfinished brackets are reset.</p>
         @endif
         <div class="overflow-x-auto">
             <table class="min-w-full text-left text-sm">
