@@ -327,8 +327,10 @@ input[type='radio']:checked {
     background: #dc2626 !important;
 }
 
-.ops-dashboard :is(input, select, textarea),
-.ops-dashboard :is(input, select, textarea):is(.text-slate-950, .text-slate-900, .text-slate-800, .text-slate-700, .text-slate-600, .text-slate-500, .text-blue-700, .text-blue-800, .text-blue-800\/75) {
+/* Text fields use the light operations palette. Checkboxes and radios retain
+   their own checked-state paint so their tick or dot is never covered. */
+.ops-dashboard :is(input:not([type='checkbox']):not([type='radio']), select, textarea),
+.ops-dashboard :is(input:not([type='checkbox']):not([type='radio']), select, textarea):is(.text-slate-950, .text-slate-900, .text-slate-800, .text-slate-700, .text-slate-600, .text-slate-500, .text-blue-700, .text-blue-800, .text-blue-800\/75) {
     color: #0f172a !important;
     background: #f8fafc !important;
     border-color: #b6c9df !important;
