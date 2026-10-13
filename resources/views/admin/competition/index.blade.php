@@ -48,7 +48,12 @@
                         @endphp
                         <tr class="align-top">
                             <td class="px-5 py-4 font-medium text-slate-900">{{ $schedule->editionSport->edition->name }}</td>
-                            <td class="px-5 py-4 text-slate-700">{{ $schedule->editionSport->sport->name }}</td>
+                            <td class="px-5 py-4 text-slate-700">
+                                <span class="flex items-center gap-2">
+                                    <span class="ops-sport-inline-icon"><x-sport-group-icon :group="$schedule->editionSport->sport?->catalogue_group_key ?? 'other'" /></span>
+                                    <span><span class="block font-medium text-slate-900">{{ $schedule->editionSport->sport->name }}</span><span class="text-xs text-slate-500">{{ $schedule->editionSport->sport?->catalogue_group_label ?? 'Other Sports' }}</span></span>
+                                </span>
+                            </td>
                             <td class="px-5 py-4 text-slate-700">{{ $scheduleLabel }}</td>
                             <td class="px-5 py-4 text-slate-700">
                                 @if ($participantTeams->isNotEmpty())

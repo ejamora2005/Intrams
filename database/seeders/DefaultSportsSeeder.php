@@ -12,14 +12,21 @@ class DefaultSportsSeeder extends Seeder
     public function run(): void
     {
         foreach (config('intramurals.default_competitions', []) as $sport) {
+            $attributes = [
+                'name' => $sport['name'],
+                'description' => $sport['description'] ?? null,
+                'status' => 'active',
+                'is_system' => true,
+            ];
+
+            if (array_key_exists('participant_category', $sport)) {
+                $attributes['participant_category'] = $sport['participant_category'];
+                $attributes['participant_category_label'] = $sport['participant_category_label'] ?? null;
+            }
+
             $model = Sport::withTrashed()->updateOrCreate(
                 ['code' => $sport['code']],
-                [
-                    'name' => $sport['name'],
-                    'description' => $sport['description'] ?? null,
-                    'status' => 'active',
-                    'is_system' => true,
-                ],
+                $attributes,
             );
 
             if ($model->trashed()) {

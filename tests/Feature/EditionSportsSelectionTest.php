@@ -87,6 +87,63 @@ test('re-seeding default sports moves basketball 3x3 to the minor point system',
     expect($configuration->fresh()->scoring_rules['point_system'])->toBe('sports_minor');
 });
 
+test('sports catalogue is organized into visible competition groups', function () {
+    $admin = editionSportsAdmin();
+
+    app(DefaultSportsSeeder::class)->run();
+
+    $edition = IntramuralEdition::query()
+        ->where('name', config('intramurals.default_edition.name'))
+        ->where('school_year', config('intramurals.default_edition.school_year'))
+        ->firstOrFail();
+
+    $this->actingAs($admin)
+        ->get(route('admin.sports.index', ['edition_id' => $edition->id]))
+        ->assertOk()
+        ->assertSee('Team Sports')
+        ->assertSee('Individual & Pair Sports')
+        ->assertSee('Track & Field')
+        ->assertSee('Mixed Volleyball (Open)')
+        ->assertSee('Badminton');
+});
+
+test('complete sport catalogue includes gendered volleyball and individual athletics events', function () {
+    app(DefaultSportsSeeder::class)->run();
+
+    $expected = [
+        'VOLLEYBALL-MEN' => ['name' => 'Volleyball (Men)', 'participant_category' => 'male'],
+        'VOLLEYBALL-WOMEN' => ['name' => 'Volleyball (Women)', 'participant_category' => 'female'],
+        'MIXED-VOLLEYBALL' => ['name' => 'Mixed Volleyball (Open)', 'participant_category' => 'mixed'],
+        'BEACH-VOLLEYBALL-MEN' => ['name' => 'Beach Volleyball (Men)', 'participant_category' => 'male'],
+        'BEACH-VOLLEYBALL-WOMEN' => ['name' => 'Beach Volleyball (Women)', 'participant_category' => 'female'],
+        'BADMINTON-TEAM' => ['name' => 'Badminton (Team)', 'participant_category' => 'open'],
+        'BADMINTON-DOUBLES' => ['name' => 'Badminton (Doubles)', 'participant_category' => 'open'],
+        'BADMINTON-SINGLES' => ['name' => 'Badminton (Singles)', 'participant_category' => 'open'],
+        'TABLE-TENNIS-TEAM' => ['name' => 'Table Tennis (Team)', 'participant_category' => 'open'],
+        'TABLE-TENNIS-DOUBLES' => ['name' => 'Table Tennis (Doubles)', 'participant_category' => 'open'],
+        'TABLE-TENNIS-SINGLES' => ['name' => 'Table Tennis (Singles)', 'participant_category' => 'open'],
+        '100M-RUN' => ['name' => '100m Run', 'participant_category' => 'open'],
+        '200M-RUN' => ['name' => '200m Run', 'participant_category' => 'open'],
+        '400M-RUN' => ['name' => '400m Run', 'participant_category' => 'open'],
+        'RELAY-4X100' => ['name' => '4x100m Relay', 'participant_category' => 'open'],
+        'RELAY-4X400' => ['name' => '4x400m Relay', 'participant_category' => 'open'],
+        'LONG-JUMP' => ['name' => 'Long Jump', 'participant_category' => 'open'],
+        'TRIPLE-JUMP' => ['name' => 'Triple Jump', 'participant_category' => 'open'],
+    ];
+
+    foreach ($expected as $code => $attributes) {
+        $sport = Sport::query()->where('code', $code)->firstOrFail();
+
+        expect($sport->name)->toBe($attributes['name'])
+            ->and($sport->participant_category)->toBe($attributes['participant_category']);
+    }
+
+    expect(Sport::catalogueGroupKeyFor('VOLLEYBALL-MEN'))->toBe('team')
+        ->and(Sport::catalogueGroupKeyFor('BADMINTON-DOUBLES'))->toBe('individual')
+        ->and(Sport::catalogueGroupKeyFor('RELAY-4X100'))->toBe('track-field')
+        ->and(Sport::catalogueGroupKeyFor('TRIPLE-JUMP'))->toBe('track-field');
+});
+
 test('proposal defaults seed scoring groups and cultural schedule items', function () {
     $admin = editionSportsAdmin();
 

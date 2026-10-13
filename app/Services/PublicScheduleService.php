@@ -40,7 +40,7 @@ class PublicScheduleService
                 ->whereNotIn('status', ['cancelled', 'canceled'])
                 ->with([
                     'editionSport:id,edition_id,sport_id',
-                    'editionSport.sport:id,name',
+                    'editionSport.sport:id,name,code',
                     'bracketMatch:id,match_number',
                     'coordinator:id,name',
                     'participants' => fn ($query) => $query
@@ -74,8 +74,14 @@ class PublicScheduleService
                         ])
                         ->all();
 
+                    $sport = $schedule->editionSport->sport;
+                    $sportCode = strtoupper((string) $sport?->code);
+                    $sportGroup = str_starts_with($sportCode, 'CULT-') ? null : $sport?->catalogue_group_key;
+
                     return [
-                        'sport' => $schedule->editionSport->sport->name,
+                        'event' => $this->eventName($sport?->name ?? 'Event'),
+                        'sport_group' => $sportGroup,
+                        'sport_group_label' => $sportGroup ? $sport?->catalogue_group_label : null,
                         'game' => $schedule->title ?: ($schedule->bracketMatch ? 'Game '.$schedule->bracketMatch->match_number : ''),
                         'time' => $schedule->starts_at->format('g:i A'),
                         'period' => $schedule->starts_at->hour < 12 ? 'Morning' : 'Afternoon',
@@ -107,5 +113,10 @@ class PublicScheduleService
         } catch (\Throwable) {
             return null;
         }
+    }
+
+    private function eventName(string $name): string
+    {
+        return preg_replace('/^(?:cultural|sports)\s*:\s*/i', '', $name) ?: $name;
     }
 }

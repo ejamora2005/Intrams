@@ -33,7 +33,7 @@ class TestIntramuralsDataSeeder extends Seeder
         app(EditionService::class)->syncDefaultSports($edition);
 
         $defaultTeams = [
-            ['name' => 'Mighty Sea Dragons', 'department' => 'Marine Biology', 'course_code' => 'MB'],
+            ['name' => 'Sea Dragons', 'department' => 'Marine Biology', 'course_code' => 'MB'],
             ['name' => 'Terraquatic Eagles', 'department' => 'Fisheries & Agriculture', 'course_code' => 'FA'],
             ['name' => 'Trojan Warriors', 'department' => 'Information Technology', 'course_code' => 'IT'],
         ];

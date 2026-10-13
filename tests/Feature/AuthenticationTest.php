@@ -1,7 +1,7 @@
 <?php
 
-use App\Models\CompetitionSchedule;
 use App\Models\BracketMatch;
+use App\Models\CompetitionSchedule;
 use App\Models\EditionSport;
 use App\Models\IntramuralEdition;
 use App\Models\ScheduleParticipant;
@@ -52,7 +52,7 @@ test('login page shows a manually refreshed snapshot of todays competition sched
             'ends_on' => '2026-09-30',
             'status' => 'active',
         ]);
-        $sport = Sport::query()->create(['name' => 'Volleyball', 'code' => 'VOLLEYBALL', 'status' => 'active']);
+        $sport = Sport::query()->create(['name' => 'Cultural: Volleyball', 'code' => 'VOLLEYBALL', 'status' => 'active']);
         $editionSport = EditionSport::query()->create([
             'edition_id' => $edition->id,
             'sport_id' => $sport->id,
@@ -96,6 +96,7 @@ test('login page shows a manually refreshed snapshot of todays competition sched
             ->assertSee('2026 SLSU Intramurals')
             ->assertSee('September 27, 2026')
             ->assertSee('Volleyball')
+            ->assertDontSee('Cultural: Volleyball')
             ->assertSee('Morning')
             ->assertSeeInOrder(['Game 1', 'Blue Spikers VS Red Smashers'])
             ->assertSee('Main Court')

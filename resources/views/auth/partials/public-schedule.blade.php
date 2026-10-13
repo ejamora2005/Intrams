@@ -4,7 +4,7 @@
 
 @php
     $scheduleCount = $todaySchedules->count();
-    $sportCount = $todaySchedules->pluck('sport')->unique()->count();
+    $eventCount = $todaySchedules->pluck('event')->unique()->count();
     $morningCount = $todaySchedules->where('period', 'Morning')->count();
     $afternoonCount = $todaySchedules->where('period', 'Afternoon')->count();
     $themeTitle = config('intramurals.theme.title');
@@ -28,12 +28,12 @@
         <section class="schedule-hero" aria-labelledby="schedule-heading">
             <div class="schedule-intro">
                 <p class="schedule-eyebrow">{{ $themeTitle }}</p>
-                <h1 id="schedule-heading">Today's match <span>schedule</span></h1>
-                <p class="schedule-description">{{ $themeTagline }} Official match board for the SLSU Bontoc Intramural Meet.</p>
+                <h1 id="schedule-heading">Today's <span>events</span></h1>
+                <p class="schedule-description">{{ $themeTagline }} Official event board for the SLSU Bontoc Intramural Meet.</p>
                 <p class="schedule-edition"><span aria-hidden="true"></span>{{ $currentEdition?->name ?? 'No active intramurals edition' }}</p>
-                <ul class="schedule-metrics" aria-label="Schedule summary">
+                <ul class="schedule-metrics" aria-label="Event summary">
                     <li><strong>{{ $scheduleCount }}</strong><span>Matches</span></li>
-                    <li><strong>{{ $sportCount }}</strong><span>Sports</span></li>
+                    <li><strong>{{ $eventCount }}</strong><span>Events</span></li>
                     <li><strong>{{ $morningCount }}</strong><span>Morning</span></li>
                     <li><strong>{{ $afternoonCount }}</strong><span>Afternoon</span></li>
                 </ul>
@@ -41,7 +41,7 @@
             <div class="schedule-date">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M7 3v4m10-4v4M3 11h18m-13 4h3m2 0h3"/></svg>
                 <div>
-                    <p>SLSU schedule desk</p>
+                    <p>SLSU event desk</p>
                     <strong>{{ $todayLabel }}</strong>
                     <span>Morning &amp; afternoon competitions</span>
                     @if (! empty($availableDates))
@@ -73,22 +73,22 @@
 
         <section class="schedule-board" aria-label="Today's competitions">
             <div class="schedule-toolbar">
-                <div><p class="schedule-section-label">Match schedule</p><h2>On the schedule today <span class="schedule-count">{{ $scheduleCount }}</span></h2></div>
-                <a class="schedule-refresh" href="{{ route('login', ['date' => $selectedDate]) }}#schedule-heading"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M20 7v5h-5M4 17v-5h5M6 7a7 7 0 0 1 12-1l2 6M4 12l2 6a7 7 0 0 0 12-1"/></svg><span>Refresh schedule</span></a>
+                <div><p class="schedule-section-label">Today's events</p><h2>Happening today <span class="schedule-count">{{ $scheduleCount }}</span></h2></div>
+                <a class="schedule-refresh" href="{{ route('login', ['date' => $selectedDate]) }}#schedule-heading"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M20 7v5h-5M4 17v-5h5M6 7a7 7 0 0 1 12-1l2 6M4 12l2 6a7 7 0 0 0 12-1"/></svg><span>Refresh events</span></a>
             </div>
 
             <div class="schedule-table-wrap hidden lg:block">
                 <table class="schedule-table" aria-describedby="schedule-refresh-note">
-                    <caption class="sr-only">Competitions scheduled for {{ $todayLabel }}</caption>
+                    <caption class="sr-only">Events for {{ $todayLabel }}</caption>
                     <colgroup><col style="width:18%"><col style="width:15%"><col style="width:34%"><col style="width:15%"><col style="width:18%"></colgroup>
-                    <thead><tr><th scope="col">Sport</th><th scope="col">Session</th><th scope="col">Teams / participants</th><th scope="col">Venue</th><th scope="col">Facilitator</th></tr></thead>
+                    <thead><tr><th scope="col">Event</th><th scope="col">Session</th><th scope="col">Teams / participants</th><th scope="col">Venue</th><th scope="col">Facilitator</th></tr></thead>
                     <tbody>
-                        @forelse ($todaySchedules->groupBy('sport') as $sport => $sportSchedules)
-                            @php($sharedFacilitator = $sportSchedules->pluck('facilitator')->unique()->count() === 1)
-                            @foreach ($sportSchedules as $schedule)
+                        @forelse ($todaySchedules->groupBy('event') as $event => $eventSchedules)
+                            @php($sharedFacilitator = $eventSchedules->pluck('facilitator')->unique()->count() === 1)
+                            @foreach ($eventSchedules as $schedule)
                                 <tr>
                                     @if ($loop->first)
-                                        <th scope="rowgroup" rowspan="{{ $sportSchedules->count() }}" class="schedule-sport">{{ $sport }}</th>
+                                        <th scope="rowgroup" rowspan="{{ $eventSchedules->count() }}" class="schedule-sport">@if ($schedule['sport_group'])<span class="schedule-sport-group"><x-sport-group-icon :group="$schedule['sport_group']" /><small>{{ $schedule['sport_group_label'] }}</small></span>@endif{{ $event }}</th>
                                     @endif
                                     <td>
                                         <div class="schedule-session-stack">
@@ -113,7 +113,7 @@
                                     </td>
                                     <td class="schedule-facilitator">{{ $schedule['venue'] }}</td>
                                     @if (! $sharedFacilitator || $loop->first)
-                                        <td @if ($sharedFacilitator) rowspan="{{ $sportSchedules->count() }}" @endif class="schedule-facilitator">{{ $schedule['facilitator'] }}</td>
+                                        <td @if ($sharedFacilitator) rowspan="{{ $eventSchedules->count() }}" @endif class="schedule-facilitator">{{ $schedule['facilitator'] }}</td>
                                     @endif
                                 </tr>
                             @endforeach
@@ -128,7 +128,12 @@
                 @forelse ($todaySchedules as $schedule)
                     <article class="schedule-match-card">
                         <header>
-                            <div><h3>{{ $schedule['sport'] }}</h3><time>{{ $schedule['time'] }}</time></div>
+                            <div>
+                                @if ($schedule['sport_group'])
+                                    <span class="schedule-sport-group"><x-sport-group-icon :group="$schedule['sport_group']" /><small>{{ $schedule['sport_group_label'] }}</small></span>
+                                @endif
+                                <h3>{{ $schedule['event'] }}</h3><time>{{ $schedule['time'] }}</time>
+                            </div>
                             <span class="schedule-session {{ $schedule['period'] === 'Morning' ? 'schedule-session--morning' : 'schedule-session--afternoon' }}"><span aria-hidden="true"></span>{{ $schedule['period'] }}</span>
                         </header>
                         <div class="schedule-mobile-match">
@@ -153,7 +158,7 @@
                     <x-landing.schedule-empty />
                 @endforelse
             </div>
-            <footer class="schedule-board-footer"><p id="schedule-refresh-note">Updates appear as coordinator entries are published.</p><span>Schedule for today</span></footer>
+            <footer class="schedule-board-footer"><p id="schedule-refresh-note">Updates appear as coordinator entries are published.</p><span>Today's events</span></footer>
         </section>
         <footer class="schedule-footer"><span>SLSU Bontoc Campus</span><span>SLSU INTRAMURALS</span></footer>
     </div>

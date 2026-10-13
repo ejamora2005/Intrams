@@ -6,9 +6,9 @@ Replace each file with a high-quality, transparent photographic cutout using the
 
 | Team | File | Placement |
 | --- | --- | --- |
-| Mighty Sea Dragons | `marine-biology/microscope.png` | Upper left, soft background layer |
-| Mighty Sea Dragons | `marine-biology/coral.png` | Right edge, foreground layer |
-| Mighty Sea Dragons | `marine-biology/diving-goggles.png` | Lower left, softly masked |
+| Sea Dragons | `marine-biology/microscope.png` | Upper left, soft background layer |
+| Sea Dragons | `marine-biology/coral.png` | Right edge, foreground layer |
+| Sea Dragons | `marine-biology/diving-goggles.png` | Lower left, softly masked |
 | Terraquatic Eagles | `fisheries-agriculture/rice-stalks.png` | Upper left, soft background layer |
 | Terraquatic Eagles | `fisheries-agriculture/fish.png` | Right edge, foreground layer |
 | Terraquatic Eagles | `fisheries-agriculture/tractor.png` | Lower left, softly masked |

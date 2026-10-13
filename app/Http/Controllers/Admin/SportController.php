@@ -5,29 +5,29 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreSportRequest;
 use App\Http\Requests\UpdateSportRequest;
-use App\Models\Sport;
-use App\Models\IntramuralEdition;
-use App\Models\EditionSport;
-use App\Models\Course;
-use App\Models\Student;
 use App\Models\AthleteEntry;
 use App\Models\BracketCompetitor;
 use App\Models\BracketMatch;
 use App\Models\CompetitionSchedule;
+use App\Models\Course;
+use App\Models\EditionSport;
+use App\Models\IntramuralEdition;
+use App\Models\Sport;
+use App\Models\Student;
 use App\Models\Team;
 use App\Models\TeamMember;
 use App\Services\AuditService;
 use App\Services\BracketService;
 use App\Services\EligibilityService;
-use App\Services\SportService;
 use App\Services\ScoreSheetImageOfficeService;
+use App\Services\SportService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
+use Symfony\Component\HttpFoundation\Response;
 
 class SportController extends Controller
 {
@@ -35,8 +35,8 @@ class SportController extends Controller
         private readonly SportService $service,
         private readonly BracketService $bracketService,
         private readonly EligibilityService $eligibilityService,
-    ) {
-    }
+    ) {}
+
     public function index(Request $request): View
     {
         return $this->catalogue($request, false);
@@ -50,6 +50,8 @@ class SportController extends Controller
     private function catalogue(Request $request, bool $cultural): View
     {
         $status = $request->string('status')->value() ?: 'active';
+        $search = trim($request->string('search')->value());
+        $category = $request->string('category')->value();
         $edition = $this->selectedEdition($request);
         $editionId = $edition?->id;
         $sports = Sport::query()
@@ -60,8 +62,11 @@ class SportController extends Controller
             )
             ->when($edition, fn ($query) => $query->whereHas('editionSports', fn ($configuration) => $configuration->where('edition_id', $edition->id)))
             ->withCount(['editionSports as edition_sports_count' => fn ($query) => $edition ? $query->where('edition_id', $edition->id) : $query])
+            ->when($search !== '', fn ($query) => $query->where('name', 'like', '%'.$search.'%'))
+            ->when($category !== '' && array_key_exists($category, Sport::PARTICIPANT_CATEGORIES), fn ($query) => $query->where('participant_category', $category))
             ->when($status === 'archived', fn ($query) => $query->onlyTrashed())
             ->when(in_array($status, ['active', 'inactive'], true), fn ($query) => $query->where('status', $status))
+            ->orderByRaw("FIELD(participant_category, 'male', 'female', 'mixed', 'open', 'custom')")
             ->orderBy('name')
             ->paginate(60)
             ->withQueryString();
@@ -70,6 +75,9 @@ class SportController extends Controller
         return view('admin.sports.index', [
             'sports' => $sports,
             'status' => $status,
+            'search' => $search,
+            'category' => $category,
+            'participantCategories' => Sport::PARTICIPANT_CATEGORIES,
             'edition' => $edition,
             'editionId' => $editionId,
             'editions' => $editions,
@@ -89,7 +97,7 @@ class SportController extends Controller
         $edition = $this->selectedEdition($request);
         abort_unless($edition !== null, 422, 'Create an edition before adding sports.');
 
-        return view('admin.sports.create', ['sport' => new Sport(), 'editionSport' => null, 'edition' => $edition]);
+        return view('admin.sports.create', ['sport' => new Sport, 'editionSport' => null, 'edition' => $edition]);
     }
 
     public function store(StoreSportRequest $request): RedirectResponse
@@ -122,8 +130,22 @@ class SportController extends Controller
 
         return redirect()->route('admin.sports.index', ['edition_id' => $edition?->id])->with('success', 'Sport and mechanics updated.');
     }
-    public function destroy(Sport $sport): RedirectResponse { $this->service->archive($sport); return redirect()->route('admin.sports.index')->with('success', 'Sport archived.'); }
-    public function restore(int $sport): RedirectResponse { $sport = Sport::withTrashed()->findOrFail($sport); $this->service->restore($sport); return redirect()->route('admin.sports.index', ['status' => 'archived'])->with('success', 'Sport restored.'); }
+
+    public function destroy(Sport $sport): RedirectResponse
+    {
+        $this->service->archive($sport);
+
+        return redirect()->route('admin.sports.index')->with('success', 'Sport archived.');
+    }
+
+    public function restore(int $sport): RedirectResponse
+    {
+        $sport = Sport::withTrashed()->findOrFail($sport);
+        $this->service->restore($sport);
+
+        return redirect()->route('admin.sports.index', ['status' => 'archived'])->with('success', 'Sport restored.');
+    }
+
     public function participants(Request $request, Sport $sport): View
     {
         $edition = $this->selectedEdition($request);
@@ -223,6 +245,7 @@ class SportController extends Controller
             ->orderBy('match_number')
             ->get()
             ->groupBy('bracket');
+
         return view('admin.sports.bracket', compact('sport', 'edition', 'editionSport', 'matches'));
     }
 
@@ -316,6 +339,7 @@ class SportController extends Controller
                 ->where('team_id', $data['winner_team_id'])
                 ->firstOrFail();
         $this->bracketService->record($match, $winner);
+
         return redirect()->route('admin.sports.bracket', ['sport' => $sport, 'edition_id' => $edition->id])->with('success', $winner->label.' was declared the winner.');
     }
 
@@ -351,6 +375,7 @@ class SportController extends Controller
             foreach ([['competitor' => $match->competitorOne, 'slot' => 'A'], ['competitor' => $match->competitorTwo, 'slot' => 'B']] as $side) {
                 if ($side['competitor']->team_id) {
                     $schedule->participants()->create(['team_id' => $side['competitor']->team_id, 'slot' => $side['slot'], 'status' => 'active']);
+
                     continue;
                 }
 
@@ -400,6 +425,7 @@ class SportController extends Controller
             ->where('status', 'active')
             ->with('course')
             ->whereDoesntHave('athleteEntries', fn ($entryQuery) => $entryQuery->where('edition_sport_id', $editionSport->id))
+            ->when(in_array($sport->participant_category, ['male', 'female'], true), fn ($query) => $query->where('gender', ucfirst($sport->participant_category)))
             ->when($requiresTeam && ! $teamId, fn ($query) => $query->whereRaw('1 = 0'))
             ->when($courseId, fn ($query) => $query->where('course_id', $courseId))
             ->when($teamId, fn ($query) => $query->whereHas('teamMembers', fn ($memberQuery) => $memberQuery->where('team_id', $teamId)))
@@ -424,13 +450,14 @@ class SportController extends Controller
         abort_unless($edition !== null, 404);
         $editionSport = EditionSport::query()->where('edition_id', $edition->id)->where('sport_id', $sport->id)->firstOrFail();
         $data = $request->validate(['team_id' => ['nullable', 'exists:teams,id'], 'student_ids' => ['required', 'array', 'min:1'], 'student_ids.*' => ['integer', 'distinct', 'exists:students,id']]);
-        $team = !empty($data['team_id']) ? Team::findOrFail($data['team_id']) : null;
+        $team = ! empty($data['team_id']) ? Team::findOrFail($data['team_id']) : null;
         $requiresTeam = in_array($editionSport->participant_type, ['team', 'dual'], true);
         abort_if($requiresTeam && (! $team || $team->edition_id !== $edition->id), 422, 'Choose a team from this edition.');
         abort_if(! $requiresTeam && $team, 422, 'Individual sports do not use a team assignment.');
         abort_if($editionSport->participant_type === 'dual' && count($data['student_ids']) !== 2, 422, 'Select exactly two students for this dual sport.');
         $students = Student::query()->where('status', 'active')->whereIn('id', $data['student_ids'])->get();
         abort_unless($students->count() === count($data['student_ids']), 422, 'Only active students can be assigned.');
+        $this->eligibilityService->assertStudentsMatchSportCategory($students, $sport);
 
         if ($requiresTeam) {
             $roster = TeamMember::query()->where('team_id', $team->id)->pluck('student_id');
@@ -509,8 +536,17 @@ class SportController extends Controller
         return redirect()->route('admin.sports.participants', ['sport' => $sport, 'edition_id' => $edition->id])
             ->with('success', $entries->count().' participant registration(s) removed.');
     }
-    public function events(Sport $sport): View { return view('admin.sports.events', ['sport' => $sport, 'events' => $sport->events()->with('edition')->latest('starts_at')->paginate(15)]); }
-    private function currentEdition(): ?IntramuralEdition { return IntramuralEdition::query()->whereIn('status', ['draft', 'active'])->orderByDesc('starts_on')->first(); }
+
+    public function events(Sport $sport): View
+    {
+        return view('admin.sports.events', ['sport' => $sport, 'events' => $sport->events()->with('edition')->latest('starts_at')->paginate(15)]);
+    }
+
+    private function currentEdition(): ?IntramuralEdition
+    {
+        return IntramuralEdition::query()->whereIn('status', ['draft', 'active'])->orderByDesc('starts_on')->first();
+    }
+
     private function selectedEdition(Request $request): ?IntramuralEdition
     {
         return $request->filled('edition_id')

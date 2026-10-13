@@ -52,6 +52,9 @@
 .schedule-table tbody tr:last-child > * { border-bottom: 0; }
 .schedule-table tbody tr:hover { background: #a0c4ed08; }
 .schedule-sport { font-size: 15px; font-weight: 600; border-right: 1px solid #8dadcf24; color: #e4cb9d; }
+.schedule-sport-group { display: inline-flex; align-items: center; gap: 6px; margin-bottom: 7px; color: #a9c7e8; font-size: 9px; font-weight: 600; letter-spacing: .1em; line-height: 1; text-transform: uppercase; }
+.schedule-sport-group svg { width: 18px; height: 18px; color: #e4cb9d; }
+.schedule-sport-group small { font-size: inherit; }
 .schedule-session { display: inline-flex; align-items: center; gap: 6px; border-radius: 5px; padding: 5px 8px; font-size: 11px; font-weight: 600; white-space: nowrap; }
 .schedule-session > span { width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
 .schedule-session--morning { color: #e9c88c; background: #d8ab4520; }

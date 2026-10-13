@@ -9,7 +9,88 @@ class Sport extends Model
 {
     use SoftDeletes;
 
-    protected $fillable = ['name', 'code', 'description', 'status', 'is_system'];
+    public const CATALOGUE_GROUPS = [
+        'team' => [
+            'label' => 'Team Sports',
+            'description' => 'Team-based competitions and court games.',
+            'icon' => 'team',
+        ],
+        'individual' => [
+            'label' => 'Individual & Pair Sports',
+            'description' => 'Singles, doubles, and pair-based competitions.',
+            'icon' => 'individual',
+        ],
+        'track-field' => [
+            'label' => 'Track & Field',
+            'description' => 'Running, relay, throwing, and jumping events.',
+            'icon' => 'track-field',
+        ],
+        'other' => [
+            'label' => 'Other Sports',
+            'description' => 'Additional sports configured for this edition.',
+            'icon' => 'other',
+        ],
+    ];
+
+    public const PARTICIPANT_CATEGORIES = [
+        'male' => 'Male',
+        'female' => 'Female',
+        'mixed' => 'Mixed',
+        'open' => 'Open',
+        'custom' => 'Other / custom',
+    ];
+
+    protected $fillable = ['name', 'code', 'description', 'participant_category', 'participant_category_label', 'status', 'is_system'];
+
+    public function getParticipantCategoryLabelAttribute(): string
+    {
+        if ($this->participant_category === 'custom' && filled($this->attributes['participant_category_label'] ?? null)) {
+            return $this->attributes['participant_category_label'];
+        }
+
+        return self::PARTICIPANT_CATEGORIES[$this->participant_category ?: 'open'] ?? self::PARTICIPANT_CATEGORIES['open'];
+    }
+
+    public static function catalogueGroupKeyFor(?string $code): string
+    {
+        $code = strtoupper((string) $code);
+
+        return match (true) {
+            str_starts_with($code, 'BASKET-'),
+            in_array($code, [
+                'BASEBALL', 'SOFTBALL', 'RUSSIAN-SOFTBALL',
+                'VOLLEYBALL', 'VOLLEYBALL-MEN', 'VOLLEYBALL-WOMEN', 'MIXED-VOLLEYBALL',
+                'BEACH-VOLLEYBALL', 'BEACH-VOLLEYBALL-MEN', 'BEACH-VOLLEYBALL-WOMEN', 'ESPORT-ML',
+            ], true) => 'team',
+            in_array($code, [
+                'BADMINTON', 'BADMINTON-TEAM', 'BADMINTON-DOUBLES', 'BADMINTON-SINGLES',
+                'TABLE-TENNIS', 'TABLE-TENNIS-TEAM', 'TABLE-TENNIS-DOUBLES', 'TABLE-TENNIS-SINGLES',
+                'CHESS',
+            ], true) => 'individual',
+            in_array($code, [
+                'RUNS', '100M-RUN', '200M-RUN', '400M-RUN', 'RELAY-4X100', 'RELAY-4X400',
+                'THROWS', 'SHOT-PUT', 'DISCUS-THROW', 'JAVELIN-THROW',
+                'JUMP', 'LONG-JUMP', 'TRIPLE-JUMP', 'HIGH-JUMP',
+            ], true) => 'track-field',
+            default => 'other',
+        };
+    }
+
+    public function getCatalogueGroupKeyAttribute(): string
+    {
+        return self::catalogueGroupKeyFor($this->code);
+    }
+
+    public function getCatalogueGroupLabelAttribute(): string
+    {
+        return self::CATALOGUE_GROUPS[$this->catalogue_group_key]['label'];
+    }
+
+    public function acceptsStudentGender(?string $gender): bool
+    {
+        return ! in_array($this->participant_category, ['male', 'female'], true)
+            || strcasecmp((string) $gender, $this->participant_category) === 0;
+    }
 
     public function events()
     {

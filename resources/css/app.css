@@ -376,3 +376,79 @@ textarea {
 .ops-stat-card {
     min-height: 8rem;
 }
+
+.ops-sport-group {
+    position: relative;
+}
+
+.ops-sport-group-heading {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    padding: 0.95rem 1.1rem;
+    border: 1px solid #d8ecff2e;
+    border-radius: 0.85rem;
+    background:
+        linear-gradient(135deg, #0b2440e8, #06172ce8),
+        linear-gradient(90deg, #0c734526, transparent 55%, #d9b87d1c);
+    box-shadow: 0 12px 30px #0003, inset 0 1px 0 #ffffff12;
+}
+
+.ops-sport-group-icon {
+    display: grid;
+    flex: 0 0 auto;
+    width: 2.8rem;
+    height: 2.8rem;
+    place-items: center;
+    border: 1px solid #d9b87d80;
+    border-radius: 0.75rem;
+    color: var(--ops-gold-bright);
+    background: #d9b87d14;
+}
+
+.ops-sport-group-icon svg {
+    width: 1.55rem;
+    height: 1.55rem;
+}
+
+.ops-sport-inline-icon {
+    display: inline-grid;
+    flex: 0 0 auto;
+    width: 1.85rem;
+    height: 1.85rem;
+    place-items: center;
+    border: 1px solid #d9b87d66;
+    border-radius: 0.55rem;
+    color: var(--ops-gold-bright);
+    background: #d9b87d12;
+}
+
+.ops-sport-inline-icon svg {
+    width: 1.05rem;
+    height: 1.05rem;
+}
+
+.ops-sport-group-count {
+    margin-left: auto;
+    flex: 0 0 auto;
+    border: 1px solid #bbd6f04d;
+    border-radius: 999px;
+    padding: 0.35rem 0.7rem;
+    color: var(--ops-muted);
+    background: #ffffff0a;
+    font-size: 0.75rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+@media (max-width: 640px) {
+    .ops-sport-group-heading {
+        align-items: flex-start;
+        flex-wrap: wrap;
+    }
+
+    .ops-sport-group-count {
+        margin-left: 3.65rem;
+        margin-top: -0.4rem;
+    }
+}

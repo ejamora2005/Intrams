@@ -9,7 +9,6 @@ return [
     'preview' => true,
     'updatedAt' => null,
     'teamLogos' => [
-        'mighty-sea-dragons' => 'images/logo/sea_dragons.png',
         'sea-dragons' => 'images/logo/sea_dragons.png',
         'terraquatic-eagles' => 'images/logo/terraquatic_eagles.png',
         'trojan-warriors' => 'images/logo/trojan_warriors.png',
@@ -17,7 +16,7 @@ return [
     // Set image to a public PNG, WebP, SVG, etc. Transparent logos are never cropped.
     'teams' => [
         [
-            'name' => 'Mighty Sea Dragons',
+            'name' => 'Sea Dragons',
             'department' => 'Marine Biology',
             'image' => 'images/logo/sea_dragons.png',
             // Replace these transparent files with real object cutouts; see their README.

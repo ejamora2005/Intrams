@@ -1,12 +1,12 @@
 <?php
 
+use App\Models\AthleteEntry;
 use App\Models\Course;
 use App\Models\EditionSport;
 use App\Models\IntramuralEdition;
 use App\Models\Sport;
 use App\Models\Student;
 use App\Models\Team;
-use App\Models\AthleteEntry;
 use App\Models\TeamMember;
 use App\Models\TeamTally;
 use App\Models\User;
@@ -29,12 +29,11 @@ function operationsEdition(): IntramuralEdition
 
 function operationsTeam(
     IntramuralEdition $edition,
-    string $name = 'Mighty Sea Dragons',
-    string $code = 'mighty-sea-dragons',
+    string $name = 'Sea Dragons',
+    string $code = 'sea-dragons',
     string $courseName = 'Marine Biology',
     string $courseCode = 'MB',
-): Team
-{
+): Team {
     $course = Course::query()->create(['name' => $courseName, 'code' => $courseCode, 'status' => 'active']);
 
     return Team::query()->create([
@@ -50,8 +49,7 @@ function operationsSport(
     IntramuralEdition $edition,
     string $name = 'Volleyball',
     string $code = 'VOLLEYBALL',
-): EditionSport
-{
+): EditionSport {
     $sport = Sport::query()->create([
         'name' => $name,
         'code' => $code,
@@ -97,7 +95,7 @@ test('GAM users are sent to the GAM dashboard', function () {
         ->assertSee('data-ops-view-panel="dashboard-overview"', false)
         ->assertSee('data-ops-view-panel="roster-management"', false)
         ->assertSee('data-ops-view-target="medical-certificates"', false)
-        ->assertSee('Mighty Sea Dragons')
+        ->assertSee('Sea Dragons')
         ->assertSee('images/logo/sea_dragons.png', false);
 });
 
@@ -128,7 +126,7 @@ test('tabulators declare sport winners and standings use admin point rules', fun
     $tabulator = User::factory()->create(['role' => 'tabulator', 'status' => 'active']);
     $edition = operationsEdition();
     $editionSport = operationsSport($edition);
-    $champion = operationsTeam($edition, 'Mighty Sea Dragons', 'mighty-sea-dragons', 'Marine Biology', 'MB');
+    $champion = operationsTeam($edition, 'Sea Dragons', 'sea-dragons', 'Marine Biology', 'MB');
     $runnerUp = operationsTeam($edition, 'Terraquatic Eagles', 'terraquatic-eagles', 'Education', 'EDU');
     $third = operationsTeam($edition, 'Trojan Warriors', 'trojan-warriors', 'Engineering', 'ENG');
 
@@ -507,7 +505,7 @@ test('GAM medical review groups individual events by student and uses the roster
 
     expect(AthleteEntry::query()->where('student_id', $student->id)->where('medical_certificate_status', 'verified')->count())->toBe(3);
 
-    $otherTeam = operationsTeam($edition, 'Mighty Sea Dragons', 'mighty-sea-dragons', 'Marine Biology', 'MB');
+    $otherTeam = operationsTeam($edition, 'Sea Dragons', 'sea-dragons', 'Marine Biology', 'MB');
     $otherGam = User::factory()->create(['role' => 'gam', 'status' => 'active', 'managed_team_id' => $otherTeam->id]);
     $this->actingAs($otherGam)->post(route('gam.medical-certificates.students.update', $student), [
         'medical_certificate_status' => 'rejected',
@@ -523,14 +521,14 @@ test('GAM medical review groups individual events by student and uses the roster
 
 test('unassigned GAM users can manage all active factions', function () {
     $edition = operationsEdition();
-    $firstTeam = operationsTeam($edition, 'Mighty Sea Dragons', 'mighty-sea-dragons', 'Marine Biology', 'MB');
+    $firstTeam = operationsTeam($edition, 'Sea Dragons', 'sea-dragons', 'Marine Biology', 'MB');
     $secondTeam = operationsTeam($edition, 'Trojan Warriors', 'trojan-warriors', 'Information Technology', 'IT');
     $gam = User::factory()->create(['role' => 'gam', 'status' => 'active', 'managed_team_id' => null]);
 
     $this->actingAs($gam)->get(route('gam.dashboard'))
         ->assertOk()
         ->assertSee('This GAM account can manage all active factions.')
-        ->assertSee('Mighty Sea Dragons')
+        ->assertSee('Sea Dragons')
         ->assertSee('Trojan Warriors');
 
     $this->actingAs($gam)->post(route('gam.teams.players.store', $secondTeam), [
@@ -550,13 +548,13 @@ test('unassigned GAM users can manage all active factions', function () {
 
 test('GAM users cannot manage another faction', function () {
     $edition = operationsEdition();
-    $assignedTeam = operationsTeam($edition, 'Mighty Sea Dragons', 'mighty-sea-dragons', 'Marine Biology', 'MB');
+    $assignedTeam = operationsTeam($edition, 'Sea Dragons', 'sea-dragons', 'Marine Biology', 'MB');
     $otherTeam = operationsTeam($edition, 'Terraquatic Eagles', 'terraquatic-eagles', 'Education', 'EDU');
     $gam = User::factory()->create(['role' => 'gam', 'status' => 'active', 'managed_team_id' => $assignedTeam->id]);
 
     $this->actingAs($gam)->get(route('gam.dashboard'))
         ->assertOk()
-        ->assertSee('Mighty Sea Dragons')
+        ->assertSee('Sea Dragons')
         ->assertDontSee('Terraquatic Eagles');
 
     $this->actingAs($gam)->post(route('gam.teams.players.store', $otherTeam), [

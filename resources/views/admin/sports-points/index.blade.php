@@ -34,15 +34,19 @@
             </div>
 
             @foreach ($pointSystems as $system)
+                @php($pointGroupIcon = $system['key'] === 'sports_athletics' ? 'track-field' : ($system['category'] === 'sports' ? 'team' : 'other'))
                 <form method="POST" action="{{ route('admin.sports-points.update', $system['key']) }}" class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
                     @csrf
                     @method('PUT')
 
                     <div class="flex flex-col justify-between gap-3 border-b border-slate-100 pb-4 sm:flex-row sm:items-start">
-                        <div>
-                            <h3 class="text-base font-semibold text-slate-950">{{ $system['label'] }}</h3>
+                        <div class="flex items-start gap-3">
+                            <span class="ops-sport-inline-icon"><x-sport-group-icon :group="$pointGroupIcon" /></span>
+                            <div>
+                                <h3 class="text-base font-semibold text-slate-950">{{ $system['label'] }}</h3>
                             <p class="mt-1 text-sm text-slate-500">{{ $system['description'] }}</p>
                             <p class="mt-2 text-xs font-semibold uppercase tracking-wide text-slate-400">{{ ucfirst($system['category']) }} point group</p>
+                            </div>
                         </div>
                         <div class="flex flex-wrap gap-2">
                             <span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-slate-600">{{ $system['configured_count'] }} configured</span>

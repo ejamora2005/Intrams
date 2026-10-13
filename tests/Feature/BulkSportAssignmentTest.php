@@ -210,7 +210,7 @@ test('participant management shows all active factions before registrations exis
     $edition = bulkAssignmentEdition();
     $editionSport = bulkAssignmentSport($edition, 'dual');
 
-    foreach (['Mighty Sea Dragons', 'Terraquatic Eagles', 'Trojan Warriors'] as $teamName) {
+    foreach (['Sea Dragons', 'Terraquatic Eagles', 'Trojan Warriors'] as $teamName) {
         Team::query()->create([
             'edition_id' => $edition->id,
             'name' => $teamName,
@@ -223,7 +223,7 @@ test('participant management shows all active factions before registrations exis
         ->get(route('admin.sports.participants', ['sport' => $editionSport->sport, 'edition_id' => $edition->id]))
         ->assertOk()
         ->assertSee('Faction filter')
-        ->assertSee('Mighty Sea Dragons')
+        ->assertSee('Sea Dragons')
         ->assertSee('Terraquatic Eagles')
         ->assertSee('Trojan Warriors')
         ->assertSee('No registered players for this sport in this faction yet.');
@@ -372,13 +372,24 @@ test('declaring a bracket winner advances the team to the next matchup', functio
 });
 
 test('double elimination routes teams through losers bracket and creates a reset final', function () {
-    $admin = bulkAssignmentAdmin(); $edition = bulkAssignmentEdition(); $editionSport = bulkAssignmentSport($edition, 'team', 'double_elimination');
-    $teams = collect(range(1, 4))->map(fn ($number) => Team::query()->create(['edition_id'=>$edition->id,'name'=>'DOUBLE '.$number,'code'=>'DOUBLE'.$number,'status'=>'active']));
-    foreach ($teams as $team) { $student = Student::factory()->create(['status'=>'active']); AthleteEntry::query()->create(['edition_sport_id'=>$editionSport->id,'student_id'=>$student->id,'team_id'=>$team->id,'status'=>'active','assigned_by'=>$admin->id,'assigned_at'=>now()]); }
+    $admin = bulkAssignmentAdmin();
+    $edition = bulkAssignmentEdition();
+    $editionSport = bulkAssignmentSport($edition, 'team', 'double_elimination');
+    $teams = collect(range(1, 4))->map(fn ($number) => Team::query()->create(['edition_id' => $edition->id, 'name' => 'DOUBLE '.$number, 'code' => 'DOUBLE'.$number, 'status' => 'active']));
+    foreach ($teams as $team) {
+        $student = Student::factory()->create(['status' => 'active']);
+        AthleteEntry::query()->create(['edition_sport_id' => $editionSport->id, 'student_id' => $student->id, 'team_id' => $team->id, 'status' => 'active', 'assigned_by' => $admin->id, 'assigned_at' => now()]);
+    }
     $this->actingAs($admin)->get(route('admin.sports.bracket', $editionSport->sport))->assertOk()->assertSee('Loser Bracket if needed');
-    $play = function (string $bracket, int $round, int $winnerId, int $matchNumber = 1) use ($admin, $editionSport) { $match = BracketMatch::where('edition_sport_id',$editionSport->id)->where('bracket',$bracket)->where('round_number',$round)->where('match_number',$matchNumber)->firstOrFail(); $this->actingAs($admin)->post(route('admin.sports.bracket.result', [$editionSport->sport,$match]), ['winner_team_id'=>$winnerId])->assertRedirect(route('admin.sports.bracket', ['sport'=>$editionSport->sport, 'edition_id'=>$editionSport->edition_id])); };
-    $play('winners', 1, $teams[0]->id, 1); $play('winners', 1, $teams[2]->id, 2);
-    $play('losers', 1, $teams[1]->id); $play('winners', 2, $teams[0]->id);
-    $play('losers', 2, $teams[1]->id); $play('finals', 1, $teams[1]->id);
-    $this->assertDatabaseHas('bracket_matches', ['edition_sport_id'=>$editionSport->id,'bracket'=>'finals','round_number'=>2,'team_one_id'=>$teams[0]->id,'team_two_id'=>$teams[1]->id,'status'=>'pending']);
+    $play = function (string $bracket, int $round, int $winnerId, int $matchNumber = 1) use ($admin, $editionSport) {
+        $match = BracketMatch::where('edition_sport_id', $editionSport->id)->where('bracket', $bracket)->where('round_number', $round)->where('match_number', $matchNumber)->firstOrFail();
+        $this->actingAs($admin)->post(route('admin.sports.bracket.result', [$editionSport->sport, $match]), ['winner_team_id' => $winnerId])->assertRedirect(route('admin.sports.bracket', ['sport' => $editionSport->sport, 'edition_id' => $editionSport->edition_id]));
+    };
+    $play('winners', 1, $teams[0]->id, 1);
+    $play('winners', 1, $teams[2]->id, 2);
+    $play('losers', 1, $teams[1]->id);
+    $play('winners', 2, $teams[0]->id);
+    $play('losers', 2, $teams[1]->id);
+    $play('finals', 1, $teams[1]->id);
+    $this->assertDatabaseHas('bracket_matches', ['edition_sport_id' => $editionSport->id, 'bracket' => 'finals', 'round_number' => 2, 'team_one_id' => $teams[0]->id, 'team_two_id' => $teams[1]->id, 'status' => 'pending']);
 });

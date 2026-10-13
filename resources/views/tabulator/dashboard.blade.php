@@ -43,9 +43,9 @@
                 <p class="mt-2 text-sm leading-6 text-slate-500">Choose winners using the active point system.</p>
             </a>
             <a href="#declared-results" data-ops-view-shortcut="declared-results" class="ops-dashboard-card block rounded-lg border p-4 transition">
-                <p class="text-sm font-semibold text-slate-950">Declared results</p>
-                <p class="mt-2 text-2xl font-semibold text-slate-950">{{ $editionSports->filter(fn ($editionSport) => $editionSport->sportResult)->count() }}</p>
-                <p class="mt-2 text-sm leading-6 text-slate-500">Audit posted placements and the standings table.</p>
+                <p class="text-sm font-semibold text-slate-950">Placement monitor</p>
+                <p class="mt-2 text-2xl font-semibold text-slate-950">{{ $editionSports->filter(fn ($editionSport) => $editionSport->sportResult)->count() }} / {{ $editionSports->count() }}</p>
+                <p class="mt-2 text-sm leading-6 text-slate-500">Track declared and pending placements in one view.</p>
             </a>
             <a href="#match-winners" data-ops-view-shortcut="match-winners" class="ops-dashboard-card block rounded-lg border p-4 transition">
                 <p class="text-sm font-semibold text-slate-950">Match winners</p>
@@ -88,10 +88,17 @@
                 <p class="mt-1 text-sm text-slate-500">Choose a sport, select the placed teams, and standings will update from the admin point system.</p>
             </div>
             @if ($editionSports->isNotEmpty())
+                @php($groupedEditionSports = $editionSports->groupBy(fn ($editionSport) => $editionSport->sport?->catalogue_group_key ?? 'other'))
                 <form method="GET" action="{{ route('tabulator.dashboard') }}#declare-sports" class="flex flex-col gap-2 sm:flex-row sm:items-center">
                     <select name="edition_sport_id" class="rounded-lg border-slate-300 py-2.5 text-sm focus:border-blue-600 focus:ring-blue-600" onchange="this.form.submit()">
-                        @foreach ($editionSports as $editionSport)
-                            <option value="{{ $editionSport->id }}" @selected($selectedSport?->id === $editionSport->id)>{{ $editionSport->sport?->name }}</option>
+                        @foreach (\App\Models\Sport::CATALOGUE_GROUPS as $groupKey => $groupDefinition)
+                            @if ($groupedEditionSports->has($groupKey))
+                                <optgroup label="{{ $groupDefinition['label'] }}">
+                                    @foreach ($groupedEditionSports->get($groupKey) as $editionSport)
+                                        <option value="{{ $editionSport->id }}" @selected($selectedSport?->id === $editionSport->id)>{{ $editionSport->sport?->name }}</option>
+                                    @endforeach
+                                </optgroup>
+                            @endif
                         @endforeach
                     </select>
                     <button class="rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700">Open</button>
@@ -101,6 +108,13 @@
 
         @if ($selectedSport)
             @php($currentPlacements = $selectedSport->sportResult?->placements_json ?? [])
+            <div class="mt-5 flex items-center gap-3 rounded-lg border border-slate-200 bg-slate-50 p-3">
+                <span class="ops-sport-inline-icon"><x-sport-group-icon :group="$selectedSport->sport?->catalogue_group_key ?? 'other'" /></span>
+                <div>
+                    <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">{{ $selectedSport->sport?->catalogue_group_label ?? 'Other Sports' }}</p>
+                    <p class="font-semibold text-slate-950">{{ $selectedSport->sport?->name }}</p>
+                </div>
+            </div>
             <form method="POST" action="{{ route('tabulator.sport-results.store') }}" class="mt-5" data-declare-winners data-allow-repeated-winners="{{ count($pointRules) > 3 ? 'true' : 'false' }}">
                 @csrf
                 <input type="hidden" name="edition_sport_id" value="{{ $selectedSport->id }}">
@@ -141,29 +155,60 @@
     </section>
 
     <section id="declared-results" data-ops-view-panel="declared-results" hidden class="ops-view-panel grid gap-6 xl:grid-cols-2">
-        <div class="scroll-mt-24 rounded-lg border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
-            <h2 class="text-base font-semibold text-slate-950">Declared results</h2>
-            <div class="mt-4 divide-y divide-slate-100">
-                @forelse ($editionSports->filter(fn ($editionSport) => $editionSport->sportResult) as $editionSport)
-                    <div class="py-3">
-                        <p class="font-semibold text-slate-950">{{ $editionSport->sport?->name }}</p>
-                        <div class="mt-2 flex flex-wrap gap-2 text-sm text-slate-600">
-                            @foreach ($editionSport->sportResult->placements_json ?? [] as $placement => $teamId)
-                                @php($placedTeam = $teamsById->get((int) $teamId))
-                                <span class="inline-flex max-w-full items-center gap-2 rounded-full bg-slate-100 px-3 py-1">
-                                    <x-landing.ranking-medal :rank="$placement" />
-                                    @if ($placedTeam)
-                                        <x-team-badge :team="$placedTeam" size="xs" class="font-semibold text-slate-700" />
+        <div class="scroll-mt-24 rounded-lg border border-slate-200 bg-white p-4 shadow-sm sm:p-6 xl:col-span-2">
+            <div class="flex flex-col justify-between gap-2 border-b border-slate-100 pb-4 sm:flex-row sm:items-end">
+                <div>
+                    <h2 class="text-base font-semibold text-slate-950">Placement monitor</h2>
+                    <p class="mt-1 text-sm text-slate-500">Review every configured sport and open the declaration form for anything still pending.</p>
+                </div>
+                <span class="inline-flex w-max rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-800">{{ $editionSports->filter(fn ($editionSport) => $editionSport->sportResult)->count() }} of {{ $editionSports->count() }} declared</span>
+            </div>
+            <div class="mt-4 overflow-x-auto">
+                <table class="min-w-full text-left text-sm">
+                    <thead class="border-b border-slate-100 text-xs uppercase tracking-wide text-slate-500">
+                        <tr><th class="px-3 py-2">Sport</th><th class="px-3 py-2">Status</th><th class="px-3 py-2">Placements</th><th class="px-3 py-2 text-right">Action</th></tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100">
+                        @forelse ($editionSports as $editionSport)
+                            @php($sportResult = $editionSport->sportResult)
+                            <tr>
+                                <td class="px-3 py-3 font-semibold text-slate-950">
+                                    <span class="flex items-center gap-2">
+                                        <span class="ops-sport-inline-icon"><x-sport-group-icon :group="$editionSport->sport?->catalogue_group_key ?? 'other'" /></span>
+                                        <span><span class="block">{{ $editionSport->sport?->name }}</span><span class="text-xs font-normal text-slate-500">{{ $editionSport->sport?->catalogue_group_label ?? 'Other Sports' }}</span></span>
+                                    </span>
+                                </td>
+                                <td class="px-3 py-3">
+                                    @if ($sportResult)
+                                        <span class="inline-flex rounded-full bg-green-100 px-2.5 py-1 text-xs font-semibold text-green-800">Declared</span>
                                     @else
-                                        <span>Removed team</span>
+                                        <span class="inline-flex rounded-full bg-amber-100 px-2.5 py-1 text-xs font-semibold text-amber-800">Pending</span>
                                     @endif
-                                </span>
-                            @endforeach
-                        </div>
-                    </div>
-                @empty
-                    <p class="py-8 text-center text-sm text-slate-500">No sport winners have been declared yet.</p>
-                @endforelse
+                                </td>
+                                <td class="px-3 py-3 text-slate-600">
+                                    @if ($sportResult)
+                                        <div class="flex flex-wrap gap-2">
+                                            @foreach ($sportResult->placements_json ?? [] as $placement => $teamId)
+                                                @php($placedTeam = $teamsById->get((int) $teamId))
+                                                <span class="inline-flex max-w-full items-center gap-2 rounded-full bg-slate-100 px-3 py-1">
+                                                    <x-landing.ranking-medal :rank="$placement" />
+                                                    <span>{{ $placedTeam?->name ?? 'Removed team' }}</span>
+                                                </span>
+                                            @endforeach
+                                        </div>
+                                    @else
+                                        <span class="text-slate-400">No placements recorded</span>
+                                    @endif
+                                </td>
+                                <td class="px-3 py-3 text-right">
+                                    <a href="{{ route('tabulator.dashboard', ['edition_sport_id' => $editionSport->id]) }}#declare-sports" class="inline-flex rounded-lg border border-blue-200 px-3 py-2 text-xs font-semibold text-blue-700 transition hover:border-blue-300 hover:bg-blue-50">{{ $sportResult ? 'Edit' : 'Record' }}</a>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr><td colspan="4" class="px-3 py-8 text-center text-slate-500">No sports are configured for the active edition.</td></tr>
+                        @endforelse
+                    </tbody>
+                </table>
             </div>
         </div>
 
@@ -199,7 +244,7 @@
             @forelse ($matches as $match)
                 <form method="POST" action="{{ route('tabulator.matches.result', $match) }}" class="rounded-lg border border-slate-200 p-4">
                     @csrf
-                    <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">{{ $match->editionSport->sport->name }} / {{ ucfirst($match->bracket) }} round {{ $match->round_number }}</p>
+                    <p class="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-slate-500"><span class="ops-sport-inline-icon"><x-sport-group-icon :group="$match->editionSport->sport?->catalogue_group_key ?? 'other'" /></span><span>{{ $match->editionSport->sport->name }} · {{ $match->editionSport->sport?->catalogue_group_label ?? 'Other Sports' }} / {{ ucfirst($match->bracket) }} round {{ $match->round_number }}</span></p>
                     <p class="mt-2 font-medium text-slate-950">Game {{ $match->match_number }}</p>
                     <div class="mt-3 flex flex-wrap items-center gap-2 text-sm font-semibold text-slate-800">
                         @if ($match->competitorOne?->team)

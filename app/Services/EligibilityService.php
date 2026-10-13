@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\AthleteEntry;
 use App\Models\EditionSport;
 use App\Models\IntramuralEdition;
+use App\Models\Sport;
 use App\Models\Student;
 use App\Models\Team;
 use Illuminate\Support\Collection;
@@ -14,8 +15,11 @@ use Illuminate\Validation\ValidationException;
 class EligibilityService
 {
     public const SLOT_MAJOR = 'major';
+
     public const SLOT_MINOR = 'minor';
+
     public const SLOT_INDIVIDUAL_DUAL = 'individual_or_dual';
+
     public const SLOT_OTHER = 'other';
 
     /** @return array<int, array<string, mixed>> */
@@ -124,6 +128,32 @@ class EligibilityService
 
         throw ValidationException::withMessages([
             'student_ids' => $message,
+        ]);
+    }
+
+    /**
+     * @param  Collection<int, Student>  $students
+     *
+     * @throws ValidationException
+     */
+    public function assertStudentsMatchSportCategory(Collection $students, Sport $sport): void
+    {
+        if (! in_array($sport->participant_category, ['male', 'female'], true)) {
+            return;
+        }
+
+        $ineligibleStudents = $students
+            ->filter(fn (Student $student): bool => ! $sport->acceptsStudentGender($student->gender))
+            ->take(3);
+
+        if ($ineligibleStudents->isEmpty()) {
+            return;
+        }
+
+        throw ValidationException::withMessages([
+            'student_ids' => $ineligibleStudents
+                ->map(fn (Student $student): string => $student->full_name)
+                ->implode(', ').' cannot join this '.$sport->participant_category_label.' category.',
         ]);
     }
 

@@ -203,7 +203,10 @@
                                     @foreach ($studentEntries as $studentEntry)
                                         @php($status = $studentEntry->effective_medical_certificate_status)
                                         <li class="flex flex-wrap items-center gap-2 text-slate-700">
-                                            <span>{{ $studentEntry->editionSport->sport?->name }}</span>
+                                            <span class="flex items-center gap-2">
+                                                <span class="ops-sport-inline-icon"><x-sport-group-icon :group="$studentEntry->editionSport->sport?->catalogue_group_key ?? 'other'" /></span>
+                                                <span><span class="block">{{ $studentEntry->editionSport->sport?->name }}</span><span class="text-xs text-slate-500">{{ $studentEntry->editionSport->sport?->catalogue_group_label ?? 'Other Sports' }}</span></span>
+                                            </span>
                                             <span class="{{ $status === 'pending' ? 'bg-amber-50 text-amber-800' : ($status === 'verified' ? 'bg-green-50 text-green-700' : 'bg-red-600 text-white') }} inline-flex w-max whitespace-nowrap rounded-full px-2.5 py-1 text-xs font-semibold">{{ Str::headline($status) }}</span>
                                         </li>
                                     @endforeach
@@ -267,7 +270,7 @@
         <div class="mt-4 grid gap-3 lg:grid-cols-2">
             @forelse ($upcomingMatches as $match)
                 <article class="rounded-lg border border-slate-200 p-4">
-                    <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">{{ $match->editionSport->sport->name }} / {{ ucfirst($match->bracket) }} round {{ $match->round_number }}</p>
+                    <p class="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-slate-500"><span class="ops-sport-inline-icon"><x-sport-group-icon :group="$match->editionSport->sport?->catalogue_group_key ?? 'other'" /></span><span>{{ $match->editionSport->sport->name }} · {{ $match->editionSport->sport?->catalogue_group_label ?? 'Other Sports' }} / {{ ucfirst($match->bracket) }} round {{ $match->round_number }}</span></p>
                     <p class="mt-2 flex flex-wrap items-center gap-2 font-medium text-slate-950">
                         @if ($match->competitorOne?->team)
                             <x-team-badge :team="$match->competitorOne->team" />

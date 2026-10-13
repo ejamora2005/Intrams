@@ -30,7 +30,7 @@
                     ['label' => 'Dashboard', 'route' => 'tabulator.dashboard', 'match' => 'tabulator/dashboard', 'active' => true],
                     ['label' => 'Possible DQ', 'route' => 'tabulator.dashboard', 'match' => 'tabulator/dashboard', 'hash' => 'possible-dq'],
                     ['label' => 'Declare Sports', 'route' => 'tabulator.dashboard', 'match' => 'tabulator/dashboard', 'hash' => 'declare-sports'],
-                    ['label' => 'Declared Results', 'route' => 'tabulator.dashboard', 'match' => 'tabulator/dashboard', 'hash' => 'declared-results'],
+                    ['label' => 'Placement Monitor', 'route' => 'tabulator.dashboard', 'match' => 'tabulator/dashboard', 'hash' => 'declared-results'],
                     ['label' => 'Match Winners', 'route' => 'tabulator.dashboard', 'match' => 'tabulator/dashboard', 'hash' => 'match-winners'],
                     ['label' => 'Rules & Guidelines', 'route' => 'tabulator.rules.index', 'match' => 'tabulator/rules-guidelines', 'active' => true],
                 ],

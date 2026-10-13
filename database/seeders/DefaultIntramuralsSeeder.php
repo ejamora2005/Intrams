@@ -11,7 +11,8 @@ class DefaultIntramuralsSeeder extends Seeder
         $this->call([
             DefaultSportsSeeder::class,
             TestIntramuralsDataSeeder::class,
-            IntramuralsStudentRosterSeeder::class,
+            LegacyIntramuralsRosterCleanupSeeder::class,
+            TrojanWarriorsRosterSeeder::class,
         ]);
     }
 }

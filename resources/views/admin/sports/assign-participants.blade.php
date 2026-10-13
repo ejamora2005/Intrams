@@ -12,7 +12,7 @@
         <div class="flex flex-col justify-between gap-2 sm:flex-row sm:items-center">
             <div>
                 <h2 id="participant-filters-heading" class="font-semibold text-slate-900">Filter students</h2>
-                <p class="mt-1 text-sm text-slate-500">This sport is configured as <span class="font-semibold text-slate-700">{{ ucfirst($editionSport->participant_type) }}</span>. Students outside the participation rules are marked Possible DQ for review.</p>
+                <p class="mt-1 text-sm text-slate-500">This sport is configured as <span class="font-semibold text-slate-700">{{ ucfirst($editionSport->participant_type) }}</span> with a <span class="font-semibold text-slate-700">{{ $sport->participant_category_label }}</span> participant category. Students outside the participation rules are marked Possible DQ for review.</p>
             </div>
             <a href="{{ route('admin.sports.participants', ['sport' => $sport, 'edition_id' => $edition->id]) }}" class="text-sm font-semibold text-blue-700 hover:text-blue-900">Back to participants</a>
         </div>
