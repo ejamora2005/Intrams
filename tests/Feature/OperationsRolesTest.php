@@ -167,7 +167,7 @@ test('GAM users select joined sports while adding a player and the selection rul
     $this->assertDatabaseMissing('students', ['student_number' => 'GAM-SPORT-002']);
 });
 
-test('relay runners are exempt from participation limits but must join an individual run', function () {
+test('relay entries do not create a DQ but new relay registrations require an individual run', function () {
     $edition = operationsEdition();
     $team = operationsTeam($edition);
     $major = operationsSport($edition, 'Baseball', 'BASEBALL');
@@ -237,6 +237,20 @@ test('relay runners are exempt from participation limits but must join an indivi
         'edition_sport_id' => $relay->id,
         'student_id' => $nonRunner->id,
     ]);
+
+    AthleteEntry::query()->create([
+        'edition_sport_id' => $relay->id,
+        'student_id' => $nonRunner->id,
+        'team_id' => $team->id,
+        'status' => 'active',
+        'assigned_by' => $admin->id,
+        'assigned_at' => now(),
+    ]);
+
+    expect(app(\App\Services\EligibilityService::class)->evaluateStudent($nonRunner, $edition)['possible_dq'])->toBeFalse();
+    $this->actingAs($admin)->get(route('admin.rules.index'))
+        ->assertOk()
+        ->assertDontSee('Morgan Santos');
 });
 
 test('tabulators declare sport winners and standings use admin point rules', function () {

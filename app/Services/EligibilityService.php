@@ -144,16 +144,26 @@ class EligibilityService
      */
     public function assertStudentsCanJoin(Collection $students, IntramuralEdition $edition, EditionSport $additionalSport): void
     {
-        $violations = $this->previewForStudents($students, $edition, $additionalSport)
+        $evaluations = $this->previewForStudents($students, $edition, $additionalSport);
+        $violations = $evaluations
             ->filter(fn (array $evaluation): bool => $evaluation['possible_dq'])
             ->take(3);
 
-        if ($violations->isEmpty()) {
+        $relayWithoutRun = $this->isRelayEvent($additionalSport)
+            ? $evaluations
+                ->filter(fn (array $evaluation): bool => ! collect($evaluation['entries'])->contains(fn (array $entry): bool => $entry['is_qualifying_run']))
+                ->take(3)
+            : collect();
+
+        if ($violations->isEmpty() && $relayWithoutRun->isEmpty()) {
             return;
         }
 
         $message = $violations
             ->map(fn (array $evaluation): string => $evaluation['student']->full_name.': '.implode(' ', $evaluation['issues']))
+            ->merge($relayWithoutRun->map(fn (array $evaluation): string => $evaluation['student']->full_name.': Relay registration requires a 100m, 200m, or 400m run.'))
+            ->unique()
+            ->take(3)
             ->implode(' ');
 
         throw ValidationException::withMessages([
@@ -293,11 +303,6 @@ class EligibilityService
         $total = $items->where('counts_toward_limit', true)->count();
         $hasMajorOrMinor = $counts[self::SLOT_MAJOR] > 0 || $counts[self::SLOT_MINOR] > 0;
         $maxEvents = $hasMajorOrMinor ? $this->maxEvents() : $this->individualDualOnlyMaxEvents();
-
-        if ($items->contains(fn (array $item): bool => $item['is_relay'])
-            && ! $items->contains(fn (array $item): bool => $item['is_qualifying_run'])) {
-            $issues[] = 'A relay entry requires the student to join a 100m, 200m, or 400m run.';
-        }
 
         if ($total > $maxEvents) {
             $issues[] = 'More than '.$maxEvents.' events registered.';
