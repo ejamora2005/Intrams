@@ -157,6 +157,7 @@
                             <input name="year_level" value="{{ old('year_level') }}" placeholder="Year level" class="rounded-lg border-slate-300 px-3 py-2.5 text-sm focus:border-blue-600 focus:ring-blue-600">
                             <input name="section" value="{{ old('section') }}" placeholder="Section" class="rounded-lg border-slate-300 px-3 py-2.5 text-sm focus:border-blue-600 focus:ring-blue-600">
                         </div>
+                        <x-participation-sport-picker :sports="$sportOptions" :team-sport-note="'Team-sport selections are assigned to '.$selectedTeam->name.'.'" />
                         <button class="mt-4 rounded-lg bg-blue-700 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-800">Add player</button>
                     </form>
                 </div>

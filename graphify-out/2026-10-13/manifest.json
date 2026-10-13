@@ -108,8 +108,8 @@
     "semantic_hash": ""
   },
   "app/Http/Controllers/Admin/SportController.php": {
-    "mtime": 1791867349.9676864,
-    "seen": 1791867386.843889,
+    "mtime": 1791890474.0382192,
+    "seen": 1791890562.670954,
     "ast_hash": "1a00513b7414a6117cb96b27e3f5806b",
     "semantic_hash": ""
   },
@@ -120,9 +120,9 @@
     "semantic_hash": "c365ab37683f561c238741798aec4472"
   },
   "app/Http/Controllers/Admin/StudentController.php": {
-    "mtime": 1791176479.7929385,
-    "seen": 1791176627.506923,
-    "ast_hash": "7f2f6b6a7e555177d910b83512760d21",
+    "mtime": 1791890586.0273376,
+    "seen": 1791890614.2989364,
+    "ast_hash": "766c4fe0dea73e688a362b565ec2dbd6",
     "semantic_hash": ""
   },
   "app/Http/Controllers/Admin/SystemLogController.php": {
@@ -282,9 +282,9 @@
     "semantic_hash": ""
   },
   "app/Http/Requests/StoreStudentRequest.php": {
-    "mtime": 1791874540.9403718,
-    "seen": 1791874601.8941429,
-    "ast_hash": "8f83f34b8b3f263876066df1ca46bbd7",
+    "mtime": 1791890586.2473743,
+    "seen": 1791890614.2989364,
+    "ast_hash": "96bda86c6e6967b8399a4991fb224410",
     "semantic_hash": ""
   },
   "app/Http/Requests/StoreTeamRequest.php": {
@@ -990,10 +990,10 @@
     "semantic_hash": ""
   },
   "resources/views/admin/students/create.blade.php": {
-    "mtime": 1790755415.682842,
-    "seen": 1790785271.6861632,
-    "ast_hash": "8f4b8696916424a6f3b874083c9884d8",
-    "semantic_hash": "8f4b8696916424a6f3b874083c9884d8"
+    "mtime": 1791890239.6445146,
+    "seen": 1791890562.670954,
+    "ast_hash": "951ee327024ce266b4ce294f989abf43",
+    "semantic_hash": ""
   },
   "resources/views/admin/students/edit.blade.php": {
     "mtime": 1791176258.8119571,
@@ -1002,9 +1002,9 @@
     "semantic_hash": ""
   },
   "resources/views/admin/students/form.blade.php": {
-    "mtime": 1791874500.4026842,
-    "seen": 1791874601.8941429,
-    "ast_hash": "8036c69efb15d7b71690a6d0a396a1d8",
+    "mtime": 1791890239.6455147,
+    "seen": 1791890562.670954,
+    "ast_hash": "e7566a346bf3e9e62d88537a6ca283fc",
     "semantic_hash": ""
   },
   "resources/views/admin/students/index.blade.php": {
@@ -1410,9 +1410,9 @@
     "semantic_hash": "f7d87914364053641c0a4b5197c1de99"
   },
   "tests/Feature/AuthenticationTest.php": {
-    "mtime": 1791874859.8660698,
-    "seen": 1791874897.0053692,
-    "ast_hash": "de0fec78d733678e1604b52ff8452bbb",
+    "mtime": 1791875032.8643644,
+    "seen": 1791875063.6667178,
+    "ast_hash": "582f41b754bfbe70871ad0820b91d391",
     "semantic_hash": ""
   },
   "tests/Feature/BrowserSessionsTest.php": {
@@ -1494,9 +1494,9 @@
     "semantic_hash": "e0da2b2c84d81fa9a2fb97c55b308f68"
   },
   "tests/Feature/StudentManagementTest.php": {
-    "mtime": 1791874546.7818546,
-    "seen": 1791874601.8941429,
-    "ast_hash": "574cfae7ca03e52819e7f0878f03cb81",
+    "mtime": 1791890404.0931628,
+    "seen": 1791890562.6719594,
+    "ast_hash": "80317be13d7e906673702b473dea1012",
     "semantic_hash": ""
   },
   "tests/Feature/SystemLogTest.php": {
@@ -2034,9 +2034,9 @@
     "semantic_hash": ""
   },
   "app/Http/Controllers/Gam/DashboardController.php": {
-    "mtime": 1791874540.9443717,
-    "seen": 1791874601.8936133,
-    "ast_hash": "ab4f7cf88bf5d41b097900d37616c333",
+    "mtime": 1791890586.2226765,
+    "seen": 1791890614.2989364,
+    "ast_hash": "08b3dea346ea4de12a447dffa3286d55",
     "semantic_hash": ""
   },
   "app/Http/Controllers/Tabulator/DashboardController.php": {
@@ -2052,9 +2052,9 @@
     "semantic_hash": ""
   },
   "resources/views/gam/dashboard.blade.php": {
-    "mtime": 1791874507.6185956,
-    "seen": 1791874601.8941429,
-    "ast_hash": "7b758ba529fb1f40d7871aa9c17af5ed",
+    "mtime": 1791890239.6465166,
+    "seen": 1791890562.6719594,
+    "ast_hash": "02c075d8ac5fb08b4623969abb235852",
     "semantic_hash": ""
   },
   "resources/views/tabulator/dashboard.blade.php": {
@@ -2064,9 +2064,9 @@
     "semantic_hash": ""
   },
   "tests/Feature/OperationsRolesTest.php": {
-    "mtime": 1791867214.1269028,
-    "seen": 1791867255.1391208,
-    "ast_hash": "c04890fae3b3999d6f72ce5eb92d576c",
+    "mtime": 1791890419.6278255,
+    "seen": 1791890562.6719594,
+    "ast_hash": "f7903fbdd33e04ea6c9f6535085f5899",
     "semantic_hash": ""
   },
   "app/Http/Controllers/Admin/OperationsAccountController.php": {
@@ -2208,9 +2208,9 @@
     "semantic_hash": ""
   },
   "app/Services/EligibilityService.php": {
-    "mtime": 1791785315.2173095,
-    "seen": 1791785541.1902823,
-    "ast_hash": "de3a6918f3d23150380b686603acd77b",
+    "mtime": 1791890141.738613,
+    "seen": 1791890562.670954,
+    "ast_hash": "8cb7d29ca1c66b90790d76ef7407ecec",
     "semantic_hash": ""
   },
   "database/migrations/2026_10_04_000002_add_medical_certificate_review_to_athlete_entries.php": {
@@ -2391,6 +2391,18 @@
     "mtime": 1791874809.912847,
     "seen": 1791874897.0053692,
     "ast_hash": "2c3f71ff1e941d960ca862fbafb37e4f",
+    "semantic_hash": ""
+  },
+  "app/Services/AthleteEntryService.php": {
+    "mtime": 1791890586.3073592,
+    "seen": 1791890614.2989364,
+    "ast_hash": "d970903fc0e9cbb5f6bff62b26d0f068",
+    "semantic_hash": ""
+  },
+  "resources/views/components/participation-sport-picker.blade.php": {
+    "mtime": 1791890239.6445146,
+    "seen": 1791890562.6719594,
+    "ast_hash": "18d84bf588b7cae140ce3cf756b73ca4",
     "semantic_hash": ""
   }
 }

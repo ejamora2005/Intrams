@@ -1,0 +1,137 @@
+<?php
+
+namespace App\Services;
+
+use App\Models\AthleteEntry;
+use App\Models\EditionSport;
+use App\Models\IntramuralEdition;
+use App\Models\Student;
+use App\Models\Team;
+use Illuminate\Support\Collection;
+use Illuminate\Validation\ValidationException;
+
+class AthleteEntryService
+{
+    public function __construct(
+        private readonly AuditService $auditService,
+        private readonly EligibilityService $eligibilityService,
+    ) {}
+
+    /** @return Collection<int, EditionSport> */
+    public function selectableSportsFor(IntramuralEdition $edition): Collection
+    {
+        $slotOrder = [
+            EligibilityService::SLOT_MAJOR => 1,
+            EligibilityService::SLOT_MINOR => 2,
+            EligibilityService::SLOT_INDIVIDUAL_DUAL => 3,
+        ];
+
+        return $edition->editionSports()
+            ->with('sport')
+            ->whereIn('status', ['preparation', 'active'])
+            ->get()
+            ->filter(fn (EditionSport $editionSport): bool => $editionSport->sport?->status === 'active'
+                && $editionSport->participant_type !== 'dual'
+                && $this->eligibilityService->isParticipationSport($editionSport))
+            ->each(function (EditionSport $editionSport): void {
+                $editionSport->setAttribute('participation_slot', $this->eligibilityService->slotFor($editionSport));
+            })
+            ->sortBy(fn (EditionSport $editionSport): string => sprintf(
+                '%d-%s',
+                $slotOrder[$editionSport->participation_slot] ?? 9,
+                $editionSport->sport?->name ?? ''
+            ))
+            ->values();
+    }
+
+    /**
+     * Register a newly created student for the sports selected at creation time.
+     *
+     * Dual events are intentionally excluded because they must be registered with
+     * both members of the pair from the sport participant-management page.
+     *
+     * @param  array<int, int|string>  $editionSportIds
+     * @return Collection<int, AthleteEntry>
+     *
+     * @throws ValidationException
+     */
+    public function registerSelectedSports(Student $student, IntramuralEdition $edition, array $editionSportIds, ?Team $team = null): Collection
+    {
+        $ids = collect($editionSportIds)
+            ->map(fn (mixed $id): int => (int) $id)
+            ->filter()
+            ->unique()
+            ->values();
+
+        if ($ids->isEmpty()) {
+            return collect();
+        }
+
+        if ($student->status !== 'active') {
+            throw ValidationException::withMessages([
+                'edition_sport_ids' => 'Only active students can be registered for sports.',
+            ]);
+        }
+
+        $editionSports = EditionSport::query()
+            ->with('sport')
+            ->where('edition_id', $edition->id)
+            ->whereIn('id', $ids)
+            ->get();
+
+        if ($editionSports->count() !== $ids->count()) {
+            throw ValidationException::withMessages([
+                'edition_sport_ids' => 'Choose sports from the active intramurals edition.',
+            ]);
+        }
+
+        foreach ($editionSports as $editionSport) {
+            if (! in_array($editionSport->status, ['preparation', 'active'], true)
+                || $editionSport->participant_type === 'dual'
+                || ! $this->eligibilityService->isParticipationSport($editionSport)) {
+                throw ValidationException::withMessages([
+                    'edition_sport_ids' => ($editionSport->sport?->name ?? 'This sport').' cannot be selected while adding one student. Dual events must be assigned with both partners from sport participant management.',
+                ]);
+            }
+
+            if (in_array($editionSport->participant_type, ['team', 'dual'], true)
+                && (! $team
+                    || $team->status !== 'active'
+                    || (int) $team->edition_id !== (int) $edition->id
+                    || ! $student->teamMembers()
+                        ->where('edition_id', $edition->id)
+                        ->where('team_id', $team->id)
+                        ->exists())) {
+                throw ValidationException::withMessages([
+                    'edition_sport_ids' => 'A student must belong to an active faction before joining a team sport.',
+                ]);
+            }
+        }
+
+        return $editionSports->map(function (EditionSport $editionSport) use ($student, $edition, $team): AthleteEntry {
+            try {
+                $this->eligibilityService->assertStudentsMatchSportCategory(collect([$student]), $editionSport->sport);
+                $this->eligibilityService->assertStudentsCanJoin(collect([$student]), $edition, $editionSport);
+            } catch (ValidationException $exception) {
+                throw ValidationException::withMessages([
+                    'edition_sport_ids' => collect($exception->errors())->flatten()->implode(' '),
+                ]);
+            }
+
+            $requiresTeam = in_array($editionSport->participant_type, ['team', 'dual'], true);
+            $entry = AthleteEntry::query()->create([
+                'edition_sport_id' => $editionSport->id,
+                'student_id' => $student->id,
+                'team_id' => $requiresTeam ? $team?->id : null,
+                'status' => 'active',
+                'medical_certificate_status' => $this->eligibilityService->requiresMedicalCertificate($editionSport) ? 'pending' : 'not_required',
+                'assigned_by' => auth()->id(),
+                'assigned_at' => now(),
+            ]);
+
+            $this->auditService->record('athlete_entry.created', $entry, null, $entry->only($entry->getFillable()));
+
+            return $entry;
+        })->values();
+    }
+}

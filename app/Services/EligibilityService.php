@@ -62,6 +62,19 @@ class EligibilityService
         };
     }
 
+    /**
+     * Determine whether an edition sport is governed by the student sport-selection rules.
+     */
+    public function isParticipationSport(EditionSport $editionSport): bool
+    {
+        return $this->countsForParticipation($editionSport)
+            && in_array($this->slotFor($editionSport), [
+                self::SLOT_MAJOR,
+                self::SLOT_MINOR,
+                self::SLOT_INDIVIDUAL_DUAL,
+            ], true);
+    }
+
     public function requiresMedicalCertificate(EditionSport $editionSport): bool
     {
         $editionSport->loadMissing('sport');

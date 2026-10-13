@@ -5,21 +5,27 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreStudentRequest;
 use App\Http\Requests\UpdateStudentRequest;
-use App\Models\Student;
 use App\Models\Course;
 use App\Models\IntramuralEdition;
+use App\Models\Student;
 use App\Models\Team;
+use App\Services\AthleteEntryService;
 use App\Services\StudentService;
 use App\Services\TeamService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
 class StudentController extends Controller
 {
-    public function __construct(private readonly StudentService $studentService, private readonly TeamService $teamService)
-    {
-    }
+    public function __construct(
+        private readonly StudentService $studentService,
+        private readonly TeamService $teamService,
+        private readonly AthleteEntryService $athleteEntryService,
+    ) {}
 
     public function index(Request $request): View
     {
@@ -64,12 +70,49 @@ class StudentController extends Controller
 
     public function create(): View
     {
-        return view('admin.students.create', ['student' => new Student(), 'courses' => Course::query()->where('status', 'active')->orderBy('name')->get()]);
+        $edition = $this->activeEdition();
+
+        return view('admin.students.create', [
+            'student' => new Student,
+            'courses' => Course::query()->where('status', 'active')->orderBy('name')->get(),
+            'edition' => $edition,
+            'sportOptions' => $edition ? $this->athleteEntryService->selectableSportsFor($edition) : collect(),
+        ]);
     }
 
     public function store(StoreStudentRequest $request): RedirectResponse
     {
-        $student = $this->studentService->create($request->validated());
+        $data = $request->validated();
+        $editionSportIds = $data['edition_sport_ids'] ?? [];
+        $edition = $this->activeEdition();
+        $sportOptions = $edition ? $this->athleteEntryService->selectableSportsFor($edition) : collect();
+
+        if ($sportOptions->isNotEmpty() && $editionSportIds === []) {
+            throw ValidationException::withMessages([
+                'edition_sport_ids' => 'Select the sports this student joined.',
+            ]);
+        }
+
+        if ($editionSportIds !== [] && ! $edition) {
+            throw ValidationException::withMessages([
+                'edition_sport_ids' => 'There is no active intramurals edition for these sport selections.',
+            ]);
+        }
+
+        $student = DB::transaction(function () use ($data, $editionSportIds, $edition): Student {
+            $student = $this->studentService->create(Arr::except($data, 'edition_sport_ids'));
+
+            if ($edition && $editionSportIds !== []) {
+                $team = $student->teamMembers()
+                    ->with('team')
+                    ->where('edition_id', $edition->id)
+                    ->first()?->team;
+
+                $this->athleteEntryService->registerSelectedSports($student, $edition, $editionSportIds, $team);
+            }
+
+            return $student;
+        });
 
         return redirect()->route('admin.students.index')->with('success', "{$student->full_name} was added.");
     }
@@ -121,5 +164,14 @@ class StudentController extends Controller
         $this->studentService->restore($archivedStudent);
 
         return redirect()->route('admin.students.index', ['status' => 'archived'])->with('success', "{$archivedStudent->full_name} was restored.");
+    }
+
+    private function activeEdition(): ?IntramuralEdition
+    {
+        return IntramuralEdition::query()
+            ->where('status', 'active')
+            ->orderByDesc('starts_on')
+            ->orderByDesc('id')
+            ->first();
     }
 }

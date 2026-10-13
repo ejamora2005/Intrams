@@ -83,6 +83,10 @@
     </div>
 </div>
 
+@isset($sportOptions)
+    <x-participation-sport-picker :sports="$sportOptions" />
+@endisset
+
 <div class="mt-7 flex flex-wrap items-center gap-3 border-t border-slate-100 pt-6">
     <button type="submit" class="rounded-lg bg-blue-700 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-800">{{ $submitLabel }}</button>
     <a href="{{ route('admin.students.index') }}" class="rounded-lg px-4 py-2.5 text-sm font-semibold text-slate-600 transition hover:bg-slate-100">Cancel</a>

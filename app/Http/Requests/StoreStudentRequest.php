@@ -2,8 +2,8 @@
 
 namespace App\Http\Requests;
 
-use Illuminate\Foundation\Http\FormRequest;
 use App\Http\Requests\Concerns\SanitizesStudentInput;
+use Illuminate\Foundation\Http\FormRequest;
 
 class StoreStudentRequest extends FormRequest
 {
@@ -33,6 +33,8 @@ class StoreStudentRequest extends FormRequest
             'year_level' => ['required', 'in:1st,2nd,3rd,4th'],
             'section' => ['required', 'in:A,B,C'],
             'status' => ['required', 'in:active,inactive'],
+            'edition_sport_ids' => ['nullable', 'array', 'max:3'],
+            'edition_sport_ids.*' => ['integer', 'distinct', 'exists:edition_sports,id'],
         ];
     }
 }

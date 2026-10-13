@@ -1,6 +1,8 @@
 <?php
 
 use App\Models\AthleteEntry;
+use App\Models\Course;
+use App\Models\EditionSport;
 use App\Models\IntramuralEdition;
 use App\Models\Sport;
 use App\Models\SportResult;
@@ -99,6 +101,55 @@ test('admin can create a student and the action is audited', function () {
     $response->assertRedirect(route('admin.students.index'));
     $this->assertDatabaseHas('students', ['student_number' => '2026-00001', 'first_name' => 'Ana', 'middle_name' => 'Santos', 'last_name' => 'Reyes', 'school_year' => '2026-2027', 'section' => 'A', 'status' => 'active']);
     $this->assertDatabaseHas('audit_logs', ['user_id' => $admin->id, 'action' => 'student.created', 'outcome' => 'success']);
+});
+
+test('admin selects joined sports when creating a student and cannot select two major sports', function () {
+    $admin = activeAdmin();
+    $edition = IntramuralEdition::query()->create([
+        'name' => 'Active Intramurals',
+        'school_year' => '2026-2027',
+        'starts_on' => '2026-10-19',
+        'ends_on' => '2026-10-23',
+        'status' => 'active',
+    ]);
+    $course = Course::query()->create(['name' => 'Information Technology', 'code' => 'IT', 'status' => 'active']);
+    Team::query()->create(['edition_id' => $edition->id, 'course_id' => $course->id, 'name' => 'Trojan Warriors', 'code' => 'TW', 'status' => 'active']);
+
+    $majorSport = Sport::query()->create(['name' => 'Volleyball', 'code' => 'VOLLEYBALL', 'status' => 'active']);
+    $minorSport = Sport::query()->create(['name' => 'Chess', 'code' => 'CHESS', 'status' => 'active']);
+    $secondMajorSport = Sport::query()->create(['name' => 'Baseball', 'code' => 'BASEBALL', 'status' => 'active']);
+    $major = EditionSport::query()->create(['edition_id' => $edition->id, 'sport_id' => $majorSport->id, 'participant_type' => 'team', 'game_mechanic' => 'single_elimination', 'scoring_rules' => ['point_system' => 'sports_major'], 'status' => 'preparation']);
+    $minor = EditionSport::query()->create(['edition_id' => $edition->id, 'sport_id' => $minorSport->id, 'participant_type' => 'individual', 'game_mechanic' => 'single_elimination', 'scoring_rules' => ['point_system' => 'sports_minor'], 'status' => 'preparation']);
+    $secondMajor = EditionSport::query()->create(['edition_id' => $edition->id, 'sport_id' => $secondMajorSport->id, 'participant_type' => 'team', 'game_mechanic' => 'single_elimination', 'scoring_rules' => ['point_system' => 'sports_major'], 'status' => 'preparation']);
+
+    $this->actingAs($admin)
+        ->get(route('admin.students.create'))
+        ->assertOk()
+        ->assertSee('Sports joined')
+        ->assertSee('Volleyball')
+        ->assertSee('Chess');
+
+    $this->actingAs($admin)
+        ->post(route('admin.students.store'), validStudentData([
+            'student_number' => '2026-SPORT-001',
+            'course_id' => $course->id,
+            'edition_sport_ids' => [$major->id, $minor->id],
+        ]))
+        ->assertRedirect(route('admin.students.index'));
+
+    $student = Student::query()->where('student_number', '2026-SPORT-001')->firstOrFail();
+    $this->assertDatabaseHas('athlete_entries', ['student_id' => $student->id, 'edition_sport_id' => $major->id, 'status' => 'active']);
+    $this->assertDatabaseHas('athlete_entries', ['student_id' => $student->id, 'edition_sport_id' => $minor->id, 'status' => 'active']);
+
+    $this->actingAs($admin)
+        ->post(route('admin.students.store'), validStudentData([
+            'student_number' => '2026-SPORT-002',
+            'course_id' => $course->id,
+            'edition_sport_ids' => [$major->id, $secondMajor->id],
+        ]))
+        ->assertSessionHasErrors('edition_sport_ids');
+
+    $this->assertDatabaseMissing('students', ['student_number' => '2026-SPORT-002']);
 });
 
 test('student ID is generated from the student name when omitted', function () {

@@ -122,6 +122,51 @@ test('GAM users can add players to their assigned faction', function () {
     ]);
 });
 
+test('GAM users select joined sports while adding a player and the selection rules reject two major sports', function () {
+    $edition = operationsEdition();
+    $team = operationsTeam($edition);
+    $major = operationsSport($edition, 'Volleyball', 'VOLLEYBALL');
+    $secondMajor = operationsSport($edition, 'Baseball', 'BASEBALL');
+    $gam = User::factory()->create(['role' => 'gam', 'status' => 'active', 'managed_team_id' => $team->id]);
+
+    $this->actingAs($gam)
+        ->get(route('gam.dashboard'))
+        ->assertOk()
+        ->assertSee('Sports joined')
+        ->assertSee('Volleyball')
+        ->assertSee('Baseball');
+
+    $this->actingAs($gam)
+        ->post(route('gam.teams.players.store', $team), [
+            'student_number' => 'GAM-SPORT-001',
+            'first_name' => 'Jordan',
+            'last_name' => 'Rivera',
+            'course_id' => $team->course_id,
+            'edition_sport_ids' => [$major->id],
+        ])
+        ->assertRedirect(route('gam.dashboard', ['team_id' => $team->id]));
+
+    $student = Student::query()->where('student_number', 'GAM-SPORT-001')->firstOrFail();
+    $this->assertDatabaseHas('athlete_entries', [
+        'student_id' => $student->id,
+        'edition_sport_id' => $major->id,
+        'team_id' => $team->id,
+        'status' => 'active',
+    ]);
+
+    $this->actingAs($gam)
+        ->post(route('gam.teams.players.store', $team), [
+            'student_number' => 'GAM-SPORT-002',
+            'first_name' => 'Taylor',
+            'last_name' => 'Rivera',
+            'course_id' => $team->course_id,
+            'edition_sport_ids' => [$major->id, $secondMajor->id],
+        ])
+        ->assertSessionHasErrors('edition_sport_ids');
+
+    $this->assertDatabaseMissing('students', ['student_number' => 'GAM-SPORT-002']);
+});
+
 test('tabulators declare sport winners and standings use admin point rules', function () {
     $tabulator = User::factory()->create(['role' => 'tabulator', 'status' => 'active']);
     $edition = operationsEdition();

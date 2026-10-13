@@ -11,12 +11,15 @@ use App\Models\Student;
 use App\Models\Team;
 use App\Models\TeamMember;
 use App\Models\User;
+use App\Services\AthleteEntryService;
 use App\Services\EligibilityService;
 use App\Services\StandingsService;
 use App\Services\TeamService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
 class DashboardController extends Controller
@@ -25,8 +28,8 @@ class DashboardController extends Controller
         private readonly StandingsService $standingsService,
         private readonly TeamService $teamService,
         private readonly EligibilityService $eligibilityService,
-    ) {
-    }
+        private readonly AthleteEntryService $athleteEntryService,
+    ) {}
 
     public function index(Request $request): View
     {
@@ -44,6 +47,9 @@ class DashboardController extends Controller
             ->orderBy('name')
             ->get() ?? collect();
         $selectedTeam = $teams->firstWhere('id', $request->integer('team_id')) ?? $teams->first();
+        $sportOptions = $edition && $selectedTeam
+            ? $this->athleteEntryService->selectableSportsFor($edition)
+            : collect();
 
         $selectedTeam?->load([
             'members' => fn ($query) => $query->with('student.course')->latest('assigned_at'),
@@ -116,6 +122,7 @@ class DashboardController extends Controller
             'managedTeamId' => $managedTeamId,
             'hasAllFactionAccess' => $hasAllFactionAccess,
             'availableStudents' => $availableStudents,
+            'sportOptions' => $sportOptions,
             'eligibilityByStudentId' => $eligibilityByStudentId,
             'medicalCertificateEntries' => $medicalCertificateEntries,
             'medicalCertificateGroups' => $medicalCertificateEntries->groupBy('student_id'),
@@ -154,16 +161,29 @@ class DashboardController extends Controller
             'gender' => ['nullable', 'string', 'max:20'],
             'year_level' => ['nullable', 'string', 'max:30'],
             'section' => ['nullable', 'string', 'max:100'],
+            'edition_sport_ids' => ['nullable', 'array', 'max:3'],
+            'edition_sport_ids.*' => ['integer', 'distinct', 'exists:edition_sports,id'],
         ]);
 
-        $student = DB::transaction(function () use ($data, $team): Student {
+        $editionSportIds = $data['edition_sport_ids'] ?? [];
+        $sportOptions = $this->athleteEntryService->selectableSportsFor($team->edition);
+
+        if ($sportOptions->isNotEmpty() && $editionSportIds === []) {
+            throw ValidationException::withMessages([
+                'edition_sport_ids' => 'Select the sports this player joined.',
+            ]);
+        }
+
+        $student = DB::transaction(function () use ($data, $editionSportIds, $team): Student {
             $student = Student::query()->create([
-                ...$data,
+                ...Arr::except($data, 'edition_sport_ids'),
                 'school_year' => $team->edition?->school_year,
                 'status' => 'active',
             ]);
 
             $this->teamService->assignStudent($team, $student);
+
+            $this->athleteEntryService->registerSelectedSports($student, $team->edition, $editionSportIds, $team);
 
             return $student;
         });
