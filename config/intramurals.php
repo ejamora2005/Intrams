@@ -192,6 +192,10 @@ $venues = [
 $participationRules = [
     'max_events_per_student' => 2,
     'individual_dual_only_max_events' => 3,
+    // Relay runners represent their faction in addition to their individual run.
+    // They do not use one of the student's participation-rule event slots.
+    'relay_exempt_sport_codes' => ['RELAY-4X100', 'RELAY-4X400'],
+    'relay_qualifying_run_sport_codes' => ['100M-RUN', '200M-RUN', '400M-RUN'],
     'allowed_combinations' => [
         ['label' => '1 minor + 1 major', 'major' => 1, 'minor' => 1, 'individual_or_dual' => 0],
         ['label' => '1 minor + 1 individual/dual', 'major' => 0, 'minor' => 1, 'individual_or_dual' => 1],

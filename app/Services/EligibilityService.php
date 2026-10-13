@@ -79,6 +79,19 @@ class EligibilityService
             ], true);
     }
 
+    /**
+     * Relays are available to runners but do not use a participation-rule event slot.
+     */
+    public function isRelayEvent(EditionSport $editionSport): bool
+    {
+        return $this->sportCodeIsIn($editionSport, config('intramurals.participation_rules.relay_exempt_sport_codes', []));
+    }
+
+    public function countsTowardParticipationLimit(EditionSport $editionSport): bool
+    {
+        return $this->isParticipationSport($editionSport) && ! $this->isRelayEvent($editionSport);
+    }
+
     public function requiresMedicalCertificate(EditionSport $editionSport): bool
     {
         $editionSport->loadMissing('sport');
@@ -257,26 +270,12 @@ class EligibilityService
     private function evaluateEntries(Collection $entries, ?EditionSport $additionalSport = null): array
     {
         $items = $entries
-            ->filter(fn (AthleteEntry $entry): bool => $entry->editionSport instanceof EditionSport && $this->countsForParticipation($entry->editionSport))
-            ->map(function (AthleteEntry $entry): array {
-                $slot = $this->slotFor($entry->editionSport);
-
-                return [
-                    'name' => $entry->editionSport->sport?->name ?? 'Unknown event',
-                    'slot' => $slot,
-                    'slot_label' => $this->slotLabel($slot),
-                ];
-            })
+            ->filter(fn (AthleteEntry $entry): bool => $entry->editionSport instanceof EditionSport && $this->isParticipationSport($entry->editionSport))
+            ->map(fn (AthleteEntry $entry): array => $this->participationItem($entry->editionSport))
             ->values();
 
-        if ($additionalSport instanceof EditionSport && $this->countsForParticipation($additionalSport) && ! $items->contains(fn (array $item): bool => $item['name'] === ($additionalSport->sport?->name ?? ''))) {
-            $additionalSport->loadMissing('sport');
-            $slot = $this->slotFor($additionalSport);
-            $items->push([
-                'name' => $additionalSport->sport?->name ?? 'Selected event',
-                'slot' => $slot,
-                'slot_label' => $this->slotLabel($slot),
-            ]);
+        if ($additionalSport instanceof EditionSport && $this->isParticipationSport($additionalSport) && ! $items->contains(fn (array $item): bool => $item['edition_sport_id'] === (int) $additionalSport->id)) {
+            $items->push($this->participationItem($additionalSport));
         }
 
         $counts = [
@@ -286,14 +285,19 @@ class EligibilityService
             self::SLOT_OTHER => 0,
         ];
 
-        foreach ($items as $item) {
+        foreach ($items->where('counts_toward_limit', true) as $item) {
             $counts[$item['slot']] = ($counts[$item['slot']] ?? 0) + 1;
         }
 
         $issues = [];
-        $total = $items->count();
+        $total = $items->where('counts_toward_limit', true)->count();
         $hasMajorOrMinor = $counts[self::SLOT_MAJOR] > 0 || $counts[self::SLOT_MINOR] > 0;
         $maxEvents = $hasMajorOrMinor ? $this->maxEvents() : $this->individualDualOnlyMaxEvents();
+
+        if ($items->contains(fn (array $item): bool => $item['is_relay'])
+            && ! $items->contains(fn (array $item): bool => $item['is_qualifying_run'])) {
+            $issues[] = 'A relay entry requires the student to join a 100m, 200m, or 400m run.';
+        }
 
         if ($total > $maxEvents) {
             $issues[] = 'More than '.$maxEvents.' events registered.';
@@ -414,6 +418,35 @@ class EligibilityService
         }
 
         return ! Str::startsWith($sportCode, 'CULT-');
+    }
+
+    /** @return array<string, int|string|bool> */
+    private function participationItem(EditionSport $editionSport): array
+    {
+        $editionSport->loadMissing('sport');
+        $slot = $this->slotFor($editionSport);
+        $isRelay = $this->isRelayEvent($editionSport);
+
+        return [
+            'edition_sport_id' => (int) $editionSport->id,
+            'name' => $editionSport->sport?->name ?? 'Unknown event',
+            'slot' => $slot,
+            'slot_label' => $isRelay ? 'Relay (exempt)' : $this->slotLabel($slot),
+            'counts_toward_limit' => ! $isRelay,
+            'is_relay' => $isRelay,
+            'is_qualifying_run' => $this->sportCodeIsIn($editionSport, config('intramurals.participation_rules.relay_qualifying_run_sport_codes', [])),
+        ];
+    }
+
+    /** @param array<int, string> $sportCodes */
+    private function sportCodeIsIn(EditionSport $editionSport, array $sportCodes): bool
+    {
+        $editionSport->loadMissing('sport');
+        $sportCode = Str::upper((string) $editionSport->sport?->code);
+
+        return $sportCode !== '' && collect($sportCodes)
+            ->map(fn (string $code): string => Str::upper($code))
+            ->contains($sportCode);
     }
 
     private function pointSystemKey(EditionSport $editionSport): ?string

@@ -161,7 +161,7 @@ class DashboardController extends Controller
             'gender' => ['nullable', 'string', 'max:20'],
             'year_level' => ['nullable', 'string', 'max:30'],
             'section' => ['nullable', 'string', 'max:100'],
-            'edition_sport_ids' => ['nullable', 'array', 'max:3'],
+            'edition_sport_ids' => ['nullable', 'array', 'max:5'],
             'edition_sport_ids.*' => ['integer', 'distinct', 'exists:edition_sports,id'],
         ]);
 

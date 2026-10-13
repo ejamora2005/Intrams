@@ -167,6 +167,78 @@ test('GAM users select joined sports while adding a player and the selection rul
     $this->assertDatabaseMissing('students', ['student_number' => 'GAM-SPORT-002']);
 });
 
+test('relay runners are exempt from participation limits but must join an individual run', function () {
+    $edition = operationsEdition();
+    $team = operationsTeam($edition);
+    $major = operationsSport($edition, 'Baseball', 'BASEBALL');
+    $run = operationsSport($edition, '100m Run', '100M-RUN');
+    $run->update([
+        'participant_type' => 'individual',
+        'scoring_rules' => ['point_system' => 'sports_athletics'],
+    ]);
+    $relay = operationsSport($edition, '4x100m Relay', 'RELAY-4X100');
+    $relay->update([
+        'participant_type' => 'team',
+        'scoring_rules' => ['point_system' => 'sports_athletics'],
+    ]);
+    $gam = User::factory()->create(['role' => 'gam', 'status' => 'active', 'managed_team_id' => $team->id]);
+
+    $this->actingAs($gam)
+        ->get(route('gam.dashboard'))
+        ->assertOk()
+        ->assertSee('Relay (exempt)')
+        ->assertSee('Relay events do not use an event slot');
+
+    $this->actingAs($gam)
+        ->post(route('gam.teams.players.store', $team), [
+            'student_number' => 'GAM-RELAY-001',
+            'first_name' => 'Casey',
+            'last_name' => 'Rivera',
+            'course_id' => $team->course_id,
+            'edition_sport_ids' => [$relay->id, $major->id, $run->id],
+        ])
+        ->assertRedirect(route('gam.dashboard', ['team_id' => $team->id]));
+
+    $runner = Student::query()->where('student_number', 'GAM-RELAY-001')->firstOrFail();
+    $evaluation = app(\App\Services\EligibilityService::class)->evaluateStudent($runner, $edition);
+
+    expect($evaluation['possible_dq'])->toBeFalse()
+        ->and($evaluation['total'])->toBe(2)
+        ->and($evaluation['counts']['major'])->toBe(1)
+        ->and($evaluation['counts']['individual_or_dual'])->toBe(1)
+        ->and(collect($evaluation['entries'])->firstWhere('edition_sport_id', $relay->id)['slot_label'])->toBe('Relay (exempt)');
+
+    $admin = User::factory()->create(['role' => 'admin', 'status' => 'active']);
+    $nonRunner = Student::query()->create([
+        'student_number' => 'RELAY-NO-RUN-001',
+        'first_name' => 'Morgan',
+        'last_name' => 'Santos',
+        'school_year' => $edition->school_year,
+        'course_id' => $team->course_id,
+        'status' => 'active',
+    ]);
+    TeamMember::query()->create([
+        'edition_id' => $edition->id,
+        'team_id' => $team->id,
+        'student_id' => $nonRunner->id,
+        'assigned_by' => $admin->id,
+        'assigned_at' => now(),
+    ]);
+
+    $this->actingAs($admin)
+        ->post(route('admin.sports.participants.store', $relay->sport), [
+            'edition_id' => $edition->id,
+            'team_id' => $team->id,
+            'student_ids' => [$nonRunner->id],
+        ])
+        ->assertSessionHasErrors('student_ids');
+
+    $this->assertDatabaseMissing('athlete_entries', [
+        'edition_sport_id' => $relay->id,
+        'student_id' => $nonRunner->id,
+    ]);
+});
+
 test('tabulators declare sport winners and standings use admin point rules', function () {
     $tabulator = User::factory()->create(['role' => 'tabulator', 'status' => 'active']);
     $edition = operationsEdition();

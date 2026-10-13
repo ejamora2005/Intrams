@@ -35,9 +35,12 @@ class AthleteEntryService
                 && $this->eligibilityService->isParticipationSport($editionSport))
             ->each(function (EditionSport $editionSport): void {
                 $editionSport->setAttribute('participation_slot', $this->eligibilityService->slotFor($editionSport));
+                $editionSport->setAttribute('counts_toward_participation_limit', $this->eligibilityService->countsTowardParticipationLimit($editionSport));
+                $editionSport->setAttribute('is_relay_event', $this->eligibilityService->isRelayEvent($editionSport));
             })
             ->sortBy(fn (EditionSport $editionSport): string => sprintf(
-                '%d-%s',
+                '%d-%d-%s',
+                $editionSport->is_relay_event ? 1 : 0,
                 $slotOrder[$editionSport->participation_slot] ?? 9,
                 $editionSport->sport?->name ?? ''
             ))
@@ -84,6 +87,12 @@ class AthleteEntryService
                 'edition_sport_ids' => 'Choose sports from the active intramurals edition.',
             ]);
         }
+
+        // When a runner and a relay are selected together, create the running
+        // entry first so the relay eligibility check can confirm the requirement.
+        $editionSports = $editionSports
+            ->sortBy(fn (EditionSport $editionSport): int => $this->eligibilityService->isRelayEvent($editionSport) ? 1 : 0)
+            ->values();
 
         foreach ($editionSports as $editionSport) {
             if (! in_array($editionSport->status, ['preparation', 'active'], true)
