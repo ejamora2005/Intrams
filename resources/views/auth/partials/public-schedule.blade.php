@@ -10,6 +10,11 @@
     $themeTitle = config('intramurals.theme.title');
     $themeTagline = config('intramurals.theme.tagline');
     $selectedDate = $selectedDate ?? now()->format('Y-m-d');
+    $factionRosters = $factionRosters ?? collect();
+    $factionRostersByKey = $factionRosters->keyBy('key');
+    $configuredTeamKeys = collect(config('landing.teams', []))
+        ->map(fn (array $team): string => \App\Models\Team::logoKey($team['name'] ?? ''));
+    $unlistedFactions = $factionRosters->reject(fn (array $faction): bool => $configuredTeamKeys->contains($faction['key']));
 @endphp
 
 <main class="schedule-page" style="--schedule-background: url('{{ asset(config('landing.background')) }}')">
@@ -58,18 +63,114 @@
             </div>
         </section>
 
-        <ul class="schedule-teams" aria-label="Campus teams">
+        <ul class="schedule-teams" aria-label="Campus factions">
             @foreach (config('landing.teams') as $team)
+                @php($roster = $factionRostersByKey->get(\App\Models\Team::logoKey($team['name'] ?? '')))
                 <li style="--team-color: {{ $team['primaryColor'] }}; --team-highlight: {{ $team['secondaryColor'] }}">
-                    @if ($team['image'] ?? null)
-                        <img class="schedule-team-logo" src="{{ asset($team['image']) }}" alt="" width="44" height="44" decoding="async">
-                    @else
-                        <span class="schedule-team-pennant" aria-hidden="true"></span>
+                    <div class="schedule-team-identity">
+                        @if ($team['image'] ?? null)
+                            <img class="schedule-team-logo" src="{{ asset($team['image']) }}" alt="" width="44" height="44" decoding="async">
+                        @else
+                            <span class="schedule-team-pennant" aria-hidden="true"></span>
+                        @endif
+                        <span class="schedule-team-name">{{ $team['name'] }}<small>{{ $team['department'] }}</small></span>
+                    </div>
+                    @if ($roster)
+                        <button type="button" class="schedule-roster-trigger" data-open-roster data-roster-id="roster-panel-{{ $roster['id'] }}" aria-haspopup="dialog">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M16 20v-1.5A3.5 3.5 0 0 0 12.5 15h-5A3.5 3.5 0 0 0 4 18.5V20M10 11a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Zm6-6.5a3 3 0 0 1 0 5.83M19.5 20v-1.5a3.5 3.5 0 0 0-2.5-3.35"/></svg>
+                            <span>View players</span>
+                            <strong>{{ $roster['member_count'] }}</strong>
+                        </button>
                     @endif
-                    <span>{{ $team['name'] }}<small>{{ $team['department'] }}</small></span>
+                </li>
+            @endforeach
+            @foreach ($unlistedFactions as $faction)
+                <li class="schedule-team-card--database" style="--team-color: #0c7345; --team-highlight: #d9b87d">
+                    <div class="schedule-team-identity">
+                        @if ($faction['logo_path'])
+                            <img class="schedule-team-logo" src="{{ asset($faction['logo_path']) }}" alt="" width="44" height="44" decoding="async">
+                        @else
+                            <span class="schedule-team-pennant" aria-hidden="true"></span>
+                        @endif
+                        <span class="schedule-team-name">{{ $faction['name'] }}<small>{{ $faction['code'] ?: 'Active faction' }}</small></span>
+                    </div>
+                    <button type="button" class="schedule-roster-trigger" data-open-roster data-roster-id="roster-panel-{{ $faction['id'] }}" aria-haspopup="dialog">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M16 20v-1.5A3.5 3.5 0 0 0 12.5 15h-5A3.5 3.5 0 0 0 4 18.5V20M10 11a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Zm6-6.5a3 3 0 0 1 0 5.83M19.5 20v-1.5a3.5 3.5 0 0 0-2.5-3.35"/></svg>
+                        <span>View players</span>
+                        <strong>{{ $faction['member_count'] }}</strong>
+                    </button>
                 </li>
             @endforeach
         </ul>
+
+        @if ($factionRosters->isNotEmpty())
+            <dialog class="schedule-roster-modal" data-roster-modal aria-labelledby="roster-modal-heading">
+                <div class="schedule-roster-dialog">
+                    <header class="schedule-roster-header">
+                        <div>
+                            <p class="schedule-section-label">Faction rosters</p>
+                            <h2 id="roster-modal-heading">Meet the players</h2>
+                            <p>Choose a faction to see its registered players and sports.</p>
+                        </div>
+                        <button type="button" class="schedule-roster-close" data-close-roster aria-label="Close player list">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg>
+                        </button>
+                    </header>
+                    <div class="schedule-roster-body">
+                        <nav class="schedule-roster-tabs" aria-label="Faction roster selection" role="tablist">
+                            @foreach ($factionRosters as $faction)
+                                <button type="button" id="roster-tab-{{ $faction['id'] }}" class="schedule-roster-tab" data-roster-tab data-roster-target="roster-panel-{{ $faction['id'] }}" role="tab" aria-controls="roster-panel-{{ $faction['id'] }}" aria-selected="{{ $loop->first ? 'true' : 'false' }}" tabindex="{{ $loop->first ? '0' : '-1' }}">
+                                    @if ($faction['logo_path'])
+                                        <img src="{{ asset($faction['logo_path']) }}" alt="" width="30" height="30" decoding="async">
+                                    @endif
+                                    <span>{{ $faction['name'] }}</span>
+                                    <strong>{{ $faction['member_count'] }}</strong>
+                                </button>
+                            @endforeach
+                        </nav>
+                        <div class="schedule-roster-panels">
+                            @foreach ($factionRosters as $faction)
+                                <section id="roster-panel-{{ $faction['id'] }}" class="schedule-roster-panel" data-roster-panel role="tabpanel" aria-labelledby="roster-tab-{{ $faction['id'] }}" @if (! $loop->first) hidden @endif>
+                                    <div class="schedule-roster-panel-heading">
+                                        <div>
+                                            <p>Active faction</p>
+                                            <h3>{{ $faction['name'] }}</h3>
+                                        </div>
+                                        <span>{{ $faction['member_count'] }} {{ \Illuminate\Support\Str::plural('player', $faction['member_count']) }}</span>
+                                    </div>
+                                    @if (count($faction['members']))
+                                        <ol class="schedule-roster-list">
+                                            @foreach ($faction['members'] as $member)
+                                                <li>
+                                                    <span class="schedule-roster-number">{{ str_pad((string) $loop->iteration, 2, '0', STR_PAD_LEFT) }}</span>
+                                                    <div>
+                                                        <strong>{{ $member['name'] }}</strong>
+                                                        @if (count($member['sports']))
+                                                            <span class="schedule-roster-sports">
+                                                                @foreach ($member['sports'] as $sport)
+                                                                    <small>{{ $sport['name'] }}<em>{{ $sport['category'] }}</em></small>
+                                                                @endforeach
+                                                            </span>
+                                                        @else
+                                                            <span class="schedule-roster-unassigned">Faction roster member</span>
+                                                        @endif
+                                                    </div>
+                                                </li>
+                                            @endforeach
+                                        </ol>
+                                    @else
+                                        <div class="schedule-roster-empty">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M16 20v-1.5A3.5 3.5 0 0 0 12.5 15h-5A3.5 3.5 0 0 0 4 18.5V20M10 11a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Zm6-6.5a3 3 0 0 1 0 5.83M19.5 20v-1.5a3.5 3.5 0 0 0-2.5-3.35"/></svg>
+                                            <p>No players have been published for this faction yet.</p>
+                                        </div>
+                                    @endif
+                                </section>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
+            </dialog>
+        @endif
 
         <section class="schedule-board" aria-label="Today's competitions">
             <div class="schedule-toolbar">

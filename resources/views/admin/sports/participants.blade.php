@@ -65,7 +65,7 @@
 
                         <div class="mt-4 min-h-0 flex-1 overflow-y-auto rounded-lg border border-slate-200 bg-white/5">
                             <table class="w-full table-fixed divide-y divide-slate-200 text-left text-sm">
-                                <thead class="sticky top-0 z-10 bg-slate-50 text-xs font-semibold uppercase tracking-wide text-slate-500"><tr><th class="w-12 px-4 py-3"><span class="sr-only">Select</span></th><th class="px-4 py-3">Student</th><th class="hidden w-44 px-4 py-3 sm:table-cell">Student number</th></tr></thead>
+                                <thead class="sticky top-0 z-10 bg-slate-50 text-xs font-semibold uppercase tracking-wide text-slate-500"><tr><th class="w-12 px-4 py-3"><span class="sr-only">Select</span></th><th class="px-4 py-3">Student</th><th class="hidden w-44 px-4 py-3 sm:table-cell">Student ID</th></tr></thead>
                                 <tbody class="divide-y divide-slate-100">
                                     @foreach ($entries as $entry)
                                         @php

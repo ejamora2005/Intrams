@@ -8,7 +8,7 @@
     <div class="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <form method="GET" class="flex w-full flex-col gap-3 sm:max-w-xl sm:flex-row">
             <label for="student-search" class="sr-only">Search students</label>
-            <input id="student-search" type="search" name="search" value="{{ $search }}" placeholder="Search by name, student number, or section" class="w-full rounded-lg border-slate-300 px-3 py-2.5 text-sm shadow-sm placeholder:text-slate-400 focus:border-blue-600 focus:ring-blue-600">
+            <input id="student-search" type="search" name="search" value="{{ $search }}" placeholder="Search by name, student ID, or section" class="w-full rounded-lg border-slate-300 px-3 py-2.5 text-sm shadow-sm placeholder:text-slate-400 focus:border-blue-600 focus:ring-blue-600">
             <select name="status" class="rounded-lg border-slate-300 py-2.5 text-sm shadow-sm focus:border-blue-600 focus:ring-blue-600" onchange="this.form.submit()">
                 <option value="active" @selected($status === 'active')>Active</option>
                 <option value="inactive" @selected($status === 'inactive')>Inactive</option>
@@ -37,7 +37,7 @@
                     <thead class="bg-slate-50 text-xs font-semibold uppercase tracking-wide text-slate-500">
                         <tr>
                             <th scope="col" class="px-5 py-3">Student</th>
-                            <th scope="col" class="px-5 py-3">Student number</th>
+                            <th scope="col" class="px-5 py-3">Student ID</th>
                             <th scope="col" class="px-5 py-3">Faction</th>
                             <th scope="col" class="px-5 py-3">Joined sports/events</th>
                             <th scope="col" class="px-5 py-3">Year & section</th>

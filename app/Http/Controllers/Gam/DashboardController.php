@@ -146,7 +146,7 @@ class DashboardController extends Controller
         $this->ensureActiveTeam($team);
 
         $data = $request->validate([
-            'student_number' => ['required', 'string', 'max:255', 'unique:students,student_number'],
+            'student_number' => ['sometimes', 'nullable', 'string', 'max:255', 'unique:students,student_number'],
             'first_name' => ['required', 'string', 'max:255'],
             'middle_name' => ['nullable', 'string', 'max:255'],
             'last_name' => ['required', 'string', 'max:255'],

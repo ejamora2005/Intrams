@@ -13,6 +13,10 @@ if (document.querySelector('[data-login-modal]')) {
     void import('./login-modal');
 }
 
+if (document.querySelector('[data-roster-modal]')) {
+    void import('./roster-modal');
+}
+
 document.querySelectorAll('[data-declare-winners]').forEach(form => {
     const selects = [...form.querySelectorAll('[data-placement-select]')];
 

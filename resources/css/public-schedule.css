@@ -760,3 +760,453 @@
         padding: 12px 15px;
     }
 }
+
+/* Public faction roster modal */
+.schedule-team-identity {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    min-width: 0;
+}
+
+.schedule-team-name {
+    min-width: 0;
+    color: #fff;
+    font-family: 'Schedule Condensed', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 1.1;
+    text-transform: uppercase;
+}
+
+.schedule-team-name small {
+    display: block;
+    margin-top: 6px;
+    color: #d3e0ef;
+    font-family: 'Schedule Barlow', sans-serif;
+    font-size: 10px;
+    font-weight: 400;
+    line-height: 1.4;
+    text-transform: none;
+}
+
+.schedule-roster-trigger {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-height: 34px;
+    margin-left: auto;
+    flex-shrink: 0;
+    padding: 6px 9px;
+    border: 1px solid #f0d49c66;
+    border-radius: 999px;
+    color: #f3d8a5;
+    background: #d9b87d14;
+    font-size: 10px;
+    font-weight: 600;
+    white-space: nowrap;
+    transition: color .2s ease, border-color .2s ease, background .2s ease, transform .2s ease;
+}
+
+.schedule-roster-trigger:hover {
+    transform: translateY(-1px);
+    border-color: #f0d49cb8;
+    color: #fff5da;
+    background: #d9b87d2b;
+}
+
+.schedule-roster-trigger svg {
+    width: 15px;
+    height: 15px;
+}
+
+.schedule-roster-trigger strong {
+    display: inline-grid;
+    place-items: center;
+    min-width: 19px;
+    height: 19px;
+    border-radius: 999px;
+    color: #07182d;
+    background: #f0d49c;
+    font-size: 10px;
+}
+
+.schedule-roster-modal {
+    width: min(920px, calc(100% - 28px));
+    max-width: 920px;
+    max-height: min(760px, calc(100dvh - 28px));
+    margin: auto;
+    overflow: hidden;
+    padding: 0;
+    border: 1px solid #b7d2ec45;
+    border-radius: 16px;
+    color: var(--slsu-text);
+    background: linear-gradient(145deg, #0c2845, #05162b 72%);
+    box-shadow: 0 32px 100px #000b, inset 0 1px 0 #ffffff1c;
+}
+
+.schedule-roster-modal::backdrop {
+    background: #010816b8;
+    backdrop-filter: blur(9px);
+}
+
+.schedule-roster-dialog {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    max-height: min(760px, calc(100dvh - 28px));
+}
+
+.schedule-roster-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 22px;
+    padding: 28px 30px 24px;
+    border-bottom: 1px solid #d8ecff20;
+    background: linear-gradient(120deg, #123c5ee8, #0a2039cc);
+}
+
+.schedule-roster-header::before {
+    content: '';
+    position: absolute;
+    inset: 0 0 auto;
+    height: 4px;
+    background: linear-gradient(90deg, var(--slsu-green), var(--slsu-gold), var(--slsu-green));
+}
+
+.schedule-roster-header h2 {
+    margin-top: 6px;
+    color: #fff;
+    font-family: 'Schedule Condensed', sans-serif;
+    font-size: 32px;
+    line-height: 1.05;
+    text-transform: uppercase;
+}
+
+.schedule-roster-header p:last-child {
+    margin-top: 8px;
+    color: #b7cbe1;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.schedule-roster-close {
+    display: inline-grid;
+    place-items: center;
+    width: 38px;
+    height: 38px;
+    flex-shrink: 0;
+    border: 1px solid #d8ecff3d;
+    border-radius: 50%;
+    color: #dcecff;
+    background: #ffffff0a;
+    transition: background .2s ease, color .2s ease;
+}
+
+.schedule-roster-close:hover {
+    color: #07182d;
+    background: #f0d49c;
+}
+
+.schedule-roster-close svg {
+    width: 17px;
+    height: 17px;
+}
+
+.schedule-roster-body {
+    display: grid;
+    grid-template-columns: 235px minmax(0, 1fr);
+    min-height: 0;
+    overflow: hidden;
+}
+
+.schedule-roster-tabs {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    overflow-y: auto;
+    padding: 18px 14px;
+    border-right: 1px solid #d8ecff20;
+    background: #04132980;
+}
+
+.schedule-roster-tab {
+    display: grid;
+    grid-template-columns: 30px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 9px;
+    min-height: 50px;
+    padding: 8px 10px;
+    border: 1px solid transparent;
+    border-radius: 9px;
+    color: #bed1e5;
+    background: transparent;
+    font-size: 12px;
+    font-weight: 600;
+    text-align: left;
+    transition: color .2s ease, border-color .2s ease, background .2s ease;
+}
+
+.schedule-roster-tab:hover,
+.schedule-roster-tab[aria-selected='true'] {
+    border-color: #f0d49c66;
+    color: #fff;
+    background: linear-gradient(100deg, #0c73452b, #d9b87d14);
+}
+
+.schedule-roster-tab img {
+    width: 30px;
+    height: 30px;
+    object-fit: contain;
+}
+
+.schedule-roster-tab span {
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
+.schedule-roster-tab strong {
+    display: inline-grid;
+    place-items: center;
+    min-width: 23px;
+    height: 23px;
+    border-radius: 999px;
+    color: #07182d;
+    background: #d9b87d;
+    font-size: 10px;
+}
+
+.schedule-roster-panels {
+    min-width: 0;
+    overflow-y: auto;
+}
+
+.schedule-roster-panel {
+    padding: 24px 27px 28px;
+}
+
+.schedule-roster-panel-heading {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 18px;
+    padding-bottom: 17px;
+    border-bottom: 1px solid #d8ecff20;
+}
+
+.schedule-roster-panel-heading p {
+    color: #d9b87d;
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: .14em !important;
+    text-transform: uppercase;
+}
+
+.schedule-roster-panel-heading h3 {
+    margin-top: 5px;
+    color: #fff;
+    font-family: 'Schedule Condensed', sans-serif;
+    font-size: 28px;
+    line-height: 1.1;
+    text-transform: uppercase;
+}
+
+.schedule-roster-panel-heading > span {
+    color: #afc6df;
+    font-size: 12px;
+    white-space: nowrap;
+}
+
+.schedule-roster-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    margin: 18px 0 0;
+    padding: 0;
+    list-style: none;
+}
+
+.schedule-roster-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    min-width: 0;
+    padding: 13px 12px;
+    border: 1px solid #d8ecff1c;
+    border-radius: 9px;
+    background: #ffffff07;
+}
+
+.schedule-roster-number {
+    color: #d9b87d;
+    font-family: 'Schedule Condensed', sans-serif;
+    font-size: 17px;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.schedule-roster-list li > div {
+    min-width: 0;
+}
+
+.schedule-roster-list strong {
+    display: block;
+    color: #f5f9ff;
+    font-size: 13px;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+}
+
+.schedule-roster-sports {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-top: 7px;
+}
+
+.schedule-roster-sports small {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 6px;
+    border: 1px solid #76b6e92e;
+    border-radius: 999px;
+    color: #a9d5fa;
+    background: #4e9bd014;
+    font-size: 9px;
+    line-height: 1.2;
+}
+
+.schedule-roster-sports em {
+    color: #e9c88c;
+    font-size: 8px;
+    font-style: normal;
+}
+
+.schedule-roster-unassigned {
+    display: block;
+    margin-top: 6px;
+    color: #9cb5ce;
+    font-size: 10px;
+}
+
+.schedule-roster-empty {
+    display: grid;
+    place-items: center;
+    gap: 12px;
+    min-height: 220px;
+    color: #9fb6cf;
+    text-align: center;
+}
+
+.schedule-roster-empty svg {
+    width: 42px;
+    height: 42px;
+    color: #d9b87d;
+}
+
+.schedule-roster-empty p {
+    max-width: 260px;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+@media (max-width: 760px) {
+    .schedule-roster-trigger span {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip-path: inset(50%);
+        white-space: nowrap;
+    }
+
+    .schedule-roster-body {
+        grid-template-columns: 1fr;
+    }
+
+    .schedule-roster-tabs {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        max-height: 148px;
+        border-right: 0;
+        border-bottom: 1px solid #d8ecff20;
+    }
+
+    .schedule-roster-list {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 640px) {
+    .schedule-team-identity {
+        gap: 8px;
+    }
+
+    .schedule-team-name {
+        font-size: 18px;
+    }
+
+    .schedule-team-name small {
+        margin-top: 4px;
+        font-size: 9px;
+    }
+
+    .schedule-roster-trigger {
+        padding-inline: 7px;
+    }
+
+    .schedule-roster-modal {
+        width: calc(100% - 14px);
+        max-height: calc(100dvh - 14px);
+        border-radius: 13px;
+    }
+
+    .schedule-roster-dialog {
+        max-height: calc(100dvh - 14px);
+    }
+
+    .schedule-roster-header {
+        padding: 23px 18px 19px;
+    }
+
+    .schedule-roster-header h2 {
+        font-size: 27px;
+    }
+
+    .schedule-roster-header p:last-child {
+        max-width: 230px;
+        font-size: 12px;
+    }
+
+    .schedule-roster-tabs {
+        padding: 11px;
+        gap: 5px;
+    }
+
+    .schedule-roster-tab {
+        grid-template-columns: 25px minmax(0, 1fr) auto;
+        min-height: 43px;
+        padding: 6px 7px;
+        font-size: 10px;
+    }
+
+    .schedule-roster-tab img {
+        width: 25px;
+        height: 25px;
+    }
+
+    .schedule-roster-panel {
+        padding: 18px 14px 22px;
+    }
+
+    .schedule-roster-panel-heading h3 {
+        font-size: 24px;
+    }
+
+    .schedule-roster-panel-heading > span {
+        font-size: 10px;
+    }
+}

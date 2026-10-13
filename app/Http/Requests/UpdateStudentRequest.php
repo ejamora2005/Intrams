@@ -2,10 +2,8 @@
 
 namespace App\Http\Requests;
 
-use App\Models\Student;
 use App\Http\Requests\Concerns\SanitizesStudentInput;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
 class UpdateStudentRequest extends FormRequest
 {
@@ -24,11 +22,8 @@ class UpdateStudentRequest extends FormRequest
     /** @return array<string, array<int, mixed>> */
     public function rules(): array
     {
-        /** @var Student $student */
-        $student = $this->route('student');
-
         return [
-            'student_number' => ['required', 'string', 'max:255', Rule::unique('students', 'student_number')->ignore($student)],
+            'student_number' => ['sometimes', 'nullable', 'string', 'max:255', \Illuminate\Validation\Rule::unique('students', 'student_number')->ignore($this->route('student'))],
             'first_name' => ['required', 'string', 'max:255'],
             'middle_name' => ['nullable', 'string', 'max:255'],
             'last_name' => ['required', 'string', 'max:255'],

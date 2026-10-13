@@ -64,7 +64,7 @@
             <form method="GET" class="grid gap-3 sm:grid-cols-[minmax(0,1fr)_14rem_auto]">
                 <input type="hidden" name="course_id" value="{{ $courseId }}">
                 <label for="roster_search" class="sr-only">Search roster members</label>
-                <input id="roster_search" type="search" name="roster_search" value="{{ $rosterSearch }}" placeholder="Search name or student number" class="rounded-lg border-slate-300 text-sm focus:border-blue-600 focus:ring-blue-600">
+                <input id="roster_search" type="search" name="roster_search" value="{{ $rosterSearch }}" placeholder="Search name or student ID" class="rounded-lg border-slate-300 text-sm focus:border-blue-600 focus:ring-blue-600">
                 <label for="roster_course_id" class="sr-only">Filter roster by course</label>
                 <select id="roster_course_id" name="roster_course_id" class="rounded-lg border-slate-300 text-sm focus:border-blue-600 focus:ring-blue-600">
                     <option value="">All courses</option>

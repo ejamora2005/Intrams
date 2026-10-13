@@ -101,6 +101,22 @@ test('admin can create a student and the action is audited', function () {
     $this->assertDatabaseHas('audit_logs', ['user_id' => $admin->id, 'action' => 'student.created', 'outcome' => 'success']);
 });
 
+test('student ID is generated from the student name when omitted', function () {
+    $admin = activeAdmin();
+    $data = validStudentData();
+    unset($data['student_number']);
+
+    $this->actingAs($admin)
+        ->post(route('admin.students.store'), $data)
+        ->assertRedirect(route('admin.students.index'));
+
+    $this->assertDatabaseHas('students', [
+        'student_number' => 'STU-ANA-SANTOS-REYES',
+        'first_name' => 'Ana',
+        'last_name' => 'Reyes',
+    ]);
+});
+
 test('student number must be unique', function () {
     $admin = activeAdmin();
     Student::factory()->create(['student_number' => '2026-00001']);

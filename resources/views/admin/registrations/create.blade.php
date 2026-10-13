@@ -22,7 +22,7 @@
                 <select id="team_id" name="team_id" class="mt-1 block w-full rounded-lg border-slate-300" disabled><option value="">Select team</option></select>
             </div>
             <div id="athlete-field" class="hidden">
-                <div class="flex items-center justify-between gap-4"><label class="text-sm font-medium">Athletes <span id="selection-hint" class="font-normal text-slate-500"></span></label><input id="athlete-search" type="search" class="w-52 rounded-lg border-slate-300 text-sm" placeholder="Search name or student no."></div>
+                <div class="flex items-center justify-between gap-4"><label class="text-sm font-medium">Athletes <span id="selection-hint" class="font-normal text-slate-500"></span></label><input id="athlete-search" type="search" class="w-52 rounded-lg border-slate-300 text-sm" placeholder="Search name or student ID"></div>
                 <p id="athlete-empty" class="mt-3 text-sm text-slate-500">Choose an event to see athletes.</p>
                 <div id="athlete-list" class="mt-3 max-h-72 divide-y overflow-y-auto rounded-lg border"></div>
             </div>

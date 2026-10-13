@@ -95,7 +95,7 @@
                     <div class="mt-4 overflow-x-auto rounded-lg border border-slate-200">
                         <table class="min-w-full text-left text-sm">
                             <thead class="border-b border-slate-100 bg-slate-50 text-xs font-semibold uppercase tracking-wide text-slate-500">
-                                <tr><th class="px-4 py-3">Player</th><th class="px-4 py-3">Student no.</th><th class="px-4 py-3">Course</th><th class="px-4 py-3">Year / Section</th><th class="px-4 py-3">Status</th></tr>
+                                <tr><th class="px-4 py-3">Player</th><th class="px-4 py-3">Student ID</th><th class="px-4 py-3">Course</th><th class="px-4 py-3">Year / Section</th><th class="px-4 py-3">Status</th></tr>
                             </thead>
                             <tbody class="divide-y divide-slate-100">
                                 @forelse ($selectedTeam->members as $member)
@@ -143,7 +143,7 @@
                         @csrf
                         <h3 class="font-semibold text-slate-950">Add new player</h3>
                         <div class="mt-4 grid gap-3 sm:grid-cols-2">
-                            <input name="student_number" value="{{ old('student_number') }}" placeholder="Student no." required class="rounded-lg border-slate-300 px-3 py-2.5 text-sm focus:border-blue-600 focus:ring-blue-600">
+                            <p class="rounded-lg border border-dashed border-slate-300 bg-slate-50 px-3 py-2.5 text-sm text-slate-500 sm:col-span-2">Student ID is generated automatically from the player’s name.</p>
                             <select name="course_id" class="rounded-lg border-slate-300 py-2.5 text-sm focus:border-blue-600 focus:ring-blue-600">
                                 <option value="">Course</option>
                                 @foreach ($courses as $course)

@@ -5,8 +5,11 @@ use App\Models\CompetitionSchedule;
 use App\Models\EditionSport;
 use App\Models\IntramuralEdition;
 use App\Models\ScheduleParticipant;
+use App\Models\AthleteEntry;
+use App\Models\Student;
 use App\Models\Sport;
 use App\Models\Team;
+use App\Models\TeamMember;
 use App\Models\User;
 use App\Providers\RouteServiceProvider;
 use Database\Seeders\AdminUserSeeder;
@@ -118,6 +121,64 @@ test('login page shows a manually refreshed snapshot of todays competition sched
     } finally {
         Carbon::setTestNow();
     }
+});
+
+test('public login page provides faction player rosters in a modal', function () {
+    $edition = IntramuralEdition::query()->create([
+        'name' => '2026 SLSU Intramurals',
+        'school_year' => '2026-2027',
+        'starts_on' => '2026-09-27',
+        'ends_on' => '2026-09-30',
+        'status' => 'active',
+    ]);
+    $sport = Sport::query()->create([
+        'name' => 'Volleyball (Women)',
+        'code' => 'VOLLEYBALL-WOMEN',
+        'participant_category' => 'female',
+        'status' => 'active',
+    ]);
+    $editionSport = EditionSport::query()->create([
+        'edition_id' => $edition->id,
+        'sport_id' => $sport->id,
+        'participant_type' => 'team',
+        'game_mechanic' => 'single_elimination',
+        'status' => 'active',
+    ]);
+    $team = Team::query()->create([
+        'edition_id' => $edition->id,
+        'name' => 'Trojan Warriors',
+        'code' => 'TROJAN',
+        'status' => 'active',
+    ]);
+    $student = Student::factory()->create([
+        'first_name' => 'Anna Mae',
+        'middle_name' => null,
+        'last_name' => 'Guzon',
+        'status' => 'active',
+    ]);
+
+    TeamMember::query()->create([
+        'edition_id' => $edition->id,
+        'team_id' => $team->id,
+        'student_id' => $student->id,
+        'assigned_at' => now(),
+    ]);
+    AthleteEntry::query()->create([
+        'edition_sport_id' => $editionSport->id,
+        'student_id' => $student->id,
+        'team_id' => $team->id,
+        'status' => 'active',
+        'assigned_at' => now(),
+    ]);
+
+    $this->get('/login')
+        ->assertOk()
+        ->assertSee('data-roster-modal', false)
+        ->assertSee('View players', false)
+        ->assertSee('Anna Mae Guzon')
+        ->assertSee('Volleyball (Women)')
+        ->assertSee('Female')
+        ->assertSee('Trojan Warriors');
 });
 
 test('active administrators and coordinators can authenticate using the shared login screen', function (string $role) {

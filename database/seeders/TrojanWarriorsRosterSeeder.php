@@ -17,7 +17,7 @@ use Illuminate\Support\Str;
 /**
  * Seeds the supplied Trojan Warriors roster and its sport registrations.
  *
- * Student numbers were not included in the supplied list, so new records use
+ * Student IDs were not included in the supplied list, so new records use
  * deterministic TROJAN- identifiers. Existing students are matched by name
  * first, which keeps this seeder safe to run alongside the original roster.
  */

@@ -85,7 +85,7 @@
                             <div class="sticky top-0 z-10 border-b border-slate-200 bg-slate-50 p-4">
                                 <h3 id="pair-member-{{ $side }}-heading" class="text-sm font-semibold text-slate-900">{{ $heading }}</h3>
                                 <label for="pair-search-{{ $side }}" class="sr-only">Search {{ strtolower($heading) }}</label>
-                                <input id="pair-search-{{ $side }}" data-pair-search type="search" placeholder="Search name or student number" class="mt-3 block w-full rounded-lg border-slate-300 text-sm focus:border-blue-600 focus:ring-blue-600">
+                        <input id="pair-search-{{ $side }}" data-pair-search type="search" placeholder="Search name or student ID" class="mt-3 block w-full rounded-lg border-slate-300 text-sm focus:border-blue-600 focus:ring-blue-600">
                             </div>
                             <div class="max-h-[30rem] divide-y divide-slate-100 overflow-y-auto" data-pair-list>
                                 @foreach ($students as $student)

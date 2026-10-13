@@ -441,6 +441,114 @@ textarea {
     white-space: nowrap;
 }
 
+.ops-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+    width: 100%;
+    padding-top: 1rem;
+    color: var(--ops-muted, #64748b);
+}
+
+.ops-pagination-summary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    margin: 0;
+    font-size: 0.8rem;
+    line-height: 1.35;
+}
+
+.ops-pagination-summary strong {
+    color: var(--ops-gold-bright, #b45309);
+    font-weight: 700;
+}
+
+.ops-pagination-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    max-width: 100%;
+    overflow-x: auto;
+    padding: 0.15rem;
+    scrollbar-width: thin;
+}
+
+.ops-pagination-button {
+    display: inline-flex;
+    flex: 0 0 auto;
+    min-width: 2.35rem;
+    height: 2.35rem;
+    align-items: center;
+    justify-content: center;
+    padding: 0 0.7rem;
+    border: 1px solid #bbd6f04d;
+    border-radius: 0.55rem;
+    color: #dcecff;
+    background: #ffffff0a;
+    font-size: 0.8rem;
+    font-weight: 700;
+    line-height: 1;
+    text-decoration: none;
+    box-shadow: inset 0 1px 0 #ffffff0c;
+    transition: border-color 150ms ease, background 150ms ease, color 150ms ease, transform 150ms ease;
+}
+
+.ops-pagination-button svg {
+    width: 1.15rem;
+    height: 1.15rem;
+}
+
+a.ops-pagination-button:hover {
+    border-color: var(--ops-gold, #d9b87d);
+    color: #06152c;
+    background: linear-gradient(180deg, #f7e3b8, #d9b87d);
+    transform: translateY(-1px);
+}
+
+.ops-pagination-button:focus-visible {
+    outline: 2px solid var(--ops-gold-bright, #f0d49c);
+    outline-offset: 2px;
+}
+
+.ops-pagination-button.is-current {
+    border-color: var(--ops-gold, #d9b87d);
+    color: #06152c;
+    background: linear-gradient(180deg, #f1d8a8, #d7b676);
+    box-shadow: 0 8px 18px #0004, inset 0 1px 0 #fff7;
+}
+
+.ops-pagination-button.is-disabled {
+    cursor: default;
+    color: #7890aa;
+    background: #ffffff05;
+    opacity: 0.7;
+}
+
+.ops-pagination-button.is-ellipsis {
+    min-width: 2.35rem;
+    border-style: dashed;
+    color: var(--ops-muted, #b4c6dc);
+}
+
+@media (max-width: 640px) {
+    .ops-pagination {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .ops-pagination-summary,
+    .ops-pagination-controls {
+        width: 100%;
+    }
+
+    .ops-pagination-controls {
+        justify-content: flex-start;
+    }
+}
+
 @media (max-width: 640px) {
     .ops-sport-group-heading {
         align-items: flex-start;

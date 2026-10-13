@@ -10,7 +10,7 @@ use Illuminate\Support\Collection;
 
 class PublicScheduleService
 {
-    /** @return array{currentEdition: ?IntramuralEdition, todayLabel: string, selectedDate: string, availableDates: array<int, string>, todaySchedules: Collection<int, array<string, mixed>>} */
+    /** @return array{currentEdition: ?IntramuralEdition, todayLabel: string, selectedDate: string, availableDates: array<int, string>, todaySchedules: Collection<int, array<string, mixed>>, factionRosters: Collection<int, array<string, mixed>>} */
     public function today(?string $requestedDate = null): array
     {
         $now = now();
@@ -20,9 +20,67 @@ class PublicScheduleService
             ->latest('starts_on')
             ->first();
         $todaySchedules = collect();
+        $factionRosters = collect();
         $availableDates = [];
 
         if ($currentEdition) {
+            $factionRosters = $currentEdition->teams()
+                ->where('status', 'active')
+                ->with([
+                    'members' => fn ($query) => $query
+                        ->where('edition_id', $currentEdition->id)
+                        ->whereHas('student', fn ($studentQuery) => $studentQuery->where('status', 'active'))
+                        ->with(['student.athleteEntries' => fn ($entryQuery) => $entryQuery
+                            ->where('status', 'active')
+                            ->whereHas('editionSport', fn ($editionSportQuery) => $editionSportQuery->where('edition_id', $currentEdition->id))
+                            ->with('editionSport.sport:id,name,participant_category,participant_category_label'),
+                        ]),
+                ])
+                ->orderBy('name')
+                ->get()
+                ->map(function (Team $team): array {
+                    $members = $team->members
+                        ->map(function ($member): ?array {
+                            $student = $member->student;
+
+                            if (! $student) {
+                                return null;
+                            }
+
+                            $sports = $student->athleteEntries
+                                ->map(fn ($entry) => $entry->editionSport?->sport)
+                                ->filter()
+                                ->unique('id')
+                                ->sortBy('name')
+                                ->map(fn ($sport): array => [
+                                    'name' => $this->eventName($sport->name),
+                                    'category' => $sport->participant_category_label,
+                                ])
+                                ->values()
+                                ->all();
+
+                            return [
+                                'id' => $student->id,
+                                'name' => $student->full_name,
+                                'sports' => $sports,
+                            ];
+                        })
+                        ->filter()
+                        ->sortBy('name', SORT_NATURAL | SORT_FLAG_CASE)
+                        ->values();
+
+                    return [
+                        'id' => $team->id,
+                        'key' => Team::logoKey($team->name),
+                        'name' => $team->name,
+                        'code' => $team->code,
+                        'logo_path' => $team->logo_path,
+                        'members' => $members->all(),
+                        'member_count' => $members->count(),
+                    ];
+                })
+                ->values();
+
             $availableDates = CompetitionSchedule::query()
                 ->whereIn('edition_sport_id', $currentEdition->editionSports()->select('id'))
                 ->whereNotIn('status', ['cancelled', 'canceled'])
@@ -99,6 +157,7 @@ class PublicScheduleService
             'selectedDate' => $selectedDate->toDateString(),
             'availableDates' => $availableDates,
             'todaySchedules' => $todaySchedules,
+            'factionRosters' => $factionRosters,
         ];
     }
 
