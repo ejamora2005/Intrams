@@ -18,7 +18,7 @@ class AthleteEntryService
     ) {}
 
     /** @return Collection<int, EditionSport> */
-    public function selectableSportsFor(IntramuralEdition $edition): Collection
+    public function selectableSportsFor(IntramuralEdition $edition, bool $includeDual = false): Collection
     {
         $slotOrder = [
             EligibilityService::SLOT_MAJOR => 1,
@@ -29,9 +29,10 @@ class AthleteEntryService
         return $edition->editionSports()
             ->with('sport')
             ->whereIn('status', ['preparation', 'active'])
+            ->when(! $includeDual, fn ($query) => $query->where('participant_type', '!=', 'dual'))
             ->get()
             ->filter(fn (EditionSport $editionSport): bool => $editionSport->sport?->status === 'active'
-                && $editionSport->participant_type !== 'dual'
+                && ($includeDual || $editionSport->participant_type !== 'dual')
                 && $this->eligibilityService->isParticipationSport($editionSport))
             ->each(function (EditionSport $editionSport): void {
                 $editionSport->setAttribute('participation_slot', $this->eligibilityService->slotFor($editionSport));

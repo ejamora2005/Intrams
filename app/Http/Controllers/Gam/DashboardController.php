@@ -152,6 +152,19 @@ class DashboardController extends Controller
         ]);
     }
 
+    public function createPlayer(Request $request, Team $team): View
+    {
+        $this->ensureActiveTeam($team);
+        $team->loadMissing(['edition', 'course']);
+
+        return view('gam.players.create', [
+            'team' => $team,
+            'edition' => $team->edition,
+            'courses' => Course::query()->where('status', 'active')->orderBy('name')->get(),
+            'sportOptions' => $this->athleteEntryService->selectableSportsFor($team->edition, true),
+        ]);
+    }
+
     public function storePlayer(Request $request, Team $team): RedirectResponse
     {
         $this->ensureActiveTeam($team);

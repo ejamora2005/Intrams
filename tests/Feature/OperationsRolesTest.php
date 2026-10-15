@@ -122,6 +122,29 @@ test('GAM users can add players to their assigned faction', function () {
     ]);
 });
 
+test('GAM add-player page lists every active edition sport', function () {
+    $edition = operationsEdition();
+    $team = operationsTeam($edition);
+    $volleyball = operationsSport($edition, 'Volleyball (Men)', 'VOLLEYBALL-MEN');
+    $baseball = operationsSport($edition, 'Baseball', 'BASEBALL');
+    $chess = operationsSport($edition, 'Chess (Men)', 'CHESS-MEN');
+    $dual = operationsSport($edition, 'Table Tennis (Doubles - Men)', 'TABLE-TENNIS-DOUBLES-MEN');
+    $dual->update(['participant_type' => 'dual', 'scoring_rules' => ['point_system' => 'sports_minor']]);
+    $gam = User::factory()->create(['role' => 'gam', 'status' => 'active', 'managed_team_id' => $team->id]);
+
+    $this->actingAs($gam)
+        ->get(route('gam.teams.players.create', $team))
+        ->assertOk()
+        ->assertSee('Add new player')
+        ->assertSee('4 sports available')
+        ->assertSee('Volleyball (Men)')
+        ->assertSee('Baseball')
+        ->assertSee('Chess (Men)')
+        ->assertSee('Table Tennis (Doubles - Men)')
+        ->assertSee('Assign both partners from sport management')
+        ->assertSee('data-sport-locked="true"', false);
+});
+
 test('GAM users select joined sports while adding a player and the selection rules reject two major sports', function () {
     $edition = operationsEdition();
     $team = operationsTeam($edition);
@@ -130,8 +153,9 @@ test('GAM users select joined sports while adding a player and the selection rul
     $gam = User::factory()->create(['role' => 'gam', 'status' => 'active', 'managed_team_id' => $team->id]);
 
     $this->actingAs($gam)
-        ->get(route('gam.dashboard'))
+        ->get(route('gam.teams.players.create', $team))
         ->assertOk()
+        ->assertSee('Add new player')
         ->assertSee('Sports joined')
         ->assertSee('Volleyball')
         ->assertSee('Baseball');
@@ -184,7 +208,7 @@ test('relay entries do not create a DQ but new relay registrations require an in
     $gam = User::factory()->create(['role' => 'gam', 'status' => 'active', 'managed_team_id' => $team->id]);
 
     $this->actingAs($gam)
-        ->get(route('gam.dashboard'))
+        ->get(route('gam.teams.players.create', $team))
         ->assertOk()
         ->assertSee('Relay (exempt)')
         ->assertSee('Relay events do not use an event slot');

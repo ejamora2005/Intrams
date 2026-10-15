@@ -8,7 +8,7 @@
 @php
     $studentGender = old('gender', $studentGender ?? null);
     $selectedIds = $selectedIds ?? [];
-    $sports = $sports->filter(fn ($editionSport) => $editionSport->sport?->acceptsStudentGender($studentGender))->values();
+    $sports = $sports->values();
     $selectedSportIds = collect(old('edition_sport_ids', $selectedIds))->map(fn ($id) => (string) $id);
 @endphp
 
@@ -30,8 +30,9 @@
                 @php($countsTowardLimit = $editionSport->counts_toward_participation_limit)
                 @php($isRelay = $editionSport->is_relay_event)
                 @php($pairedPartnerExemptGenders = $editionSport->paired_partner_exempt_genders ?? [])
+                @php($isDual = $editionSport->participant_type === 'dual')
                 @php($defaultSlotLabel = $isRelay ? 'Relay (exempt)' : ($slot === 'individual_or_dual' ? 'Individual / dual' : ucfirst($slot)))
-                <label data-sport-option data-sport-category="{{ $sport?->participant_category }}" class="flex cursor-pointer items-start gap-3 rounded-lg border border-slate-200 p-4 transition hover:border-blue-300 hover:bg-blue-50">
+                <label data-sport-option data-sport-category="{{ $sport?->participant_category }}" data-sport-locked="{{ $isDual ? 'true' : 'false' }}" class="flex cursor-pointer items-start gap-3 rounded-lg border border-slate-200 p-4 transition hover:border-blue-300 hover:bg-blue-50">
                     <input
                         type="checkbox"
                         name="edition_sport_ids[]"
@@ -41,6 +42,8 @@
                         data-counts-toward-limit="{{ $countsTowardLimit ? 'true' : 'false' }}"
                         data-relay="{{ $isRelay ? 'true' : 'false' }}"
                         data-paired-partner-exempt-for="{{ implode(',', $pairedPartnerExemptGenders) }}"
+                        data-sport-locked="{{ $isDual ? 'true' : 'false' }}"
+                        @disabled($isDual)
                         @checked($selectedSportIds->contains((string) $editionSport->id))
                         class="mt-0.5 rounded border-slate-300 text-blue-700 focus:ring-blue-600"
                     >
@@ -51,6 +54,9 @@
                             <span>{{ ucfirst($editionSport->participant_type) }} event</span>
                             @if (in_array($sport?->participant_category, ['male', 'female'], true))
                                 <span>{{ $sport->participant_category_label }}</span>
+                            @endif
+                            @if ($isDual)
+                                <span class="font-semibold text-amber-700">Assign both partners from sport management</span>
                             @endif
                         </span>
                     </span>
@@ -105,8 +111,10 @@
                     if (!genderAllowed && input.checked) input.checked = false;
                     if (input.checked) return;
 
-                    const allowed = genderAllowed && (!countsTowardLimit(input) || canUse(counts, input.dataset.slot));
+                    const locked = input.dataset.sportLocked === 'true';
+                    const allowed = !locked && genderAllowed && (!countsTowardLimit(input) || canUse(counts, input.dataset.slot));
                     input.disabled = !allowed;
+                    option.hidden = false;
                     option.classList.toggle('cursor-not-allowed', !allowed);
                     option.classList.toggle('opacity-50', !allowed);
                 });

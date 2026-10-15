@@ -191,26 +191,11 @@
                         <button class="mt-3 rounded-lg bg-blue-700 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-800">Assign player</button>
                     </form>
 
-                    <form method="POST" action="{{ route('gam.teams.players.store', [$selectedTeam, 'team_id' => $selectedTeam->id, 'view' => 'roster-management']) }}" data-ops-form class="rounded-lg border border-slate-200 p-4">
-                        @csrf
+                    <div class="rounded-lg border border-slate-200 p-4">
                         <h3 class="font-semibold text-slate-950">Add new player</h3>
-                        <div class="mt-4 grid gap-3 sm:grid-cols-2">
-                            <select name="course_id" class="rounded-lg border-slate-300 py-2.5 text-sm focus:border-blue-600 focus:ring-blue-600">
-                                <option value="">Course</option>
-                                @foreach ($courses as $course)
-                                    <option value="{{ $course->id }}" @selected(old('course_id') == $course->id)>{{ $course->code }}</option>
-                                @endforeach
-                            </select>
-                            <input name="first_name" value="{{ old('first_name') }}" placeholder="First name" required class="rounded-lg border-slate-300 px-3 py-2.5 text-sm focus:border-blue-600 focus:ring-blue-600">
-                            <input name="last_name" value="{{ old('last_name') }}" placeholder="Last name" required class="rounded-lg border-slate-300 px-3 py-2.5 text-sm focus:border-blue-600 focus:ring-blue-600">
-                            <input name="middle_name" value="{{ old('middle_name') }}" placeholder="Middle name" class="rounded-lg border-slate-300 px-3 py-2.5 text-sm focus:border-blue-600 focus:ring-blue-600">
-                            <input name="gender" value="{{ old('gender') }}" placeholder="Gender" class="rounded-lg border-slate-300 px-3 py-2.5 text-sm focus:border-blue-600 focus:ring-blue-600">
-                            <input name="year_level" value="{{ old('year_level') }}" placeholder="Year level" class="rounded-lg border-slate-300 px-3 py-2.5 text-sm focus:border-blue-600 focus:ring-blue-600">
-                            <input name="section" value="{{ old('section') }}" placeholder="Section" class="rounded-lg border-slate-300 px-3 py-2.5 text-sm focus:border-blue-600 focus:ring-blue-600">
-                        </div>
-                        <x-participation-sport-picker :sports="$sportOptions" :student-gender="old('gender')" :team-sport-note="'Team-sport selections are assigned to '.$selectedTeam->name.'.'" />
-                        <button class="mt-4 rounded-lg bg-blue-700 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-800">Add player</button>
-                    </form>
+                        <p class="mt-2 text-sm leading-6 text-slate-500">Use the full-page form to review every sport in this edition, select the player’s gender, and register the joined sports in one step.</p>
+                        <a href="{{ route('gam.teams.players.create', [$selectedTeam, 'team_id' => $selectedTeam->id]) }}" class="mt-4 inline-flex items-center justify-center rounded-lg bg-blue-700 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-800">Open full player form</a>
+                    </div>
                 </div>
             </div>
         @else

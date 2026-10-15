@@ -157,6 +157,7 @@ Route::middleware([
         Route::get('/dashboard', [GamDashboardController::class, 'index'])->name('dashboard');
         Route::get('/rules-guidelines', [RulesController::class, 'gam'])->name('rules.index');
         Route::get('/possible-dq', [RulesController::class, 'possibleDqGam'])->name('possible-dq.index');
+        Route::get('/teams/{team}/players/create', [GamDashboardController::class, 'createPlayer'])->name('teams.players.create');
         Route::post('/teams/{team}/players', [GamDashboardController::class, 'storePlayer'])->name('teams.players.store');
         Route::put('/teams/{team}/players/{student}/sports', [GamDashboardController::class, 'updatePlayerSports'])->name('teams.players.sports.update');
         Route::post('/teams/{team}/players/assign', [GamDashboardController::class, 'assignExistingPlayer'])->name('teams.players.assign');
