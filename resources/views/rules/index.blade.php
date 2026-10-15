@@ -62,6 +62,7 @@
             </div>
             <div class="flex flex-wrap items-center gap-3">
                 <span class="inline-flex w-max whitespace-nowrap rounded-full bg-red-600 px-3 py-1 text-xs font-semibold text-white">{{ $flaggedStudents->count() }} flagged</span>
+                <a href="{{ route(match (auth()->user()?->role) { 'admin' => 'admin.possible-dq.index', 'gam' => 'gam.possible-dq.index', default => 'tabulator.possible-dq.index' }) }}" class="rounded-lg border border-red-200 bg-white px-3 py-2 text-xs font-semibold text-red-700 transition hover:border-red-300 hover:bg-red-50">Open full watchlist</a>
                 @if ($canRepairRegistrations && $duplicateOpenRegistrationCount > 0)
                     <form method="POST" action="{{ route('admin.rules.repair-registrations') }}">
                         @csrf

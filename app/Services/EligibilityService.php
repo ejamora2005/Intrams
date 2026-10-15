@@ -87,9 +87,34 @@ class EligibilityService
         return $this->sportCodeIsIn($editionSport, config('intramurals.participation_rules.relay_exempt_sport_codes', []));
     }
 
-    public function countsTowardParticipationLimit(EditionSport $editionSport): bool
+    public function countsTowardParticipationLimit(EditionSport $editionSport, ?Student $student = null): bool
     {
-        return $this->isParticipationSport($editionSport) && ! $this->isRelayEvent($editionSport);
+        return $this->isParticipationSport($editionSport)
+            && ! $this->isRelayEvent($editionSport)
+            && ! $this->isPairedPartnerExempt($editionSport, $student);
+    }
+
+    /** @return array<int, string> */
+    public function pairedPartnerExemptGenders(EditionSport $editionSport): array
+    {
+        $editionSport->loadMissing('sport');
+        $sportCode = Str::upper((string) $editionSport->sport?->code);
+        $configured = config('intramurals.participation_rules.paired_partner_exemptions', []);
+
+        return collect($configured[$sportCode] ?? [])
+            ->map(fn (mixed $gender): string => Str::lower((string) $gender))
+            ->filter()
+            ->values()
+            ->all();
+    }
+
+    public function isPairedPartnerExempt(EditionSport $editionSport, ?Student $student): bool
+    {
+        if (! $student || ! filled($student->gender)) {
+            return false;
+        }
+
+        return in_array(Str::lower((string) $student->gender), $this->pairedPartnerExemptGenders($editionSport), true);
     }
 
     public function requiresMedicalCertificate(EditionSport $editionSport): bool
@@ -208,7 +233,7 @@ class EligibilityService
             ->whereHas('editionSport', fn ($query) => $query->where('edition_id', $editionId))
             ->get();
 
-        $evaluation = $this->evaluateEntries($entries, $additionalSport);
+        $evaluation = $this->evaluateEntries($entries, $additionalSport, $student);
         $evaluation['student'] = $student;
 
         return $evaluation;
@@ -277,15 +302,15 @@ class EligibilityService
      * @param  Collection<int, AthleteEntry>  $entries
      * @return array<string, mixed>
      */
-    private function evaluateEntries(Collection $entries, ?EditionSport $additionalSport = null): array
+    private function evaluateEntries(Collection $entries, ?EditionSport $additionalSport = null, ?Student $student = null): array
     {
         $items = $entries
             ->filter(fn (AthleteEntry $entry): bool => $entry->editionSport instanceof EditionSport && $this->isParticipationSport($entry->editionSport))
-            ->map(fn (AthleteEntry $entry): array => $this->participationItem($entry->editionSport))
+            ->map(fn (AthleteEntry $entry): array => $this->participationItem($entry->editionSport, $student))
             ->values();
 
         if ($additionalSport instanceof EditionSport && $this->isParticipationSport($additionalSport) && ! $items->contains(fn (array $item): bool => $item['edition_sport_id'] === (int) $additionalSport->id)) {
-            $items->push($this->participationItem($additionalSport));
+            $items->push($this->participationItem($additionalSport, $student));
         }
 
         $counts = [
@@ -426,19 +451,21 @@ class EligibilityService
     }
 
     /** @return array<string, int|string|bool> */
-    private function participationItem(EditionSport $editionSport): array
+    private function participationItem(EditionSport $editionSport, ?Student $student = null): array
     {
         $editionSport->loadMissing('sport');
         $slot = $this->slotFor($editionSport);
         $isRelay = $this->isRelayEvent($editionSport);
+        $isPairedPartner = $this->isPairedPartnerExempt($editionSport, $student);
 
         return [
             'edition_sport_id' => (int) $editionSport->id,
             'name' => $editionSport->sport?->name ?? 'Unknown event',
             'slot' => $slot,
-            'slot_label' => $isRelay ? 'Relay (exempt)' : $this->slotLabel($slot),
-            'counts_toward_limit' => ! $isRelay,
+            'slot_label' => $isRelay ? 'Relay (exempt)' : ($isPairedPartner ? 'Paired partner (exempt)' : $this->slotLabel($slot)),
+            'counts_toward_limit' => ! $isRelay && ! $isPairedPartner,
             'is_relay' => $isRelay,
+            'is_paired_partner' => $isPairedPartner,
             'is_qualifying_run' => $this->sportCodeIsIn($editionSport, config('intramurals.participation_rules.relay_qualifying_run_sport_codes', [])),
         ];
     }

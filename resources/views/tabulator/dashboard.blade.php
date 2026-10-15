@@ -1,12 +1,12 @@
 @extends('layouts.coordinator', ['title' => 'Tabulator dashboard', 'workspaceLabel' => 'Tabulator workspace', 'homeRoute' => 'tabulator.dashboard'])
 
 @section('content')
-    @if (session('success'))
-        <div class="mb-6 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800">{{ session('success') }}</div>
+    <x-ops-feedback />
+    @if (request('modal'))
+        <div data-ops-auto-modal="{{ request('modal') }}" hidden></div>
     @endif
-
-    @if ($errors->any())
-        <div class="mb-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">{{ $errors->first() }}</div>
+    @if (session('ops_view'))
+        <div data-ops-auto-view="{{ session('ops_view') }}" hidden></div>
     @endif
 
     <section data-ops-view-panel="dashboard-overview" class="ops-view-panel space-y-6">
@@ -18,7 +18,8 @@
                     <p class="mt-3 max-w-2xl text-sm leading-6 text-slate-600">{{ $edition?->name ?? 'No active intramurals edition is available yet.' }}</p>
                 </div>
                 <div class="grid gap-3 sm:min-w-80 sm:grid-cols-2">
-                    <a href="{{ route('tabulator.rules.index') }}" class="flex items-center justify-center rounded-lg border border-blue-200 bg-white px-4 py-3 text-sm font-semibold text-blue-800 shadow-sm transition hover:border-blue-300 hover:bg-blue-50 sm:col-span-2">Rules & Guidelines</a>
+                    <a href="{{ route('tabulator.rules.index') }}" class="flex items-center justify-center rounded-lg border border-blue-200 bg-white px-4 py-3 text-sm font-semibold text-blue-800 shadow-sm transition hover:border-blue-300 hover:bg-blue-50">Rules & Guidelines</a>
+                    <a href="{{ route('tabulator.possible-dq.index') }}" class="flex items-center justify-center rounded-lg bg-red-600 px-4 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-red-700">Possible DQ Watchlist</a>
                     <div class="rounded-lg border border-white/15 bg-white/10 px-4 py-3">
                         <p class="text-xs font-semibold uppercase text-slate-500">Sports</p>
                         <p class="mt-1 text-2xl font-semibold text-slate-950">{{ $editionSports->count() }}</p>
@@ -32,7 +33,7 @@
         </div>
 
         <section class="grid gap-4 lg:grid-cols-4">
-            <a href="#possible-dq" data-ops-view-shortcut="possible-dq" class="ops-dashboard-card block rounded-lg border p-4 transition">
+            <a href="{{ route('tabulator.possible-dq.index') }}" class="ops-dashboard-card block rounded-lg border border-red-200 p-4 transition hover:border-red-300">
                 <p class="text-sm font-semibold text-slate-950">Possible DQ</p>
                 <p class="mt-2 text-2xl font-semibold text-slate-950">{{ $flaggedStudents->count() }}</p>
                 <p class="mt-2 text-sm leading-6 text-slate-500">Review students that need correction before scoring.</p>
@@ -115,7 +116,7 @@
                     <p class="font-semibold text-slate-950">{{ $selectedSport->sport?->name }}</p>
                 </div>
             </div>
-            <form method="POST" action="{{ route('tabulator.sport-results.store') }}" class="mt-5" data-declare-winners data-allow-repeated-winners="{{ count($pointRules) > 3 ? 'true' : 'false' }}">
+            <form method="POST" action="{{ route('tabulator.sport-results.store', ['edition_sport_id' => $selectedSport->id, 'view' => 'declare-sports', 'modal' => 'tabulator-declare-sports-modal']) }}" data-ops-form class="mt-5" data-declare-winners data-allow-repeated-winners="{{ count($pointRules) > 3 ? 'true' : 'false' }}">
                 @csrf
                 <input type="hidden" name="edition_sport_id" value="{{ $selectedSport->id }}">
                 @if ($teams->isNotEmpty())
@@ -139,15 +140,38 @@
                         </label>
                     @endforeach
                 </div>
+                @error('placements')
+                    <p class="mt-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800">{{ $message }}</p>
+                @enderror
                 @if (count($pointRules) > 3)
                     <p class="mt-3 text-xs leading-5 text-slate-500">This event has more than three winner placements, so a faction may be selected more than once.</p>
                 @endif
-                <div class="mt-4 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-                    <label class="block text-sm font-medium text-slate-700">Tabulator password
-                        <input name="tabulator_password" type="password" required autocomplete="current-password" class="mt-1 block w-full rounded-lg border-slate-300 px-3 py-2.5 text-sm focus:border-blue-600 focus:ring-blue-600 sm:w-72">
-                    </label>
-                    <button class="rounded-lg bg-blue-700 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-800">Declare winners</button>
+                <div class="mt-4 flex flex-col gap-3 border-t border-slate-100 pt-4 sm:flex-row sm:items-center sm:justify-between">
+                    <p class="text-sm text-slate-500">Review the placements above, then confirm the declaration with your tabulator password.</p>
+                    <button type="button" data-ops-modal-open="tabulator-declare-sports-modal" class="rounded-lg bg-blue-700 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-800">Review and declare</button>
                 </div>
+                <dialog id="tabulator-declare-sports-modal" data-ops-modal class="w-[min(30rem,calc(100vw-2rem))] rounded-2xl border-0 bg-white p-0 text-slate-900 shadow-2xl backdrop:bg-slate-950/60">
+                    <div class="flex items-start justify-between gap-4 border-b border-slate-200 px-5 py-4">
+                        <div>
+                            <p class="text-xs font-semibold uppercase tracking-wide text-blue-700">Final check</p>
+                            <h3 class="mt-1 text-lg font-semibold">Declare {{ $selectedSport->sport?->name }} winners?</h3>
+                            <p class="mt-1 text-sm leading-6 text-slate-500">This updates standings immediately. Confirm the placements before saving.</p>
+                        </div>
+                        <button type="button" data-ops-modal-close class="rounded-lg p-2 text-xl leading-none text-slate-400 transition hover:bg-slate-100 hover:text-slate-700" aria-label="Close declaration dialog">&times;</button>
+                    </div>
+                    <div class="space-y-3 px-5 py-4">
+                        <label class="block text-sm font-medium text-slate-700">Tabulator password
+                            <input name="tabulator_password" type="password" required autocomplete="current-password" class="mt-1 block w-full rounded-lg border-slate-300 px-3 py-2.5 text-sm focus:border-blue-600 focus:ring-blue-600">
+                        </label>
+                        @error('tabulator_password')
+                            <p class="text-sm text-red-700">{{ $message }}</p>
+                        @enderror
+                    </div>
+                    <div class="flex flex-col-reverse gap-2 border-t border-slate-200 bg-slate-50 px-5 py-4 sm:flex-row sm:justify-end">
+                        <button type="button" data-ops-modal-close class="rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-100">Cancel</button>
+                        <button type="submit" data-loading-label="Declaring…" class="rounded-lg bg-blue-700 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-800">Declare winners</button>
+                    </div>
+                </dialog>
             </form>
         @else
             <p class="mt-5 rounded-lg border border-dashed border-slate-300 px-4 py-8 text-center text-sm text-slate-500">No sports are configured for the active edition.</p>
@@ -242,7 +266,8 @@
         <h2 class="text-base font-semibold text-slate-950">Declare match winners</h2>
         <div class="mt-4 grid gap-3 lg:grid-cols-2">
             @forelse ($matches as $match)
-                <form method="POST" action="{{ route('tabulator.matches.result', $match) }}" class="rounded-lg border border-slate-200 p-4">
+                @php($matchModalId = 'match-winner-modal-'.$match->id)
+                <form method="POST" action="{{ route('tabulator.matches.result', [$match, 'view' => 'match-winners', 'modal' => $matchModalId]) }}" data-ops-form class="rounded-lg border border-slate-200 p-4">
                     @csrf
                     <p class="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-slate-500"><span class="ops-sport-inline-icon"><x-sport-group-icon :group="$match->editionSport->sport?->catalogue_group_key ?? 'other'" /></span><span>{{ $match->editionSport->sport->name }} · {{ $match->editionSport->sport?->catalogue_group_label ?? 'Other Sports' }} / {{ ucfirst($match->bracket) }} round {{ $match->round_number }}</span></p>
                     <p class="mt-2 font-medium text-slate-950">Game {{ $match->match_number }}</p>
@@ -264,10 +289,29 @@
                         <option value="{{ $match->competitorOne->id }}">{{ $match->competitorOne->label }}</option>
                         <option value="{{ $match->competitorTwo->id }}">{{ $match->competitorTwo->label }}</option>
                     </select>
-                    <label class="mt-3 block text-sm font-medium text-slate-700">Tabulator password
-                        <input name="tabulator_password" type="password" required autocomplete="current-password" class="mt-1 block w-full rounded-lg border-slate-300 px-3 py-2.5 text-sm focus:border-blue-600 focus:ring-blue-600">
-                    </label>
-                    <button class="mt-3 rounded-lg bg-blue-700 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2">Declare winner</button>
+                    <button type="button" data-ops-modal-open="{{ $matchModalId }}" class="mt-3 rounded-lg bg-blue-700 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2">Review and declare</button>
+                    <dialog id="{{ $matchModalId }}" data-ops-modal class="w-[min(30rem,calc(100vw-2rem))] rounded-2xl border-0 bg-white p-0 text-slate-900 shadow-2xl backdrop:bg-slate-950/60">
+                        <div class="flex items-start justify-between gap-4 border-b border-slate-200 px-5 py-4">
+                            <div>
+                                <p class="text-xs font-semibold uppercase tracking-wide text-blue-700">Final check</p>
+                                <h3 class="mt-1 text-lg font-semibold">Declare Game {{ $match->match_number }} winner?</h3>
+                                <p class="mt-1 text-sm leading-6 text-slate-500">Choose the winner above, then confirm with your tabulator password.</p>
+                            </div>
+                            <button type="button" data-ops-modal-close class="rounded-lg p-2 text-xl leading-none text-slate-400 transition hover:bg-slate-100 hover:text-slate-700" aria-label="Close match result dialog">&times;</button>
+                        </div>
+                        <div class="px-5 py-4">
+                            <label class="block text-sm font-medium text-slate-700">Tabulator password
+                                <input name="tabulator_password" type="password" required autocomplete="current-password" class="mt-1 block w-full rounded-lg border-slate-300 px-3 py-2.5 text-sm focus:border-blue-600 focus:ring-blue-600">
+                            </label>
+                            @error('tabulator_password')
+                                <p class="text-sm text-red-700">{{ $message }}</p>
+                            @enderror
+                        </div>
+                        <div class="flex flex-col-reverse gap-2 border-t border-slate-200 bg-slate-50 px-5 py-4 sm:flex-row sm:justify-end">
+                            <button type="button" data-ops-modal-close class="rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-100">Cancel</button>
+                            <button type="submit" data-loading-label="Saving result…" class="rounded-lg bg-blue-700 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-800">Declare winner</button>
+                        </div>
+                    </dialog>
                 </form>
             @empty
                 <p class="rounded-lg border border-dashed border-slate-300 px-4 py-8 text-center text-sm text-slate-500 lg:col-span-2">No ready matches need a winner yet.</p>

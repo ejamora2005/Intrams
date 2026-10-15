@@ -148,7 +148,7 @@
                                                         @if (count($member['sports']))
                                                             <span class="schedule-roster-sports">
                                                                 @foreach ($member['sports'] as $sport)
-                                                                    <small>{{ $sport['name'] }}<em>{{ $sport['category'] }}</em></small>
+                                                                    <small>{{ $sport['name'] }}@if(filled($sport['category']))<em>{{ $sport['category'] }}</em>@endif</small>
                                                                 @endforeach
                                                             </span>
                                                         @else
@@ -189,7 +189,7 @@
                             @foreach ($eventSchedules as $schedule)
                                 <tr>
                                     @if ($loop->first)
-                                        <th scope="rowgroup" rowspan="{{ $eventSchedules->count() }}" class="schedule-sport">@if ($schedule['sport_group'])<span class="schedule-sport-group"><x-sport-group-icon :group="$schedule['sport_group']" /><small>{{ $schedule['sport_group_label'] }}</small></span>@endif{{ $event }}</th>
+                                        <th scope="rowgroup" rowspan="{{ $eventSchedules->count() }}" class="schedule-sport">@if ($schedule['sport_group'])<span class="schedule-sport-group"><x-sport-group-icon :group="$schedule['sport_group']" /></span>@endif{{ $event }}</th>
                                     @endif
                                     <td>
                                         <div class="schedule-session-stack">
@@ -202,7 +202,7 @@
                                         @if (! empty($schedule['competitor_teams']))
                                             <span class="schedule-competitor-list" aria-label="{{ $schedule['competitors'] }}">
                                                 @foreach ($schedule['competitor_teams'] as $team)
-                                                    <x-team-badge :team="$team" class="schedule-team-badge" />
+                                                    <x-team-badge :team="$team" :show-subtitle="false" :logo-only="count($schedule['competitor_teams']) > 2" class="schedule-team-badge" />
                                                     @unless ($loop->last)
                                                         <span class="schedule-versus">VS</span>
                                                     @endunless
@@ -231,7 +231,7 @@
                         <header>
                             <div>
                                 @if ($schedule['sport_group'])
-                                    <span class="schedule-sport-group"><x-sport-group-icon :group="$schedule['sport_group']" /><small>{{ $schedule['sport_group_label'] }}</small></span>
+                                    <span class="schedule-sport-group"><x-sport-group-icon :group="$schedule['sport_group']" /></span>
                                 @endif
                                 <h3>{{ $schedule['event'] }}</h3><time>{{ $schedule['time'] }}</time>
                             </div>
@@ -242,7 +242,7 @@
                             @if (! empty($schedule['competitor_teams']))
                                 <p class="schedule-competitor-list" aria-label="{{ $schedule['competitors'] }}">
                                     @foreach ($schedule['competitor_teams'] as $team)
-                                        <x-team-badge :team="$team" class="schedule-team-badge" />
+                                        <x-team-badge :team="$team" :show-subtitle="false" :logo-only="count($schedule['competitor_teams']) > 2" class="schedule-team-badge" />
                                         @unless ($loop->last)
                                             <span class="schedule-versus">VS</span>
                                         @endunless

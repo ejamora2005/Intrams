@@ -10,6 +10,7 @@
             </div>
             <div class="flex flex-col gap-2 sm:flex-row">
                 <a href="{{ route('admin.rules.index') }}" class="inline-flex w-full items-center justify-center rounded-lg border border-blue-200 bg-white px-4 py-2.5 text-sm font-semibold text-blue-800 shadow-sm transition hover:border-blue-300 hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2 sm:w-fit">Rules & Guidelines</a>
+                <a href="{{ route('admin.possible-dq.index') }}" class="inline-flex w-full items-center justify-center rounded-lg bg-red-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-600 focus:ring-offset-2 sm:w-fit">Possible DQ Watchlist</a>
                 <a href="{{ route('admin.editions.index') }}" class="inline-flex w-full items-center justify-center rounded-lg bg-blue-700 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2 sm:w-fit">Manage editions</a>
             </div>
         </div>
@@ -40,6 +41,7 @@
             <a href="{{ route('admin.students.index') }}" class="rounded-lg bg-blue-700 px-4 py-2.5 text-center text-sm font-semibold text-white transition hover:bg-blue-800">Students</a>
             <a href="{{ route('admin.editions.index') }}" class="rounded-lg border border-blue-200 bg-white px-4 py-2.5 text-center text-sm font-semibold text-blue-800 transition hover:border-blue-300 hover:bg-blue-50">Events / Editions</a>
             <a href="{{ route('admin.rules.index') }}" class="rounded-lg border border-blue-200 bg-white px-4 py-2.5 text-center text-sm font-semibold text-blue-800 transition hover:border-blue-300 hover:bg-blue-50">Rules & Guidelines</a>
+            <a href="{{ route('admin.possible-dq.index') }}" class="rounded-lg bg-red-600 px-4 py-2.5 text-center text-sm font-semibold text-white transition hover:bg-red-700">Possible DQ Watchlist</a>
         </div>
     </section>
 @endsection

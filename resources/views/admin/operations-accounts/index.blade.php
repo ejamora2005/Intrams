@@ -4,7 +4,7 @@
     @if (session('success'))<div class="mb-6 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800">{{ session('success') }}</div>@endif
 
     <div class="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
-        <form method="GET" class="grid w-full gap-3 sm:max-w-3xl sm:grid-cols-[minmax(180px,1fr)_150px_150px_auto]">
+        <form method="GET" action="{{ route('admin.operations-accounts.index') }}" class="grid w-full gap-3 sm:max-w-3xl sm:grid-cols-[minmax(180px,1fr)_150px_150px_auto]">
             <input type="search" name="search" value="{{ $search }}" placeholder="Search accounts" class="w-full rounded-lg border-slate-300 px-3 py-2.5 text-sm shadow-sm focus:border-blue-600 focus:ring-blue-600">
             <select name="role" class="rounded-lg border-slate-300 py-2.5 text-sm shadow-sm focus:border-blue-600 focus:ring-blue-600" onchange="this.form.submit()">
                 <option value="">All roles</option>
@@ -22,6 +22,9 @@
         </form>
         <a href="{{ route('admin.operations-accounts.create') }}" class="inline-flex shrink-0 items-center justify-center rounded-lg bg-blue-700 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-800">Add account</a>
     </div>
+    @if ($search || $role || $status !== 'active')
+        <div class="mt-4 flex justify-end"><a href="{{ route('admin.operations-accounts.index') }}" class="text-sm font-semibold text-blue-700 transition hover:text-blue-900">Clear filters</a></div>
+    @endif
 
     <section class="mt-6 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
         @if ($accounts->isEmpty())

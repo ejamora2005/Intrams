@@ -66,6 +66,7 @@
 .schedule-team-badge img { width: 34px; height: 34px; }
 .schedule-team-badge span { min-width: 0; }
 .schedule-versus { flex-shrink: 0; border-radius: 999px; border: 1px solid #f0d49c66; padding: 3px 7px; color: #f0d49c; background: #d9b87d1c; font-size: 10px; line-height: 1; }
+@media (min-width: 1024px) { .schedule-competitor-list { flex-wrap: nowrap; } }
 .schedule-facilitator { font-size: 13px; color: #bacbdf; }
 .schedule-empty { display: flex; flex-direction: column; align-items: center; text-align: center; padding: 45px 20px 52px; }
 .schedule-empty-icon { display: grid; place-items: center; width: 72px; height: 72px; margin-bottom: 20px; background: #d7b87d0c; border: 1px solid #d7b87d45; border-radius: 50%; color: #dcc28e; }

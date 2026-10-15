@@ -3,7 +3,7 @@
 @section('content')
     @if (session('success'))<div class="mb-6 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800">{{ session('success') }}</div>@endif
     <div class="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
-        <form method="GET" class="flex w-full flex-col gap-3 sm:max-w-xl sm:flex-row">
+        <form method="GET" action="{{ route('admin.coordinators.index') }}" class="flex w-full flex-col gap-3 sm:max-w-xl sm:flex-row">
             <input type="search" name="search" value="{{ $search }}" placeholder="Search coordinators" class="w-full rounded-lg border-slate-300 px-3 py-2.5 text-sm shadow-sm focus:border-blue-600 focus:ring-blue-600">
             <select name="status" class="rounded-lg border-slate-300 py-2.5 text-sm shadow-sm focus:border-blue-600 focus:ring-blue-600" onchange="this.form.submit()">
                 <option value="active" @selected($status === 'active')>Active</option>
@@ -15,6 +15,9 @@
         </form>
         <a href="{{ route('admin.coordinators.create') }}" class="inline-flex shrink-0 items-center justify-center rounded-lg bg-blue-700 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-800">Add coordinator</a>
     </div>
+    @if ($search || $status !== 'active')
+        <div class="mt-4 flex justify-end"><a href="{{ route('admin.coordinators.index') }}" class="text-sm font-semibold text-blue-700 transition hover:text-blue-900">Clear filters</a></div>
+    @endif
 
     <section class="mt-6 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
         @if ($coordinators->isEmpty())

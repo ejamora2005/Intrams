@@ -43,6 +43,7 @@
                             ['label' => 'Cultural', 'route' => 'admin.cultural.index', 'match' => 'admin/cultural'],
                             ['label' => 'Points System', 'route' => 'admin.sports-points.index', 'match' => 'admin/sports-points'],
                             ['label' => 'Rules & Guidelines', 'route' => 'admin.rules.index', 'match' => 'admin/rules-guidelines'],
+                            ['label' => 'Possible DQ Watchlist', 'route' => 'admin.possible-dq.index', 'match' => 'admin/possible-dq'],
                             ['label' => 'Live Competition', 'route' => 'admin.competition.index', 'match' => 'admin/competition'],
                             ['label' => 'System Logs', 'route' => 'admin.system-logs.index', 'match' => 'admin/system-logs'],
                         ];

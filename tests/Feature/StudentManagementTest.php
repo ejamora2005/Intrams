@@ -41,6 +41,28 @@ test('admin can browse and search student athlete records', function () {
     $response->assertOk()->assertSee('Lina')->assertDontSee('Marco');
 });
 
+test('admin student search also matches course and faction', function () {
+    $admin = activeAdmin();
+    $edition = IntramuralEdition::query()->create([
+        'name' => 'Search Edition',
+        'school_year' => '2026-2027',
+        'starts_on' => '2026-10-01',
+        'ends_on' => '2026-10-06',
+        'status' => 'active',
+    ]);
+    $course = Course::query()->create(['name' => 'Marine Biology', 'code' => 'MB', 'status' => 'active']);
+    $team = Team::query()->create(['edition_id' => $edition->id, 'course_id' => $course->id, 'name' => 'Sea Dragons', 'code' => 'SEA', 'status' => 'active']);
+    $student = Student::factory()->create(['first_name' => 'Kai', 'last_name' => 'Rivera', 'course_id' => $course->id]);
+    TeamMember::query()->create(['edition_id' => $edition->id, 'team_id' => $team->id, 'student_id' => $student->id, 'assigned_by' => $admin->id, 'assigned_at' => now()]);
+
+    $this->actingAs($admin)->get(route('admin.students.index', ['search' => 'Sea Dragons']))
+        ->assertOk()
+        ->assertSee('Kai');
+    $this->actingAs($admin)->get(route('admin.students.index', ['search' => 'Marine Biology']))
+        ->assertOk()
+        ->assertSee('Kai');
+});
+
 test('admin student records show joined sports and events automatically', function () {
     $admin = activeAdmin();
     $edition = IntramuralEdition::query()->create([

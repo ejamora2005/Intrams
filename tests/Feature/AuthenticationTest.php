@@ -1,17 +1,18 @@
 <?php
 
+use App\Models\AthleteEntry;
 use App\Models\BracketMatch;
 use App\Models\CompetitionSchedule;
 use App\Models\EditionSport;
 use App\Models\IntramuralEdition;
 use App\Models\ScheduleParticipant;
-use App\Models\AthleteEntry;
-use App\Models\Student;
 use App\Models\Sport;
+use App\Models\Student;
 use App\Models\Team;
 use App\Models\TeamMember;
 use App\Models\User;
 use App\Providers\RouteServiceProvider;
+use App\Services\PublicScheduleService;
 use Database\Seeders\AdminUserSeeder;
 use Illuminate\Support\Carbon;
 
@@ -123,6 +124,44 @@ test('login page shows a manually refreshed snapshot of todays competition sched
     }
 });
 
+test('cultural schedules list every active faction as participants', function () {
+    Carbon::setTestNow('2026-09-27 09:00:00');
+
+    try {
+        $edition = IntramuralEdition::query()->create([
+            'name' => 'Cultural Edition',
+            'school_year' => '2026-2027',
+            'starts_on' => '2026-09-27',
+            'ends_on' => '2026-09-30',
+            'status' => 'active',
+        ]);
+        $sport = Sport::query()->create(['name' => 'Collaborative Painting', 'code' => 'CULT-COLLAB-PAINT', 'status' => 'active']);
+        $editionSport = EditionSport::query()->create([
+            'edition_id' => $edition->id,
+            'sport_id' => $sport->id,
+            'participant_type' => 'team',
+            'game_mechanic' => 'custom',
+            'status' => 'active',
+        ]);
+        foreach ([['name' => 'Sea Dragons', 'code' => 'SEA'], ['name' => 'Terraquatic Eagles', 'code' => 'EAGLES'], ['name' => 'Trojan Warriors', 'code' => 'TROJAN']] as $team) {
+            Team::query()->create(['edition_id' => $edition->id, ...$team, 'status' => 'active']);
+        }
+        CompetitionSchedule::query()->create([
+            'edition_sport_id' => $editionSport->id,
+            'starts_at' => '2026-09-27 09:30:00',
+            'ends_at' => '2026-09-27 11:00:00',
+            'status' => 'scheduled',
+        ]);
+
+        $schedule = app(PublicScheduleService::class)->today('2026-09-27')['todaySchedules']->first();
+
+        expect($schedule['competitors'])->toBe('Sea Dragons VS Terraquatic Eagles VS Trojan Warriors')
+            ->and($schedule['competitor_teams'])->toHaveCount(3);
+    } finally {
+        Carbon::setTestNow();
+    }
+});
+
 test('public login page provides faction player rosters in a modal', function () {
     $edition = IntramuralEdition::query()->create([
         'name' => '2026 SLSU Intramurals',
@@ -177,7 +216,7 @@ test('public login page provides faction player rosters in a modal', function ()
         ->assertSee('View players', false)
         ->assertSee('Anna Mae Guzon')
         ->assertSee('Volleyball (Women)')
-        ->assertSee('Female')
+        ->assertDontSee('Volleyball (Women)<em>Female</em>', false)
         ->assertSee('Trojan Warriors');
 });
 

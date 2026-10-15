@@ -5,8 +5,8 @@
         <div class="mb-6 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800">{{ session('success') }}</div>
     @endif
 
-    <div class="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
-        <form method="GET" class="flex w-full flex-col gap-3 sm:max-w-xl sm:flex-row">
+    <div class="flex flex-col justify-between gap-4 xl:flex-row xl:items-start">
+        <form method="GET" action="{{ route('admin.students.index') }}" class="grid w-full gap-3 xl:flex-1 xl:grid-cols-[minmax(220px,1fr)_140px_170px_190px_auto]">
             <label for="student-search" class="sr-only">Search students</label>
             <input id="student-search" type="search" name="search" value="{{ $search }}" placeholder="Search by name, student ID, or section" class="w-full rounded-lg border-slate-300 px-3 py-2.5 text-sm shadow-sm placeholder:text-slate-400 focus:border-blue-600 focus:ring-blue-600">
             <select name="status" class="rounded-lg border-slate-300 py-2.5 text-sm shadow-sm focus:border-blue-600 focus:ring-blue-600" onchange="this.form.submit()">
@@ -16,9 +16,17 @@
                 <option value="archived" @selected($status === 'archived')>Archived</option>
             </select>
             <select name="course_id" class="rounded-lg border-slate-300 py-2.5 text-sm shadow-sm focus:border-blue-600 focus:ring-blue-600" onchange="this.form.submit()"><option value="">All courses</option>@foreach($courses as $course)<option value="{{ $course->id }}" @selected((int) $courseId === $course->id)>{{ $course->code }}</option>@endforeach</select>
+            <select name="team_id" class="rounded-lg border-slate-300 py-2.5 text-sm shadow-sm focus:border-blue-600 focus:ring-blue-600" onchange="this.form.submit()"><option value="">All factions</option>@foreach($teams as $team)<option value="{{ $team->id }}" @selected((int) $teamId === $team->id)>{{ $team->name }}</option>@endforeach</select>
             <button type="submit" class="rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:border-blue-300 hover:text-blue-800">Search</button>
         </form>
-        <div class="flex shrink-0 flex-wrap gap-3"><a href="{{ route('admin.courses.index') }}" class="inline-flex items-center justify-center rounded-lg border border-blue-200 bg-white px-4 py-2.5 text-sm font-semibold text-blue-800 transition hover:border-blue-400">Manage courses</a><a href="{{ route('admin.students.create') }}" class="inline-flex items-center justify-center rounded-lg bg-blue-700 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2">Add student</a></div>
+        <div class="flex shrink-0 flex-wrap gap-3 xl:pt-0"><a href="{{ route('admin.courses.index') }}" class="inline-flex items-center justify-center rounded-lg border border-blue-200 bg-white px-4 py-2.5 text-sm font-semibold text-blue-800 transition hover:border-blue-400">Manage courses</a><a href="{{ route('admin.students.create') }}" class="inline-flex items-center justify-center rounded-lg bg-blue-700 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2">Add student</a></div>
+    </div>
+
+    <div class="mt-4 flex flex-wrap items-center justify-between gap-2 text-sm text-slate-500">
+        <p>{{ number_format($students->total()) }} student{{ $students->total() === 1 ? '' : 's' }} found{{ $search ? ' for “'.$search.'”' : '' }}.</p>
+        @if ($search || $courseId || $teamId || $status !== 'active')
+            <a href="{{ route('admin.students.index') }}" class="font-semibold text-blue-700 transition hover:text-blue-900">Clear filters</a>
+        @endif
     </div>
 
     <section class="mt-6 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm" aria-labelledby="student-list-heading">
@@ -80,7 +88,7 @@
                                         </div>
                                     @endif
                                 </td>
-                                <td class="px-5 py-4">{{ collect([$student->year_level ? 'Year '.$student->year_level : null, $student->section])->filter()->implode(' · ') ?: '—' }}</td>
+                                <td class="px-5 py-4">{{ collect([$student->year_level, $student->section])->filter()->implode(' · ') ?: '—' }}</td>
                                 <td class="px-5 py-4">
                                     @if ($student->trashed())
                                         <span class="text-sm font-medium text-slate-500">Archived</span>

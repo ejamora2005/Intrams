@@ -37,6 +37,7 @@ class AthleteEntryService
                 $editionSport->setAttribute('participation_slot', $this->eligibilityService->slotFor($editionSport));
                 $editionSport->setAttribute('counts_toward_participation_limit', $this->eligibilityService->countsTowardParticipationLimit($editionSport));
                 $editionSport->setAttribute('is_relay_event', $this->eligibilityService->isRelayEvent($editionSport));
+                $editionSport->setAttribute('paired_partner_exempt_genders', $this->eligibilityService->pairedPartnerExemptGenders($editionSport));
             })
             ->sortBy(fn (EditionSport $editionSport): string => sprintf(
                 '%d-%d-%s',
@@ -142,5 +143,46 @@ class AthleteEntryService
 
             return $entry;
         })->values();
+    }
+
+    /**
+     * Replace the active sport registrations for one student in an edition.
+     * Removed registrations are kept as inactive history.
+     */
+    public function syncSelectedSports(Student $student, IntramuralEdition $edition, array $editionSportIds, ?Team $team = null): Collection
+    {
+        $ids = collect($editionSportIds)->map(fn (mixed $id): int => (int) $id)->filter()->unique()->values();
+        $selectedSports = EditionSport::query()->with('sport')->where('edition_id', $edition->id)->whereIn('id', $ids)->get();
+        if ($selectedSports->count() !== $ids->count()) {
+            throw ValidationException::withMessages(['edition_sport_ids' => 'Choose sports from the active intramurals edition.']);
+        }
+        try {
+            $this->assertStudentCanJoinCategories($student, $selectedSports);
+        } catch (ValidationException $exception) {
+            throw ValidationException::withMessages(['edition_sport_ids' => collect($exception->errors())->flatten()->implode(' ')]);
+        }
+        $current = AthleteEntry::query()
+            ->where('student_id', $student->id)
+            ->where('status', 'active')
+            ->whereHas('editionSport', fn ($query) => $query->where('edition_id', $edition->id))
+            ->get();
+
+        $remove = $current->filter(fn (AthleteEntry $entry): bool => ! $ids->contains((int) $entry->edition_sport_id));
+        if ($remove->isNotEmpty()) {
+            $remove->each(fn (AthleteEntry $entry) => $entry->update(['status' => 'inactive']));
+        }
+
+        $existingIds = $current->reject(fn (AthleteEntry $entry): bool => $remove->contains('id', $entry->id))
+            ->pluck('edition_sport_id')->map(fn ($id) => (int) $id);
+        $addIds = $ids->reject(fn (int $id): bool => $existingIds->contains($id))->all();
+
+        return $addIds === [] ? collect() : $this->registerSelectedSports($student, $edition, $addIds, $team);
+    }
+
+    private function assertStudentCanJoinCategories(Student $student, Collection $editionSports): void
+    {
+        foreach ($editionSports as $editionSport) {
+            $this->eligibilityService->assertStudentsMatchSportCategory(collect([$student]), $editionSport->sport);
+        }
     }
 }

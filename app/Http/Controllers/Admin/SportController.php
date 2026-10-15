@@ -62,7 +62,10 @@ class SportController extends Controller
             )
             ->when($edition, fn ($query) => $query->whereHas('editionSports', fn ($configuration) => $configuration->where('edition_id', $edition->id)))
             ->withCount(['editionSports as edition_sports_count' => fn ($query) => $edition ? $query->where('edition_id', $edition->id) : $query])
-            ->when($search !== '', fn ($query) => $query->where('name', 'like', '%'.$search.'%'))
+            ->when($search !== '', fn ($query) => $query->where(fn ($sportQuery) => $sportQuery
+                ->where('name', 'like', '%'.$search.'%')
+                ->orWhere('code', 'like', '%'.$search.'%')
+                ->orWhere('description', 'like', '%'.$search.'%')))
             ->when($category !== '' && array_key_exists($category, Sport::PARTICIPANT_CATEGORIES), fn ($query) => $query->where('participant_category', $category))
             ->when($status === 'archived', fn ($query) => $query->onlyTrashed())
             ->when(in_array($status, ['active', 'inactive'], true), fn ($query) => $query->where('status', $status))
@@ -349,6 +352,7 @@ class SportController extends Controller
         $edition = $this->selectedEdition($request);
         abort_unless($edition !== null && $match->editionSport->edition_id === $edition->id, 404);
         abort_unless($match->status === 'pending' && $match->competitor_one_id && $match->competitor_two_id, 422, 'Only a ready bracket match can be scheduled.');
+        $match->loadMissing('editionSport.sport');
 
         $data = $request->validate([
             'date' => ['required', 'date_format:Y-m-d', 'after_or_equal:'.$edition->starts_on->format('Y-m-d'), 'before_or_equal:'.$edition->ends_on->format('Y-m-d')],
@@ -356,7 +360,7 @@ class SportController extends Controller
             'venue' => ['nullable', 'string', 'max:120'],
         ]);
         $startsAt = Carbon::createFromFormat('Y-m-d H:i', $data['date'].' '.($data['period'] === 'morning' ? '08:00' : '13:00'));
-        $venue = trim((string) ($data['venue'] ?? '')) ?: 'TBA';
+        $venue = trim((string) ($data['venue'] ?? '')) ?: $this->defaultScheduleVenue($match->editionSport->sport);
         $match->loadMissing(['competitorOne', 'competitorTwo']);
 
         $schedule = DB::transaction(function () use ($match, $startsAt, $venue): CompetitionSchedule {
@@ -409,6 +413,11 @@ class SportController extends Controller
         return redirect()
             ->route('admin.sports.bracket', ['sport' => $sport, 'edition_id' => $edition->id])
             ->with('success', 'Bracket reset. Athlete registrations and team rosters were not changed.');
+    }
+
+    private function defaultScheduleVenue(?Sport $sport): string
+    {
+        return str_starts_with(strtoupper((string) $sport?->code), 'BASKET-') ? 'MPCC' : 'TBA';
     }
 
     public function assignParticipants(Request $request, Sport $sport): View

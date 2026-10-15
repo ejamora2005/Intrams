@@ -23,7 +23,7 @@ class OperationsAccountController extends Controller
 
     public function index(Request $request): View
     {
-        $search = $request->string('search')->value();
+        $search = trim($request->string('search')->value());
         $role = $request->string('role')->value();
         $status = $request->string('status')->value() ?: 'active';
 
@@ -32,7 +32,13 @@ class OperationsAccountController extends Controller
             ->whereIn('role', array_keys($this->roles))
             ->when(array_key_exists($role, $this->roles), fn ($query) => $query->where('role', $role))
             ->when(in_array($status, ['active', 'inactive', 'suspended'], true), fn ($query) => $query->where('status', $status))
-            ->when($search !== '', fn ($query) => $query->where(fn ($inner) => $inner->where('name', 'like', "%{$search}%")->orWhere('email', 'like', "%{$search}%")))
+            ->when($search !== '', fn ($query) => $query->where(function ($inner) use ($search): void {
+                $inner->where('name', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%")
+                    ->orWhereHas('managedTeam', fn ($teamQuery) => $teamQuery
+                        ->where('name', 'like', "%{$search}%")
+                        ->orWhere('code', 'like', "%{$search}%"));
+            }))
             ->orderBy('role')
             ->orderBy('name')
             ->paginate(15)
@@ -50,7 +56,7 @@ class OperationsAccountController extends Controller
     public function create(): View
     {
         return view('admin.operations-accounts.create', [
-            'account' => new User(),
+            'account' => new User,
             'roles' => $this->roles,
             'teams' => $this->assignableTeams(),
         ]);

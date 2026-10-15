@@ -47,12 +47,15 @@ class DashboardController extends Controller
             ->orderBy('name')
             ->get() ?? collect();
         $selectedTeam = $teams->firstWhere('id', $request->integer('team_id')) ?? $teams->first();
+        $flaggedStudents = $edition
+            ? $this->eligibilityService->flaggedStudents($edition, $managedTeamId ? $teams->first() : null)
+            : collect();
         $sportOptions = $edition && $selectedTeam
             ? $this->athleteEntryService->selectableSportsFor($edition)
             : collect();
 
         $selectedTeam?->load([
-            'members' => fn ($query) => $query->with('student.course')->latest('assigned_at'),
+            'members' => fn ($query) => $query->with('student.course', 'student.athleteEntries.editionSport.sport')->latest('assigned_at'),
         ]);
 
         $availableStudents = $edition && $selectedTeam
@@ -124,6 +127,7 @@ class DashboardController extends Controller
             'availableStudents' => $availableStudents,
             'sportOptions' => $sportOptions,
             'eligibilityByStudentId' => $eligibilityByStudentId,
+            'flaggedStudents' => $flaggedStudents,
             'medicalCertificateEntries' => $medicalCertificateEntries,
             'medicalCertificateGroups' => $medicalCertificateEntries->groupBy('student_id'),
             'courses' => Course::query()->where('status', 'active')->orderBy('name')->get(),
@@ -190,7 +194,7 @@ class DashboardController extends Controller
 
         return redirect()
             ->route('gam.dashboard', ['team_id' => $team->id])
-            ->with('success', $student->full_name.' was added to '.$team->name.'.');
+            ->with(['success' => $student->full_name.' was added to '.$team->name.'.', 'ops_view' => 'roster-management']);
     }
 
     public function assignExistingPlayer(Request $request, Team $team): RedirectResponse
@@ -206,7 +210,23 @@ class DashboardController extends Controller
 
         return redirect()
             ->route('gam.dashboard', ['team_id' => $team->id])
-            ->with('success', $student->full_name.' was assigned to '.$team->name.'.');
+            ->with(['success' => $student->full_name.' was assigned to '.$team->name.'.', 'ops_view' => 'roster-management']);
+    }
+
+    public function updatePlayerSports(Request $request, Team $team, Student $student): RedirectResponse
+    {
+        $this->ensureActiveTeam($team);
+        abort_unless($team->members()->where('student_id', $student->id)->exists(), 404);
+
+        $data = $request->validate([
+            'edition_sport_ids' => ['nullable', 'array', 'max:5'],
+            'edition_sport_ids.*' => ['integer', 'distinct', 'exists:edition_sports,id'],
+        ]);
+
+        DB::transaction(fn () => $this->athleteEntryService->syncSelectedSports($student, $team->edition, $data['edition_sport_ids'] ?? [], $team));
+
+        return redirect()->route('gam.dashboard', ['team_id' => $team->id])
+            ->with(['success' => $student->full_name.' sports were updated.', 'ops_view' => 'roster-management']);
     }
 
     public function updateMedicalCertificate(Request $request, AthleteEntry $entry): RedirectResponse
@@ -231,7 +251,7 @@ class DashboardController extends Controller
             'medical_certificate_reviewed_at' => $reviewed ? now() : null,
         ]);
 
-        return back()->with('success', 'Medical certificate status updated for '.$entry->student?->full_name.'.');
+        return back()->with(['success' => 'Medical certificate status updated for '.$entry->student?->full_name.'.', 'ops_view' => 'medical-certificates']);
     }
 
     public function updateStudentMedicalCertificates(Request $request, Student $student): RedirectResponse
@@ -269,7 +289,7 @@ class DashboardController extends Controller
         });
 
         return redirect()->to(route('gam.dashboard').'#medical-certificates')
-            ->with('success', 'Medical certificate status updated for '.$student->full_name.' across '.$entries->count().' events.');
+            ->with(['success' => 'Medical certificate status updated for '.$student->full_name.' across '.$entries->count().' events.', 'ops_view' => 'medical-certificates']);
     }
 
     private function ensureActiveTeam(Team $team): void

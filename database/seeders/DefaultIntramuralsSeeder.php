@@ -12,6 +12,8 @@ class DefaultIntramuralsSeeder extends Seeder
             DefaultSportsSeeder::class,
             TestIntramuralsDataSeeder::class,
             LegacyIntramuralsRosterCleanupSeeder::class,
+            SeaDragonsRosterSeeder::class,
+            TerraquaticEaglesRosterSeeder::class,
             TrojanWarriorsRosterSeeder::class,
         ]);
     }

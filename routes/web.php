@@ -1,19 +1,18 @@
 <?php
 
-use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\CompetitionController;
 use App\Http\Controllers\Admin\CoordinatorController;
+use App\Http\Controllers\Admin\CourseController;
+use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\EditionController;
 use App\Http\Controllers\Admin\EditionSportController;
 use App\Http\Controllers\Admin\EventController;
-use App\Http\Controllers\Admin\ModuleController;
 use App\Http\Controllers\Admin\OperationsAccountController;
-use App\Http\Controllers\Admin\StudentController;
-use App\Http\Controllers\Admin\SportController;
-use App\Http\Controllers\Admin\SportPointController;
-use App\Http\Controllers\Admin\SportModuleController;
 use App\Http\Controllers\Admin\RegistrationController;
-use App\Http\Controllers\Admin\CompetitionController;
-use App\Http\Controllers\Admin\CourseController;
+use App\Http\Controllers\Admin\SportController;
+use App\Http\Controllers\Admin\SportModuleController;
+use App\Http\Controllers\Admin\SportPointController;
+use App\Http\Controllers\Admin\StudentController;
 use App\Http\Controllers\Admin\SystemLogController;
 use App\Http\Controllers\Admin\TeamController;
 use App\Http\Controllers\Coordinator\DashboardController as CoordinatorDashboardController;
@@ -118,6 +117,7 @@ Route::middleware([
         Route::get('/sports-points', [SportPointController::class, 'index'])->name('sports-points.index');
         Route::put('/sports-points/{system}', [SportPointController::class, 'update'])->where('system', '[A-Za-z0-9_-]+')->name('sports-points.update');
         Route::get('/rules-guidelines', [RulesController::class, 'admin'])->name('rules.index');
+        Route::get('/possible-dq', [RulesController::class, 'possibleDqAdmin'])->name('possible-dq.index');
         Route::post('/rules-guidelines/repair-registrations', [RulesController::class, 'repair'])->name('rules.repair-registrations');
         Route::get('/sports/{sport}/bracket', [SportController::class, 'bracket'])->name('sports.bracket');
         Route::get('/sports/{sport}/basketball-score-sheet', [SportController::class, 'basketballScoreSheet'])->name('sports.basketball-score-sheet');
@@ -156,7 +156,9 @@ Route::middleware([
     Route::prefix('gam')->as('gam.')->middleware('role:gam')->group(function () {
         Route::get('/dashboard', [GamDashboardController::class, 'index'])->name('dashboard');
         Route::get('/rules-guidelines', [RulesController::class, 'gam'])->name('rules.index');
+        Route::get('/possible-dq', [RulesController::class, 'possibleDqGam'])->name('possible-dq.index');
         Route::post('/teams/{team}/players', [GamDashboardController::class, 'storePlayer'])->name('teams.players.store');
+        Route::put('/teams/{team}/players/{student}/sports', [GamDashboardController::class, 'updatePlayerSports'])->name('teams.players.sports.update');
         Route::post('/teams/{team}/players/assign', [GamDashboardController::class, 'assignExistingPlayer'])->name('teams.players.assign');
         Route::post('/medical-certificates/students/{student}', [GamDashboardController::class, 'updateStudentMedicalCertificates'])->name('medical-certificates.students.update');
         Route::post('/medical-certificates/{entry}', [GamDashboardController::class, 'updateMedicalCertificate'])->name('medical-certificates.update');
@@ -165,6 +167,7 @@ Route::middleware([
     Route::prefix('tabulator')->as('tabulator.')->middleware('role:tabulator')->group(function () {
         Route::get('/dashboard', [TabulatorDashboardController::class, 'index'])->name('dashboard');
         Route::get('/rules-guidelines', [RulesController::class, 'tabulator'])->name('rules.index');
+        Route::get('/possible-dq', [RulesController::class, 'possibleDqTabulator'])->name('possible-dq.index');
         Route::post('/sport-results', [TabulatorDashboardController::class, 'declareSportWinners'])->name('sport-results.store');
         Route::post('/matches/{match}/result', [TabulatorDashboardController::class, 'recordBracketResult'])->name('matches.result');
     });

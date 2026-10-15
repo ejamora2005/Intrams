@@ -81,7 +81,7 @@
 </div>
 
 @isset($sportOptions)
-    <x-participation-sport-picker :sports="$sportOptions" />
+    <x-participation-sport-picker :sports="$sportOptions" :student-gender="$student->gender" :selected-ids="$selectedSportIds ?? []" />
 @endisset
 
 <div class="mt-7 flex flex-wrap items-center gap-3 border-t border-slate-100 pt-6">

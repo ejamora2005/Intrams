@@ -345,6 +345,54 @@ test('an admin schedules a selected bracket match by date and time of day', func
         ->and($schedule->fresh()->venue)->toBe('Campus Gym');
 });
 
+test('basketball bracket schedules default to MPCC', function () {
+    $admin = bulkAssignmentAdmin();
+    $edition = bulkAssignmentEdition();
+    $sport = Sport::query()->create(['name' => 'Basketball 3x3 (Men)', 'code' => 'BASKET-3X3-MEN', 'status' => 'active']);
+    $editionSport = EditionSport::query()->create([
+        'edition_id' => $edition->id,
+        'sport_id' => $sport->id,
+        'participant_type' => 'team',
+        'game_mechanic' => 'single_elimination',
+        'status' => 'active',
+    ]);
+    $teams = collect(range(1, 2))->map(fn ($number) => Team::query()->create([
+        'edition_id' => $edition->id,
+        'name' => 'BASKET TEAM '.$number,
+        'code' => 'BASKET'.$number,
+        'status' => 'active',
+    ]));
+
+    foreach ($teams as $team) {
+        AthleteEntry::query()->create([
+            'edition_sport_id' => $editionSport->id,
+            'student_id' => Student::factory()->create(['status' => 'active'])->id,
+            'team_id' => $team->id,
+            'status' => 'active',
+            'assigned_at' => now(),
+        ]);
+    }
+
+    $match = BracketMatch::query()->where('edition_sport_id', $editionSport->id)->where('status', 'pending')->first();
+    if (! $match) {
+        app(\App\Services\BracketService::class)->initialize($editionSport);
+        $match = BracketMatch::query()->where('edition_sport_id', $editionSport->id)->where('status', 'pending')->firstOrFail();
+    }
+
+    $this->actingAs($admin)
+        ->get(route('admin.sports.bracket', ['sport' => $sport, 'edition_id' => $edition->id]))
+        ->assertOk()
+        ->assertSee('value="MPCC"', false);
+
+    $this->actingAs($admin)->post(route('admin.sports.bracket.schedule', [$sport, $match]), [
+        'edition_id' => $edition->id,
+        'date' => '2026-10-02',
+        'period' => 'morning',
+    ])->assertRedirect();
+
+    expect(CompetitionSchedule::query()->where('bracket_match_id', $match->id)->value('venue'))->toBe('MPCC');
+});
+
 test('declaring a bracket winner advances the team to the next matchup', function () {
     $admin = bulkAssignmentAdmin();
     $edition = bulkAssignmentEdition();

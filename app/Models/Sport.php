@@ -59,8 +59,8 @@ class Sport extends Model
             str_starts_with($code, 'BASKET-'),
             in_array($code, [
                 'BASEBALL', 'SOFTBALL', 'RUSSIAN-SOFTBALL',
-                'VOLLEYBALL', 'VOLLEYBALL-MEN', 'VOLLEYBALL-WOMEN', 'MIXED-VOLLEYBALL',
-                'BEACH-VOLLEYBALL', 'BEACH-VOLLEYBALL-MEN', 'BEACH-VOLLEYBALL-WOMEN', 'ESPORT-ML',
+                'VOLLEYBALL', 'VOLLEYBALL-MEN', 'VOLLEYBALL-WOMEN', 'MODIFIED-VOLLEYBALL', 'MODIFIED-VOLLEYBALL-MEN', 'MODIFIED-VOLLEYBALL-WOMEN', 'MIXED-VOLLEYBALL',
+                'BEACH-VOLLEYBALL', 'BEACH-VOLLEYBALL-MEN', 'BEACH-VOLLEYBALL-WOMEN', 'ESPORT-ML', 'ESPORT-ML-MEN', 'ESPORT-ML-WOMEN',
             ], true) => 'team',
             in_array($code, ['BADMINTON', 'TABLE-TENNIS', 'CHESS'], true)
             || str_starts_with($code, 'BADMINTON-')
@@ -71,6 +71,12 @@ class Sport extends Model
                 'THROWS', 'SHOT-PUT', 'DISCUS-THROW', 'JAVELIN-THROW',
                 'JUMP', 'LONG-JUMP', 'TRIPLE-JUMP', 'HIGH-JUMP',
             ], true) => 'track-field',
+            (str_ends_with($code, '-MEN') || str_ends_with($code, '-WOMEN'))
+                && in_array(str_replace(['-MEN', '-WOMEN'], '', $code), [
+                    'RUNS', '100M-RUN', '200M-RUN', '400M-RUN', 'RELAY-4X100', 'RELAY-4X400',
+                    'THROWS', 'SHOT-PUT', 'DISCUS-THROW', 'JAVELIN-THROW',
+                    'JUMP', 'LONG-JUMP', 'TRIPLE-JUMP', 'HIGH-JUMP',
+                ], true) => 'track-field',
             default => 'other',
         };
     }

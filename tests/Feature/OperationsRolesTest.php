@@ -551,14 +551,90 @@ test('participation rules prevent invalid sport assignments and flag legacy regi
     $this->actingAs($tabulator)->get(route('tabulator.dashboard'))->assertOk()->assertSee('Possible DQ')->assertSee('Riley Cruz');
 });
 
+test('male Russian Softball partners do not consume a participation rule slot', function () {
+    $edition = operationsEdition();
+    $team = operationsTeam($edition);
+    $russianSoftball = operationsSport($edition, 'Russian Softball', 'RUSSIAN-SOFTBALL');
+    $male = Student::query()->create([
+        'student_number' => 'RUSSIAN-MALE-001',
+        'first_name' => 'Marco',
+        'last_name' => 'Partner',
+        'gender' => 'Male',
+        'school_year' => $edition->school_year,
+        'course_id' => $team->course_id,
+        'status' => 'active',
+    ]);
+    $female = Student::query()->create([
+        'student_number' => 'RUSSIAN-FEMALE-001',
+        'first_name' => 'Maria',
+        'last_name' => 'Partner',
+        'gender' => 'Female',
+        'school_year' => $edition->school_year,
+        'course_id' => $team->course_id,
+        'status' => 'active',
+    ]);
+
+    AthleteEntry::query()->create(['edition_sport_id' => $russianSoftball->id, 'student_id' => $male->id, 'team_id' => $team->id, 'status' => 'active', 'assigned_at' => now()]);
+    AthleteEntry::query()->create(['edition_sport_id' => $russianSoftball->id, 'student_id' => $female->id, 'team_id' => $team->id, 'status' => 'active', 'assigned_at' => now()]);
+
+    expect(app(\App\Services\EligibilityService::class)->evaluateStudent($male, $edition)['counts']['major'])->toBe(0)
+        ->and(app(\App\Services\EligibilityService::class)->evaluateStudent($female, $edition)['counts']['major'])->toBe(1);
+});
+
+test('each operations dashboard can open its full role-scoped Possible DQ watchlist', function () {
+    $edition = operationsEdition();
+    $team = operationsTeam($edition);
+    $admin = User::factory()->create(['role' => 'admin', 'status' => 'active']);
+    $gam = User::factory()->create(['role' => 'gam', 'status' => 'active', 'managed_team_id' => $team->id]);
+    $tabulator = User::factory()->create(['role' => 'tabulator', 'status' => 'active']);
+    $firstMajor = operationsSport($edition, 'Volleyball', 'VOLLEYBALL');
+    $secondMajor = operationsSport($edition, 'Basketball 5x5', 'BASKET-5X5');
+    $student = Student::query()->create([
+        'student_number' => 'DQ-WATCHLIST-001',
+        'first_name' => 'Watchlist',
+        'last_name' => 'Player',
+        'school_year' => $edition->school_year,
+        'course_id' => $team->course_id,
+        'status' => 'active',
+    ]);
+    TeamMember::query()->create([
+        'edition_id' => $edition->id,
+        'team_id' => $team->id,
+        'student_id' => $student->id,
+        'assigned_by' => $admin->id,
+        'assigned_at' => now(),
+    ]);
+    AthleteEntry::query()->create(['edition_sport_id' => $firstMajor->id, 'student_id' => $student->id, 'team_id' => $team->id, 'status' => 'active', 'assigned_at' => now()]);
+    AthleteEntry::query()->create(['edition_sport_id' => $secondMajor->id, 'student_id' => $student->id, 'team_id' => $team->id, 'status' => 'active', 'assigned_at' => now()]);
+
+    $this->actingAs($admin)->get(route('admin.possible-dq.index'))
+        ->assertOk()
+        ->assertSee('Possible DQ Watchlist')
+        ->assertSee('Watchlist Player')
+        ->assertSee('1 flagged');
+    $this->actingAs($gam)->get(route('gam.possible-dq.index'))
+        ->assertOk()
+        ->assertSee('Possible DQ Watchlist')
+        ->assertSee('Watchlist Player');
+    $this->actingAs($tabulator)->get(route('tabulator.possible-dq.index'))
+        ->assertOk()
+        ->assertSee('Possible DQ Watchlist')
+        ->assertSee('Watchlist Player');
+
+    $this->actingAs($admin)->get(route('admin.dashboard'))->assertSee(route('admin.possible-dq.index'), false);
+    $this->actingAs($gam)->get(route('gam.dashboard'))->assertSee(route('gam.possible-dq.index'), false);
+    $this->actingAs($tabulator)->get(route('tabulator.dashboard'))->assertSee(route('tabulator.possible-dq.index'), false);
+});
+
 test('administrators can remove only duplicate open registrations from the rules watchlist', function () {
     $admin = User::factory()->create(['role' => 'admin', 'status' => 'active']);
     $edition = operationsEdition();
     $team = operationsTeam($edition);
     $openChess = operationsSport($edition, 'Chess', 'CHESS');
-    $mensChessSport = Sport::query()->create([
-        'name' => 'Chess (Men)',
+    $mensChessSport = Sport::query()->firstOrCreate([
         'code' => 'CHESS-MEN',
+    ], [
+        'name' => 'Chess (Men)',
         'participant_category' => 'male',
         'status' => 'active',
     ]);

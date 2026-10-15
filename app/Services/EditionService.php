@@ -9,9 +9,7 @@ use Illuminate\Support\Facades\DB;
 
 class EditionService
 {
-    public function __construct(private readonly AuditService $auditService)
-    {
-    }
+    public function __construct(private readonly AuditService $auditService) {}
 
     /** @param array<string, mixed> $attributes */
     public function create(array $attributes): IntramuralEdition
@@ -130,7 +128,7 @@ class EditionService
                 ->addDays($day - 1)
                 ->setTimeFromTimeString($schedule['ends_at'] ?? '10:00');
 
-            CompetitionSchedule::query()->firstOrCreate(
+            $competitionSchedule = CompetitionSchedule::query()->firstOrCreate(
                 [
                     'edition_sport_id' => $editionSport->id,
                     'starts_at' => $startsAt,
@@ -139,9 +137,14 @@ class EditionService
                 [
                     'ends_at' => $endsAt->greaterThan($startsAt) ? $endsAt : $startsAt->copy()->addHours(2),
                     'venue' => $schedule['venue'] ?? 'TBA',
+                    'is_activity' => (bool) ($schedule['is_activity'] ?? false),
                     'status' => $schedule['status'] ?? 'scheduled',
                 ],
             );
+
+            if (array_key_exists('is_activity', $schedule)) {
+                $competitionSchedule->update(['is_activity' => (bool) $schedule['is_activity']]);
+            }
         }
     }
 

@@ -5,7 +5,7 @@
 
 @section('content')
     <div class="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
-        <form class="flex flex-col gap-3 sm:flex-row sm:items-center">
+        <form method="GET" action="{{ route(($cardTarget ?? 'bracket') === 'edit' ? 'admin.cultural.index' : 'admin.sports.index') }}" class="flex flex-col gap-3 sm:flex-row sm:items-center">
             <div>
                 <label for="search" class="sr-only">Search sports</label>
                 <input id="search" name="search" value="{{ $search ?? '' }}" placeholder="Search sports" class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:w-52">
@@ -54,8 +54,8 @@
 
     <div class="mt-6 flex flex-wrap items-center justify-between gap-3">
         <p class="text-sm text-slate-500">{{ $sports->total() }} {{ Str::lower($title ?? 'sports') }} found{{ $search ? ' for “'.$search.'”' : '' }}.</p>
-        @if ($search || ($category ?? '') !== '')
-            <a href="{{ route(($cardTarget ?? 'bracket') === 'edit' ? 'admin.cultural.index' : 'admin.sports.index', ['edition_id' => $editionId, 'status' => $status]) }}" class="text-sm font-semibold text-blue-700 hover:text-blue-900">Clear filters</a>
+        @if ($search || ($category ?? '') !== '' || $status !== 'active')
+            <a href="{{ route(($cardTarget ?? 'bracket') === 'edit' ? 'admin.cultural.index' : 'admin.sports.index', ['edition_id' => $editionId]) }}" class="text-sm font-semibold text-blue-700 hover:text-blue-900">Clear filters</a>
         @endif
     </div>
 

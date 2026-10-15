@@ -18,14 +18,12 @@ use Illuminate\View\View;
 
 class TeamController extends Controller
 {
-    public function __construct(private readonly TeamService $teamService)
-    {
-    }
+    public function __construct(private readonly TeamService $teamService) {}
 
     public function index(Request $request): View
     {
         $status = $request->string('status')->value() ?: 'active';
-        $search = $request->string('search')->value();
+        $search = trim($request->string('search')->value());
         $editionId = $request->integer('edition_id') ?: null;
 
         $teams = Team::query()
@@ -37,7 +35,10 @@ class TeamController extends Controller
             ->when($search !== '', function ($query) use ($search): void {
                 $query->where(fn ($teamQuery) => $teamQuery
                     ->where('name', 'like', "%{$search}%")
-                    ->orWhere('code', 'like', "%{$search}%"));
+                    ->orWhere('code', 'like', "%{$search}%")
+                    ->orWhereHas('edition', fn ($editionQuery) => $editionQuery
+                        ->where('name', 'like', "%{$search}%")
+                        ->orWhere('school_year', 'like', "%{$search}%")));
             })
             ->orderBy('name')
             ->paginate(15)
@@ -136,7 +137,9 @@ class TeamController extends Controller
     {
         abort_if($team->trashed(), 404);
         $students = Student::query()->whereIn('id', $request->validated('student_ids'))->get();
-        foreach ($students as $student) { $this->teamService->assignStudent($team, $student); }
+        foreach ($students as $student) {
+            $this->teamService->assignStudent($team, $student);
+        }
 
         return redirect()->route('admin.teams.index')->with('success', "{$students->count()} athlete(s) were assigned to {$team->name}.");
     }

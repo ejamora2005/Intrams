@@ -22,8 +22,7 @@ class DashboardController extends Controller
         private readonly BracketService $bracketService,
         private readonly StandingsService $standingsService,
         private readonly EligibilityService $eligibilityService,
-    ) {
-    }
+    ) {}
 
     public function index(Request $request): View
     {
@@ -51,7 +50,7 @@ class DashboardController extends Controller
             'pointRules' => $selectedSport ? $this->standingsService->pointRulesFor($selectedSport) : [],
             'teams' => $teams,
             'teamsById' => $teams->keyBy('id'),
-            'flaggedStudents' => $edition ? $this->eligibilityService->flaggedStudents($edition)->take(8) : collect(),
+            'flaggedStudents' => $edition ? $this->eligibilityService->flaggedStudents($edition) : collect(),
             'matches' => $editionSportIds->isEmpty()
                 ? collect()
                 : BracketMatch::query()
@@ -114,8 +113,8 @@ class DashboardController extends Controller
         $this->standingsService->recordSportResult($editionSport, $data['placements'], $request->user());
 
         return redirect()
-            ->route('tabulator.dashboard', ['edition_sport_id' => $editionSport->id])
-            ->with('success', $editionSport->sport?->name.' winners were declared.');
+            ->to(route('tabulator.dashboard', ['edition_sport_id' => $editionSport->id]).'#declare-sports')
+            ->with(['success' => $editionSport->sport?->name.' winners were declared.', 'ops_view' => 'declare-sports']);
     }
 
     public function recordBracketResult(Request $request, BracketMatch $match): RedirectResponse
@@ -138,7 +137,7 @@ class DashboardController extends Controller
         $winner = BracketCompetitor::query()->findOrFail($data['winner_competitor_id']);
         $this->bracketService->record($match, $winner);
 
-        return back()->with('success', $winner->label.' was declared the winner.');
+        return back()->with(['success' => $winner->label.' was declared the winner.', 'ops_view' => 'match-winners']);
     }
 
     private function ensureCurrentPassword(Request $request, string $password): void

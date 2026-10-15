@@ -1,5 +1,6 @@
 import './bootstrap';
 import './pwa';
+import './ops-interactions';
 
 if (document.querySelector('[data-score-sheet-export]')) {
     void import('./score-sheet-export');

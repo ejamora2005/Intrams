@@ -30,23 +30,35 @@ class StudentController extends Controller
     public function index(Request $request): View
     {
         $status = $request->string('status')->value() ?: 'active';
-        $search = $request->string('search')->value();
+        $search = trim($request->string('search')->value());
         $courseId = $request->integer('course_id') ?: null;
         $activeEditionId = IntramuralEdition::query()->where('status', 'active')->orderByDesc('starts_on')->orderByDesc('id')->value('id');
+        $teamId = $request->integer('team_id') ?: null;
 
         $students = Student::query()
             ->when($status === 'archived', fn ($query) => $query->onlyTrashed())
             ->when(in_array($status, ['active', 'inactive'], true), fn ($query) => $query->where('status', $status))
-            ->when($search !== '', function ($query) use ($search): void {
-                $query->where(function ($studentQuery) use ($search): void {
+            ->when($search !== '', function ($query) use ($search, $activeEditionId): void {
+                $query->where(function ($studentQuery) use ($search, $activeEditionId): void {
                     $studentQuery->where('student_number', 'like', "%{$search}%")
                         ->orWhere('first_name', 'like', "%{$search}%")
                         ->orWhere('middle_name', 'like', "%{$search}%")
                         ->orWhere('last_name', 'like', "%{$search}%")
-                        ->orWhere('section', 'like', "%{$search}%");
+                        ->orWhere('section', 'like', "%{$search}%")
+                        ->orWhereHas('course', fn ($courseQuery) => $courseQuery
+                            ->where('name', 'like', "%{$search}%")
+                            ->orWhere('code', 'like', "%{$search}%"))
+                        ->orWhereHas('teamMembers', function ($memberQuery) use ($search, $activeEditionId): void {
+                            $memberQuery
+                                ->when($activeEditionId, fn ($editionQuery) => $editionQuery->where('edition_id', $activeEditionId))
+                                ->whereHas('team', fn ($teamQuery) => $teamQuery
+                                    ->where('name', 'like', "%{$search}%")
+                                    ->orWhere('code', 'like', "%{$search}%"));
+                        });
                 });
             })
             ->when($courseId, fn ($query) => $query->where('course_id', $courseId))
+            ->when($teamId && $activeEditionId, fn ($query) => $query->whereHas('teamMembers', fn ($memberQuery) => $memberQuery->where('edition_id', $activeEditionId)->where('team_id', $teamId)))
             ->with([
                 'course',
                 'teamMembers' => fn ($query) => $query
@@ -62,10 +74,10 @@ class StudentController extends Controller
             ])
             ->orderBy('last_name')
             ->orderBy('first_name')
-            ->paginate(15)
+            ->paginate(100)
             ->withQueryString();
 
-        return view('admin.students.index', ['students' => $students, 'status' => $status, 'search' => $search, 'courseId' => $courseId, 'courses' => Course::query()->where('status', 'active')->orderBy('name')->get()]);
+        return view('admin.students.index', ['students' => $students, 'status' => $status, 'search' => $search, 'courseId' => $courseId, 'teamId' => $teamId, 'courses' => Course::query()->where('status', 'active')->orderBy('name')->get(), 'teams' => $activeEditionId ? Team::query()->where('edition_id', $activeEditionId)->where('status', 'active')->orderBy('name')->get() : collect()]);
     }
 
     public function create(): View
@@ -128,12 +140,25 @@ class StudentController extends Controller
             'edition' => $edition,
             'currentTeam' => $currentTeam,
             'teams' => $edition ? Team::query()->where('edition_id', $edition->id)->where('status', 'active')->orderBy('name')->get() : collect(),
+            'sportOptions' => $edition ? $this->athleteEntryService->selectableSportsFor($edition) : collect(),
+            'selectedSportIds' => $edition ? $student->athleteEntries()->where('status', 'active')->whereHas('editionSport', fn ($query) => $query->where('edition_id', $edition->id))->pluck('edition_sport_id')->map(fn ($id) => (string) $id)->values() : collect(),
         ]);
     }
 
     public function update(UpdateStudentRequest $request, Student $student): RedirectResponse
     {
-        $student = $this->studentService->update($student, $request->validated());
+        $data = $request->validated();
+        $editionSportIds = $data['edition_sport_ids'] ?? null;
+        $edition = $this->activeEdition();
+        $team = $edition ? $student->teamMembers()->with('team')->where('edition_id', $edition->id)->first()?->team : null;
+        $student = DB::transaction(function () use ($student, $data, $edition, $editionSportIds, $team): Student {
+            $student = $this->studentService->update($student, Arr::except($data, 'edition_sport_ids'));
+            if ($edition && $editionSportIds !== null) {
+                $this->athleteEntryService->syncSelectedSports($student, $edition, $editionSportIds, $team);
+            }
+
+            return $student;
+        });
 
         return redirect()->route('admin.students.index')->with('success', "{$student->full_name} was updated.");
     }

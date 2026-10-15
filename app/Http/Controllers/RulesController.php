@@ -30,6 +30,21 @@ class RulesController extends Controller
         return $this->show('layouts.coordinator', 'tabulator.dashboard', 'Tabulator workspace');
     }
 
+    public function possibleDqAdmin(): View
+    {
+        return $this->possibleDq('layouts.admin', 'admin.dashboard', 'Admin workspace', 'admin.rules.index');
+    }
+
+    public function possibleDqGam(): View
+    {
+        return $this->possibleDq('layouts.coordinator', 'gam.dashboard', 'GAM workspace', 'gam.rules.index', request()->user()?->managedTeam);
+    }
+
+    public function possibleDqTabulator(): View
+    {
+        return $this->possibleDq('layouts.coordinator', 'tabulator.dashboard', 'Tabulator workspace', 'tabulator.rules.index');
+    }
+
     public function repair(Request $request): RedirectResponse
     {
         $request->validate(['confirmation' => ['required', 'in:REPAIR']]);
@@ -69,6 +84,24 @@ class RulesController extends Controller
             'duplicateOpenRegistrationCount' => $edition && request()->user()?->role === 'admin'
                 ? $this->eligibilityService->duplicateOpenRegistrationCount($edition)
                 : 0,
+        ]);
+    }
+
+    private function possibleDq(string $layout, string $homeRoute, string $workspaceLabel, string $rulesRoute, $managedTeam = null): View
+    {
+        $edition = $this->standingsService->activeEdition();
+        $flaggedStudents = $edition
+            ? $this->eligibilityService->flaggedStudents($edition, $managedTeam)
+            : collect();
+
+        return view('rules.possible-dq', [
+            'layout' => $layout,
+            'homeRoute' => $homeRoute,
+            'workspaceLabel' => $workspaceLabel,
+            'rulesRoute' => $rulesRoute,
+            'edition' => $edition,
+            'managedTeam' => $managedTeam,
+            'flaggedStudents' => $flaggedStudents,
         ]);
     }
 }

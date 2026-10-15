@@ -2,6 +2,7 @@
     'team' => null,
     'name' => null,
     'subtitle' => null,
+    'showSubtitle' => true,
     'size' => 'sm',
     'logoOnly' => false,
 ])
@@ -43,7 +44,7 @@
     @unless ($logoOnly)
         <span class="min-w-0">
             <span class="block truncate leading-tight">{{ $teamName ?? 'All active factions' }}</span>
-            @if ($teamSubtitle)
+            @if ($showSubtitle && $teamSubtitle)
                 <span class="mt-0.5 block truncate text-xs font-medium opacity-75">{{ $teamSubtitle }}</span>
             @endif
         </span>

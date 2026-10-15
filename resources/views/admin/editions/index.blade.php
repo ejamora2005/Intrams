@@ -6,7 +6,7 @@
     @endif
 
     <div class="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
-        <form method="GET" class="flex w-full flex-col gap-3 sm:max-w-xl sm:flex-row">
+        <form method="GET" action="{{ route('admin.editions.index') }}" class="flex w-full flex-col gap-3 sm:max-w-xl sm:flex-row">
             <label for="edition-search" class="sr-only">Search editions</label>
             <input id="edition-search" type="search" name="search" value="{{ $search }}" placeholder="Search by edition or school year" class="w-full rounded-lg border-slate-300 px-3 py-2.5 text-sm shadow-sm placeholder:text-slate-400 focus:border-blue-600 focus:ring-blue-600">
             <select name="status" class="rounded-lg border-slate-300 py-2.5 text-sm shadow-sm focus:border-blue-600 focus:ring-blue-600" onchange="this.form.submit()">
@@ -18,6 +18,13 @@
             <button type="submit" class="rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:border-blue-300 hover:text-blue-800">Search</button>
         </form>
         <a href="{{ route('admin.editions.create') }}" class="inline-flex shrink-0 items-center justify-center rounded-lg bg-blue-700 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-800">Add edition</a>
+    </div>
+
+    <div class="mt-4 flex flex-wrap items-center justify-between gap-2 text-sm text-slate-500">
+        <p>{{ number_format($editions->total()) }} edition{{ $editions->total() === 1 ? '' : 's' }} found{{ $search ? ' for “'.$search.'”' : '' }}.</p>
+        @if ($search || $status !== 'all')
+            <a href="{{ route('admin.editions.index') }}" class="font-semibold text-blue-700 transition hover:text-blue-900">Clear filters</a>
+        @endif
     </div>
 
     <section class="mt-6 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm" aria-labelledby="edition-list-heading">

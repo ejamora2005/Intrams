@@ -65,8 +65,8 @@ test('re-seeding default sports moves basketball 3x3 to the minor point system',
         'status' => 'draft',
     ]);
     $basketball3x3 = Sport::query()->create([
-        'name' => 'Basketball 3x3',
-        'code' => 'BASKET-3X3',
+        'name' => 'Basketball 3x3 (Men)',
+        'code' => 'BASKET-3X3-MEN',
         'status' => 'active',
         'is_system' => true,
     ]);
@@ -118,31 +118,46 @@ test('complete sport catalogue includes gendered volleyball and individual athle
         'BEACH-VOLLEYBALL-WOMEN' => ['name' => 'Beach Volleyball (Women)', 'participant_category' => 'female'],
         'CHESS-MEN' => ['name' => 'Chess (Men)', 'participant_category' => 'male'],
         'CHESS-WOMEN' => ['name' => 'Chess (Women)', 'participant_category' => 'female'],
-        'BADMINTON-TEAM' => ['name' => 'Badminton (Team)', 'participant_category' => 'open'],
-        'BADMINTON-DOUBLES' => ['name' => 'Badminton (Doubles)', 'participant_category' => 'open'],
-        'BADMINTON-SINGLES' => ['name' => 'Badminton (Singles)', 'participant_category' => 'open'],
         'BADMINTON-TEAM-MEN' => ['name' => 'Badminton (Team - Men)', 'participant_category' => 'male'],
         'BADMINTON-TEAM-WOMEN' => ['name' => 'Badminton (Team - Women)', 'participant_category' => 'female'],
         'BADMINTON-DOUBLES-MEN' => ['name' => 'Badminton (Doubles - Men)', 'participant_category' => 'male'],
         'BADMINTON-DOUBLES-WOMEN' => ['name' => 'Badminton (Doubles - Women)', 'participant_category' => 'female'],
         'BADMINTON-SINGLES-MEN' => ['name' => 'Badminton (Singles - Men)', 'participant_category' => 'male'],
         'BADMINTON-SINGLES-WOMEN' => ['name' => 'Badminton (Singles - Women)', 'participant_category' => 'female'],
-        'TABLE-TENNIS-TEAM' => ['name' => 'Table Tennis (Team)', 'participant_category' => 'open'],
-        'TABLE-TENNIS-DOUBLES' => ['name' => 'Table Tennis (Doubles)', 'participant_category' => 'open'],
-        'TABLE-TENNIS-SINGLES' => ['name' => 'Table Tennis (Singles)', 'participant_category' => 'open'],
         'TABLE-TENNIS-TEAM-MEN' => ['name' => 'Table Tennis (Team - Men)', 'participant_category' => 'male'],
         'TABLE-TENNIS-TEAM-WOMEN' => ['name' => 'Table Tennis (Team - Women)', 'participant_category' => 'female'],
         'TABLE-TENNIS-DOUBLES-MEN' => ['name' => 'Table Tennis (Doubles - Men)', 'participant_category' => 'male'],
         'TABLE-TENNIS-DOUBLES-WOMEN' => ['name' => 'Table Tennis (Doubles - Women)', 'participant_category' => 'female'],
         'TABLE-TENNIS-SINGLES-MEN' => ['name' => 'Table Tennis (Singles - Men)', 'participant_category' => 'male'],
         'TABLE-TENNIS-SINGLES-WOMEN' => ['name' => 'Table Tennis (Singles - Women)', 'participant_category' => 'female'],
-        '100M-RUN' => ['name' => '100m Run', 'participant_category' => 'open'],
-        '200M-RUN' => ['name' => '200m Run', 'participant_category' => 'open'],
-        '400M-RUN' => ['name' => '400m Run', 'participant_category' => 'open'],
-        'RELAY-4X100' => ['name' => '4x100m Relay', 'participant_category' => 'open'],
-        'RELAY-4X400' => ['name' => '4x400m Relay', 'participant_category' => 'open'],
-        'LONG-JUMP' => ['name' => 'Long Jump', 'participant_category' => 'open'],
-        'TRIPLE-JUMP' => ['name' => 'Triple Jump', 'participant_category' => 'open'],
+        'RUNS-MEN' => ['name' => 'Runs (Men)', 'participant_category' => 'male'],
+        'RUNS-WOMEN' => ['name' => 'Runs (Women)', 'participant_category' => 'female'],
+        '100M-RUN-MEN' => ['name' => '100m Run (Men)', 'participant_category' => 'male'],
+        '100M-RUN-WOMEN' => ['name' => '100m Run (Women)', 'participant_category' => 'female'],
+        '200M-RUN-MEN' => ['name' => '200m Run (Men)', 'participant_category' => 'male'],
+        '200M-RUN-WOMEN' => ['name' => '200m Run (Women)', 'participant_category' => 'female'],
+        '400M-RUN-MEN' => ['name' => '400m Run (Men)', 'participant_category' => 'male'],
+        '400M-RUN-WOMEN' => ['name' => '400m Run (Women)', 'participant_category' => 'female'],
+        'RELAY-4X100-MEN' => ['name' => '4x100m Relay (Men)', 'participant_category' => 'male'],
+        'RELAY-4X100-WOMEN' => ['name' => '4x100m Relay (Women)', 'participant_category' => 'female'],
+        'RELAY-4X400-MEN' => ['name' => '4x400m Relay (Men)', 'participant_category' => 'male'],
+        'RELAY-4X400-WOMEN' => ['name' => '4x400m Relay (Women)', 'participant_category' => 'female'],
+        'THROWS-MEN' => ['name' => 'Throws (Men)', 'participant_category' => 'male'],
+        'THROWS-WOMEN' => ['name' => 'Throws (Women)', 'participant_category' => 'female'],
+        'SHOT-PUT-MEN' => ['name' => 'Shot Put (Men)', 'participant_category' => 'male'],
+        'SHOT-PUT-WOMEN' => ['name' => 'Shot Put (Women)', 'participant_category' => 'female'],
+        'DISCUS-THROW-MEN' => ['name' => 'Discus Throw (Men)', 'participant_category' => 'male'],
+        'DISCUS-THROW-WOMEN' => ['name' => 'Discus Throw (Women)', 'participant_category' => 'female'],
+        'JAVELIN-THROW-MEN' => ['name' => 'Javelin Throw (Men)', 'participant_category' => 'male'],
+        'JAVELIN-THROW-WOMEN' => ['name' => 'Javelin Throw (Women)', 'participant_category' => 'female'],
+        'JUMP-MEN' => ['name' => 'Jump (Men)', 'participant_category' => 'male'],
+        'JUMP-WOMEN' => ['name' => 'Jump (Women)', 'participant_category' => 'female'],
+        'LONG-JUMP-MEN' => ['name' => 'Long Jump (Men)', 'participant_category' => 'male'],
+        'LONG-JUMP-WOMEN' => ['name' => 'Long Jump (Women)', 'participant_category' => 'female'],
+        'TRIPLE-JUMP-MEN' => ['name' => 'Triple Jump (Men)', 'participant_category' => 'male'],
+        'TRIPLE-JUMP-WOMEN' => ['name' => 'Triple Jump (Women)', 'participant_category' => 'female'],
+        'HIGH-JUMP-MEN' => ['name' => 'High Jump (Men)', 'participant_category' => 'male'],
+        'HIGH-JUMP-WOMEN' => ['name' => 'High Jump (Women)', 'participant_category' => 'female'],
     ];
 
     foreach ($expected as $code => $attributes) {
@@ -153,9 +168,9 @@ test('complete sport catalogue includes gendered volleyball and individual athle
     }
 
     expect(Sport::catalogueGroupKeyFor('VOLLEYBALL-MEN'))->toBe('team')
-        ->and(Sport::catalogueGroupKeyFor('BADMINTON-DOUBLES'))->toBe('individual')
-        ->and(Sport::catalogueGroupKeyFor('RELAY-4X100'))->toBe('track-field')
-        ->and(Sport::catalogueGroupKeyFor('TRIPLE-JUMP'))->toBe('track-field');
+        ->and(Sport::catalogueGroupKeyFor('BADMINTON-DOUBLES-MEN'))->toBe('individual')
+        ->and(Sport::catalogueGroupKeyFor('RELAY-4X100-MEN'))->toBe('track-field')
+        ->and(Sport::catalogueGroupKeyFor('TRIPLE-JUMP-WOMEN'))->toBe('track-field');
 });
 
 test('proposal defaults seed scoring groups and cultural schedule items', function () {
@@ -179,9 +194,9 @@ test('proposal defaults seed scoring groups and cultural schedule items', functi
         ->and(EditionSport::query()->where('edition_id', $edition->id)->whereHas('sport', fn ($query) => $query->whereIn('code', $expectedCodes))->count())->toBe(count($expectedCodes))
         ->and(CompetitionSchedule::query()->whereIn('edition_sport_id', $edition->editionSports()->select('id'))->whereNotNull('title')->count())->toBe(count(config('intramurals.default_schedules')));
 
-    $basketball3x3 = EditionSport::query()->where('edition_id', $edition->id)->whereHas('sport', fn ($query) => $query->where('code', 'BASKET-3X3'))->firstOrFail();
-    $basketball = EditionSport::query()->where('edition_id', $edition->id)->whereHas('sport', fn ($query) => $query->where('code', 'BASKET-5X5'))->firstOrFail();
-    $chess = EditionSport::query()->where('edition_id', $edition->id)->whereHas('sport', fn ($query) => $query->where('code', 'CHESS'))->firstOrFail();
+    $basketball3x3 = EditionSport::query()->where('edition_id', $edition->id)->whereHas('sport', fn ($query) => $query->where('code', 'BASKET-3X3-MEN'))->firstOrFail();
+    $basketball = EditionSport::query()->where('edition_id', $edition->id)->whereHas('sport', fn ($query) => $query->where('code', 'BASKET-5X5-MEN'))->firstOrFail();
+    $chess = EditionSport::query()->where('edition_id', $edition->id)->whereHas('sport', fn ($query) => $query->where('code', 'CHESS-MEN'))->firstOrFail();
     $festivalDance = EditionSport::query()->where('edition_id', $edition->id)->whereHas('sport', fn ($query) => $query->where('code', 'CULT-FEST-DANCE'))->firstOrFail();
     $festivalProgram = EditionSport::query()->where('edition_id', $edition->id)->whereHas('sport', fn ($query) => $query->where('code', 'CULT-FESTIVAL-PROGRAM'))->firstOrFail();
 
@@ -196,7 +211,8 @@ test('proposal defaults seed scoring groups and cultural schedule items', functi
     $awarding = CompetitionSchedule::query()->where('title', 'Awarding')->firstOrFail();
 
     expect($run->starts_at->format('Y-m-d H:i'))->toBe('2026-10-19 06:00')
-        ->and($run->venue)->toBe('TBA')
+        ->and($run->is_activity)->toBeTrue()
+        ->and($run->venue)->toBe('Field/Oval')
         ->and($awarding->starts_at->format('Y-m-d H:i'))->toBe('2026-10-23 13:00')
         ->and($awarding->venue)->toBe('TBA');
 

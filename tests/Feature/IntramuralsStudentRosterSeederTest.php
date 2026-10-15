@@ -17,6 +17,11 @@ test('default intramurals seeder uses the Trojan roster and removes the retired 
     ]);
     $this->assertDatabaseHas('students', [
         'first_name' => 'Grace',
+        'last_name' => 'Gula',
+        'gender' => 'Female',
+    ]);
+    $this->assertDatabaseHas('students', [
+        'first_name' => 'Cristina',
         'last_name' => 'Tago-on',
         'gender' => 'Female',
     ]);
@@ -33,8 +38,17 @@ test('default Trojan roster includes the supplied sport mappings', function () {
     $this->seed(DefaultIntramuralsSeeder::class);
 
     $assertEntry = function (string $firstName, string $lastName, string $sportCode): void {
+        $student = Student::query()
+            ->where('last_name', $lastName)
+            ->get()
+            ->first(fn (Student $candidate): bool => $candidate->full_name === $firstName.' '.$lastName);
+        expect($student)->not->toBeNull();
+        if ($student === null) {
+            return;
+        }
+
         $query = AthleteEntry::query()
-            ->whereHas('student', fn ($studentQuery) => $studentQuery->where('first_name', $firstName)->where('last_name', $lastName))
+            ->where('student_id', $student->id)
             ->whereHas('editionSport.sport', fn ($sportQuery) => $sportQuery->where('code', $sportCode));
 
         expect($query->exists())->toBeTrue();
@@ -42,10 +56,9 @@ test('default Trojan roster includes the supplied sport mappings', function () {
 
     $assertEntry('Jay-R', 'Danas', 'BASEBALL');
     $assertEntry('Anna Mae', 'Guzon', 'VOLLEYBALL-WOMEN');
-    $assertEntry('Jericho', 'Bisnar', 'TRIPLE-JUMP');
-    $assertEntry('Jericho', 'Bisnar', 'HIGH-JUMP');
-    $assertEntry('Grace', 'Tago-on', 'SHOT-PUT');
-    $assertEntry('Jhon Kristian', 'Cundangan', 'ESPORT-ML');
+    $assertEntry('Jericho', 'Bisnar', 'LONG-JUMP-MEN');
+    $assertEntry('Grace', 'Gula', 'RUSSIAN-SOFTBALL');
+    $assertEntry('Jhon Kristian', 'Cundangan', 'ESPORT-ML-MEN');
 });
 
 test('default Trojan roster seeding is safe to rerun', function () {

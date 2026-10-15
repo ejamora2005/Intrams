@@ -14,15 +14,14 @@ class CompetitionController extends Controller
 {
     private const SCHEDULE_STATUSES = ['scheduled', 'live', 'completed', 'cancelled'];
 
-    public function __construct(private readonly AuditService $auditService)
-    {
-    }
+    public function __construct(private readonly AuditService $auditService) {}
 
     public function index(): View
     {
         return view('admin.competition.index', [
             'schedules' => CompetitionSchedule::with([
                 'editionSport.edition',
+                'editionSport.edition.teams',
                 'editionSport.sport',
                 'bracketMatch',
                 'participants.team',

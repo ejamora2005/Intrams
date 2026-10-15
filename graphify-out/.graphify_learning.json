@@ -1,8 +1,8 @@
 {
-  "generated_at": "2026-10-01T06:30:44.727392+00:00",
+  "generated_at": "2026-10-15T00:37:03.223414+00:00",
   "nodes": {
     "app_http_controllers_admin_sportcontroller_sportcontroller_downloadbasketballscoresheet": {
-      "code_fingerprint": "df47ef70907a67522dad6d0a7eedcc153161469c026486ac1da0f28ad3bacf63",
+      "code_fingerprint": "8cd9a214d35ecbfc869e41cad98ba9cbc9d2942f6164de26a26766951c55e78e",
       "label": ".downloadBasketballScoreSheet()",
       "last": "2026-09-27T02:04:43.899953+00:00",
       "provenance": [
@@ -12,7 +12,7 @@
           "q": "inheret the format from preview to the download"
         }
       ],
-      "score": 0.907839358,
+      "score": 0.66068275,
       "source_file": "app/Http/Controllers/Admin/SportController.php",
       "status": "tentative",
       "uses": 1
@@ -28,13 +28,13 @@
           "q": "replace the basketball score sheet with this, but inheret the function autofill name based on the team, and lisence replaced with course."
         }
       ],
-      "score": 0.907661918,
+      "score": 0.660553617,
       "source_file": "app/Models/Course.php",
       "status": "tentative",
       "uses": 1
     },
     "app_models_team_team": {
-      "code_fingerprint": "e56b1a6cda586fad42967a2a6b124ffbf2cc57ec95dc6ae00afee7cfd9bf47fe",
+      "code_fingerprint": "c392feaf5ab6733c5be306807bddee403e3aac4886f7f850329662736a8fc9c5",
       "label": "Team",
       "last": "2026-09-27T01:52:32.938154+00:00",
       "provenance": [
@@ -44,7 +44,7 @@
           "q": "replace the basketball score sheet with this, but inheret the function autofill name based on the team, and lisence replaced with course."
         }
       ],
-      "score": 0.907661918,
+      "score": 0.660553617,
       "source_file": "app/Models/Team.php",
       "status": "tentative",
       "uses": 1
@@ -70,7 +70,7 @@
           "q": "replace the basketball score sheet with this, but inheret the function autofill name based on the team, and lisence replaced with course."
         }
       ],
-      "score": 2.723424572,
+      "score": 1.981980204,
       "source_file": "resources/views/admin/sports/basketball-score-sheet-pdf.blade.php",
       "status": "preferred",
       "uses": 3
@@ -86,7 +86,7 @@
           "q": "swap the competition and team b, make this changes in both the preview and downloadable"
         }
       ],
-      "score": 0.907923297,
+      "score": 0.660743837,
       "source_file": "resources/views/admin/sports/partials/basketball-score-sheet.blade.php",
       "status": "tentative",
       "uses": 1

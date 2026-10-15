@@ -1,10 +1,18 @@
 @props([
+    'studentGender' => null,
+    'selectedIds' => [],
     'sports' => collect(),
     'teamSportNote' => 'Team-sport selections are assigned to the student’s current faction.',
 ])
 
+@php
+    $studentGender = old('gender', $studentGender ?? null);
+    $selectedIds = $selectedIds ?? [];
+    $sports = $sports->filter(fn ($editionSport) => $editionSport->sport?->acceptsStudentGender($studentGender))->values();
+    $selectedSportIds = collect(old('edition_sport_ids', $selectedIds))->map(fn ($id) => (string) $id);
+@endphp
+
 @if ($sports->isNotEmpty())
-    @php($selectedSportIds = collect(old('edition_sport_ids', []))->map(fn ($id) => (string) $id))
 
     <fieldset data-sport-picker class="mt-7 border-t border-slate-100 pt-6">
         <div class="flex flex-col justify-between gap-2 sm:flex-row sm:items-end">
@@ -21,7 +29,9 @@
                 @php($slot = $editionSport->participation_slot)
                 @php($countsTowardLimit = $editionSport->counts_toward_participation_limit)
                 @php($isRelay = $editionSport->is_relay_event)
-                <label data-sport-option class="flex cursor-pointer items-start gap-3 rounded-lg border border-slate-200 p-4 transition hover:border-blue-300 hover:bg-blue-50">
+                @php($pairedPartnerExemptGenders = $editionSport->paired_partner_exempt_genders ?? [])
+                @php($defaultSlotLabel = $isRelay ? 'Relay (exempt)' : ($slot === 'individual_or_dual' ? 'Individual / dual' : ucfirst($slot)))
+                <label data-sport-option data-sport-category="{{ $sport?->participant_category }}" class="flex cursor-pointer items-start gap-3 rounded-lg border border-slate-200 p-4 transition hover:border-blue-300 hover:bg-blue-50">
                     <input
                         type="checkbox"
                         name="edition_sport_ids[]"
@@ -29,13 +39,15 @@
                         data-sport-choice
                         data-slot="{{ $slot }}"
                         data-counts-toward-limit="{{ $countsTowardLimit ? 'true' : 'false' }}"
+                        data-relay="{{ $isRelay ? 'true' : 'false' }}"
+                        data-paired-partner-exempt-for="{{ implode(',', $pairedPartnerExemptGenders) }}"
                         @checked($selectedSportIds->contains((string) $editionSport->id))
                         class="mt-0.5 rounded border-slate-300 text-blue-700 focus:ring-blue-600"
                     >
                     <span>
                         <span class="block font-medium text-slate-900">{{ $sport?->name }}</span>
                         <span class="mt-1 flex flex-wrap gap-2 text-xs text-slate-500">
-                            <span class="rounded-full bg-slate-100 px-2 py-0.5 font-semibold text-slate-700">{{ $isRelay ? 'Relay (exempt)' : ($slot === 'individual_or_dual' ? 'Individual / dual' : ucfirst($slot)) }}</span>
+                            <span data-sport-slot-label data-default-slot-label="{{ $defaultSlotLabel }}" class="rounded-full bg-slate-100 px-2 py-0.5 font-semibold text-slate-700">{{ $defaultSlotLabel }}</span>
                             <span>{{ ucfirst($editionSport->participant_type) }} event</span>
                             @if (in_array($sport?->participant_category, ['male', 'female'], true))
                                 <span>{{ $sport->participant_category_label }}</span>
@@ -61,13 +73,16 @@
             const summary = picker.querySelector('[data-sport-picker-summary]');
             const error = picker.querySelector('[data-sport-picker-client-error]');
             const form = picker.closest('form');
+            const genderInput = form?.querySelector('[name="gender"]');
             const emptyCounts = () => ({ major: 0, minor: 0, individual_or_dual: 0 });
-            const countsTowardLimit = input => input.dataset.countsTowardLimit === 'true';
+            const isPairedPartnerExempt = input => (input.dataset.pairedPartnerExemptFor || '').split(',').filter(Boolean).includes((genderInput?.value || '').toLowerCase());
+            const countsTowardLimit = input => input.dataset.countsTowardLimit === 'true' && !isPairedPartnerExempt(input);
             const selectedCounts = () => inputs.filter(input => input.checked && countsTowardLimit(input)).reduce((counts, input) => {
                 counts[input.dataset.slot] = (counts[input.dataset.slot] || 0) + 1;
                 return counts;
             }, emptyCounts());
-            const selectedRelayCount = () => inputs.filter(input => input.checked && !countsTowardLimit(input)).length;
+            const selectedRelayCount = () => inputs.filter(input => input.checked && input.dataset.relay === 'true').length;
+            const selectedPairedPartnerCount = () => inputs.filter(input => input.checked && isPairedPartnerExempt(input)).length;
             const total = counts => Object.values(counts).reduce((sum, count) => sum + count, 0);
             const canUse = (counts, slot) => {
                 const next = { ...counts, [slot]: (counts[slot] || 0) + 1 };
@@ -78,21 +93,30 @@
 
             const sync = () => {
                 const counts = selectedCounts();
+                const gender = (genderInput?.value || '').toLowerCase();
 
                 inputs.forEach(input => {
+                    const option = input.closest('[data-sport-option]');
+                    const category = option.dataset.sportCategory || '';
+                    const genderAllowed = !['male', 'female'].includes(category) || !gender || category === gender;
+                    const slotLabel = option.querySelector('[data-sport-slot-label]');
+                    if (slotLabel) slotLabel.textContent = isPairedPartnerExempt(input) ? 'Paired partner (exempt)' : slotLabel.dataset.defaultSlotLabel;
+                    option.hidden = !genderAllowed;
+                    if (!genderAllowed && input.checked) input.checked = false;
                     if (input.checked) return;
 
-                    const allowed = !countsTowardLimit(input) || canUse(counts, input.dataset.slot);
+                    const allowed = genderAllowed && (!countsTowardLimit(input) || canUse(counts, input.dataset.slot));
                     input.disabled = !allowed;
-                    input.closest('[data-sport-option]').classList.toggle('cursor-not-allowed', !allowed);
-                    input.closest('[data-sport-option]').classList.toggle('opacity-50', !allowed);
+                    option.classList.toggle('cursor-not-allowed', !allowed);
+                    option.classList.toggle('opacity-50', !allowed);
                 });
 
-                summary.textContent = `Selected: Major ${counts.major} / Minor ${counts.minor} / Individual-Dual ${counts.individual_or_dual} / Relay ${selectedRelayCount()} (exempt)`;
+                summary.textContent = `Selected: Major ${counts.major} / Minor ${counts.minor} / Individual-Dual ${counts.individual_or_dual} / Relay ${selectedRelayCount()} (exempt) / Paired partner ${selectedPairedPartnerCount()} (exempt)`;
                 if (inputs.some(input => input.checked)) error.hidden = true;
             };
 
             inputs.forEach(input => input.addEventListener('change', sync));
+            genderInput?.addEventListener('change', sync);
             form?.addEventListener('submit', event => {
                 if (inputs.some(input => input.checked)) return;
 

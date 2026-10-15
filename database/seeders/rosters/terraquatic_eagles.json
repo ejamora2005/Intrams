@@ -1,0 +1,260 @@
+[
+    {
+        "name":  "Shawn C. Galos",
+        "gender":  "Male",
+        "year_section":  "2A",
+        "sports":  "Volleyball \u0026 Beach Volleyball"
+    },
+    {
+        "name":  "Frank Leymar B. Guzmana",
+        "gender":  "Male",
+        "year_section":  "2A",
+        "sports":  "Basketball \u0026 Long jump"
+    },
+    {
+        "name":  "Daryl G. Amad",
+        "gender":  "Female",
+        "year_section":  "3A",
+        "sports":  "Volleyball"
+    },
+    {
+        "name":  "Ralph Adriane I.  Ocaña",
+        "gender":  "Male",
+        "year_section":  "1B",
+        "sports":  "Volleyball \u0026 Badminton"
+    },
+    {
+        "name":  "Jodel P. Acampado",
+        "gender":  "Male",
+        "year_section":  "3A",
+        "sports":  "Basketball 5v5"
+    },
+    {
+        "name":  "Trixia Mae F. Rafalle",
+        "gender":  "Female",
+        "year_section":  "3A",
+        "sports":  "Modified Volleyball \u0026 Run"
+    },
+    {
+        "name":  "Joanah C. Odog",
+        "gender":  "Female",
+        "year_section":  "3A",
+        "sports":  "Table Tennis"
+    },
+    {
+        "name":  "Cris Ann Gaye L. Oja",
+        "gender":  "Female",
+        "year_section":  "3A",
+        "sports":  "Modified Volleyball"
+    },
+    {
+        "name":  "Mary Lyn M. Marte",
+        "gender":  "Female",
+        "year_section":  "3A",
+        "sports":  "Modified Volleyball"
+    },
+    {
+        "name":  "Clark Eugene C. Lopez",
+        "gender":  "Male",
+        "year_section":  "4A",
+        "sports":  "Baseball\u0026Russian"
+    },
+    {
+        "name":  "Gantala, Antonette L.",
+        "gender":  "Female",
+        "year_section":  "3A",
+        "sports":  "Russian Soft ball"
+    },
+    {
+        "name":  "Aires Panisan",
+        "gender":  "Female",
+        "year_section":  "BSA 1A",
+        "sports":  "Russian softball"
+    },
+    {
+        "name":  "Shiella Mariz P. Getil",
+        "gender":  "Female",
+        "year_section":  "1A",
+        "sports":  "Shot Put"
+    },
+    {
+        "name":  "Gayo, French",
+        "gender":  "Male",
+        "year_section":  "3A",
+        "sports":  "Basketball \u0026 Beach Volleyball"
+    },
+    {
+        "name":  "Althea Marie R. Villacorte",
+        "gender":  "Female",
+        "year_section":  "1A",
+        "sports":  "Chess"
+    },
+    {
+        "name":  "Lontoco, Lance Patrick A.",
+        "gender":  "Male",
+        "year_section":  "1A",
+        "sports":  "Baseball\u0026Russian"
+    },
+    {
+        "name":  "Evelyn T. Rama",
+        "gender":  "Female",
+        "year_section":  "1A",
+        "sports":  "Shot Put"
+    },
+    {
+        "name":  "Jimuel Pagay",
+        "gender":  "Male",
+        "year_section":  "BSA 3-A",
+        "sports":  "Javelin Throw"
+    },
+    {
+        "name":  "Timkang, Rey Ann M.",
+        "gender":  "Female",
+        "year_section":  "4A",
+        "sports":  "Chess"
+    },
+    {
+        "name":  "Guma, John Norbert C.",
+        "gender":  "Male",
+        "year_section":  "4A",
+        "sports":  "eSports"
+    },
+    {
+        "name":  "Quilos, Kenzies Dwight David",
+        "gender":  "Male",
+        "year_section":  "4A",
+        "sports":  "chess"
+    },
+    {
+        "name":  "Manatad, Christel Kaye A.",
+        "gender":  "Female",
+        "year_section":  "1B",
+        "sports":  "Volleyball \u0026 Badminton"
+    },
+    {
+        "name":  "Villaseñor, Rodelar",
+        "gender":  "Male",
+        "year_section":  "1B",
+        "sports":  "Volleyball \u0026 Badminton"
+    },
+    {
+        "name":  "Renier F. Timkang",
+        "gender":  "Male",
+        "year_section":  "1B",
+        "sports":  "Volleyball \u0026 Badminton"
+    },
+    {
+        "name":  "Catarman Roll James B.",
+        "gender":  "Male",
+        "year_section":  "1A",
+        "sports":  "eSports"
+    },
+    {
+        "name":  "James Mark Trimucha",
+        "gender":  "Male",
+        "year_section":  "1A",
+        "sports":  "eSports"
+    },
+    {
+        "name":  "Danica E. Delute",
+        "gender":  "Female",
+        "year_section":  "BSA 3-A",
+        "sports":  "chess \u0026 modified volleyball"
+    },
+    {
+        "name":  "April Rose B. Caadyang",
+        "gender":  "Female",
+        "year_section":  "BSA 3-A",
+        "sports":  "modified volleyball \u0026 festival"
+    },
+    {
+        "name":  "Caren S.Traboc",
+        "gender":  "Female",
+        "year_section":  "BSA 3",
+        "sports":  "Modified volleyball"
+    },
+    {
+        "name":  "Claire Angelie M. Bulabos",
+        "gender":  "Female",
+        "year_section":  "BSA 3",
+        "sports":  "Modified Volleyball"
+    },
+    {
+        "name":  "Roxan C. Nambatac",
+        "gender":  "Female",
+        "year_section":  "BSA 3",
+        "sports":  "Modified volleyball"
+    },
+    {
+        "name":  "Jelaica Pajo",
+        "gender":  "Female",
+        "year_section":  "BSA 1A",
+        "sports":  "Russian softball"
+    },
+    {
+        "name":  "Princes Grace Jesto",
+        "gender":  "Female",
+        "year_section":  "BSFi 3-A",
+        "sports":  "Long Jump"
+    },
+    {
+        "name":  "Sheva Marie De paz",
+        "gender":  "Female",
+        "year_section":  "BSFi 3A",
+        "sports":  "Long jump"
+    },
+    {
+        "name":  "Jake C. Keleste",
+        "gender":  "Male",
+        "year_section":  "BSA 1B",
+        "sports":  "eSports"
+    },
+    {
+        "name":  "Lorena Capusoran",
+        "gender":  "Female",
+        "year_section":  "BSFi 3A",
+        "sports":  "Triple Jump"
+    },
+    {
+        "name":  "Rhea Maraveles",
+        "gender":  "Female",
+        "year_section":  "BSA 3",
+        "sports":  "Modified Volleyball"
+    },
+    {
+        "name":  "Jan Sander E. Aboyot",
+        "gender":  "Male",
+        "year_section":  "BSA 1-B",
+        "sports":  "Chess"
+    },
+    {
+        "name":  "Kyrelle Jhane C. Ronato",
+        "gender":  "Female",
+        "year_section":  "BSA 3A",
+        "sports":  "E-sport"
+    },
+    {
+        "name":  "Nathaniel M. America",
+        "gender":  "Male",
+        "year_section":  "BSA 2-A",
+        "sports":  "400m Run"
+    },
+    {
+        "name":  "Nica M. Gitanes",
+        "gender":  "Female",
+        "year_section":  "BSA 1-A",
+        "sports":  "Russian Softball"
+    },
+    {
+        "name":  "Niña Celeste",
+        "gender":  "Female",
+        "year_section":  "BSFi 1-A",
+        "sports":  "Discuss  Throw"
+    },
+    {
+        "name":  "Alvin Renzo J. Angub",
+        "gender":  "Male",
+        "year_section":  "BSA 1-B",
+        "sports":  "Baseball, Run 400 mm dash"
+    }
+]

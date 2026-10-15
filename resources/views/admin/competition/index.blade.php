@@ -39,7 +39,11 @@
                     @forelse ($schedules as $schedule)
                         @php
                             $scheduleLabel = $schedule->title ?: ($schedule->bracketMatch ? 'Game '.$schedule->bracketMatch->match_number : 'Competition');
-                            $participantTeams = $schedule->participants->pluck('team')->filter()->unique('id')->values();
+                            $isActivity = (bool) $schedule->is_activity;
+                            $isCultural = str_starts_with(strtoupper((string) $schedule->editionSport->sport?->code), 'CULT-');
+                            $participantTeams = $isCultural
+                                ? $schedule->editionSport->edition->teams->where('status', 'active')->values()
+                                : $schedule->participants->pluck('team')->filter()->unique('id')->values();
                             $participantNames = $schedule->participants
                                 ->map(fn ($participant) => $participant->athleteEntry?->student?->full_name)
                                 ->filter()
@@ -49,17 +53,21 @@
                         <tr class="align-top">
                             <td class="px-5 py-4 font-medium text-slate-900">{{ $schedule->editionSport->edition->name }}</td>
                             <td class="px-5 py-4 text-slate-700">
-                                <span class="flex items-center gap-2">
-                                    <span class="ops-sport-inline-icon"><x-sport-group-icon :group="$schedule->editionSport->sport?->catalogue_group_key ?? 'other'" /></span>
-                                    <span><span class="block font-medium text-slate-900">{{ $schedule->editionSport->sport->name }}</span><span class="text-xs text-slate-500">{{ $schedule->editionSport->sport?->catalogue_group_label ?? 'Other Sports' }}</span></span>
-                                </span>
+                                @if ($isActivity)
+                                    <span class="font-medium text-slate-900">School activity</span>
+                                @else
+                                    <span class="flex items-center gap-2">
+                                        <span class="ops-sport-inline-icon"><x-sport-group-icon :group="$schedule->editionSport->sport?->catalogue_group_key ?? 'other'" /></span>
+                                        <span><span class="block font-medium text-slate-900">{{ $schedule->editionSport->sport->name }}</span><span class="text-xs text-slate-500">{{ $schedule->editionSport->sport?->catalogue_group_label ?? 'Other Sports' }}</span></span>
+                                    </span>
+                                @endif
                             </td>
                             <td class="px-5 py-4 text-slate-700">{{ $scheduleLabel }}</td>
                             <td class="px-5 py-4 text-slate-700">
                                 @if ($participantTeams->isNotEmpty())
                                     <div class="flex flex-wrap items-center gap-2">
                                         @foreach ($participantTeams as $team)
-                                            <x-team-badge :team="$team" class="font-medium text-slate-900" />
+                                            <x-team-badge :team="$team" :show-subtitle="false" :logo-only="$participantTeams->count() > 2" class="font-medium text-slate-900" />
                                             @unless ($loop->last)
                                                 <span class="text-xs font-semibold uppercase text-slate-400">vs</span>
                                             @endunless

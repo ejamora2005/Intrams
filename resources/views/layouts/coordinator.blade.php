@@ -25,10 +25,11 @@
                     ['label' => 'Team Standings', 'route' => 'gam.dashboard', 'match' => 'gam/dashboard', 'hash' => 'team-standings'],
                     ['label' => 'Ready Matches', 'route' => 'gam.dashboard', 'match' => 'gam/dashboard', 'hash' => 'ready-matches'],
                     ['label' => 'Rules & Guidelines', 'route' => 'gam.rules.index', 'match' => 'gam/rules-guidelines', 'active' => true],
+                    ['label' => 'Possible DQ Watchlist', 'route' => 'gam.possible-dq.index', 'match' => 'gam/possible-dq', 'active' => true],
                 ],
                 'tabulator' => [
                     ['label' => 'Dashboard', 'route' => 'tabulator.dashboard', 'match' => 'tabulator/dashboard', 'active' => true],
-                    ['label' => 'Possible DQ', 'route' => 'tabulator.dashboard', 'match' => 'tabulator/dashboard', 'hash' => 'possible-dq'],
+                    ['label' => 'Possible DQ Watchlist', 'route' => 'tabulator.possible-dq.index', 'match' => 'tabulator/possible-dq', 'active' => true],
                     ['label' => 'Declare Sports', 'route' => 'tabulator.dashboard', 'match' => 'tabulator/dashboard', 'hash' => 'declare-sports'],
                     ['label' => 'Placement Monitor', 'route' => 'tabulator.dashboard', 'match' => 'tabulator/dashboard', 'hash' => 'declared-results'],
                     ['label' => 'Match Winners', 'route' => 'tabulator.dashboard', 'match' => 'tabulator/dashboard', 'hash' => 'match-winners'],
@@ -190,7 +191,10 @@
             };
 
             if (opsViewPanels.length > 0) {
-                const initialOpsView = window.location.hash ? window.location.hash.slice(1) : 'dashboard-overview';
+                const autoOpsView = document.querySelector('[data-ops-auto-view]')?.dataset.opsAutoView;
+                const initialOpsView = window.location.hash
+                    ? window.location.hash.slice(1)
+                    : (new URLSearchParams(window.location.search).get('view') ?? autoOpsView ?? 'dashboard-overview');
                 setOpsView(initialOpsView);
 
                 [...opsViewLinks, ...opsViewShortcuts].forEach((link) => {
@@ -205,7 +209,7 @@
                 });
 
                 window.addEventListener('popstate', () => {
-                    setOpsView(window.location.hash ? window.location.hash.slice(1) : 'dashboard-overview');
+                    setOpsView(window.location.hash ? window.location.hash.slice(1) : (new URLSearchParams(window.location.search).get('view') ?? 'dashboard-overview'));
                 });
             }
         </script>

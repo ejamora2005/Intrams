@@ -1,12 +1,12 @@
 @extends('layouts.coordinator', ['title' => 'GAM dashboard', 'workspaceLabel' => 'GAM workspace', 'homeRoute' => 'gam.dashboard'])
 
 @section('content')
-    @if (session('success'))
-        <div class="mb-6 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800">{{ session('success') }}</div>
+    <x-ops-feedback />
+    @if (request('modal'))
+        <div data-ops-auto-modal="{{ request('modal') }}" hidden></div>
     @endif
-
-    @if ($errors->any())
-        <div class="mb-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">{{ $errors->first() }}</div>
+    @if (session('ops_view'))
+        <div data-ops-auto-view="{{ session('ops_view') }}" hidden></div>
     @endif
 
     <section data-ops-view-panel="dashboard-overview" class="ops-view-panel space-y-6">
@@ -18,7 +18,10 @@
                     <p class="mt-3 max-w-2xl text-sm leading-6 text-slate-600">{{ $edition?->name ?? 'No active intramurals edition is available yet.' }}</p>
                 </div>
                 <div class="flex flex-col gap-3 sm:flex-row sm:items-end">
-                    <a href="{{ route('gam.rules.index') }}" class="inline-flex w-fit items-center justify-center rounded-lg border border-blue-200 bg-white px-4 py-2.5 text-sm font-semibold text-blue-800 shadow-sm transition hover:border-blue-300 hover:bg-blue-50">Rules & Guidelines</a>
+                    <div class="flex flex-wrap gap-3">
+                        <a href="{{ route('gam.rules.index') }}" class="inline-flex w-fit items-center justify-center rounded-lg border border-blue-200 bg-white px-4 py-2.5 text-sm font-semibold text-blue-800 shadow-sm transition hover:border-blue-300 hover:bg-blue-50">Rules & Guidelines</a>
+                        <a href="{{ route('gam.possible-dq.index') }}" class="inline-flex w-fit items-center justify-center rounded-lg bg-red-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-red-700">Possible DQ Watchlist</a>
+                    </div>
                     @if ($selectedTeam)
                         <div class="rounded-lg border border-white/15 bg-white/10 px-4 py-3 sm:min-w-72">
                             <p class="text-xs font-semibold uppercase text-slate-500">Current team</p>
@@ -45,6 +48,11 @@
             <a href="#roster-management" data-ops-view-shortcut="roster-management" class="ops-dashboard-card block rounded-lg border p-4 transition">
                 <p class="text-sm font-semibold text-slate-950">Roster management</p>
                 <p class="mt-2 text-sm leading-6 text-slate-500">Assign players, add new students, and review Possible DQ roster flags.</p>
+            </a>
+            <a href="{{ route('gam.possible-dq.index') }}" class="ops-dashboard-card block rounded-lg border border-red-200 p-4 transition hover:border-red-300">
+                <p class="text-sm font-semibold text-slate-950">Possible DQ watchlist</p>
+                <p class="mt-2 text-2xl font-semibold text-red-700">{{ $flaggedStudents->count() }}</p>
+                <p class="mt-2 text-sm leading-6 text-slate-500">Open the full list of players requiring registration review.</p>
             </a>
             <a href="#medical-certificates" data-ops-view-shortcut="medical-certificates" class="ops-dashboard-card block rounded-lg border p-4 transition">
                 <p class="text-sm font-semibold text-slate-950">Medical certificates</p>
@@ -95,7 +103,7 @@
                     <div class="mt-4 overflow-x-auto rounded-lg border border-slate-200">
                         <table class="min-w-full text-left text-sm">
                             <thead class="border-b border-slate-100 bg-slate-50 text-xs font-semibold uppercase tracking-wide text-slate-500">
-                                <tr><th class="px-4 py-3">Player</th><th class="px-4 py-3">Student ID</th><th class="px-4 py-3">Course</th><th class="px-4 py-3">Year / Section</th><th class="px-4 py-3">Status</th></tr>
+                                <tr><th class="px-4 py-3">Player</th><th class="px-4 py-3">Student ID</th><th class="px-4 py-3">Course</th><th class="px-4 py-3">Year / Section</th><th class="px-4 py-3">Status</th><th class="px-4 py-3">Sports joined</th></tr>
                             </thead>
                             <tbody class="divide-y divide-slate-100">
                                 @forelse ($selectedTeam->members as $member)
@@ -117,9 +125,53 @@
                                                 <span class="inline-flex w-max whitespace-nowrap rounded-full bg-green-50 px-2.5 py-1 text-xs font-semibold text-green-700">Clear</span>
                                             @endif
                                         </td>
+                                        <td class="px-4 py-3 align-top">
+                                            @if ($member->student)
+                                                @php($selectedIds = $member->student->athleteEntries->where('status', 'active')->filter(fn ($entry) => (int) $entry->editionSport?->edition_id === (int) $selectedTeam->edition_id)->pluck('edition_sport_id')->map(fn ($id) => (string) $id))
+                                                @php($editModalId = 'edit-sports-'.$member->student->id)
+                                                @php($editSportIds = collect(old('edition_sport_ids', $selectedIds->all())))
+                                                <button type="button" data-ops-modal-open="{{ $editModalId }}" class="inline-flex items-center gap-2 rounded-lg border border-blue-200 bg-white px-3 py-2 text-xs font-semibold text-blue-700 transition hover:border-blue-300 hover:bg-blue-50">
+                                                    <span>Edit sports</span>
+                                                    <span class="rounded-full bg-blue-50 px-2 py-0.5 text-[11px]">{{ $selectedIds->count() }}</span>
+                                                </button>
+                                                <dialog id="{{ $editModalId }}" data-ops-modal class="w-[min(42rem,calc(100vw-2rem))] rounded-2xl border-0 bg-white p-0 text-slate-900 shadow-2xl backdrop:bg-slate-950/60">
+                                                    <form method="POST" action="{{ route('gam.teams.players.sports.update', [$selectedTeam, $member->student, 'team_id' => $selectedTeam->id, 'view' => 'roster-management', 'modal' => $editModalId]) }}" data-ops-form>
+                                                        @csrf
+                                                        @method('PUT')
+                                                        <div class="flex items-start justify-between gap-4 border-b border-slate-200 px-5 py-4">
+                                                            <div>
+                                                                <p class="text-xs font-semibold uppercase tracking-wide text-blue-700">Roster update</p>
+                                                                <h3 class="mt-1 text-lg font-semibold">Edit sports for {{ $member->student->full_name }}</h3>
+                                                                <p class="mt-1 text-sm text-slate-500">Choose the sports this player has joined. Gender-matched events are shown automatically.</p>
+                                                            </div>
+                                                            <button type="button" data-ops-modal-close class="rounded-lg p-2 text-xl leading-none text-slate-400 transition hover:bg-slate-100 hover:text-slate-700" aria-label="Close edit sports dialog">&times;</button>
+                                                        </div>
+                                                        <div class="max-h-[55vh] space-y-2 overflow-y-auto px-5 py-4">
+                                                            @error('edition_sport_ids')
+                                                                <p class="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800">{{ $message }}</p>
+                                                            @enderror
+                                                            @forelse ($sportOptions->filter(fn ($option) => $option->sport?->acceptsStudentGender($member->student->gender)) as $option)
+                                                                <label class="flex cursor-pointer items-start gap-3 rounded-xl border border-slate-200 p-3 text-sm text-slate-700 transition hover:border-blue-300 hover:bg-blue-50">
+                                                                    <input type="checkbox" name="edition_sport_ids[]" value="{{ $option->id }}" @checked($editSportIds->contains((string) $option->id) || $editSportIds->contains((int) $option->id)) class="mt-0.5 rounded border-slate-300 text-blue-700 focus:ring-blue-600">
+                                                                    <span class="font-medium">{{ $option->sport?->name }}</span>
+                                                                </label>
+                                                            @empty
+                                                                <p class="rounded-lg border border-dashed border-slate-300 px-4 py-8 text-center text-sm text-slate-500">No gender-matched sports are available for this edition.</p>
+                                                            @endforelse
+                                                        </div>
+                                                        <div class="flex flex-col-reverse gap-2 border-t border-slate-200 bg-slate-50 px-5 py-4 sm:flex-row sm:justify-end">
+                                                            <button type="button" data-ops-modal-close class="rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-100">Cancel</button>
+                                                            <button type="submit" data-loading-label="Saving sports…" class="rounded-lg bg-blue-700 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-800">Save sports</button>
+                                                        </div>
+                                                    </form>
+                                                </dialog>
+                                            @else
+                                                <span class="text-slate-400">-</span>
+                                            @endif
+                                        </td>
                                     </tr>
                                 @empty
-                                    <tr><td colspan="5" class="px-4 py-10 text-center text-slate-500">No players assigned yet.</td></tr>
+                                    <tr><td colspan="6" class="px-4 py-10 text-center text-slate-500">No players assigned yet.</td></tr>
                                 @endforelse
                             </tbody>
                         </table>
@@ -127,7 +179,7 @@
                 </div>
 
                 <div class="space-y-5">
-                    <form method="POST" action="{{ route('gam.teams.players.assign', $selectedTeam) }}" class="rounded-lg border border-slate-200 p-4">
+                    <form method="POST" action="{{ route('gam.teams.players.assign', [$selectedTeam, 'team_id' => $selectedTeam->id, 'view' => 'roster-management']) }}" data-ops-form class="rounded-lg border border-slate-200 p-4">
                         @csrf
                         <h3 class="font-semibold text-slate-950">Assign existing player</h3>
                         <select name="student_id" required class="mt-3 block w-full rounded-lg border-slate-300 py-2.5 text-sm focus:border-blue-600 focus:ring-blue-600">
@@ -139,7 +191,7 @@
                         <button class="mt-3 rounded-lg bg-blue-700 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-800">Assign player</button>
                     </form>
 
-                    <form method="POST" action="{{ route('gam.teams.players.store', $selectedTeam) }}" class="rounded-lg border border-slate-200 p-4">
+                    <form method="POST" action="{{ route('gam.teams.players.store', [$selectedTeam, 'team_id' => $selectedTeam->id, 'view' => 'roster-management']) }}" data-ops-form class="rounded-lg border border-slate-200 p-4">
                         @csrf
                         <h3 class="font-semibold text-slate-950">Add new player</h3>
                         <div class="mt-4 grid gap-3 sm:grid-cols-2">
@@ -156,7 +208,7 @@
                             <input name="year_level" value="{{ old('year_level') }}" placeholder="Year level" class="rounded-lg border-slate-300 px-3 py-2.5 text-sm focus:border-blue-600 focus:ring-blue-600">
                             <input name="section" value="{{ old('section') }}" placeholder="Section" class="rounded-lg border-slate-300 px-3 py-2.5 text-sm focus:border-blue-600 focus:ring-blue-600">
                         </div>
-                        <x-participation-sport-picker :sports="$sportOptions" :team-sport-note="'Team-sport selections are assigned to '.$selectedTeam->name.'.'" />
+                        <x-participation-sport-picker :sports="$sportOptions" :student-gender="old('gender')" :team-sport-note="'Team-sport selections are assigned to '.$selectedTeam->name.'.'" />
                         <button class="mt-4 rounded-lg bg-blue-700 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-800">Add player</button>
                     </form>
                 </div>
@@ -213,7 +265,7 @@
                                 </ul>
                             </td>
                             <td class="px-4 py-3 align-top">
-                                <form method="POST" action="{{ route('gam.medical-certificates.students.update', $entry->student) }}" class="grid min-w-[15rem] gap-2">
+                                <form method="POST" action="{{ route('gam.medical-certificates.students.update', [$entry->student, 'team_id' => $rosterTeam?->id, 'view' => 'medical-certificates']) }}" data-ops-form class="grid min-w-[15rem] gap-2">
                                     @csrf
                                     <select name="medical_certificate_status" required aria-label="Medical certificate status for {{ $entry->student?->full_name }}" class="rounded-lg border-slate-300 py-2 text-sm focus:border-blue-600 focus:ring-blue-600">
                                         <option value="">Choose status</option>
@@ -222,7 +274,7 @@
                                         <option value="rejected">Rejected</option>
                                     </select>
                                     <input name="medical_certificate_notes" placeholder="Notes" aria-label="Medical certificate notes for {{ $entry->student?->full_name }}" class="rounded-lg border-slate-300 px-3 py-2 text-sm focus:border-blue-600 focus:ring-blue-600">
-                                    <button class="w-fit rounded-lg bg-blue-700 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-800">Save</button>
+                                    <button type="submit" data-loading-label="Saving review…" class="w-fit rounded-lg bg-blue-700 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-800">Save</button>
                                 </form>
                             </td>
                         </tr>

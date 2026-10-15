@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\CompetitionSchedule;
 use App\Models\IntramuralEdition;
+use App\Models\Sport;
 use App\Models\Team;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
@@ -54,7 +55,7 @@ class PublicScheduleService
                                 ->sortBy('name')
                                 ->map(fn ($sport): array => [
                                     'name' => $this->eventName($sport->name),
-                                    'category' => $sport->participant_category_label,
+                                    'category' => $this->rosterCategory($sport),
                                 ])
                                 ->values()
                                 ->all();
@@ -92,7 +93,7 @@ class PublicScheduleService
                 ->all();
 
             $todaySchedules = CompetitionSchedule::query()
-                ->select(['id', 'edition_sport_id', 'bracket_match_id', 'title', 'starts_at', 'venue', 'coordinator_id', 'status'])
+                ->select(['id', 'edition_sport_id', 'bracket_match_id', 'title', 'is_activity', 'starts_at', 'venue', 'coordinator_id', 'status'])
                 ->whereIn('edition_sport_id', $currentEdition->editionSports()->select('id'))
                 ->whereDate('starts_at', $selectedDate->toDateString())
                 ->whereNotIn('status', ['cancelled', 'canceled'])
@@ -113,34 +114,44 @@ class PublicScheduleService
                 ])
                 ->orderBy('starts_at')
                 ->get()
-                ->map(function (CompetitionSchedule $schedule): array {
-                    $competitors = $schedule->participants
-                        ->map(fn ($participant) => $participant->team?->name
-                            ?: $participant->athleteEntry?->student?->full_name)
-                        ->filter()
-                        ->unique()
-                        ->values();
-                    $competitorTeams = $schedule->participants
-                        ->pluck('team')
-                        ->filter()
-                        ->unique('id')
-                        ->values()
-                        ->map(fn (Team $team): array => [
-                            'name' => $team->name,
-                            'code' => $team->code,
-                            'logo_path' => $team->logo_path,
-                        ])
-                        ->all();
-
+                ->map(function (CompetitionSchedule $schedule) use ($factionRosters): array {
                     $sport = $schedule->editionSport->sport;
+                    $isActivity = (bool) $schedule->is_activity;
+                    $isCultural = str_starts_with(strtoupper((string) $sport?->code), 'CULT-');
+                    $competitors = $isCultural
+                        ? $factionRosters->pluck('name')->values()
+                        : $schedule->participants
+                            ->map(fn ($participant) => $participant->team?->name
+                                ?: $participant->athleteEntry?->student?->full_name)
+                            ->filter()
+                            ->unique()
+                            ->values();
+                    $competitorTeams = $isCultural
+                        ? $factionRosters->map(fn (array $faction): array => [
+                            'name' => $faction['name'],
+                            'code' => $faction['code'],
+                            'logo_path' => $faction['logo_path'],
+                        ])->all()
+                        : $schedule->participants
+                            ->pluck('team')
+                            ->filter()
+                            ->unique('id')
+                            ->values()
+                            ->map(fn (Team $team): array => [
+                                'name' => $team->name,
+                                'code' => $team->code,
+                                'logo_path' => $team->logo_path,
+                            ])
+                            ->all();
+
                     $sportCode = strtoupper((string) $sport?->code);
-                    $sportGroup = str_starts_with($sportCode, 'CULT-') ? null : $sport?->catalogue_group_key;
+                    $sportGroup = $isActivity || str_starts_with($sportCode, 'CULT-') ? null : $sport?->catalogue_group_key;
 
                     return [
-                        'event' => $this->eventName($sport?->name ?? 'Event'),
+                        'event' => $isActivity ? ($schedule->title ?: 'School Activity') : $this->eventName($sport?->name ?? 'Event'),
                         'sport_group' => $sportGroup,
                         'sport_group_label' => $sportGroup ? $sport?->catalogue_group_label : null,
-                        'game' => $schedule->title ?: ($schedule->bracketMatch ? 'Game '.$schedule->bracketMatch->match_number : ''),
+                        'game' => $isActivity ? '' : ($schedule->title ?: ($schedule->bracketMatch ? 'Game '.$schedule->bracketMatch->match_number : '')),
                         'time' => $schedule->starts_at->format('g:i A'),
                         'period' => $schedule->starts_at->hour < 12 ? 'Morning' : 'Afternoon',
                         'competitors' => $competitors->isEmpty() ? 'To be announced' : $competitors->implode(' VS '),
@@ -177,5 +188,15 @@ class PublicScheduleService
     private function eventName(string $name): string
     {
         return preg_replace('/^(?:cultural|sports)\s*:\s*/i', '', $name) ?: $name;
+    }
+
+    private function rosterCategory(Sport $sport): ?string
+    {
+        if (in_array($sport->participant_category, ['male', 'female'], true)
+            && preg_match('/\b(?:men|women)\b/i', $sport->name) === 1) {
+            return null;
+        }
+
+        return $sport->participant_category_label;
     }
 }

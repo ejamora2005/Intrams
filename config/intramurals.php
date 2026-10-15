@@ -6,9 +6,9 @@ $pointSystems = [
         'category' => 'sports',
         'description' => 'Major athletic events from the Intramurals 2026 proposal.',
         'codes' => [
-            'BASKET-5X5',
-            'VOLLEYBALL', 'VOLLEYBALL-MEN', 'VOLLEYBALL-WOMEN', 'MIXED-VOLLEYBALL',
-            'BASEBALL', 'SOFTBALL', 'RUSSIAN-SOFTBALL', 'ESPORT-ML',
+            'BASKET-5X5', 'BASKET-5X5-MEN', 'BASKET-5X5-WOMEN',
+            'VOLLEYBALL', 'VOLLEYBALL-MEN', 'VOLLEYBALL-WOMEN', 'MIXED-VOLLEYBALL', 'MODIFIED-VOLLEYBALL', 'MODIFIED-VOLLEYBALL-MEN', 'MODIFIED-VOLLEYBALL-WOMEN',
+            'BASEBALL', 'SOFTBALL', 'RUSSIAN-SOFTBALL', 'ESPORT-ML', 'ESPORT-ML-MEN', 'ESPORT-ML-WOMEN',
         ],
         'placements' => [
             ['placement' => 1, 'label' => 'Champion', 'points' => 25.0, 'medal' => 'gold'],
@@ -21,7 +21,7 @@ $pointSystems = [
         'category' => 'sports',
         'description' => 'Minor athletic events listed in the proposal.',
         'codes' => [
-            'BASKET-3X3', 'CHESS', 'CHESS-MEN', 'CHESS-WOMEN',
+            'BASKET-3X3', 'BASKET-3X3-MEN', 'BASKET-3X3-WOMEN', 'CHESS', 'CHESS-MEN', 'CHESS-WOMEN',
             'BADMINTON', 'BADMINTON-TEAM', 'BADMINTON-DOUBLES', 'BADMINTON-SINGLES',
             'BADMINTON-TEAM-MEN', 'BADMINTON-TEAM-WOMEN', 'BADMINTON-DOUBLES-MEN', 'BADMINTON-DOUBLES-WOMEN',
             'BADMINTON-SINGLES-MEN', 'BADMINTON-SINGLES-WOMEN',
@@ -45,6 +45,10 @@ $pointSystems = [
             'RELAY-4X100', 'RELAY-4X400',
             'THROWS', 'SHOT-PUT', 'DISCUS-THROW', 'JAVELIN-THROW',
             'JUMP', 'LONG-JUMP', 'TRIPLE-JUMP', 'HIGH-JUMP',
+            'RUNS-MEN', 'RUNS-WOMEN', '100M-RUN-MEN', '100M-RUN-WOMEN', '200M-RUN-MEN', '200M-RUN-WOMEN', '400M-RUN-MEN', '400M-RUN-WOMEN',
+            'RELAY-4X100-MEN', 'RELAY-4X100-WOMEN', 'RELAY-4X400-MEN', 'RELAY-4X400-WOMEN',
+            'THROWS-MEN', 'THROWS-WOMEN', 'SHOT-PUT-MEN', 'SHOT-PUT-WOMEN', 'DISCUS-THROW-MEN', 'DISCUS-THROW-WOMEN', 'JAVELIN-THROW-MEN', 'JAVELIN-THROW-WOMEN',
+            'JUMP-MEN', 'JUMP-WOMEN', 'LONG-JUMP-MEN', 'LONG-JUMP-WOMEN', 'TRIPLE-JUMP-MEN', 'TRIPLE-JUMP-WOMEN', 'HIGH-JUMP-MEN', 'HIGH-JUMP-WOMEN',
         ],
         'placements' => [
             ['placement' => 1, 'label' => '1st Place', 'points' => 5.0, 'medal' => 'gold'],
@@ -192,10 +196,15 @@ $venues = [
 $participationRules = [
     'max_events_per_student' => 2,
     'individual_dual_only_max_events' => 3,
+    // Male Russian Softball entries are the partner side of a women's pair.
+    'paired_partner_exemptions' => [
+        'RUSSIAN-SOFTBALL' => ['Male'],
+        'RUSSIAN-SOFTBALL-MEN' => ['Male'],
+    ],
     // Relay runners represent their faction in addition to their individual run.
     // They do not use one of the student's participation-rule event slots.
-    'relay_exempt_sport_codes' => ['RELAY-4X100', 'RELAY-4X400'],
-    'relay_qualifying_run_sport_codes' => ['100M-RUN', '200M-RUN', '400M-RUN'],
+    'relay_exempt_sport_codes' => ['RELAY-4X100', 'RELAY-4X400', 'RELAY-4X100-MEN', 'RELAY-4X100-WOMEN', 'RELAY-4X400-MEN', 'RELAY-4X400-WOMEN'],
+    'relay_qualifying_run_sport_codes' => ['100M-RUN', '200M-RUN', '400M-RUN', '100M-RUN-MEN', '100M-RUN-WOMEN', '200M-RUN-MEN', '200M-RUN-WOMEN', '400M-RUN-MEN', '400M-RUN-WOMEN'],
     'allowed_combinations' => [
         ['label' => '1 minor + 1 major', 'major' => 1, 'minor' => 1, 'individual_or_dual' => 0],
         ['label' => '1 minor + 1 individual/dual', 'major' => 0, 'minor' => 1, 'individual_or_dual' => 1],
@@ -205,7 +214,7 @@ $participationRules = [
 ];
 
 $medicalCertificate = [
-    'exempt_sport_codes' => ['CHESS', 'ESPORT-ML'],
+    'exempt_sport_codes' => ['CHESS', 'CHESS-MEN', 'CHESS-WOMEN', 'ESPORT-ML', 'ESPORT-ML-MEN', 'ESPORT-ML-WOMEN'],
 ];
 
 return [
@@ -222,56 +231,44 @@ return [
     'point_systems' => $pointSystems,
 
     'default_competitions' => [
-        ['name' => 'Basketball 3x3', 'code' => 'BASKET-3X3', 'scoring_rules' => $rules('sports_minor')],
-        ['name' => 'Basketball 5x5', 'code' => 'BASKET-5X5', 'scoring_rules' => $rules('sports_major')],
-        ['name' => 'Volleyball', 'code' => 'VOLLEYBALL', 'scoring_rules' => $rules('sports_major')],
+        ['name' => 'Basketball 3x3 (Men)', 'code' => 'BASKET-3X3-MEN', 'participant_category' => 'male', 'scoring_rules' => $rules('sports_minor')],
+        ['name' => 'Basketball 3x3 (Women)', 'code' => 'BASKET-3X3-WOMEN', 'participant_category' => 'female', 'scoring_rules' => $rules('sports_minor')],
+        ['name' => 'Basketball 5x5 (Men)', 'code' => 'BASKET-5X5-MEN', 'participant_category' => 'male', 'scoring_rules' => $rules('sports_major')],
+        ['name' => 'Basketball 5x5 (Women)', 'code' => 'BASKET-5X5-WOMEN', 'participant_category' => 'female', 'scoring_rules' => $rules('sports_major')],
         ['name' => 'Volleyball (Men)', 'code' => 'VOLLEYBALL-MEN', 'participant_category' => 'male', 'scoring_rules' => $rules('sports_major')],
         ['name' => 'Volleyball (Women)', 'code' => 'VOLLEYBALL-WOMEN', 'participant_category' => 'female', 'scoring_rules' => $rules('sports_major')],
+        ['name' => 'Modified Volleyball (Men)', 'code' => 'MODIFIED-VOLLEYBALL-MEN', 'participant_category' => 'male', 'participant_type' => 'team', 'scoring_rules' => $rules('sports_major')],
+        ['name' => 'Modified Volleyball (Women)', 'code' => 'MODIFIED-VOLLEYBALL-WOMEN', 'participant_category' => 'female', 'participant_type' => 'team', 'scoring_rules' => $rules('sports_major')],
         ['name' => 'Mixed Volleyball (Open)', 'code' => 'MIXED-VOLLEYBALL', 'participant_category' => 'mixed', 'scoring_rules' => $rules('sports_major')],
         ['name' => 'Baseball', 'code' => 'BASEBALL', 'scoring_rules' => $rules('sports_major')],
         ['name' => 'Softball', 'code' => 'SOFTBALL', 'scoring_rules' => $rules('sports_major')],
         ['name' => 'Russian Softball', 'code' => 'RUSSIAN-SOFTBALL', 'scoring_rules' => $rules('sports_major')],
-        ['name' => 'E-Sport (ML)', 'code' => 'ESPORT-ML', 'scoring_rules' => $rules('sports_major')],
-        ['name' => 'Chess', 'code' => 'CHESS', 'participant_type' => 'individual', 'scoring_rules' => $rules('sports_minor')],
+        ['name' => 'E-Sport (ML) (Men)', 'code' => 'ESPORT-ML-MEN', 'participant_category' => 'male', 'participant_type' => 'team', 'scoring_rules' => $rules('sports_major')],
+        ['name' => 'E-Sport (ML) (Women)', 'code' => 'ESPORT-ML-WOMEN', 'participant_category' => 'female', 'participant_type' => 'team', 'scoring_rules' => $rules('sports_major')],
         ['name' => 'Chess (Men)', 'code' => 'CHESS-MEN', 'participant_category' => 'male', 'participant_type' => 'individual', 'scoring_rules' => $rules('sports_minor')],
         ['name' => 'Chess (Women)', 'code' => 'CHESS-WOMEN', 'participant_category' => 'female', 'participant_type' => 'individual', 'scoring_rules' => $rules('sports_minor')],
-        ['name' => 'Badminton', 'code' => 'BADMINTON', 'participant_type' => 'dual', 'scoring_rules' => $rules('sports_minor')],
-        ['name' => 'Badminton (Team)', 'code' => 'BADMINTON-TEAM', 'participant_type' => 'team', 'scoring_rules' => $rules('sports_minor')],
-        ['name' => 'Badminton (Doubles)', 'code' => 'BADMINTON-DOUBLES', 'participant_type' => 'dual', 'scoring_rules' => $rules('sports_minor')],
-        ['name' => 'Badminton (Singles)', 'code' => 'BADMINTON-SINGLES', 'participant_type' => 'individual', 'scoring_rules' => $rules('sports_minor')],
         ['name' => 'Badminton (Team - Men)', 'code' => 'BADMINTON-TEAM-MEN', 'participant_category' => 'male', 'participant_type' => 'team', 'scoring_rules' => $rules('sports_minor')],
         ['name' => 'Badminton (Team - Women)', 'code' => 'BADMINTON-TEAM-WOMEN', 'participant_category' => 'female', 'participant_type' => 'team', 'scoring_rules' => $rules('sports_minor')],
         ['name' => 'Badminton (Doubles - Men)', 'code' => 'BADMINTON-DOUBLES-MEN', 'participant_category' => 'male', 'participant_type' => 'dual', 'scoring_rules' => $rules('sports_minor')],
         ['name' => 'Badminton (Doubles - Women)', 'code' => 'BADMINTON-DOUBLES-WOMEN', 'participant_category' => 'female', 'participant_type' => 'dual', 'scoring_rules' => $rules('sports_minor')],
         ['name' => 'Badminton (Singles - Men)', 'code' => 'BADMINTON-SINGLES-MEN', 'participant_category' => 'male', 'participant_type' => 'individual', 'scoring_rules' => $rules('sports_minor')],
         ['name' => 'Badminton (Singles - Women)', 'code' => 'BADMINTON-SINGLES-WOMEN', 'participant_category' => 'female', 'participant_type' => 'individual', 'scoring_rules' => $rules('sports_minor')],
-        ['name' => 'Table Tennis', 'code' => 'TABLE-TENNIS', 'participant_type' => 'individual', 'scoring_rules' => $rules('sports_minor')],
-        ['name' => 'Table Tennis (Team)', 'code' => 'TABLE-TENNIS-TEAM', 'participant_type' => 'team', 'scoring_rules' => $rules('sports_minor')],
-        ['name' => 'Table Tennis (Doubles)', 'code' => 'TABLE-TENNIS-DOUBLES', 'participant_type' => 'dual', 'scoring_rules' => $rules('sports_minor')],
-        ['name' => 'Table Tennis (Singles)', 'code' => 'TABLE-TENNIS-SINGLES', 'participant_type' => 'individual', 'scoring_rules' => $rules('sports_minor')],
         ['name' => 'Table Tennis (Team - Men)', 'code' => 'TABLE-TENNIS-TEAM-MEN', 'participant_category' => 'male', 'participant_type' => 'team', 'scoring_rules' => $rules('sports_minor')],
         ['name' => 'Table Tennis (Team - Women)', 'code' => 'TABLE-TENNIS-TEAM-WOMEN', 'participant_category' => 'female', 'participant_type' => 'team', 'scoring_rules' => $rules('sports_minor')],
         ['name' => 'Table Tennis (Doubles - Men)', 'code' => 'TABLE-TENNIS-DOUBLES-MEN', 'participant_category' => 'male', 'participant_type' => 'dual', 'scoring_rules' => $rules('sports_minor')],
         ['name' => 'Table Tennis (Doubles - Women)', 'code' => 'TABLE-TENNIS-DOUBLES-WOMEN', 'participant_category' => 'female', 'participant_type' => 'dual', 'scoring_rules' => $rules('sports_minor')],
         ['name' => 'Table Tennis (Singles - Men)', 'code' => 'TABLE-TENNIS-SINGLES-MEN', 'participant_category' => 'male', 'participant_type' => 'individual', 'scoring_rules' => $rules('sports_minor')],
         ['name' => 'Table Tennis (Singles - Women)', 'code' => 'TABLE-TENNIS-SINGLES-WOMEN', 'participant_category' => 'female', 'participant_type' => 'individual', 'scoring_rules' => $rules('sports_minor')],
-        ['name' => 'Beach Volleyball', 'code' => 'BEACH-VOLLEYBALL', 'scoring_rules' => $rules('sports_minor')],
         ['name' => 'Beach Volleyball (Men)', 'code' => 'BEACH-VOLLEYBALL-MEN', 'participant_category' => 'male', 'scoring_rules' => $rules('sports_minor')],
         ['name' => 'Beach Volleyball (Women)', 'code' => 'BEACH-VOLLEYBALL-WOMEN', 'participant_category' => 'female', 'scoring_rules' => $rules('sports_minor')],
-        ['name' => 'Runs', 'code' => 'RUNS', 'participant_type' => 'individual', 'game_mechanic' => 'custom', 'scoring_rules' => $rules('sports_athletics')],
-        ['name' => '100m Run', 'code' => '100M-RUN', 'participant_type' => 'individual', 'game_mechanic' => 'custom', 'scoring_rules' => $rules('sports_athletics')],
-        ['name' => '200m Run', 'code' => '200M-RUN', 'participant_type' => 'individual', 'game_mechanic' => 'custom', 'scoring_rules' => $rules('sports_athletics')],
-        ['name' => '400m Run', 'code' => '400M-RUN', 'participant_type' => 'individual', 'game_mechanic' => 'custom', 'scoring_rules' => $rules('sports_athletics')],
-        ['name' => '4x100m Relay', 'code' => 'RELAY-4X100', 'participant_type' => 'team', 'game_mechanic' => 'custom', 'scoring_rules' => $rules('sports_athletics')],
-        ['name' => '4x400m Relay', 'code' => 'RELAY-4X400', 'participant_type' => 'team', 'game_mechanic' => 'custom', 'scoring_rules' => $rules('sports_athletics')],
-        ['name' => 'Throws', 'code' => 'THROWS', 'participant_type' => 'individual', 'game_mechanic' => 'custom', 'scoring_rules' => $rules('sports_athletics')],
-        ['name' => 'Shot Put', 'code' => 'SHOT-PUT', 'participant_type' => 'individual', 'game_mechanic' => 'custom', 'scoring_rules' => $rules('sports_athletics')],
-        ['name' => 'Discus Throw', 'code' => 'DISCUS-THROW', 'participant_type' => 'individual', 'game_mechanic' => 'custom', 'scoring_rules' => $rules('sports_athletics')],
-        ['name' => 'Javelin Throw', 'code' => 'JAVELIN-THROW', 'participant_type' => 'individual', 'game_mechanic' => 'custom', 'scoring_rules' => $rules('sports_athletics')],
-        ['name' => 'Jump', 'code' => 'JUMP', 'participant_type' => 'individual', 'game_mechanic' => 'custom', 'scoring_rules' => $rules('sports_athletics')],
-        ['name' => 'Long Jump', 'code' => 'LONG-JUMP', 'participant_type' => 'individual', 'game_mechanic' => 'custom', 'scoring_rules' => $rules('sports_athletics')],
-        ['name' => 'Triple Jump', 'code' => 'TRIPLE-JUMP', 'participant_type' => 'individual', 'game_mechanic' => 'custom', 'scoring_rules' => $rules('sports_athletics')],
-        ['name' => 'High Jump', 'code' => 'HIGH-JUMP', 'participant_type' => 'individual', 'game_mechanic' => 'custom', 'scoring_rules' => $rules('sports_athletics')],
+        ...collect([
+            ['Runs', 'RUNS', 'individual'], ['100m Run', '100M-RUN', 'individual'], ['200m Run', '200M-RUN', 'individual'], ['400m Run', '400M-RUN', 'individual'],
+            ['4x100m Relay', 'RELAY-4X100', 'team'], ['4x400m Relay', 'RELAY-4X400', 'team'], ['Throws', 'THROWS', 'individual'], ['Shot Put', 'SHOT-PUT', 'individual'],
+            ['Discus Throw', 'DISCUS-THROW', 'individual'], ['Javelin Throw', 'JAVELIN-THROW', 'individual'], ['Jump', 'JUMP', 'individual'], ['Long Jump', 'LONG-JUMP', 'individual'],
+            ['Triple Jump', 'TRIPLE-JUMP', 'individual'], ['High Jump', 'HIGH-JUMP', 'individual'],
+        ])->flatMap(fn (array $sport): array => collect(['Men' => 'male', 'Women' => 'female'])->map(fn (string $category, string $label): array => [
+            'name' => $sport[0].' ('.$label.')', 'code' => $sport[1].'-'.strtoupper($label), 'participant_category' => $category, 'participant_type' => $sport[2], 'game_mechanic' => 'custom', 'scoring_rules' => $rules('sports_athletics'),
+        ])->values()->all())->values()->all(),
 
         $cultural('Festival Dance Competition', 'CULT-FEST-DANCE', 'Students: 40 minimum; props or propsmen excluded. Employees: none.', 'cultural_festival_dance'),
         $cultural('Faction Pakulo', 'CULT-FACTION-PAKULO', 'Students: not specified. Employees: encouraged.', 'cultural_major_15_10_7'),
@@ -311,7 +308,7 @@ return [
     ],
 
     'default_schedules' => [
-        ['code' => 'RUNS', 'title' => 'Ruperto Run 2026', 'day' => 1, 'starts_at' => '06:00', 'ends_at' => '08:00'],
+        ['code' => 'RUNS-MEN', 'title' => 'Ruperto Run 2026', 'is_activity' => true, 'day' => 1, 'starts_at' => '06:00', 'ends_at' => '08:00', 'venue' => 'Field/Oval'],
         ['code' => 'CULT-DIGITAL-POSTER', 'title' => 'Visual Art Exhibition', 'day' => 1, 'starts_at' => '08:00', 'ends_at' => '12:00'],
         ['code' => 'CULT-FESTIVAL-PROGRAM', 'title' => 'Parade', 'day' => 1, 'starts_at' => '13:00', 'ends_at' => '14:00'],
         ['code' => 'CULT-FESTIVAL-PROGRAM', 'title' => 'Opening Festival', 'day' => 1, 'starts_at' => '14:00', 'ends_at' => '15:00'],
