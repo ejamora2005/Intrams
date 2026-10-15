@@ -322,6 +322,10 @@ input[type='radio']:checked {
     color: #fecdd3 !important;
 }
 
+.ops-dashboard :is(.text-red-950, .text-red-900\/75) {
+    color: #ffe4e6 !important;
+}
+
 .ops-dashboard :is(.bg-red-600) {
     color: #fff !important;
     background: #dc2626 !important;
@@ -375,6 +379,45 @@ input[type='radio']:checked {
 .ops-dashboard :is(span, a, button).bg-blue-50 {
     color: #06152c !important;
     background: #fff7e6 !important;
+}
+
+/* Dialogs sit on white paper inside the dark operations workspace. Keep the
+   workspace palette outside the dialog while restoring readable form text
+   and controls inside it. */
+.ops-dashboard dialog {
+    color: #0f172a;
+    color-scheme: light;
+}
+
+.ops-dashboard dialog :is(.text-slate-950, .text-slate-900, .text-slate-800, .text-slate-700, .text-blue-950) {
+    color: #0f172a !important;
+}
+
+.ops-dashboard dialog :is(.text-slate-600, .text-slate-500) {
+    color: #64748b !important;
+}
+
+.ops-dashboard dialog .text-blue-700 {
+    color: #1d4ed8 !important;
+}
+
+.ops-dashboard dialog label {
+    color: #334155 !important;
+    background: #ffffff !important;
+    border-color: #cbd5e1 !important;
+}
+
+.ops-dashboard dialog label:hover {
+    border-color: #93c5fd !important;
+    background: #eff6ff !important;
+}
+
+.ops-dashboard dialog .bg-slate-50 {
+    background: #f8fafc !important;
+}
+
+.ops-dashboard dialog :is(.border-slate-200, .border-slate-300) {
+    border-color: #cbd5e1 !important;
 }
 
 .ops-dashboard .border-dashed {
