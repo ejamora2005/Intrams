@@ -25,12 +25,9 @@
             <table class="min-w-full text-left text-sm">
                 <thead class="border-b border-slate-200 bg-slate-50 text-xs font-semibold uppercase tracking-wide text-slate-500">
                     <tr>
-                        <th scope="col" class="px-5 py-3">Edition</th>
-                        <th scope="col" class="px-5 py-3">Sport</th>
-                        <th scope="col" class="px-5 py-3">Schedule item</th>
+                        <th scope="col" class="px-5 py-3">Event</th>
                         <th scope="col" class="px-5 py-3">Teams / participants</th>
-                        <th scope="col" class="px-5 py-3">Time</th>
-                        <th scope="col" class="px-5 py-3">Venue</th>
+                        <th scope="col" class="px-5 py-3">When &amp; where</th>
                         <th scope="col" class="px-5 py-3">Status</th>
                         <th scope="col" class="px-5 py-3"><span class="sr-only">Actions</span></th>
                     </tr>
@@ -51,18 +48,18 @@
                                 ->values();
                         @endphp
                         <tr class="align-top">
-                            <td class="px-5 py-4 font-medium text-slate-900">{{ $schedule->editionSport->edition->name }}</td>
                             <td class="px-5 py-4 text-slate-700">
+                                <span class="mb-2 block text-xs font-medium text-slate-400">{{ $schedule->editionSport->edition->name }}</span>
                                 @if ($isActivity)
-                                    <span class="font-medium text-slate-900">School activity</span>
+                                    <span class="inline-flex items-center gap-2 rounded-full bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-800">School activity</span>
                                 @else
                                     <span class="flex items-center gap-2">
                                         <span class="ops-sport-inline-icon"><x-sport-group-icon :group="$schedule->editionSport->sport?->catalogue_group_key ?? 'other'" /></span>
-                                        <span><span class="block font-medium text-slate-900">{{ $schedule->editionSport->sport->name }}</span><span class="text-xs text-slate-500">{{ $schedule->editionSport->sport?->catalogue_group_label ?? 'Other Sports' }}</span></span>
+                                        <span><span class="block font-semibold text-slate-900">{{ $schedule->editionSport->sport->name }}</span><span class="text-xs text-slate-500">{{ $schedule->editionSport->sport?->catalogue_group_label ?? 'Other Sports' }}</span></span>
                                     </span>
                                 @endif
+                                <p class="mt-3 font-medium leading-5 text-slate-800">{{ $scheduleLabel }}</p>
                             </td>
-                            <td class="px-5 py-4 text-slate-700">{{ $scheduleLabel }}</td>
                             <td class="px-5 py-4 text-slate-700">
                                 @if ($participantTeams->isNotEmpty())
                                     <div class="flex flex-wrap items-center gap-2">
@@ -82,10 +79,10 @@
                             <td class="px-5 py-4 text-slate-700">
                                 <span class="block font-medium text-slate-900">{{ $schedule->starts_at->format('M j, Y g:i A') }}</span>
                                 @if ($schedule->ends_at)
-                                    <span class="mt-1 block text-xs text-slate-500">Ends {{ $schedule->ends_at->format('M j, Y g:i A') }}</span>
+                                    <span class="mt-1 block text-xs text-slate-500">Ends {{ $schedule->ends_at->format('g:i A') }}</span>
                                 @endif
+                                <span class="mt-3 inline-flex rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs font-semibold text-slate-600">{{ $schedule->venue ?: 'TBA' }}</span>
                             </td>
-                            <td class="px-5 py-4 text-slate-700">{{ $schedule->venue ?: 'TBA' }}</td>
                             <td class="px-5 py-4">
                                 <span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold capitalize text-slate-700">{{ $schedule->status }}</span>
                             </td>
@@ -140,7 +137,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="8" class="px-5 py-10 text-center text-slate-500">No competitions are scheduled yet. Configure an edition sport, add eligible athletes or teams, then create its schedule.</td>
+                            <td colspan="5" class="px-5 py-10 text-center text-slate-500">No competitions are scheduled yet. Configure an edition sport, add eligible athletes or teams, then create its schedule.</td>
                         </tr>
                     @endforelse
                 </tbody>

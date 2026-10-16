@@ -184,40 +184,38 @@
                     <colgroup><col style="width:18%"><col style="width:15%"><col style="width:34%"><col style="width:15%"><col style="width:18%"></colgroup>
                     <thead><tr><th scope="col">Event</th><th scope="col">Session</th><th scope="col">Teams / participants</th><th scope="col">Venue</th><th scope="col">Facilitator</th></tr></thead>
                     <tbody>
-                        @forelse ($todaySchedules->groupBy('event') as $event => $eventSchedules)
-                            @php($sharedFacilitator = $eventSchedules->pluck('facilitator')->unique()->count() === 1)
-                            @foreach ($eventSchedules as $schedule)
-                                <tr>
-                                    @if ($loop->first)
-                                        <th scope="rowgroup" rowspan="{{ $eventSchedules->count() }}" class="schedule-sport">@if ($schedule['sport_group'])<span class="schedule-sport-group"><x-sport-group-icon :group="$schedule['sport_group']" /></span>@endif{{ $event }}</th>
+                        @forelse ($todaySchedules as $schedule)
+                            <tr>
+                                <th scope="row" class="schedule-sport">
+                                    @if ($schedule['sport_group'])
+                                        <span class="schedule-sport-group"><x-sport-group-icon :group="$schedule['sport_group']" /></span>
                                     @endif
-                                    <td>
-                                        <div class="schedule-session-stack">
-                                            <span class="schedule-time">{{ $schedule['time'] }}</span>
-                                            <span class="schedule-session {{ $schedule['period'] === 'Morning' ? 'schedule-session--morning' : 'schedule-session--afternoon' }}"><span aria-hidden="true"></span>{{ $schedule['period'] }}</span>
-                                        </div>
-                                    </td>
-                                    <td class="schedule-match">
-                                        @if ($schedule['game'])<span class="schedule-game">{{ $schedule['game'] }}</span>@endif
-                                        @if (! empty($schedule['competitor_teams']))
-                                            <span class="schedule-competitor-list" aria-label="{{ $schedule['competitors'] }}">
-                                                @foreach ($schedule['competitor_teams'] as $team)
-                                                    <x-team-badge :team="$team" :show-subtitle="false" :logo-only="count($schedule['competitor_teams']) > 2" class="schedule-team-badge" />
-                                                    @unless ($loop->last)
-                                                        <span class="schedule-versus">VS</span>
-                                                    @endunless
-                                                @endforeach
-                                            </span>
-                                        @else
-                                            <span class="schedule-competitors">{{ $schedule['competitors'] }}</span>
-                                        @endif
-                                    </td>
-                                    <td class="schedule-facilitator">{{ $schedule['venue'] }}</td>
-                                    @if (! $sharedFacilitator || $loop->first)
-                                        <td @if ($sharedFacilitator) rowspan="{{ $eventSchedules->count() }}" @endif class="schedule-facilitator">{{ $schedule['facilitator'] }}</td>
+                                    <span class="schedule-sport-name">{{ $schedule['event'] }}</span>
+                                </th>
+                                <td>
+                                    <div class="schedule-session-stack">
+                                        <span class="schedule-time">{{ $schedule['time'] }}</span>
+                                        <span class="schedule-session {{ $schedule['period'] === 'Morning' ? 'schedule-session--morning' : 'schedule-session--afternoon' }}"><span aria-hidden="true"></span>{{ $schedule['period'] }}</span>
+                                    </div>
+                                </td>
+                                <td class="schedule-match">
+                                    @if ($schedule['game'])<span class="schedule-game">{{ $schedule['game'] }}</span>@endif
+                                    @if (! empty($schedule['competitor_teams']))
+                                        <span class="schedule-competitor-list" aria-label="{{ $schedule['competitors'] }}">
+                                            @foreach ($schedule['competitor_teams'] as $team)
+                                                <x-team-badge :team="$team" :show-subtitle="false" :logo-only="count($schedule['competitor_teams']) > 2" class="schedule-team-badge" />
+                                                @unless ($loop->last)
+                                                    <span class="schedule-versus">VS</span>
+                                                @endunless
+                                            @endforeach
+                                        </span>
+                                    @else
+                                        <span class="schedule-competitors">{{ $schedule['competitors'] }}</span>
                                     @endif
-                                </tr>
-                            @endforeach
+                                </td>
+                                <td class="schedule-facilitator schedule-venue">{{ $schedule['venue'] }}</td>
+                                <td class="schedule-facilitator">{{ $schedule['facilitator'] }}</td>
+                            </tr>
                         @empty
                             <tr><td colspan="5"><x-landing.schedule-empty /></td></tr>
                         @endforelse

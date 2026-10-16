@@ -110,7 +110,8 @@ test('login page shows a manually refreshed snapshot of todays competition sched
             ->assertSee('TBA')
             ->assertSee('Green Servers VS Gold Blockers')
             ->assertSee('Jamie Facilitator')
-            ->assertSee('<th scope="rowgroup" rowspan="2"', false)
+            ->assertSee('<th scope="row" class="schedule-sport"', false)
+            ->assertDontSee('scope="rowgroup"', false)
             ->assertSee('data-open-login', false)
             ->assertSee('data-login-modal', false)
             ->assertSee('backdrop:backdrop-blur-md', false)
@@ -118,7 +119,7 @@ test('login page shows a manually refreshed snapshot of todays competition sched
             ->assertDontSee('wire:poll', false)
             ->assertDontSee('setInterval(', false);
 
-        expect(substr_count($response->getContent(), '>Volleyball</th>'))->toBe(1);
+        expect(substr_count($response->getContent(), 'schedule-sport-name">Volleyball</span>'))->toBe(2);
     } finally {
         Carbon::setTestNow();
     }

@@ -762,6 +762,60 @@
     }
 }
 
+/* Keep the schedule board chronological and compact when several events share a day. */
+.schedule-table thead th {
+    padding: 13px 20px;
+}
+
+.schedule-table tbody th,
+.schedule-table tbody td {
+    padding: 16px 20px;
+    vertical-align: top;
+}
+
+.schedule-table tbody tr {
+    transition: background .18s ease, box-shadow .18s ease;
+}
+
+.schedule-table tbody tr:hover {
+    box-shadow: inset 3px 0 0 var(--slsu-gold-bright);
+}
+
+.schedule-sport {
+    border-right: 0;
+    background: linear-gradient(90deg, #0c73451c, transparent 88%);
+}
+
+.schedule-sport-name {
+    display: block;
+    max-width: 190px;
+    color: #fff;
+    font-size: 14px;
+    line-height: 1.35;
+}
+
+.schedule-match {
+    min-width: 260px;
+}
+
+.schedule-game {
+    margin-bottom: 5px;
+    font-size: 9px;
+    letter-spacing: .08em;
+}
+
+.schedule-venue {
+    color: #d6e4f3;
+    font-weight: 600;
+}
+
+@media (max-width: 1023px) {
+    .schedule-table tbody th,
+    .schedule-table tbody td {
+        padding: 14px 16px;
+    }
+}
+
 /* Public faction roster modal */
 .schedule-team-identity {
     display: flex;
