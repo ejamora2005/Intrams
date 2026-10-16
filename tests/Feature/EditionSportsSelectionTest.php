@@ -209,12 +209,25 @@ test('proposal defaults seed scoring groups and cultural schedule items', functi
 
     $run = CompetitionSchedule::query()->where('title', 'Ruperto Run 2026')->firstOrFail();
     $awarding = CompetitionSchedule::query()->where('title', 'Awarding')->firstOrFail();
+    $implementationTitles = [
+        'Team Officials Meeting (Sports)',
+        'Athletics Runs Finals (M&W)',
+        'Volleyball Elimination (M&W)',
+        'Badminton Individual Finals (M&W)',
+        'Basketball 3x3 Finals (M&W)',
+        'Russian Softball Finals',
+        'Modified Volleyball Finals (M&W)',
+        'Alumni Games',
+    ];
 
     expect($run->starts_at->format('Y-m-d H:i'))->toBe('2026-10-19 06:00')
         ->and($run->is_activity)->toBeTrue()
         ->and($run->venue)->toBe('Field/Oval')
         ->and($awarding->starts_at->format('Y-m-d H:i'))->toBe('2026-10-23 13:00')
-        ->and($awarding->venue)->toBe('TBA');
+        ->and($awarding->venue)->toBe('TBA')
+        ->and(CompetitionSchedule::query()->whereIn('title', $implementationTitles)->distinct('title')->count('title'))->toBe(count($implementationTitles))
+        ->and(CompetitionSchedule::query()->where('title', 'Athletics Runs Finals (M&W)')->value('venue'))->toBe('Field/Oval')
+        ->and(CompetitionSchedule::query()->where('title', 'Basketball 3x3 Finals (M&W)')->value('venue'))->toBe('MPCC');
 
     $this->actingAs($admin)
         ->put(route('admin.competition.schedule-venue.update', $run), ['venue' => 'SSC Hall'])
@@ -251,7 +264,11 @@ test('proposal defaults seed scoring groups and cultural schedule items', functi
         ->assertSee('Open Court (Volleyball/Pickleball)')
         ->assertSee('MPCC')
         ->assertSee('Field/Oval')
-        ->assertSee('Live')
+        ->assertSee('Live');
+
+    $this->actingAs($admin)
+        ->get(route('admin.competition.index', ['page' => 3]))
+        ->assertOk()
         ->assertSee('Awarding');
 
     $this->actingAs($admin)
