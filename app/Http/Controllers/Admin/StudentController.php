@@ -18,6 +18,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
+use Throwable;
 
 class StudentController extends Controller
 {
@@ -151,14 +152,27 @@ class StudentController extends Controller
         $editionSportIds = $data['edition_sport_ids'] ?? null;
         $edition = $this->activeEdition();
         $team = $edition ? $student->teamMembers()->with('team')->where('edition_id', $edition->id)->first()?->team : null;
-        $student = DB::transaction(function () use ($student, $data, $edition, $editionSportIds, $team): Student {
-            $student = $this->studentService->update($student, Arr::except($data, 'edition_sport_ids'));
-            if ($edition && $editionSportIds !== null) {
-                $this->athleteEntryService->syncSelectedSports($student, $edition, $editionSportIds, $team);
-            }
+        try {
+            $student = DB::transaction(function () use ($student, $data, $edition, $editionSportIds, $team): Student {
+                $student = $this->studentService->update($student, Arr::except($data, 'edition_sport_ids'));
+                if ($edition && $editionSportIds !== null) {
+                    $this->athleteEntryService->syncSelectedSports($student, $edition, $editionSportIds, $team);
+                }
 
-            return $student;
-        });
+                return $student;
+            });
+        } catch (ValidationException $exception) {
+            throw $exception;
+        } catch (Throwable $exception) {
+            // A stale edit page can submit an event that was archived or
+            // reconfigured after the form loaded. Keep the user on the form
+            // with a useful message instead of exposing a generic 500 page.
+            report($exception);
+
+            return back()->withInput()->withErrors([
+                'edition_sport_ids' => 'The sport selection could not be saved. Refresh this page, choose the current sports, and try again.',
+            ]);
+        }
 
         return redirect()->route('admin.students.index')->with('success', "{$student->full_name} was updated.");
     }

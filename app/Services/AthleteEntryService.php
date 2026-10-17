@@ -157,6 +157,14 @@ class AthleteEntryService
         if ($selectedSports->count() !== $ids->count()) {
             throw ValidationException::withMessages(['edition_sport_ids' => 'Choose sports from the active intramurals edition.']);
         }
+        $invalidSports = $selectedSports->filter(fn (EditionSport $editionSport): bool =>
+            ! $editionSport->sport instanceof \App\Models\Sport
+            || ! in_array($editionSport->status, ['preparation', 'active'], true)
+            || ! $this->eligibilityService->isParticipationSport($editionSport)
+        );
+        if ($invalidSports->isNotEmpty()) {
+            throw ValidationException::withMessages(['edition_sport_ids' => 'One or more selected sports are no longer available. Refresh the page and choose from the current list.']);
+        }
         try {
             $this->assertStudentCanJoinCategories($student, $selectedSports);
         } catch (ValidationException $exception) {

@@ -85,7 +85,7 @@ Route::middleware([
         Route::get('/students/{student}/edit', [StudentController::class, 'edit'])->name('students.edit');
         // Keep direct student links usable while the edit form remains the
         // single place for profile and sport-registration changes.
-        Route::get('/students/{student}', fn (\App\Models\Student $student) => redirect()->route('admin.students.edit', $student));
+        Route::get('/students/{student}', fn (\App\Models\Student $student) => redirect()->route('admin.students.edit', ['student' => $student->getKey()]));
         Route::put('/students/{student}', [StudentController::class, 'update'])->name('students.update');
         Route::put('/students/{student}/team', [StudentController::class, 'transferTeam'])->name('students.team.update');
         Route::delete('/students/{student}', [StudentController::class, 'destroy'])->name('students.destroy');
