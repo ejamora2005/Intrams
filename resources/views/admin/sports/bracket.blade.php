@@ -117,7 +117,7 @@
                                     <div class="space-y-6">
                                         @foreach ($roundMatches as $match)
                                             <div class="bracket-node relative" data-bracket-node data-match-id="{{ $match->id }}">
-                                                @include('admin.sports.partials.bracket-match', ['match' => $match])
+                                                @include('admin.sports.partials.bracket-match', ['match' => $match, 'bracketSlotStart' => $roundNumber === 1 ? (($match->match_number - 1) * 2) : null])
                                             </div>
                                         @endforeach
                                     </div>
