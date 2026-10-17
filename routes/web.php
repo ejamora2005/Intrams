@@ -123,6 +123,7 @@ Route::middleware([
         Route::get('/possible-dq', [RulesController::class, 'possibleDqAdmin'])->name('possible-dq.index');
         Route::post('/rules-guidelines/repair-registrations', [RulesController::class, 'repair'])->name('rules.repair-registrations');
         Route::get('/sports/{sport}/bracket', [SportController::class, 'bracket'])->name('sports.bracket');
+        Route::post('/sports/{sport}/bracket/order', [SportController::class, 'reorderBracket'])->name('sports.bracket.order');
         Route::get('/sports/{sport}/basketball-score-sheet', [SportController::class, 'basketballScoreSheet'])->name('sports.basketball-score-sheet');
         Route::post('/sports/{sport}/basketball-score-sheet/download', [SportController::class, 'downloadBasketballScoreSheet'])->name('sports.basketball-score-sheet.download');
         Route::get('/sports/{sport}/volleyball-score-sheet', [SportController::class, 'volleyballScoreSheet'])->name('sports.volleyball-score-sheet');

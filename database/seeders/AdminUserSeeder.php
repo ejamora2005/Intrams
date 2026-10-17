@@ -16,13 +16,14 @@ class AdminUserSeeder extends Seeder
         $password = env('INTRAMURALS_DEFAULT_ACCOUNT_PASSWORD');
 
         if (! is_string($password) || $password === '') {
-            $this->command?->warn('Skipping default admin, GAM, and Tabulator accounts. Set INTRAMURALS_DEFAULT_ACCOUNT_PASSWORD in .env to seed them.');
+            $this->command?->warn('Skipping default admin, SSC, GAM, and Tabulator accounts. Set INTRAMURALS_DEFAULT_ACCOUNT_PASSWORD in .env to seed them.');
 
             return;
         }
 
         foreach ([
             ['name' => 'System Administrator', 'email' => 'admin@example.com', 'role' => 'admin'],
+            ['name' => 'Supreme Student Council', 'email' => 'ssc@example.com', 'role' => 'admin'],
             ['name' => 'General Athletics Manager', 'email' => 'gam@example.com', 'role' => 'gam'],
             ['name' => 'Event Tabulator', 'email' => 'tabulator@example.com', 'role' => 'tabulator'],
         ] as $account) {

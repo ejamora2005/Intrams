@@ -4,7 +4,16 @@ const focusFirstControl = (modal) => {
 };
 
 const closeModal = (modal) => {
-    if (modal instanceof HTMLDialogElement && modal.open) modal.close();
+    if (!(modal instanceof HTMLDialogElement)) return;
+    if (modal.open && typeof modal.close === 'function') modal.close();
+    else modal.removeAttribute('open');
+};
+
+const openModal = (modal) => {
+    if (!(modal instanceof HTMLDialogElement)) return;
+    if (! modal.open && typeof modal.showModal === 'function') modal.showModal();
+    else modal.setAttribute('open', '');
+    focusFirstControl(modal);
 };
 
 document.querySelectorAll('[data-ops-modal]').forEach((modal) => {
@@ -25,8 +34,7 @@ document.querySelectorAll('[data-ops-modal-open]').forEach((button) => {
         const modal = document.getElementById(button.dataset.opsModalOpen ?? '');
         if (!(modal instanceof HTMLDialogElement)) return;
 
-        modal.showModal();
-        focusFirstControl(modal);
+        openModal(modal);
     });
 });
 
@@ -34,8 +42,7 @@ const autoModal = document.querySelector('[data-ops-auto-modal]')?.dataset.opsAu
 if (autoModal) {
     const modal = document.getElementById(autoModal);
     if (modal instanceof HTMLDialogElement) {
-        modal.showModal();
-        focusFirstControl(modal);
+        openModal(modal);
     }
 }
 
@@ -58,4 +65,17 @@ document.querySelectorAll('[data-ops-form]').forEach((form) => {
 
 document.querySelectorAll('[data-ops-feedback-close]').forEach((button) => {
     button.addEventListener('click', () => button.closest('[data-ops-feedback]')?.remove());
+});
+
+// Browsers can restore a submitted GAM/tabulator page from the back-forward
+// cache with its buttons still disabled. Re-arm those forms when that happens.
+window.addEventListener('pageshow', () => {
+    document.querySelectorAll('[data-ops-form]').forEach((form) => {
+        form.dataset.submitting = 'false';
+        form.querySelectorAll('button[type="submit"]').forEach((button) => {
+            button.disabled = false;
+            button.classList.remove('cursor-wait', 'opacity-70');
+            if (button.dataset.originalLabel) button.textContent = button.dataset.originalLabel;
+        });
+    });
 });

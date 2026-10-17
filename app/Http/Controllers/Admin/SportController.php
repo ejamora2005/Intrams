@@ -257,7 +257,27 @@ class SportController extends Controller
             ->get()
             ->groupBy('bracket');
 
-        return view('admin.sports.bracket', compact('sport', 'edition', 'editionSport', 'matches'));
+        $bracketCompetitors = BracketCompetitor::query()
+            ->where('edition_sport_id', $editionSport->id)
+            ->orderBy('label')
+            ->get();
+        $lineupIds = $matches->flatten(1)
+            ->sortBy(fn (BracketMatch $match) => [$match->bracket === 'winners' ? 0 : 1, $match->round_number, $match->match_number])
+            ->flatMap(fn (BracketMatch $match) => [$match->competitor_one_id, $match->competitor_two_id])
+            ->filter()
+            ->unique()
+            ->values();
+        $lineup = $lineupIds
+            ->map(fn (int $id) => $bracketCompetitors->firstWhere('id', $id))
+            ->filter()
+            ->values();
+        if ($lineup->isEmpty()) {
+            $lineup = $bracketCompetitors->values();
+        }
+        $selectedCompetitors = $lineup;
+        $availableCompetitors = $bracketCompetitors->whereNotIn('id', $lineup->pluck('id'))->values();
+
+        return view('admin.sports.bracket', compact('sport', 'edition', 'editionSport', 'matches', 'selectedCompetitors', 'availableCompetitors'));
     }
 
     public function basketballScoreSheet(Request $request, Sport $sport): View
@@ -421,6 +441,26 @@ class SportController extends Controller
         return redirect()
             ->route('admin.sports.bracket', ['sport' => $sport, 'edition_id' => $edition->id])
             ->with('success', 'Bracket reset. Athlete registrations and team rosters were not changed.');
+    }
+
+    public function reorderBracket(Request $request, Sport $sport): RedirectResponse
+    {
+        $edition = $this->selectedEdition($request);
+        abort_unless($edition !== null, 404);
+        $editionSport = EditionSport::query()
+            ->where('edition_id', $edition->id)
+            ->where('sport_id', $sport->id)
+            ->firstOrFail();
+        $data = $request->validate([
+            'competitor_ids' => ['required', 'array', 'min:2'],
+            'competitor_ids.*' => ['required', 'integer', 'distinct'],
+        ]);
+
+        $this->bracketService->reorder($editionSport, $data['competitor_ids']);
+
+        return redirect()
+            ->route('admin.sports.bracket', ['sport' => $sport, 'edition_id' => $edition->id])
+            ->with('success', 'Bracket lineup saved. The selected competitors were placed in the order you chose.');
     }
 
     private function defaultScheduleVenue(?Sport $sport): string

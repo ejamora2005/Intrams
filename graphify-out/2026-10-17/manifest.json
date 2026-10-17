@@ -108,9 +108,9 @@
     "semantic_hash": ""
   },
   "app/Http/Controllers/Admin/SportController.php": {
-    "mtime": 1792215793.0069897,
-    "seen": 1792216085.8383002,
-    "ast_hash": "ef1d6ce920ea506f81ec64ae4479cf8d",
+    "mtime": 1792216213.734738,
+    "seen": 1792216277.3981283,
+    "ast_hash": "f8747227694b7e9368c3a3f57cfc8407",
     "semantic_hash": ""
   },
   "app/Http/Controllers/Admin/SportModuleController.php": {
@@ -504,9 +504,9 @@
     "semantic_hash": "04c4c697907ac3c3940503e8b569b9dc"
   },
   "app/Services/EditionService.php": {
-    "mtime": 1792215793.0059936,
-    "seen": 1792216085.8383002,
-    "ast_hash": "5bfc786795df1b7b31cf50daeb4726f9",
+    "mtime": 1792216213.7337377,
+    "seen": 1792216277.3981283,
+    "ast_hash": "deb6bcc88ca2a8860d3e3eadf062a3cf",
     "semantic_hash": ""
   },
   "app/Services/EventService.php": {
@@ -978,9 +978,9 @@
     "semantic_hash": "b67a1e6bcaf3cebe1ea82b582468ace4"
   },
   "resources/views/admin/sports/form.blade.php": {
-    "mtime": 1792215827.0689752,
-    "seen": 1792216085.8392727,
-    "ast_hash": "dcde5ae268ea9598d9673474d3337fa6",
+    "mtime": 1792216213.7357407,
+    "seen": 1792216277.3981283,
+    "ast_hash": "d52887f60fc4c2c8064aceb892c57516",
     "semantic_hash": ""
   },
   "resources/views/admin/sports/index.blade.php": {
@@ -2535,6 +2535,12 @@
     "mtime": 1792215827.071978,
     "seen": 1792216085.8383002,
     "ast_hash": "f91f1c2070af529d75d42284dc7c02e9",
+    "semantic_hash": ""
+  },
+  "database/migrations/2026_10_17_000003_use_custom_mechanics_for_custom_categories.php": {
+    "mtime": 1792216213.7367413,
+    "seen": 1792216277.3981283,
+    "ast_hash": "4d35d27772d0f19f6a929f03d001dd4f",
     "semantic_hash": ""
   }
 }

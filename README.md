@@ -177,6 +177,7 @@ Running `php artisan db:seed` creates (or resets) the default operations account
 | Email | Password | Role |
 |---|---|---|
 | `admin@example.com` | value of `INTRAMURALS_DEFAULT_ACCOUNT_PASSWORD` | `admin` |
+  | `ssc@example.com` | value of `INTRAMURALS_DEFAULT_ACCOUNT_PASSWORD` | `admin` |
 | `gam@example.com` | value of `INTRAMURALS_DEFAULT_ACCOUNT_PASSWORD` | `gam` |
 | `tabulator@example.com` | value of `INTRAMURALS_DEFAULT_ACCOUNT_PASSWORD` | `tabulator` |
 

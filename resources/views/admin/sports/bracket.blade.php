@@ -10,6 +10,8 @@
         $maxWinnerMatches = max(1, $winnerRounds->map(fn ($round) => $round->count())->max() ?? 0);
         $canvasWidth = max(1120, ($winnerRounds->count() * 320) + ($finalMatches->isNotEmpty() ? 320 : 260));
         $canvasHeight = max(520, ($maxWinnerMatches * 150) + 180);
+        $roundRobinWidth = max(1120, ($roundRobinRounds->count() * 320) + 80);
+        $roundRobinHeight = max(520, (($roundRobinRounds->map(fn ($round) => $round->count())->max() ?? 1) * 320) + 140);
         $champion = $finalMatches->where('status', 'completed')->last()?->winnerCompetitor ?? $winnerRounds->get($lastWinnerRound, collect())->whereIn('status', ['completed', 'bye'])->last()?->winnerCompetitor;
     @endphp
 
@@ -39,15 +41,63 @@
             </div>
         </header>
 
+        @if (in_array($editionSport->game_mechanic, ['single_elimination', 'double_elimination', 'round_robin', 'custom'], true) && ($selectedCompetitors->isNotEmpty() || $availableCompetitors->isNotEmpty()))
+            @php
+                $lineupLocked = $matches->flatten(1)->contains(fn ($match) => $match->status !== 'pending');
+            @endphp
+            <section class="border-b border-slate-200 bg-slate-50 px-5 py-5 sm:px-6" aria-labelledby="lineup-heading">
+                <div class="flex flex-col justify-between gap-3 sm:flex-row sm:items-start">
+                    <div>
+                        <p class="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Manual bracket entry</p>
+                        <h3 id="lineup-heading" class="mt-1 text-base font-semibold text-slate-900">Choose and order competitors</h3>
+                        <p class="mt-1 max-w-3xl text-sm text-slate-600">Drag teams, pairs, or athletes into the bracket lineup. The order controls the opening slots for elimination brackets and the selected field for round robin and custom events.</p>
+                    </div>
+                    <span class="rounded-full border border-slate-300 bg-white px-3 py-1 text-xs font-semibold text-slate-600"><span data-lineup-count>{{ $selectedCompetitors->count() }}</span> selected</span>
+                </div>
+                @if ($lineupLocked)
+                    <p class="mt-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">Lineup editing is locked after a result or automatic bye. Reset the bracket before changing the field.</p>
+                @else
+                    <form method="POST" action="{{ route('admin.sports.bracket.order', ['sport' => $sport, 'edition_id' => $edition->id]) }}" class="mt-5" data-bracket-lineup-form>
+                        @csrf
+                        <input type="hidden" name="edition_id" value="{{ $edition->id }}">
+                        <div class="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.35fr)]">
+                            <div>
+                                <div class="mb-2 flex items-center justify-between"><h4 class="text-sm font-semibold text-slate-800">Available</h4><span class="text-xs text-slate-500">Drag to add</span></div>
+                                <div class="min-h-28 space-y-2 rounded-xl border-2 border-dashed border-slate-300 bg-white p-3" data-lineup-dropzone="available" aria-label="Available competitors">
+                                    @foreach ($availableCompetitors as $competitor)
+                                        <button type="button" draggable="true" data-lineup-card data-competitor-id="{{ $competitor->id }}" class="flex w-full cursor-grab items-center justify-between gap-3 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-left text-sm font-medium text-slate-800 shadow-sm transition hover:border-blue-300 hover:bg-blue-50 active:cursor-grabbing" aria-label="Add {{ $competitor->label }} to bracket">
+                                            <span class="truncate">{{ $competitor->label }}</span><span class="text-xs text-slate-400">+</span>
+                                        </button>
+                                    @endforeach
+                                    <p data-lineup-empty="available" class="{{ $availableCompetitors->isNotEmpty() ? 'hidden ' : '' }}px-2 py-3 text-center text-xs text-slate-400">All registered competitors are selected.</p>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="mb-2 flex items-center justify-between"><h4 class="text-sm font-semibold text-slate-800">Bracket lineup</h4><span class="text-xs text-slate-500">Drag to reorder · drop to remove</span></div>
+                                <div class="min-h-28 space-y-2 rounded-xl border-2 border-blue-200 bg-blue-50/60 p-3" data-lineup-dropzone="selected" aria-label="Selected bracket lineup">
+                                    @foreach ($selectedCompetitors as $competitor)
+                                        <button type="button" draggable="true" data-lineup-card data-competitor-id="{{ $competitor->id }}" class="flex w-full cursor-grab items-center justify-between gap-3 rounded-lg border border-blue-200 bg-white px-3 py-2 text-left text-sm font-medium text-slate-800 shadow-sm transition hover:border-blue-400 hover:bg-blue-50 active:cursor-grabbing" aria-label="Reorder {{ $competitor->label }}">
+                                            <span class="flex min-w-0 items-center gap-2"><span class="lineup-position inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-blue-100 text-[11px] font-bold text-blue-800"></span><span class="truncate">{{ $competitor->label }}</span></span><span class="text-xs text-slate-400">↕</span>
+                                        </button>
+                                    @endforeach
+                                    <p data-lineup-empty="selected" class="{{ $selectedCompetitors->isNotEmpty() ? 'hidden ' : '' }}px-2 py-3 text-center text-xs text-slate-400">Drop at least two competitors here.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-4 flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
+                            <p class="text-xs text-slate-500">Tip: use Tab and Enter/Space with the + and ↕ controls if dragging is unavailable.</p>
+                            <button type="submit" data-lineup-submit class="rounded-lg bg-blue-700 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-800 disabled:cursor-not-allowed disabled:opacity-50">Save bracket lineup</button>
+                        </div>
+                    </form>
+                @endif
+            </section>
+        @endif
+
         @if (! in_array($editionSport->game_mechanic, ['single_elimination', 'double_elimination', 'round_robin', 'custom'], true))
             <div class="m-6 rounded-lg border border-blue-100 bg-blue-50 p-5 text-sm text-blue-900">This sport does not use an automated tournament mechanic.</div>
         @elseif ($matches->isEmpty())
             <div class="m-6 rounded-lg border border-dashed border-slate-300 bg-slate-50 p-8 text-center text-sm text-slate-500">Register at least two competitors in Manage Participants to generate the tournament. Teams, dual pairs, and individual athletes are supported.</div>
         @elseif (in_array($editionSport->game_mechanic, ['round_robin', 'custom'], true))
-            @php
-                $roundRobinWidth = max(1120, ($roundRobinRounds->count() * 320) + 80);
-                $roundRobinHeight = max(520, (($roundRobinRounds->map(fn ($round) => $round->count())->max() ?? 1) * 320) + 140);
-            @endphp
             <div class="border-t border-slate-100 bg-slate-50 px-5 py-2 text-xs text-slate-500 sm:px-6">Every competitor plays every other competitor once. Scroll horizontally for rounds and vertically for large fields.</div>
             <div class="h-[calc(100vh-19rem)] min-h-[34rem] max-h-[52rem] overflow-auto bg-slate-100 p-4 sm:p-6" aria-label="Round-robin tournament canvas">
                 <div class="bracket-canvas relative isolate rounded-lg border border-slate-300 bg-white p-6" data-bracket-canvas style="min-width: {{ $roundRobinWidth }}px; min-height: {{ $roundRobinHeight }}px;">
@@ -195,6 +245,104 @@
     </style>
 
     <script>
+        const lineupForm = document.querySelector('[data-bracket-lineup-form]');
+        if (lineupForm) {
+            const selectedZone = lineupForm.querySelector('[data-lineup-dropzone="selected"]');
+            const availableZone = lineupForm.querySelector('[data-lineup-dropzone="available"]');
+            const lineupCount = lineupForm.querySelector('[data-lineup-count]');
+            const submitLineup = lineupForm.querySelector('[data-lineup-submit]');
+            let draggedCard = null;
+
+            const refreshLineup = () => {
+                const selectedCards = [...selectedZone.querySelectorAll('[data-lineup-card]')];
+                const availableCards = [...availableZone.querySelectorAll('[data-lineup-card]')];
+                selectedCards.forEach((card, index) => {
+                    const position = card.querySelector('.lineup-position');
+                    if (position) position.textContent = String(index + 1);
+                });
+                lineupForm.querySelector('[data-lineup-empty="selected"]')?.classList.toggle('hidden', selectedCards.length > 0);
+                lineupForm.querySelector('[data-lineup-empty="available"]')?.classList.toggle('hidden', availableCards.length > 0);
+                lineupCount.textContent = String(selectedCards.length);
+                submitLineup.disabled = selectedCards.length < 2;
+            };
+
+            const moveCard = (card, zone, before = null) => {
+                if (! card || ! zone) return;
+                if (before && before !== card && before.parentElement === zone) zone.insertBefore(card, before);
+                else zone.append(card);
+                refreshLineup();
+            };
+
+            lineupForm.querySelectorAll('[data-lineup-card]').forEach((card) => {
+                card.addEventListener('dragstart', (event) => {
+                    draggedCard = card;
+                    card.classList.add('opacity-50');
+                    event.dataTransfer.effectAllowed = 'move';
+                    event.dataTransfer.setData('text/plain', card.dataset.competitorId);
+                });
+                card.addEventListener('dragend', () => {
+                    draggedCard?.classList.remove('opacity-50');
+                    draggedCard = null;
+                });
+                card.addEventListener('click', () => {
+                    if (card.parentElement === availableZone) moveCard(card, selectedZone);
+                });
+                card.addEventListener('keydown', (event) => {
+                    const cards = [...selectedZone.querySelectorAll('[data-lineup-card]')];
+                    const index = cards.indexOf(card);
+                    if (card.parentElement !== selectedZone) {
+                        if (event.key === 'Enter' || event.key === ' ') {
+                            event.preventDefault();
+                            moveCard(card, selectedZone);
+                            card.focus();
+                        }
+                        return;
+                    }
+                    if (event.key === 'ArrowUp' && index > 0) {
+                        event.preventDefault();
+                        moveCard(card, selectedZone, cards[index - 1]);
+                        card.focus();
+                    } else if (event.key === 'ArrowDown' && index < cards.length - 1) {
+                        event.preventDefault();
+                        moveCard(card, selectedZone, cards[index + 1].nextElementSibling);
+                        card.focus();
+                    } else if (event.key === 'Delete' || event.key === 'Backspace') {
+                        event.preventDefault();
+                        moveCard(card, availableZone);
+                        card.focus();
+                    }
+                });
+            });
+
+            [selectedZone, availableZone].forEach((zone) => {
+                zone.addEventListener('dragover', (event) => {
+                    event.preventDefault();
+                    zone.classList.add('ring-2', 'ring-blue-300');
+                });
+                zone.addEventListener('dragleave', () => zone.classList.remove('ring-2', 'ring-blue-300'));
+                zone.addEventListener('drop', (event) => {
+                    event.preventDefault();
+                    zone.classList.remove('ring-2', 'ring-blue-300');
+                    const target = event.target.closest('[data-lineup-card]');
+                    moveCard(draggedCard, zone, target);
+                });
+            });
+
+            lineupForm.addEventListener('submit', (event) => {
+                lineupForm.querySelectorAll('input[data-lineup-id]').forEach((input) => input.remove());
+                [...selectedZone.querySelectorAll('[data-lineup-card]')].forEach((card) => {
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = 'competitor_ids[]';
+                    input.value = card.dataset.competitorId;
+                    input.dataset.lineupId = 'true';
+                    lineupForm.append(input);
+                });
+                if (selectedZone.querySelectorAll('[data-lineup-card]').length < 2) event.preventDefault();
+            });
+            refreshLineup();
+        }
+
         const bracketCanvas = document.querySelector('[data-bracket-canvas]');
         const connectorLayer = bracketCanvas?.querySelector('[data-bracket-connectors]');
         const bracketNodes = bracketCanvas ? [...bracketCanvas.querySelectorAll('[data-bracket-node]')] : [];

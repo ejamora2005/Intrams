@@ -57,6 +57,43 @@ class BracketService
         });
     }
 
+    /**
+     * Rebuild a bracket from the explicitly selected and ordered competitors.
+     * This is deliberately separate from reset: registrations stay intact and
+     * the competitor records remain available for future lineup changes.
+     */
+    public function reorder(EditionSport $editionSport, array $competitorIds): void
+    {
+        abort_unless($this->usesBracketEngine($editionSport), 422, 'This sport does not use a generated bracket.');
+
+        DB::transaction(function () use ($editionSport, $competitorIds): void {
+            $editionSport = EditionSport::query()->lockForUpdate()->findOrFail($editionSport->id);
+            $matches = BracketMatch::query()
+                ->where('edition_sport_id', $editionSport->id)
+                ->lockForUpdate()
+                ->get();
+            abort_if($matches->contains(fn (BracketMatch $match): bool => $match->status !== 'pending'), 422, 'The lineup cannot be changed after a bracket result has been recorded.');
+
+            $competitors = BracketCompetitor::query()
+                ->where('edition_sport_id', $editionSport->id)
+                ->get()
+                ->keyBy('id');
+            $ids = collect($competitorIds)->map(fn ($id): int => (int) $id);
+            abort_if($ids->count() < 2 || $ids->duplicates()->isNotEmpty(), 422, 'Choose at least two different competitors.');
+            abort_if($ids->contains(fn (int $id): bool => ! $competitors->has($id)), 422, 'One or more selected competitors are not part of this sport.');
+
+            $ordered = $ids->map(fn (int $id) => $competitors->get($id))->values();
+            $before = $matches->flatMap(fn (BracketMatch $match) => [$match->competitor_one_id, $match->competitor_two_id])->filter()->unique()->values()->all();
+            BracketMatch::query()->where('edition_sport_id', $editionSport->id)->delete();
+            $this->generate($editionSport, $ordered);
+
+            $this->auditService->record('bracket.reordered', $editionSport, ['competitor_ids' => $before], [
+                'competitor_ids' => $ordered->pluck('id')->all(),
+                'match_count' => BracketMatch::query()->where('edition_sport_id', $editionSport->id)->count(),
+            ]);
+        });
+    }
+
     public function record(BracketMatch $match, BracketCompetitor $winner): void
     {
         DB::transaction(function () use ($match, $winner): void {
@@ -88,9 +125,9 @@ class BracketService
         });
     }
 
-    private function generate(EditionSport $editionSport): void
+    private function generate(EditionSport $editionSport, ?Collection $competitors = null): void
     {
-        $competitors = $this->synchronizeCompetitors($editionSport);
+        $competitors ??= $this->synchronizeCompetitors($editionSport);
 
         if ($competitors->count() < 2) {
             return;
