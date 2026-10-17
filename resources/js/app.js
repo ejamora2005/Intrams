@@ -2,6 +2,50 @@ import './bootstrap';
 import './pwa';
 import './ops-interactions';
 
+// Shared in-page search for long GAM, Tabulator, and Admin lists. Each search
+// is scoped to its nearest container, so separate panels never affect one
+// another's rows or result count.
+const listSearchNormalize = (value) => (value || '').toString().trim().toLowerCase();
+
+document.querySelectorAll('[data-list-search-container]').forEach((container) => {
+    const input = container.querySelector('[data-list-search-input]');
+    if (!input) return;
+
+    const rows = [...container.querySelectorAll('[data-list-search-row]')]
+        .filter((row) => row.closest('[data-list-search-container]') === container);
+    const empty = [...container.querySelectorAll('[data-list-search-empty]')]
+        .find((item) => item.closest('[data-list-search-container]') === container);
+    const count = container.querySelector('[data-list-search-count]');
+    const update = () => {
+        const query = listSearchNormalize(input.value);
+        let visible = 0;
+
+        rows.forEach((row) => {
+            const matches = !query || listSearchNormalize(row.dataset.searchText || row.textContent).includes(query);
+            row.classList.toggle('hidden', !matches);
+            if (matches) visible += 1;
+        });
+
+        if (empty) empty.hidden = rows.length === 0 || visible > 0;
+        if (count) count.textContent = query ? `${visible} ${visible === 1 ? 'match' : 'matches'}` : `${rows.length} ${rows.length === 1 ? 'item' : 'items'}`;
+    };
+
+    input.addEventListener('input', update);
+    update();
+});
+
+document.querySelectorAll('[data-select-search]').forEach((input) => {
+    const select = document.getElementById(input.dataset.selectSearch);
+    if (!select) return;
+
+    input.addEventListener('input', () => {
+        const query = listSearchNormalize(input.value);
+        [...select.options].forEach((option, index) => {
+            option.hidden = index > 0 && query !== '' && !listSearchNormalize(option.textContent).includes(query);
+        });
+    });
+});
+
 if (document.querySelector('[data-score-sheet-export]')) {
     void import('./score-sheet-export');
 }

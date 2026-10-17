@@ -56,17 +56,24 @@
         </section>
     </section>
 
-    <section id="possible-dq" data-ops-view-panel="possible-dq" hidden class="ops-view-panel scroll-mt-24 rounded-lg border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
+    <section id="possible-dq" data-ops-view-panel="possible-dq" data-list-search-container hidden class="ops-view-panel scroll-mt-24 rounded-lg border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
         <div class="flex flex-col justify-between gap-2 border-b border-slate-100 pb-4 sm:flex-row sm:items-end">
             <div>
                 <h2 class="text-base font-semibold text-slate-950">Possible DQ watchlist</h2>
                 <p class="mt-1 text-sm text-slate-500">Check these registrations before declaring winners.</p>
             </div>
-            <span class="inline-flex w-max whitespace-nowrap rounded-full bg-red-600 px-3 py-1 text-xs font-semibold text-white">{{ $flaggedStudents->count() }} flagged</span>
+            <div class="flex flex-col gap-2 sm:items-end">
+                <label class="relative block min-w-0 sm:w-72">
+                    <span class="sr-only">Search Possible DQ students</span>
+                    <input type="search" data-list-search-input placeholder="Search student or sport" class="block w-full rounded-lg border-red-200 bg-white py-2.5 pl-10 pr-3 text-sm focus:border-red-500 focus:ring-red-500">
+                    <svg class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path stroke-linecap="round" d="m16 16 4.5 4.5"/></svg>
+                </label>
+                <div class="flex items-center gap-2"><span data-list-search-count class="text-xs font-medium text-red-900/70" aria-live="polite"></span><span class="inline-flex w-max whitespace-nowrap rounded-full bg-red-600 px-3 py-1 text-xs font-semibold text-white">{{ $flaggedStudents->count() }} flagged</span></div>
+            </div>
         </div>
         <div class="mt-4 grid gap-3 lg:grid-cols-2">
             @forelse ($flaggedStudents as $evaluation)
-                <article class="rounded-lg border border-red-400/60 bg-red-950/45 p-4">
+                <article data-list-search-row data-search-text="{{ Str::lower($evaluation['student']->full_name.' '.$evaluation['student']->student_number.' '.$evaluation['summary'].' '.implode(' ', $evaluation['issues'])) }}" class="rounded-lg border border-red-400/60 bg-red-950/45 p-4">
                     <div class="flex flex-col justify-between gap-2 sm:flex-row sm:items-start">
                         <div>
                             <p class="font-semibold text-slate-950">{{ $evaluation['student']->full_name }}</p>
@@ -79,6 +86,7 @@
             @empty
                 <p class="rounded-lg border border-dashed border-slate-300 px-4 py-8 text-center text-sm text-slate-500 lg:col-span-2">No Possible DQ students found.</p>
             @endforelse
+            <p data-list-search-empty hidden class="rounded-lg border border-dashed border-slate-300 px-4 py-8 text-center text-sm text-slate-500 lg:col-span-2">No Possible DQ students match your search.</p>
         </div>
     </section>
 
@@ -179,13 +187,17 @@
     </section>
 
     <section id="declared-results" data-ops-view-panel="declared-results" hidden class="ops-view-panel grid gap-6 xl:grid-cols-2">
-        <div class="scroll-mt-24 rounded-lg border border-slate-200 bg-white p-4 shadow-sm sm:p-6 xl:col-span-2">
+        <div class="scroll-mt-24 rounded-lg border border-slate-200 bg-white p-4 shadow-sm sm:p-6 xl:col-span-2" data-list-search-container>
             <div class="flex flex-col justify-between gap-2 border-b border-slate-100 pb-4 sm:flex-row sm:items-end">
                 <div>
                     <h2 class="text-base font-semibold text-slate-950">Placement monitor</h2>
                     <p class="mt-1 text-sm text-slate-500">Review every configured sport and open the declaration form for anything still pending.</p>
                 </div>
-                <span class="inline-flex w-max rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-800">{{ $editionSports->filter(fn ($editionSport) => $editionSport->sportResult)->count() }} of {{ $editionSports->count() }} declared</span>
+                <div class="flex flex-col gap-2 sm:items-end">
+                    <label class="relative block min-w-0 sm:w-72"><span class="sr-only">Search placement monitor</span><input type="search" data-list-search-input placeholder="Search sport or team" class="block w-full rounded-lg border-slate-300 py-2.5 pl-10 pr-3 text-sm focus:border-blue-600 focus:ring-blue-600"><svg class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path stroke-linecap="round" d="m16 16 4.5 4.5"/></svg></label>
+                    <span data-list-search-count class="text-xs font-medium text-slate-500" aria-live="polite"></span>
+                    <span class="inline-flex w-max rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-800">{{ $editionSports->filter(fn ($editionSport) => $editionSport->sportResult)->count() }} of {{ $editionSports->count() }} declared</span>
+                </div>
             </div>
             <div class="mt-4 overflow-x-auto">
                 <table class="min-w-full text-left text-sm">
@@ -195,7 +207,7 @@
                     <tbody class="divide-y divide-slate-100">
                         @forelse ($editionSports as $editionSport)
                             @php($sportResult = $editionSport->sportResult)
-                            <tr>
+                            <tr data-list-search-row data-search-text="{{ Str::lower(($editionSport->sport?->name ?? '').' '.($editionSport->sport?->catalogue_group_label ?? '').' '.($sportResult?->placements_json ? collect($sportResult->placements_json)->map(fn ($teamId) => $teamsById->get((int) $teamId)?->name)->filter()->implode(' ') : '')) }}">
                                 <td class="px-3 py-3 font-semibold text-slate-950">
                                     <span class="flex items-center gap-2">
                                         <span class="ops-sport-inline-icon"><x-sport-group-icon :group="$editionSport->sport?->catalogue_group_key ?? 'other'" /></span>
@@ -231,13 +243,15 @@
                         @empty
                             <tr><td colspan="4" class="px-3 py-8 text-center text-slate-500">No sports are configured for the active edition.</td></tr>
                         @endforelse
+                    <tr data-list-search-empty hidden><td colspan="4" class="px-3 py-8 text-center text-slate-500">No placement entries match your search.</td></tr>
                     </tbody>
                 </table>
             </div>
         </div>
 
-        <div class="rounded-lg border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
-            <h2 class="text-base font-semibold text-slate-950">Overall standings</h2>
+        <div class="rounded-lg border border-slate-200 bg-white p-4 shadow-sm sm:p-6" data-list-search-container>
+            <div class="flex flex-col justify-between gap-2 sm:flex-row sm:items-end"><div><h2 class="text-base font-semibold text-slate-950">Overall standings</h2></div><label class="relative block min-w-0 sm:w-64"><span class="sr-only">Search overall standings</span><input type="search" data-list-search-input placeholder="Search team" class="block w-full rounded-lg border-slate-300 py-2.5 pl-10 pr-3 text-sm focus:border-blue-600 focus:ring-blue-600"><svg class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path stroke-linecap="round" d="m16 16 4.5 4.5"/></svg></label></div>
+            <div class="mt-2 flex justify-end"><span data-list-search-count class="text-xs font-medium text-slate-500" aria-live="polite"></span></div>
             <div class="mt-4 overflow-x-auto">
                 <table class="min-w-full text-left text-sm">
                     <thead class="border-b border-slate-100 text-xs uppercase tracking-wide text-slate-500">
@@ -245,7 +259,7 @@
                     </thead>
                     <tbody class="divide-y divide-slate-100">
                         @forelse ($standings as $row)
-                            <tr>
+                            <tr data-list-search-row data-search-text="{{ Str::lower($row['team']->name ?? '') }}">
                                 <td class="px-3 py-3 font-semibold text-slate-700"><x-landing.ranking-medal :rank="$row['rank']" /></td>
                                 <td class="px-3 py-3 font-medium text-slate-950">
                                     <x-team-badge :team="$row['team']" />
@@ -256,18 +270,20 @@
                         @empty
                             <tr><td colspan="4" class="px-3 py-10 text-center text-slate-500">No active teams are available.</td></tr>
                         @endforelse
+                    <tr data-list-search-empty hidden><td colspan="4" class="px-3 py-10 text-center text-slate-500">No teams match your search.</td></tr>
                     </tbody>
                 </table>
             </div>
         </div>
     </section>
 
-    <section id="match-winners" data-ops-view-panel="match-winners" hidden class="ops-view-panel scroll-mt-24 rounded-lg border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
-        <h2 class="text-base font-semibold text-slate-950">Declare match winners</h2>
-        <div class="mt-4 grid gap-3 lg:grid-cols-2">
+    <section id="match-winners" data-ops-view-panel="match-winners" data-list-search-container hidden class="ops-view-panel scroll-mt-24 rounded-lg border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
+        <div class="flex flex-col justify-between gap-2 sm:flex-row sm:items-end"><div><h2 class="text-base font-semibold text-slate-950">Declare match winners</h2></div><label class="relative block min-w-0 sm:w-72"><span class="sr-only">Search match winners</span><input type="search" data-list-search-input placeholder="Search sport or team" class="block w-full rounded-lg border-slate-300 py-2.5 pl-10 pr-3 text-sm focus:border-blue-600 focus:ring-blue-600"><svg class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path stroke-linecap="round" d="m16 16 4.5 4.5"/></svg></label></div>
+        <div class="mt-2 flex justify-end"><span data-list-search-count class="text-xs font-medium text-slate-500" aria-live="polite"></span></div>
+        <div class="mt-2 grid gap-3 lg:grid-cols-2">
             @forelse ($matches as $match)
                 @php($matchModalId = 'match-winner-modal-'.$match->id)
-                <form method="POST" action="{{ route('tabulator.matches.result', [$match, 'view' => 'match-winners', 'modal' => $matchModalId]) }}" data-ops-form class="rounded-lg border border-slate-200 p-4">
+                <form method="POST" action="{{ route('tabulator.matches.result', [$match, 'view' => 'match-winners', 'modal' => $matchModalId]) }}" data-list-search-row data-search-text="{{ Str::lower(($match->editionSport->sport->name ?? '').' '.($match->competitorOne?->label ?? '').' '.($match->competitorTwo?->label ?? '')) }}" data-ops-form class="rounded-lg border border-slate-200 p-4">
                     @csrf
                     <p class="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-slate-500"><span class="ops-sport-inline-icon"><x-sport-group-icon :group="$match->editionSport->sport?->catalogue_group_key ?? 'other'" /></span><span>{{ $match->editionSport->sport->name }} · {{ $match->editionSport->sport?->catalogue_group_label ?? 'Other Sports' }} / {{ ucfirst($match->bracket) }} round {{ $match->round_number }}</span></p>
                     <p class="mt-2 font-medium text-slate-950">Game {{ $match->match_number }}</p>
@@ -316,6 +332,7 @@
             @empty
                 <p class="rounded-lg border border-dashed border-slate-300 px-4 py-8 text-center text-sm text-slate-500 lg:col-span-2">No ready matches need a winner yet.</p>
             @endforelse
+            <p data-list-search-empty hidden class="rounded-lg border border-dashed border-slate-300 px-4 py-8 text-center text-sm text-slate-500 lg:col-span-2">No matches match your search.</p>
         </div>
     </section>
 @endsection

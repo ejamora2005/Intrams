@@ -16,10 +16,12 @@
         </div>
     @endif
 
-    <section class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
-        <div class="border-b border-slate-200 px-5 py-4">
+    <section class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm" data-list-search-container>
+        <div class="flex flex-col justify-between gap-2 border-b border-slate-200 bg-slate-50 px-5 py-4 sm:flex-row sm:items-center">
             <h2 class="font-semibold text-slate-950">Competition schedule</h2>
+            <label class="relative block min-w-0 sm:w-80"><span class="sr-only">Search competition schedule</span><input type="search" data-list-search-input placeholder="Search event, sport, team, venue, or status" class="block w-full rounded-lg border-slate-300 bg-white py-2.5 pl-10 pr-3 text-sm focus:border-blue-600 focus:ring-blue-600"><svg class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path stroke-linecap="round" d="m16 16 4.5 4.5"/></svg></label>
         </div>
+        <div class="flex justify-end border-b border-slate-200 px-5 py-2"><span data-list-search-count class="text-xs font-medium text-slate-500" aria-live="polite"></span></div>
 
         <div class="overflow-x-auto">
             <table class="min-w-full text-left text-sm">
@@ -47,7 +49,7 @@
                                 ->unique()
                                 ->values();
                         @endphp
-                        <tr class="align-top">
+                        <tr data-list-search-row data-search-text="{{ Str::lower($scheduleLabel.' '.($schedule->editionSport->sport?->name ?? '').' '.($schedule->editionSport->edition?->name ?? '').' '.($schedule->venue ?? '').' '.$schedule->status.' '.$participantTeams->pluck('name')->implode(' ').' '.$participantNames->implode(' ')) }}" class="align-top">
                             <td class="px-5 py-4 text-slate-700">
                                 <span class="mb-2 block text-xs font-medium text-slate-400">{{ $schedule->editionSport->edition->name }}</span>
                                 @if ($isActivity)
@@ -140,6 +142,7 @@
                             <td colspan="5" class="px-5 py-10 text-center text-slate-500">No competitions are scheduled yet. Configure an edition sport, add eligible athletes or teams, then create its schedule.</td>
                         </tr>
                     @endforelse
+                    <tr data-list-search-empty hidden><td colspan="5" class="px-5 py-10 text-center text-slate-500">No scheduled competitions match your search.</td></tr>
                 </tbody>
             </table>
         </div>

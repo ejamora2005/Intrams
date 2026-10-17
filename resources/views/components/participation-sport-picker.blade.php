@@ -14,7 +14,7 @@
 
 @if ($sports->isNotEmpty())
 
-    <fieldset data-sport-picker class="mt-7 border-t border-slate-100 pt-6">
+    <fieldset data-sport-picker data-list-search-container class="mt-7 border-t border-slate-100 pt-6">
         <div class="flex flex-col justify-between gap-2 sm:flex-row sm:items-end">
             <div>
                 <legend class="text-sm font-semibold text-slate-800">Sports joined <span class="text-red-600">*</span></legend>
@@ -23,7 +23,16 @@
             <p data-sport-picker-summary class="text-xs font-medium text-slate-600" aria-live="polite"></p>
         </div>
 
-        <div class="mt-4 grid gap-3 sm:grid-cols-2">
+        <div class="mt-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <label class="relative block min-w-0 flex-1 sm:max-w-md">
+                <span class="sr-only">Search sports</span>
+                <input type="search" data-list-search-input placeholder="Search sports" class="block w-full rounded-lg border-slate-300 py-2.5 pl-10 pr-3 text-sm focus:border-blue-600 focus:ring-blue-600">
+                <svg class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path stroke-linecap="round" d="m16 16 4.5 4.5"/></svg>
+            </label>
+            <span data-list-search-count class="text-xs font-medium text-slate-500" aria-live="polite"></span>
+        </div>
+
+        <div class="mt-3 grid gap-3 sm:grid-cols-2">
             @foreach ($sports as $editionSport)
                 @php($sport = $editionSport->sport)
                 @php($slot = $editionSport->participation_slot)
@@ -32,7 +41,7 @@
                 @php($pairedPartnerExemptGenders = $editionSport->paired_partner_exempt_genders ?? [])
                 @php($isDual = $editionSport->participant_type === 'dual')
                 @php($defaultSlotLabel = $isRelay ? 'Relay (exempt)' : ($slot === 'individual_or_dual' ? 'Individual / dual' : ucfirst($slot)))
-                <label data-sport-option data-sport-category="{{ $sport?->participant_category }}" data-sport-locked="{{ $isDual ? 'true' : 'false' }}" class="flex cursor-pointer items-start gap-3 rounded-lg border border-slate-200 p-4 transition hover:border-blue-300 hover:bg-blue-50">
+                <label data-sport-option data-list-search-row data-search-text="{{ Str::lower($sport?->name ?? '') }}" data-sport-category="{{ $sport?->participant_category }}" data-sport-locked="{{ $isDual ? 'true' : 'false' }}" class="flex cursor-pointer items-start gap-3 rounded-lg border border-slate-200 p-4 transition hover:border-blue-300 hover:bg-blue-50">
                     <input
                         type="checkbox"
                         name="edition_sport_ids[]"
@@ -62,6 +71,7 @@
                     </span>
                 </label>
             @endforeach
+            <p data-list-search-empty hidden class="rounded-lg border border-dashed border-slate-300 px-4 py-8 text-center text-sm text-slate-500 sm:col-span-2">No sports match your search.</p>
         </div>
 
         <p class="mt-3 text-xs text-slate-500">Allowed combinations: 1 Major + 1 Minor, 1 Major + 1 Individual/Dual, 1 Minor + 1 Individual/Dual, or up to 3 Individual/Dual events. A second Major or Minor is locked after the first selection. Relay events do not use an event slot, but require the student to join a 100m, 200m, or 400m run. {{ $teamSportNote }} Dual events are assigned separately with both partners.</p>

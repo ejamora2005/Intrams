@@ -822,9 +822,9 @@
     "semantic_hash": "3b58bff18126a61c142cc576457c82a6"
   },
   "resources/js/app.js": {
-    "mtime": 1792029519.546712,
-    "seen": 1792029707.7550676,
-    "ast_hash": "cbcb35c38063110cc3fd84d74b271d08",
+    "mtime": 1792220690.8450956,
+    "seen": 1792220748.4841008,
+    "ast_hash": "0f83ee27501a0144c7b708d7dc6083d4",
     "semantic_hash": ""
   },
   "resources/js/bootstrap.js": {
@@ -834,9 +834,9 @@
     "semantic_hash": "3836060411368a5c3c6e59295ce7aa77"
   },
   "resources/views/admin/competition/index.blade.php": {
-    "mtime": 1792134084.6902392,
-    "seen": 1792134333.3895798,
-    "ast_hash": "d6b46044f0f5b1be39488008747779c8",
+    "mtime": 1792220562.8879304,
+    "seen": 1792220748.4841008,
+    "ast_hash": "ceb539d16c496af84d77d4de02f9bcf5",
     "semantic_hash": ""
   },
   "resources/views/admin/coordinators/create.blade.php": {
@@ -918,9 +918,9 @@
     "semantic_hash": "58ba804c74b1cf4539cca75105db7fb1"
   },
   "resources/views/admin/events/index.blade.php": {
-    "mtime": 1791870440.1492498,
-    "seen": 1791870618.1060207,
-    "ast_hash": "ef1de181ea6e489e7fbf9cec3ec77267",
+    "mtime": 1792220540.2898443,
+    "seen": 1792220748.4841008,
+    "ast_hash": "4b7282016c6dfb7e4f700f52204e6c10",
     "semantic_hash": ""
   },
   "resources/views/admin/module.blade.php": {
@@ -936,9 +936,9 @@
     "semantic_hash": ""
   },
   "resources/views/admin/registrations/index.blade.php": {
-    "mtime": 1791098821.1661105,
-    "seen": 1791099003.133201,
-    "ast_hash": "cca0ad72df74e1e0be37ac2d25790de0",
+    "mtime": 1792220540.2957761,
+    "seen": 1792220748.4841008,
+    "ast_hash": "bc9667262619a38d02963eedf6347106",
     "semantic_hash": ""
   },
   "resources/views/admin/registrations/rules.blade.php": {
@@ -948,9 +948,9 @@
     "semantic_hash": "2ea29387e9c82aeea50e9f5f6d9e5c30"
   },
   "resources/views/admin/sport-modules/index.blade.php": {
-    "mtime": 1791870339.947053,
-    "seen": 1791870618.1060207,
-    "ast_hash": "8310eb6a24b9ea7a99cd37aaab25d82c",
+    "mtime": 1792220703.9047542,
+    "seen": 1792220748.4841008,
+    "ast_hash": "757dc04f96db28040d21b137d9be2227",
     "semantic_hash": ""
   },
   "resources/views/admin/sport-modules/show.blade.php": {
@@ -1296,9 +1296,9 @@
     "semantic_hash": ""
   },
   "resources/views/layouts/coordinator.blade.php": {
-    "mtime": 1792029881.7720854,
-    "seen": 1792029933.9420872,
-    "ast_hash": "9d15ee538439b9572b9b334e0a83a26c",
+    "mtime": 1792220502.0624783,
+    "seen": 1792220748.485099,
+    "ast_hash": "973bad79f80ae57f581e08c2feeb32c6",
     "semantic_hash": ""
   },
   "resources/views/layouts/guest.blade.php": {
@@ -2052,15 +2052,15 @@
     "semantic_hash": ""
   },
   "resources/views/gam/dashboard.blade.php": {
-    "mtime": 1792033255.9528093,
-    "seen": 1792033427.8932147,
-    "ast_hash": "7b6357ef897a60cc274bf74d6978a1c8",
+    "mtime": 1792220096.100305,
+    "seen": 1792220748.485099,
+    "ast_hash": "8ccecd82a3ad6351f404ca0259baf0c7",
     "semantic_hash": ""
   },
   "resources/views/tabulator/dashboard.blade.php": {
-    "mtime": 1792029881.7893279,
-    "seen": 1792029933.9420872,
-    "ast_hash": "c39f29578decc22cd442f9cf4b19025b",
+    "mtime": 1792220172.463504,
+    "seen": 1792220748.485099,
+    "ast_hash": "ecfdae20a8cedd580d47d6749d81f34b",
     "semantic_hash": ""
   },
   "tests/Feature/OperationsRolesTest.php": {
@@ -2400,9 +2400,9 @@
     "semantic_hash": ""
   },
   "resources/views/components/participation-sport-picker.blade.php": {
-    "mtime": 1792033255.9813085,
-    "seen": 1792033427.8932147,
-    "ast_hash": "e5ccb9a1211528de4cf5b5642a0ff100",
+    "mtime": 1792220121.8183916,
+    "seen": 1792220748.485099,
+    "ast_hash": "34df9ce3564b08c830dfb5cf31bbb6fb",
     "semantic_hash": ""
   },
   "database/migrations/2026_10_15_000002_split_gendered_volleyball_sports.php": {
@@ -2496,9 +2496,9 @@
     "semantic_hash": ""
   },
   "resources/views/rules/possible-dq.blade.php": {
-    "mtime": 1792028848.2529457,
-    "seen": 1792028944.8631713,
-    "ast_hash": "4f7703a9a5a39c1fd622dbf9671bffd9",
+    "mtime": 1792220108.163623,
+    "seen": 1792220748.485099,
+    "ast_hash": "c2ded3b4cb730d0455ff84f63f344ae7",
     "semantic_hash": ""
   },
   "resources/js/ops-interactions.js": {

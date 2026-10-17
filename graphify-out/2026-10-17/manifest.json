@@ -1914,9 +1914,9 @@
     "semantic_hash": ""
   },
   "app/Services/PublicScheduleService.php": {
-    "mtime": 1792028005.3747394,
-    "seen": 1792028059.974993,
-    "ast_hash": "6310f443c9d16d0c365a9d7c5e8c9ff3",
+    "mtime": 1792219630.0361338,
+    "seen": 1792219763.1859064,
+    "ast_hash": "d3e06c02d5c3d7cc344af1496bb8270a",
     "semantic_hash": ""
   },
   "resources/js/login-modal.js": {
@@ -2022,9 +2022,9 @@
     "semantic_hash": ""
   },
   "resources/views/auth/partials/public-schedule.blade.php": {
-    "mtime": 1792134108.528155,
-    "seen": 1792134333.3895798,
-    "ast_hash": "00b3edbb51efa22f5427cc21fd88d1c8",
+    "mtime": 1792219707.1515348,
+    "seen": 1792219763.1859064,
+    "ast_hash": "991b051aaa29f2f5e9c9ecb9bb2a494c",
     "semantic_hash": ""
   },
   "resources/views/components/landing/schedule-empty.blade.php": {
@@ -2547,6 +2547,12 @@
     "mtime": 1792216570.9126327,
     "seen": 1792217037.2546299,
     "ast_hash": "64c9614f855c634bf9e6230cac732953",
+    "semantic_hash": ""
+  },
+  "resources/views/auth/partials/public-schedule-board.blade.php": {
+    "mtime": 1792219801.9307892,
+    "seen": 1792219842.2242308,
+    "ast_hash": "90b6f50c54aa19087389ab4adda57147",
     "semantic_hash": ""
   }
 }

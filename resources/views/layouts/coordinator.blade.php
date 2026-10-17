@@ -212,6 +212,7 @@
                     setOpsView(window.location.hash ? window.location.hash.slice(1) : (new URLSearchParams(window.location.search).get('view') ?? 'dashboard-overview'));
                 });
             }
+
         </script>
         <x-pwa-install />
     </body>
