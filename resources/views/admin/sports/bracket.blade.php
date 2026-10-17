@@ -85,7 +85,10 @@
                             </div>
                         </div>
                         <div class="mt-4 flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
-                            <p class="text-xs text-slate-500">Tip: use Tab and Enter/Space with the + and ↕ controls if dragging is unavailable.</p>
+                            <div>
+                                <p class="text-xs text-slate-500">Tip: drag a team directly onto an opening bracket slot below, or use Tab and Enter/Space with the + and ↕ controls.</p>
+                                <p data-bracket-drag-feedback hidden class="mt-1 text-xs font-semibold text-blue-700">Opening slots updated. Save the bracket lineup to rebuild the matches.</p>
+                            </div>
                             <button type="submit" data-lineup-submit class="rounded-lg bg-blue-700 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-800 disabled:cursor-not-allowed disabled:opacity-50">Save bracket lineup</button>
                         </div>
                     </form>
@@ -156,7 +159,7 @@
                                                 }
                                             @endphp
                                             <div class="bracket-node relative flex items-center" data-bracket-node data-match-id="{{ $match->id }}" data-winner-next-id="{{ $winnerNext?->id }}" data-loser-next-id="{{ $loserNext?->id }}">
-                                                @include('admin.sports.partials.bracket-match', ['match' => $match])
+                                                @include('admin.sports.partials.bracket-match', ['match' => $match, 'bracketSlotStart' => $roundNumber === 1 ? (($match->match_number - 1) * 2) : null])
                                             </div>
                                         @endforeach
                                     </div>
@@ -234,6 +237,9 @@
         .bracket-node.is-highlighted > article { border-color: #355872; box-shadow: 0 0 0 3px #9CD5FF, 0 12px 22px -16px #355872; transform: translateY(-1px); }
         .bracket-node.is-competitor-highlighted .bracket-team[data-competitor-id] { background-color: #F7F8F0; color: #355872; }
         .bracket-team { transition: background-color 150ms ease, box-shadow 150ms ease, color 150ms ease; }
+        [data-bracket-slot-card].is-bracket-dragging { opacity: .45; }
+        [data-bracket-slot-card].is-bracket-drop-target { background-color: #E0F2FE; box-shadow: inset 0 0 0 2px #0284C7; }
+        .bracket-slot-empty { min-height: 2.75rem; border: 2px dashed #BAE6FD; background: #F0F9FF; }
         .bracket-team.is-click-selected { background-color: #9CD5FF; box-shadow: inset 4px 0 0 #355872; color: #355872; }
         .bracket-team.is-click-selected:focus-visible { outline: 2px solid #355872; outline-offset: -2px; }
         .bracket-canvas.has-bracket-focus .bracket-node:not(.is-highlighted):not(.is-competitor-highlighted) { opacity: .42; }
@@ -252,6 +258,9 @@
             const lineupCount = lineupForm.querySelector('[data-lineup-count]');
             const submitLineup = lineupForm.querySelector('[data-lineup-submit]');
             let draggedCard = null;
+            let draggedSource = null;
+            let draggedCompetitorId = null;
+            const bracketDragFeedback = document.querySelector('[data-bracket-drag-feedback]');
 
             const refreshLineup = () => {
                 const selectedCards = [...selectedZone.querySelectorAll('[data-lineup-card]')];
@@ -273,9 +282,44 @@
                 refreshLineup();
             };
 
+            const selectedCompetitorIds = () => [...selectedZone.querySelectorAll('[data-lineup-card]')].map((card) => card.dataset.competitorId);
+            const setSelectedCompetitorIds = (ids) => {
+                const cards = new Map([...lineupForm.querySelectorAll('[data-lineup-card]')].map((card) => [card.dataset.competitorId, card]));
+                const selected = new Set(ids);
+                ids.forEach((id) => {
+                    const card = cards.get(String(id));
+                    if (card) selectedZone.append(card);
+                });
+                cards.forEach((card, id) => {
+                    if (! selected.has(String(id))) availableZone.append(card);
+                });
+                refreshLineup();
+            };
+
+            const applyBracketDrop = (sourceId, targetIndex) => {
+                const ids = selectedCompetitorIds();
+                const sourceIndex = ids.indexOf(String(sourceId));
+
+                if (sourceIndex === -1) {
+                    const availableCard = availableZone.querySelector(`[data-lineup-card][data-competitor-id="${CSS.escape(String(sourceId))}"]`);
+                    if (! availableCard) return;
+                    if (targetIndex >= ids.length) ids.push(String(sourceId));
+                    else ids[targetIndex] = String(sourceId);
+                } else if (targetIndex >= ids.length) {
+                    ids.push(String(sourceId));
+                } else if (sourceIndex !== targetIndex) {
+                    [ids[sourceIndex], ids[targetIndex]] = [ids[targetIndex], ids[sourceIndex]];
+                }
+
+                setSelectedCompetitorIds(ids);
+                if (bracketDragFeedback) bracketDragFeedback.hidden = false;
+            };
+
             lineupForm.querySelectorAll('[data-lineup-card]').forEach((card) => {
                 card.addEventListener('dragstart', (event) => {
                     draggedCard = card;
+                    draggedSource = 'lineup';
+                    draggedCompetitorId = card.dataset.competitorId;
                     card.classList.add('opacity-50');
                     event.dataTransfer.effectAllowed = 'move';
                     event.dataTransfer.setData('text/plain', card.dataset.competitorId);
@@ -283,6 +327,8 @@
                 card.addEventListener('dragend', () => {
                     draggedCard?.classList.remove('opacity-50');
                     draggedCard = null;
+                    draggedSource = null;
+                    draggedCompetitorId = null;
                 });
                 card.addEventListener('click', () => {
                     if (card.parentElement === availableZone) moveCard(card, selectedZone);
@@ -323,8 +369,42 @@
                 zone.addEventListener('drop', (event) => {
                     event.preventDefault();
                     zone.classList.remove('ring-2', 'ring-blue-300');
-                    const target = event.target.closest('[data-lineup-card]');
-                    moveCard(draggedCard, zone, target);
+                    if (draggedSource === 'bracket') {
+                        const sourceCard = lineupForm.querySelector(`[data-lineup-card][data-competitor-id="${CSS.escape(String(draggedCompetitorId))}"]`);
+                        if (sourceCard) moveCard(sourceCard, zone);
+                    } else {
+                        const target = event.target.closest('[data-lineup-card]');
+                        moveCard(draggedCard, zone, target);
+                    }
+                });
+            });
+
+            document.querySelectorAll('[data-bracket-slot-card]').forEach((slot) => {
+                slot.addEventListener('dragstart', (event) => {
+                    draggedSource = 'bracket';
+                    draggedCompetitorId = slot.dataset.competitorId || null;
+                    slot.classList.add('is-bracket-dragging');
+                    event.dataTransfer.effectAllowed = 'move';
+                    event.dataTransfer.setData('text/plain', draggedCompetitorId || '');
+                });
+                slot.addEventListener('dragend', () => {
+                    slot.classList.remove('is-bracket-dragging');
+                    draggedSource = null;
+                    draggedCompetitorId = null;
+                    document.querySelectorAll('[data-bracket-slot-card]').forEach((target) => target.classList.remove('is-bracket-drop-target'));
+                });
+                slot.addEventListener('dragover', (event) => {
+                    if (! draggedCompetitorId) return;
+                    event.preventDefault();
+                    slot.classList.add('is-bracket-drop-target');
+                });
+                slot.addEventListener('dragleave', () => slot.classList.remove('is-bracket-drop-target'));
+                slot.addEventListener('drop', (event) => {
+                    event.preventDefault();
+                    slot.classList.remove('is-bracket-drop-target');
+                    const sourceId = draggedCompetitorId || event.dataTransfer.getData('text/plain');
+                    const targetIndex = Number.parseInt(slot.dataset.bracketSlotIndex || '', 10);
+                    if (sourceId && Number.isInteger(targetIndex)) applyBracketDrop(sourceId, targetIndex);
                 });
             });
 

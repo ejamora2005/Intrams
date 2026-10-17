@@ -5,8 +5,14 @@
     </div>
     <div class="divide-y divide-slate-200">
         @foreach ([$match->competitorOne, $match->competitorTwo] as $competitor)
+            @php
+                $bracketSlotIndex = isset($bracketSlotStart) && $bracketSlotStart !== null
+                    ? $bracketSlotStart + $loop->index
+                    : null;
+                $canDragBracketSlot = $bracketSlotIndex !== null && $match->status === 'pending';
+            @endphp
             @if ($competitor)
-                <button type="button" data-match="{{ $match->id }}" data-competitor-id="{{ $competitor->id }}" aria-pressed="false" class="bracket-team flex w-full items-center justify-between gap-3 px-3 py-2.5 text-left text-sm font-semibold {{ $match->winner_competitor_id === $competitor->id ? 'bg-green-50 text-green-800' : 'bg-white text-slate-800' }}" @disabled($match->status !== 'pending' || ! $match->competitor_one_id || ! $match->competitor_two_id)>
+                <button type="button" data-match="{{ $match->id }}" data-competitor-id="{{ $competitor->id }}" @if ($bracketSlotIndex !== null) data-bracket-slot-card data-bracket-slot-index="{{ $bracketSlotIndex }}" @endif aria-pressed="false" class="bracket-team flex w-full items-center justify-between gap-3 px-3 py-2.5 text-left text-sm font-semibold {{ $match->winner_competitor_id === $competitor->id ? 'bg-green-50 text-green-800' : 'bg-white text-slate-800' }} {{ $canDragBracketSlot ? 'cursor-grab active:cursor-grabbing' : '' }}" @if ($canDragBracketSlot) draggable="true" @endif @disabled($match->status !== 'pending' || ! $match->competitor_one_id || ! $match->competitor_two_id)>
                     <span class="flex min-w-0 items-center gap-2">
                         @if ($competitor->team)
                             <x-team-badge :team="$competitor->team" size="xs" :logo-only="true" />
@@ -21,7 +27,7 @@
                     </span>
                 </button>
             @else
-                <div class="px-3 py-2.5 text-sm text-slate-400">{{ $match->status === 'bye' ? 'Bye' : 'Awaiting competitor' }}</div>
+                <div @if ($bracketSlotIndex !== null) data-bracket-slot-card data-bracket-slot-index="{{ $bracketSlotIndex }}" @endif class="px-3 py-2.5 text-sm text-slate-400 {{ $canDragBracketSlot ? 'bracket-slot-empty' : '' }}">{{ $match->status === 'bye' ? 'Bye' : 'Awaiting competitor' }}</div>
             @endif
         @endforeach
     </div>
@@ -61,7 +67,9 @@
                 <input id="schedule-time-{{ $match->id }}" name="time" type="time" required step="60" value="{{ $match->schedule?->starts_at?->format('H:i') ?? '08:00' }}" class="block w-full rounded border-slate-300 text-sm focus:border-blue-600 focus:ring-blue-600">
                 <p class="text-[11px] text-slate-500">Enter the exact start time. The public schedule will show it in 12-hour format.</p>
                 <label class="block font-semibold" for="schedule-venue-{{ $match->id }}">Venue</label>
-                @php($defaultVenue = str_starts_with(strtoupper((string) $sport->code), 'BASKET-') ? 'MPCC' : 'TBA')
+                @php
+                    $defaultVenue = str_starts_with(strtoupper((string) $sport->code), 'BASKET-') ? 'MPCC' : 'TBA';
+                @endphp
                 <input id="schedule-venue-{{ $match->id }}" name="venue" type="text" maxlength="120" value="{{ old('venue', $match->schedule?->venue ?: $defaultVenue) }}" class="block w-full rounded border-slate-300 text-sm focus:border-blue-600 focus:ring-blue-600">
                 <button class="w-full rounded bg-blue-700 px-3 py-2 font-semibold text-white hover:bg-blue-800">Save schedule</button>
             </form>
