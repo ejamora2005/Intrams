@@ -116,7 +116,9 @@
                             </thead>
                             <tbody class="divide-y divide-slate-100">
                                 @forelse ($selectedTeam->members as $member)
-                                    @php($eligibility = $member->student ? $eligibilityByStudentId->get($member->student->id) : null)
+                                    @php
+                                        $eligibility = $member->student ? $eligibilityByStudentId->get($member->student->id) : null;
+                                    @endphp
                                     @php
                                         $joinedSportNames = $member->student?->athleteEntries
                                             ?->where('status', 'active')
@@ -151,9 +153,17 @@
                                         </td>
                                         <td class="px-4 py-3 align-top">
                                             @if ($member->student)
-                                                @php($selectedIds = $member->student->athleteEntries->where('status', 'active')->filter(fn ($entry) => (int) $entry->editionSport?->edition_id === (int) $selectedTeam->edition_id)->pluck('edition_sport_id')->map(fn ($id) => (string) $id))
+                                                @php
+                                                    $selectedIds = $member->student->athleteEntries
+                                                        ->where('status', 'active')
+                                                        ->filter(fn ($entry) => (int) $entry->editionSport?->edition_id === (int) $selectedTeam->edition_id)
+                                                        ->pluck('edition_sport_id')
+                                                        ->map(fn ($id) => (string) $id);
+                                                @endphp
                                                 @php($editModalId = 'edit-sports-'.$member->student->id)
-                                                @php($editSportIds = collect(old('edition_sport_ids', $selectedIds->all())))
+                                                @php
+                                                    $editSportIds = collect(old('edition_sport_ids', $selectedIds->all()));
+                                                @endphp
                                                 <button type="button" data-ops-modal-open="{{ $editModalId }}" class="inline-flex items-center gap-2 rounded-lg border border-blue-200 bg-white px-3 py-2 text-xs font-semibold text-blue-700 transition hover:border-blue-300 hover:bg-blue-50">
                                                     <span>Edit sports</span>
                                                     <span class="rounded-full bg-blue-50 px-2 py-0.5 text-[11px]">{{ $selectedIds->count() }}</span>
@@ -270,7 +280,14 @@
                     @forelse ($medicalCertificateGroups as $studentEntries)
                         @php($entry = $studentEntries->first())
                         @php($rosterTeam = $entry->student?->teamMembers?->first()?->team ?? $entry->team)
-                        @php($medicalSearchText = implode(' ', [$entry->student?->full_name ?? 'Removed student', $entry->student?->student_number ?? '', $rosterTeam?->name ?? '', $studentEntries->map(fn ($studentEntry) => $studentEntry->editionSport->sport?->name)->filter()->implode(' ')]))
+                        @php
+                            $medicalSearchText = implode(' ', [
+                                $entry->student?->full_name ?? 'Removed student',
+                                $entry->student?->student_number ?? '',
+                                $rosterTeam?->name ?? '',
+                                $studentEntries->map(fn ($studentEntry) => $studentEntry->editionSport->sport?->name)->filter()->implode(' '),
+                            ]);
+                        @endphp
                         <tr data-list-search-row data-search-text="{{ Str::lower($medicalSearchText) }}">
                             <td class="px-4 py-3 align-top">
                                 <p class="font-medium text-slate-950">{{ $entry->student?->full_name ?? 'Removed student' }}</p>

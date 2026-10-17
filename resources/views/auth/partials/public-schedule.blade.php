@@ -65,7 +65,9 @@
 
         <ul class="schedule-teams" aria-label="Campus factions">
             @foreach (config('landing.teams') as $team)
-                @php($roster = $factionRostersByKey->get(\App\Models\Team::logoKey($team['name'] ?? '')))
+                @php
+                    $roster = $factionRostersByKey->get(\App\Models\Team::logoKey($team['name'] ?? ''));
+                @endphp
                 <li style="--team-color: {{ $team['primaryColor'] }}; --team-highlight: {{ $team['secondaryColor'] }}">
                     <div class="schedule-team-identity">
                         @if ($team['image'] ?? null)
