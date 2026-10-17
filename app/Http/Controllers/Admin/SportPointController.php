@@ -30,6 +30,11 @@ class SportPointController extends Controller
                     ...$definition,
                     'key' => $key,
                     'configured_count' => $editionSports->count(),
+                    'configured_items' => $editionSports->map(fn (EditionSport $editionSport): array => [
+                        'name' => $editionSport->sport?->name ?? 'Unnamed sport',
+                        'code' => $editionSport->sport?->code ?? null,
+                        'category' => $editionSport->sport?->participant_category_label ?? null,
+                    ])->values()->all(),
                     'declared_count' => $editionSports
                         ->filter(fn (EditionSport $editionSport): bool => $editionSport->sportResult !== null)
                         ->count(),
