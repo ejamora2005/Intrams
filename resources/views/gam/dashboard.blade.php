@@ -160,7 +160,9 @@
                                                         ->pluck('edition_sport_id')
                                                         ->map(fn ($id) => (string) $id);
                                                 @endphp
-                                                @php($editModalId = 'edit-sports-'.$member->student->id)
+                                                @php
+                                                    $editModalId = 'edit-sports-'.$member->student->id;
+                                                @endphp
                                                 @php
                                                     $editSportIds = collect(old('edition_sport_ids', $selectedIds->all()));
                                                 @endphp
@@ -259,7 +261,9 @@
                 <h2 class="text-base font-semibold text-slate-950">Medical certificate verification</h2>
                 <p class="mt-1 text-sm text-slate-500">Review physical sports entries that require clearance. Chess and E-Sport (ML) are excluded.</p>
             </div>
-            @php($pendingStudents = $medicalCertificateEntries->where('effective_medical_certificate_status', 'pending')->groupBy('student_id')->count())
+            @php
+                $pendingStudents = $medicalCertificateEntries->where('effective_medical_certificate_status', 'pending')->groupBy('student_id')->count();
+            @endphp
             <span class="inline-flex w-max whitespace-nowrap rounded-full bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-800">{{ $pendingStudents }} {{ Str::plural('student', $pendingStudents) }} pending</span>
         </div>
         <div class="mt-4" data-list-search-container>
@@ -278,8 +282,10 @@
                 </thead>
                 <tbody class="divide-y divide-slate-100">
                     @forelse ($medicalCertificateGroups as $studentEntries)
-                        @php($entry = $studentEntries->first())
-                        @php($rosterTeam = $entry->student?->teamMembers?->first()?->team ?? $entry->team)
+                        @php
+                            $entry = $studentEntries->first();
+                            $rosterTeam = $entry->student?->teamMembers?->first()?->team ?? $entry->team;
+                        @endphp
                         @php
                             $medicalSearchText = implode(' ', [
                                 $entry->student?->full_name ?? 'Removed student',
@@ -303,7 +309,9 @@
                             <td class="px-4 py-3 align-top">
                                 <ul class="space-y-2">
                                     @foreach ($studentEntries as $studentEntry)
-                                        @php($status = $studentEntry->effective_medical_certificate_status)
+                                        @php
+                                            $status = $studentEntry->effective_medical_certificate_status;
+                                        @endphp
                                         <li class="flex flex-wrap items-center gap-2 text-slate-700">
                                             <span class="flex items-center gap-2">
                                                 <span class="ops-sport-inline-icon"><x-sport-group-icon :group="$studentEntry->editionSport->sport?->catalogue_group_key ?? 'other'" /></span>

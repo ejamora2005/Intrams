@@ -34,13 +34,15 @@
 
         <div class="mt-3 grid gap-3 sm:grid-cols-2">
             @foreach ($sports as $editionSport)
-                @php($sport = $editionSport->sport)
-                @php($slot = $editionSport->participation_slot)
-                @php($countsTowardLimit = $editionSport->counts_toward_participation_limit)
-                @php($isRelay = $editionSport->is_relay_event)
-                @php($pairedPartnerExemptGenders = $editionSport->paired_partner_exempt_genders ?? [])
-                @php($isDual = $editionSport->participant_type === 'dual')
-                @php($defaultSlotLabel = $isRelay ? 'Relay (exempt)' : ($slot === 'individual_or_dual' ? 'Individual / dual' : ucfirst($slot)))
+                @php
+                    $sport = $editionSport->sport;
+                    $slot = $editionSport->participation_slot;
+                    $countsTowardLimit = $editionSport->counts_toward_participation_limit;
+                    $isRelay = $editionSport->is_relay_event;
+                    $pairedPartnerExemptGenders = $editionSport->paired_partner_exempt_genders ?? [];
+                    $isDual = $editionSport->participant_type === 'dual';
+                    $defaultSlotLabel = $isRelay ? 'Relay (exempt)' : ($slot === 'individual_or_dual' ? 'Individual / dual' : ucfirst($slot));
+                @endphp
                 <label data-sport-option data-list-search-row data-search-text="{{ Str::lower($sport?->name ?? '') }}" data-sport-category="{{ $sport?->participant_category }}" data-sport-locked="{{ $isDual ? 'true' : 'false' }}" class="flex cursor-pointer items-start gap-3 rounded-lg border border-slate-200 p-4 transition hover:border-blue-300 hover:bg-blue-50">
                     <input
                         type="checkbox"

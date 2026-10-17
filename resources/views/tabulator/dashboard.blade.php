@@ -97,7 +97,9 @@
                 <p class="mt-1 text-sm text-slate-500">Choose a sport, select the placed teams, and standings will update from the admin point system.</p>
             </div>
             @if ($editionSports->isNotEmpty())
-                @php($groupedEditionSports = $editionSports->groupBy(fn ($editionSport) => $editionSport->sport?->catalogue_group_key ?? 'other'))
+                @php
+                    $groupedEditionSports = $editionSports->groupBy(fn ($editionSport) => $editionSport->sport?->catalogue_group_key ?? 'other');
+                @endphp
                 <form method="GET" action="{{ route('tabulator.dashboard') }}#declare-sports" class="flex flex-col gap-2 sm:flex-row sm:items-center">
                     <select name="edition_sport_id" class="rounded-lg border-slate-300 py-2.5 text-sm focus:border-blue-600 focus:ring-blue-600" onchange="this.form.submit()">
                         @foreach (\App\Models\Sport::CATALOGUE_GROUPS as $groupKey => $groupDefinition)
@@ -116,7 +118,9 @@
         </div>
 
         @if ($selectedSport)
-            @php($currentPlacements = $selectedSport->sportResult?->placements_json ?? [])
+            @php
+                $currentPlacements = $selectedSport->sportResult?->placements_json ?? [];
+            @endphp
             <div class="mt-5 flex items-center gap-3 rounded-lg border border-slate-200 bg-slate-50 p-3">
                 <span class="ops-sport-inline-icon"><x-sport-group-icon :group="$selectedSport->sport?->catalogue_group_key ?? 'other'" /></span>
                 <div>
@@ -206,7 +210,9 @@
                     </thead>
                     <tbody class="divide-y divide-slate-100">
                         @forelse ($editionSports as $editionSport)
-                            @php($sportResult = $editionSport->sportResult)
+                            @php
+                                $sportResult = $editionSport->sportResult;
+                            @endphp
                             <tr data-list-search-row data-search-text="{{ Str::lower(($editionSport->sport?->name ?? '').' '.($editionSport->sport?->catalogue_group_label ?? '').' '.($sportResult?->placements_json ? collect($sportResult->placements_json)->map(fn ($teamId) => $teamsById->get((int) $teamId)?->name)->filter()->implode(' ') : '')) }}">
                                 <td class="px-3 py-3 font-semibold text-slate-950">
                                     <span class="flex items-center gap-2">
@@ -225,7 +231,9 @@
                                     @if ($sportResult)
                                         <div class="flex flex-wrap gap-2">
                                             @foreach ($sportResult->placements_json ?? [] as $placement => $teamId)
-                                                @php($placedTeam = $teamsById->get((int) $teamId))
+                                                @php
+                                                    $placedTeam = $teamsById->get((int) $teamId);
+                                                @endphp
                                                 <span class="inline-flex max-w-full items-center gap-2 rounded-full bg-slate-100 px-3 py-1">
                                                     <x-landing.ranking-medal :rank="$placement" />
                                                     <span>{{ $placedTeam?->name ?? 'Removed team' }}</span>
@@ -282,7 +290,9 @@
         <div class="mt-2 flex justify-end"><span data-list-search-count class="text-xs font-medium text-slate-500" aria-live="polite"></span></div>
         <div class="mt-2 grid gap-3 lg:grid-cols-2">
             @forelse ($matches as $match)
-                @php($matchModalId = 'match-winner-modal-'.$match->id)
+                @php
+                    $matchModalId = 'match-winner-modal-'.$match->id;
+                @endphp
                 <form method="POST" action="{{ route('tabulator.matches.result', [$match, 'view' => 'match-winners', 'modal' => $matchModalId]) }}" data-list-search-row data-search-text="{{ Str::lower(($match->editionSport->sport->name ?? '').' '.($match->competitorOne?->label ?? '').' '.($match->competitorTwo?->label ?? '')) }}" data-ops-form class="rounded-lg border border-slate-200 p-4">
                     @csrf
                     <p class="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-slate-500"><span class="ops-sport-inline-icon"><x-sport-group-icon :group="$match->editionSport->sport?->catalogue_group_key ?? 'other'" /></span><span>{{ $match->editionSport->sport->name }} · {{ $match->editionSport->sport?->catalogue_group_label ?? 'Other Sports' }} / {{ ucfirst($match->bracket) }} round {{ $match->round_number }}</span></p>
