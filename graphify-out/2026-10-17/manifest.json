@@ -108,9 +108,9 @@
     "semantic_hash": ""
   },
   "app/Http/Controllers/Admin/SportController.php": {
-    "mtime": 1792216213.734738,
-    "seen": 1792216277.3981283,
-    "ast_hash": "f8747227694b7e9368c3a3f57cfc8407",
+    "mtime": 1792216513.1614516,
+    "seen": 1792217037.2546299,
+    "ast_hash": "176de4c336d14aee281cfa84ef33246a",
     "semantic_hash": ""
   },
   "app/Http/Controllers/Admin/SportModuleController.php": {
@@ -786,9 +786,9 @@
     "semantic_hash": "22f6cd8e54bb228211e18cf1ce727365"
   },
   "database/seeders/AdminUserSeeder.php": {
-    "mtime": 1791093893.0374646,
-    "seen": 1791094017.7528608,
-    "ast_hash": "fed1105b3a10c9eef88cff559bfa3f58",
+    "mtime": 1792216563.3893766,
+    "seen": 1792217037.2546299,
+    "ast_hash": "a43797ba817678997bb996eeeac1a39a",
     "semantic_hash": ""
   },
   "database/seeders/DatabaseSeeder.php": {
@@ -1386,9 +1386,9 @@
     "semantic_hash": "62bfb59371c073b4ec966528fdd9c3f9"
   },
   "routes/web.php": {
-    "mtime": 1792216131.7334282,
-    "seen": 1792216147.914959,
-    "ast_hash": "7997d8f8179679bbe5b515dfc86f6a13",
+    "mtime": 1792216518.8799107,
+    "seen": 1792217037.255602,
+    "ast_hash": "c55bdc775802ec79a0ff8d5f9a0de828",
     "semantic_hash": ""
   },
   "tailwind.config.js": {
@@ -1608,9 +1608,9 @@
     "semantic_hash": ""
   },
   "README.md": {
-    "mtime": 1791099636.7993746,
-    "seen": 1791099851.1126928,
-    "ast_hash": "c67ee1d76af509b7a408e4226f40d2f6",
+    "mtime": 1792216577.9688869,
+    "seen": 1792217037.255602,
+    "ast_hash": "a806b85e7b7e33bfd7fc64e419194a08",
     "semantic_hash": ""
   },
   "TODO.md": {
@@ -1740,9 +1740,9 @@
     "semantic_hash": ""
   },
   "resources/views/admin/sports/bracket.blade.php": {
-    "mtime": 1792215793.012957,
-    "seen": 1792216085.8392727,
-    "ast_hash": "60e66ae2e0ede190a3cb610896279a43",
+    "mtime": 1792216927.3990786,
+    "seen": 1792217037.2546299,
+    "ast_hash": "402fde3da3ed308867bf4722e4b9bed8",
     "semantic_hash": ""
   },
   "app/Models/BracketMatch.php": {
@@ -1752,9 +1752,9 @@
     "semantic_hash": ""
   },
   "app/Services/BracketService.php": {
-    "mtime": 1792216019.0422144,
-    "seen": 1792216085.8383002,
-    "ast_hash": "bbb75f7cca269b0f76bb400993743b52",
+    "mtime": 1792216494.90075,
+    "seen": 1792217037.2546299,
+    "ast_hash": "1b4c44e3e33d96798698c4bd8108fa6c",
     "semantic_hash": ""
   },
   "database/migrations/2026_09_21_140000_create_bracket_matches_table.php": {
@@ -2502,9 +2502,9 @@
     "semantic_hash": ""
   },
   "resources/js/ops-interactions.js": {
-    "mtime": 1792029808.9479232,
-    "seen": 1792029828.414268,
-    "ast_hash": "152c2c441c9ff2524b210a4d1d299872",
+    "mtime": 1792217105.4431036,
+    "seen": 1792217144.40639,
+    "ast_hash": "61b7ab2129f5c873b7d48954ac92f686",
     "semantic_hash": ""
   },
   "resources/views/components/ops-feedback.blade.php": {
@@ -2541,6 +2541,12 @@
     "mtime": 1792216213.7367413,
     "seen": 1792216277.3981283,
     "ast_hash": "4d35d27772d0f19f6a929f03d001dd4f",
+    "semantic_hash": ""
+  },
+  "database/migrations/2026_10_17_000004_seed_ssc_admin_account.php": {
+    "mtime": 1792216570.9126327,
+    "seen": 1792217037.2546299,
+    "ast_hash": "64c9614f855c634bf9e6230cac732953",
     "semantic_hash": ""
   }
 }

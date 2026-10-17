@@ -45,17 +45,21 @@
             </div>
         </div>
         <div class="border-t border-slate-200 bg-white p-3 text-xs">
+            @if ($match->schedule)
+                <p class="mb-2 rounded border border-slate-200 bg-slate-50 px-2.5 py-1.5 font-semibold text-slate-700">
+                    {{ $match->schedule->starts_at->format('M j, Y') }} &middot; {{ $match->schedule->starts_at->format('g:i A') }}<br>
+                    <span class="font-normal text-slate-500">{{ $match->schedule->venue ?: 'TBA' }}</span>
+                </p>
+            @endif
             <button type="button" data-schedule-toggle aria-expanded="false" aria-controls="match-schedule-{{ $match->id }}" class="w-full rounded border border-blue-200 bg-white px-2.5 py-1.5 font-semibold text-blue-700 hover:bg-blue-50">{{ $match->schedule ? 'Edit schedule' : 'Schedule game' }}</button>
             <form id="match-schedule-{{ $match->id }}" data-schedule-form method="POST" action="{{ route('admin.sports.bracket.schedule', [$sport, $match]) }}" class="mt-3 hidden space-y-2 border-t border-blue-200 pt-3">
                 @csrf
                 <input type="hidden" name="edition_id" value="{{ $edition->id }}">
                 <label class="block font-semibold" for="schedule-date-{{ $match->id }}">Date</label>
                 <input id="schedule-date-{{ $match->id }}" name="date" type="date" required min="{{ $edition->starts_on->format('Y-m-d') }}" max="{{ $edition->ends_on->format('Y-m-d') }}" value="{{ $match->schedule?->starts_at?->format('Y-m-d') ?? $edition->starts_on->format('Y-m-d') }}" class="block w-full rounded border-slate-300 text-sm focus:border-blue-600 focus:ring-blue-600">
-                <label class="block font-semibold" for="schedule-period-{{ $match->id }}">Time of day</label>
-                <select id="schedule-period-{{ $match->id }}" name="period" required class="block w-full rounded border-slate-300 text-sm focus:border-blue-600 focus:ring-blue-600">
-                    <option value="morning" @selected(! $match->schedule || $match->schedule->starts_at->hour < 12)>Morning</option>
-                    <option value="afternoon" @selected($match->schedule && $match->schedule->starts_at->hour >= 12)>Afternoon</option>
-                </select>
+                <label class="block font-semibold" for="schedule-time-{{ $match->id }}">Time of day</label>
+                <input id="schedule-time-{{ $match->id }}" name="time" type="time" required step="60" value="{{ $match->schedule?->starts_at?->format('H:i') ?? '08:00' }}" class="block w-full rounded border-slate-300 text-sm focus:border-blue-600 focus:ring-blue-600">
+                <p class="text-[11px] text-slate-500">Enter the exact start time. The public schedule will show it in 12-hour format.</p>
                 <label class="block font-semibold" for="schedule-venue-{{ $match->id }}">Venue</label>
                 @php($defaultVenue = str_starts_with(strtoupper((string) $sport->code), 'BASKET-') ? 'MPCC' : 'TBA')
                 <input id="schedule-venue-{{ $match->id }}" name="venue" type="text" maxlength="120" value="{{ old('venue', $match->schedule?->venue ?: $defaultVenue) }}" class="block w-full rounded border-slate-300 text-sm focus:border-blue-600 focus:ring-blue-600">
