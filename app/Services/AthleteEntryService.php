@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\AthleteEntry;
 use App\Models\EditionSport;
 use App\Models\IntramuralEdition;
+use App\Models\Sport;
 use App\Models\Student;
 use App\Models\Team;
 use Illuminate\Support\Collection;
@@ -96,8 +97,19 @@ class AthleteEntryService
             ->sortBy(fn (EditionSport $editionSport): int => $this->eligibilityService->isRelayEvent($editionSport) ? 1 : 0)
             ->values();
 
+        // Athlete entries are retained as inactive history and the database
+        // enforces one row per student/sport. Re-selecting a sport must
+        // reactivate that historical row instead of attempting a duplicate
+        // insert (which previously surfaced as a generic save error).
+        $existingEntries = AthleteEntry::query()
+            ->where('student_id', $student->id)
+            ->whereIn('edition_sport_id', $editionSports->pluck('id'))
+            ->get()
+            ->keyBy('edition_sport_id');
+
         foreach ($editionSports as $editionSport) {
-            if (! in_array($editionSport->status, ['preparation', 'active'], true)
+            if (! $editionSport->sport instanceof Sport
+                || ! in_array($editionSport->status, ['preparation', 'active'], true)
                 || $editionSport->participant_type === 'dual'
                 || ! $this->eligibilityService->isParticipationSport($editionSport)) {
                 throw ValidationException::withMessages([
@@ -130,15 +142,30 @@ class AthleteEntryService
             }
 
             $requiresTeam = in_array($editionSport->participant_type, ['team', 'dual'], true);
-            $entry = AthleteEntry::query()->create([
+            $attributes = [
                 'edition_sport_id' => $editionSport->id,
                 'student_id' => $student->id,
                 'team_id' => $requiresTeam ? $team?->id : null,
                 'status' => 'active',
                 'medical_certificate_status' => $this->eligibilityService->requiresMedicalCertificate($editionSport) ? 'pending' : 'not_required',
+                'medical_certificate_reviewed_by' => null,
+                'medical_certificate_reviewed_at' => null,
+                'medical_certificate_notes' => null,
                 'assigned_by' => auth()->id(),
                 'assigned_at' => now(),
-            ]);
+            ];
+
+            $entry = $existingEntries->get($editionSport->id);
+            if ($entry instanceof AthleteEntry) {
+                $oldValues = $entry->only(array_keys($attributes));
+                $entry->fill($attributes);
+                $entry->save();
+                $this->auditService->record('athlete_entry.updated', $entry, $oldValues, $entry->only(array_keys($attributes)));
+
+                return $entry;
+            }
+
+            $entry = AthleteEntry::query()->create($attributes);
 
             $this->auditService->record('athlete_entry.created', $entry, null, $entry->only($entry->getFillable()));
 
