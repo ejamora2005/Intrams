@@ -27,7 +27,7 @@
                 <div class="sm:text-right"><p class="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Tournament Name</p><p class="mt-1 text-sm font-semibold text-slate-900">{{ $edition->name }} — {{ $sport->name }}</p></div>
                 <div class="flex flex-wrap gap-2 sm:justify-end">
                     <a href="{{ route('admin.sports.participants', ['sport' => $sport, 'edition_id' => $edition->id]) }}" class="w-fit rounded-lg border border-blue-200 bg-white px-4 py-2 text-sm font-semibold text-blue-700 transition hover:border-blue-300 hover:bg-blue-50">Manage participants</a>
-                    @if ($matches->isNotEmpty() && in_array($editionSport->game_mechanic, ['single_elimination', 'double_elimination', 'round_robin'], true))
+                    @if ($matches->isNotEmpty() && in_array($editionSport->game_mechanic, ['single_elimination', 'double_elimination', 'round_robin', 'custom'], true))
                         <form method="POST" action="{{ route('admin.sports.bracket.reset', $sport) }}" onsubmit="return confirm('Reset this bracket? All recorded bracket results will be removed and the bracket will be rebuilt from the current registrations. Teams, students, and registrations will not be changed.');">
                             @csrf
                             <input type="hidden" name="edition_id" value="{{ $edition->id }}">
@@ -39,11 +39,11 @@
             </div>
         </header>
 
-        @if (! in_array($editionSport->game_mechanic, ['single_elimination', 'double_elimination', 'round_robin'], true))
+        @if (! in_array($editionSport->game_mechanic, ['single_elimination', 'double_elimination', 'round_robin', 'custom'], true))
             <div class="m-6 rounded-lg border border-blue-100 bg-blue-50 p-5 text-sm text-blue-900">This sport does not use an automated tournament mechanic.</div>
         @elseif ($matches->isEmpty())
             <div class="m-6 rounded-lg border border-dashed border-slate-300 bg-slate-50 p-8 text-center text-sm text-slate-500">Register at least two competitors in Manage Participants to generate the tournament. Teams, dual pairs, and individual athletes are supported.</div>
-        @elseif ($editionSport->game_mechanic === 'round_robin')
+        @elseif (in_array($editionSport->game_mechanic, ['round_robin', 'custom'], true))
             @php
                 $roundRobinWidth = max(1120, ($roundRobinRounds->count() * 320) + 80);
                 $roundRobinHeight = max(520, (($roundRobinRounds->map(fn ($round) => $round->count())->max() ?? 1) * 320) + 140);
@@ -54,7 +54,7 @@
                     <svg class="bracket-connectors pointer-events-none absolute inset-0 z-0 h-full w-full overflow-visible" data-bracket-connectors aria-hidden="true"></svg>
                     <section class="relative z-10" aria-labelledby="round-robin-heading">
                         <div class="mb-5 flex items-center justify-between border-b-2 border-slate-900 pb-3">
-                            <div><p class="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">League schedule</p><h3 id="round-robin-heading" class="mt-1 text-base font-semibold text-slate-900">Round Robin</h3></div>
+                            <div><p class="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">League schedule</p><h3 id="round-robin-heading" class="mt-1 text-base font-semibold text-slate-900">{{ $editionSport->game_mechanic === 'custom' ? 'Custom league schedule' : 'Round Robin' }}</h3></div>
                             <span class="rounded border border-slate-300 px-2 py-1 text-xs font-semibold text-slate-600">{{ $roundRobinRounds->flatten(1)->count() }} {{ Str::plural('game', $roundRobinRounds->flatten(1)->count()) }}</span>
                         </div>
                         <div class="flex min-w-max items-start gap-12">

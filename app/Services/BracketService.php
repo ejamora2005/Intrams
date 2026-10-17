@@ -79,7 +79,7 @@ class BracketService
             ]);
             $this->auditService->record('bracket.match.completed', $match, null, $match->fresh()->only($match->getFillable()));
 
-            if ($match->editionSport->game_mechanic === 'round_robin') {
+            if (in_array($match->editionSport->game_mechanic, ['round_robin', 'custom'], true)) {
                 return;
             }
 
@@ -96,7 +96,7 @@ class BracketService
             return;
         }
 
-        if ($editionSport->game_mechanic === 'round_robin') {
+        if (in_array($editionSport->game_mechanic, ['round_robin', 'custom'], true)) {
             $this->createRoundRobinSchedule($editionSport, $competitors);
 
             return;
@@ -209,7 +209,10 @@ class BracketService
             ->setInGame(2)
             ->setType(Constants::ROUND_ROBIN)
             ->genGames());
-        $gamesPerRound = intdiv($competitors->count(), 2);
+        // The generator emits n*(n-1)/2 games. For an odd field, keeping
+        // floor(n/2) games per round yields the expected n rounds with one
+        // idle competitor rotating through each round.
+        $gamesPerRound = max(1, intdiv($competitors->count(), 2));
 
         foreach ($games as $index => $game) {
             [$oneId, $twoId] = $game->getTeamsIds();
@@ -477,6 +480,6 @@ class BracketService
 
     private function usesBracketEngine(EditionSport $editionSport): bool
     {
-        return in_array($editionSport->game_mechanic, ['single_elimination', 'double_elimination', 'round_robin'], true);
+        return in_array($editionSport->game_mechanic, ['single_elimination', 'double_elimination', 'round_robin', 'custom'], true);
     }
 }

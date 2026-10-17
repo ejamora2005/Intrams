@@ -108,7 +108,7 @@ class SportController extends Controller
         $edition = $this->selectedEdition($request);
         abort_unless($edition !== null, 422, 'Create an edition before adding sports.');
         $sport = $this->service->create($request->validated());
-        EditionSport::query()->firstOrCreate(['edition_id' => $edition->id, 'sport_id' => $sport->id], ['participant_type' => $request->input('participant_type', 'team'), 'game_mechanic' => $request->input('game_mechanic', 'single_elimination'), 'rules' => $request->input('rules'), 'status' => $request->input('configuration_status', 'preparation')]);
+        EditionSport::query()->firstOrCreate(['edition_id' => $edition->id, 'sport_id' => $sport->id], ['participant_type' => $request->input('participant_type', 'team'), 'game_mechanic' => $request->input('game_mechanic', 'round_robin'), 'rules' => $request->input('rules'), 'status' => $request->input('configuration_status', 'preparation')]);
 
         return redirect()->route('admin.sports.index', ['edition_id' => $edition->id])->with('success', 'Sport created for '.$edition->name.'.');
     }
@@ -116,7 +116,7 @@ class SportController extends Controller
     public function edit(Request $request, Sport $sport): View
     {
         $edition = $this->selectedEdition($request);
-        $editionSport = $edition ? EditionSport::firstOrCreate(['edition_id' => $edition->id, 'sport_id' => $sport->id], ['participant_type' => 'team', 'game_mechanic' => 'single_elimination', 'status' => 'preparation']) : null;
+        $editionSport = $edition ? EditionSport::firstOrCreate(['edition_id' => $edition->id, 'sport_id' => $sport->id], ['participant_type' => 'team', 'game_mechanic' => 'round_robin', 'status' => 'preparation']) : null;
 
         return view('admin.sports.edit', compact('sport', 'editionSport', 'edition'));
     }
@@ -127,7 +127,7 @@ class SportController extends Controller
         $data = $request->validate(['participant_type' => ['required', 'in:team,dual,individual'], 'game_mechanic' => ['required', 'in:single_elimination,double_elimination,round_robin,custom'], 'rules' => ['nullable', 'string', 'max:5000'], 'configuration_status' => ['required', 'in:preparation,active,archived']]);
         $edition = $this->selectedEdition($request);
         if ($edition) {
-            $editionSport = EditionSport::firstOrCreate(['edition_id' => $edition->id, 'sport_id' => $sport->id], ['participant_type' => 'team', 'game_mechanic' => 'single_elimination', 'status' => 'preparation']);
+            $editionSport = EditionSport::firstOrCreate(['edition_id' => $edition->id, 'sport_id' => $sport->id], ['participant_type' => 'team', 'game_mechanic' => 'round_robin', 'status' => 'preparation']);
             $editionSport->update(['participant_type' => $data['participant_type'], 'game_mechanic' => $data['game_mechanic'], 'rules' => $data['rules'], 'status' => $data['configuration_status']]);
         }
 
@@ -205,7 +205,7 @@ class SportController extends Controller
         };
 
         $bracketRounds = collect();
-        if (in_array($editionSport->game_mechanic, ['single_elimination', 'double_elimination'], true) && $competitors->isNotEmpty()) {
+        if (in_array($editionSport->game_mechanic, ['single_elimination', 'double_elimination', 'round_robin', 'custom'], true) && $competitors->isNotEmpty()) {
             $bracketSize = 2 ** (int) ceil(log(max($competitors->count(), 2), 2));
             $slots = $competitors->pluck('name')->pad($bracketSize, 'Bye')->all();
             $bracketRounds->push($slots);

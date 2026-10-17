@@ -99,7 +99,9 @@ class EditionService
 
         return [
             'participant_type' => $catalogItem['participant_type'] ?? 'team',
-            'game_mechanic' => $catalogItem['game_mechanic'] ?? 'single_elimination',
+            // Sports start with a complete league schedule. Administrators can
+            // still choose elimination or custom rules per edition when needed.
+            'game_mechanic' => $catalogItem['game_mechanic'] ?? 'round_robin',
             'scoring_rules' => $catalogItem['scoring_rules'] ?? StandingsService::defaultScoringRules(),
             'rules' => $catalogItem['rules'] ?? null,
         ];

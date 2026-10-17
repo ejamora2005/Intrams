@@ -25,13 +25,13 @@ class EditionSportController extends Controller
             'name' => ['required', 'string', 'max:100'],
             'description' => ['nullable', 'string', 'max:2000'],
             'participant_type' => ['required', 'in:team,dual,individual'],
-            'game_mechanic' => ['required', 'in:single_elimination,double_elimination,round_robin,custom'],
+            'game_mechanic' => ['sometimes', 'nullable', 'in:single_elimination,double_elimination,round_robin,custom'],
             'rules' => ['nullable', 'string', 'max:5000'],
         ]);
         $name = Str::headline(trim($data['name']));
         $sport = Sport::firstOrCreate(['name' => $name], ['code' => 'SPORT-'.Str::upper(Str::random(8)), 'description' => $data['description'] ?? null, 'status' => 'active', 'is_system' => false]);
         abort_if(EditionSport::where('edition_id', $edition->id)->where('sport_id', $sport->id)->exists(), 422, 'This sport is already configured for the edition.');
-        $editionSport = EditionSport::create(['edition_id' => $edition->id, 'sport_id' => $sport->id, 'participant_type' => $data['participant_type'], 'game_mechanic' => $data['game_mechanic'], 'rules' => $data['rules'] ?? null, 'status' => 'preparation']);
+        $editionSport = EditionSport::create(['edition_id' => $edition->id, 'sport_id' => $sport->id, 'participant_type' => $data['participant_type'], 'game_mechanic' => $data['game_mechanic'] ?? 'round_robin', 'rules' => $data['rules'] ?? null, 'status' => 'preparation']);
         app(AuditService::class)->record('edition_sport.created', $editionSport, null, $editionSport->only($editionSport->getFillable()));
 
         return redirect()->route('admin.editions.index')->with('success', "{$sport->name} was configured for this edition.");

@@ -161,7 +161,7 @@ class TeamService
             }
 
             foreach ($entries->filter(fn (AthleteEntry $entry): bool => $entry->editionSport?->participant_type === 'team')->pluck('editionSport')->unique('id') as $editionSport) {
-                if (in_array($editionSport->game_mechanic, ['single_elimination', 'double_elimination', 'round_robin'], true)
+                if (in_array($editionSport->game_mechanic, ['single_elimination', 'double_elimination', 'round_robin', 'custom'], true)
                     && BracketMatch::query()->where('edition_sport_id', $editionSport->id)->exists()) {
                     $this->bracketService->reset($editionSport);
                 }

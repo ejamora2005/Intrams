@@ -39,8 +39,18 @@
                             ['label' => 'Coordinators', 'route' => 'admin.coordinators.index', 'match' => 'admin/coordinators'],
                             ['label' => 'Operations Accounts', 'route' => 'admin.operations-accounts.index', 'match' => 'admin/operations-accounts'],
                             ['label' => 'Teams', 'route' => 'admin.teams.index', 'match' => 'admin/teams'],
-                            ['label' => 'Sports', 'route' => 'admin.sports.index', 'match' => 'admin/sports'],
-                            ['label' => 'Cultural', 'route' => 'admin.cultural.index', 'match' => 'admin/cultural'],
+                            ['label' => 'Sports', 'route' => 'admin.sports.index', 'match' => 'admin/sports', 'children' => [
+                                ['label' => 'All sports', 'route' => 'admin.sports.index', 'anchor' => 'sports-list'],
+                                ['label' => 'Team sports', 'route' => 'admin.sports.index', 'anchor' => 'sport-group-team'],
+                                ['label' => 'Individual & pairs', 'route' => 'admin.sports.index', 'anchor' => 'sport-group-individual'],
+                                ['label' => 'Track & field', 'route' => 'admin.sports.index', 'anchor' => 'sport-group-track-field'],
+                            ]],
+                            ['label' => 'Cultural', 'route' => 'admin.cultural.index', 'match' => 'admin/cultural', 'children' => [
+                                ['label' => 'All cultural events', 'route' => 'admin.cultural.index', 'anchor' => 'sports-list'],
+                                ['label' => 'Festival & group events', 'route' => 'admin.cultural.index', 'anchor' => 'sport-group-other'],
+                                ['label' => 'Visual & performing arts', 'route' => 'admin.cultural.index', 'anchor' => 'sport-group-other'],
+                                ['label' => 'Special awards', 'route' => 'admin.cultural.index', 'anchor' => 'sport-group-other'],
+                            ]],
                             ['label' => 'Points System', 'route' => 'admin.sports-points.index', 'match' => 'admin/sports-points'],
                             ['label' => 'Rules & Guidelines', 'route' => 'admin.rules.index', 'match' => 'admin/rules-guidelines'],
                             ['label' => 'Possible DQ Watchlist', 'route' => 'admin.possible-dq.index', 'match' => 'admin/possible-dq'],
@@ -50,13 +60,31 @@
                     @endphp
                     @foreach ($navigation as $item)
                         @php($isActive = request()->is($item['match'], $item['match'].'/*'))
-                        <a href="{{ route($item['route']) }}" @class([
-                            'w-full whitespace-nowrap rounded-lg px-3 py-2.5 text-sm font-medium transition',
-                            'bg-white text-blue-950 shadow-sm' => $isActive,
-                            'text-blue-200 hover:bg-blue-900 hover:text-white' => !$isActive,
-                        ]) @if ($isActive) aria-current="page" @endif>
-                            {{ $item['label'] }}
-                        </a>
+                        @if (isset($item['children']))
+                            <details class="group" @if ($isActive) open @endif>
+                                <summary @class([
+                                    'flex w-full cursor-pointer list-none items-center justify-between rounded-lg px-3 py-2.5 text-sm font-medium transition',
+                                    'bg-white text-blue-950 shadow-sm' => $isActive,
+                                    'text-blue-200 hover:bg-blue-900 hover:text-white' => !$isActive,
+                                ])>
+                                    <span>{{ $item['label'] }}</span>
+                                    <svg class="h-4 w-4 transition group-open:rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="m6 9 6 6 6-6" /></svg>
+                                </summary>
+                                <div class="ml-3 mt-1 space-y-0.5 border-l border-blue-800 pl-2">
+                                    @foreach ($item['children'] as $child)
+                                        <a href="{{ route($child['route']) }}#{{ $child['anchor'] }}" class="block rounded-md px-3 py-2 text-xs font-medium text-blue-200 transition hover:bg-blue-900 hover:text-white">{{ $child['label'] }}</a>
+                                    @endforeach
+                                </div>
+                            </details>
+                        @else
+                            <a href="{{ route($item['route']) }}" @class([
+                                'w-full whitespace-nowrap rounded-lg px-3 py-2.5 text-sm font-medium transition',
+                                'bg-white text-blue-950 shadow-sm' => $isActive,
+                                'text-blue-200 hover:bg-blue-900 hover:text-white' => !$isActive,
+                            ]) @if ($isActive) aria-current="page" @endif>
+                                {{ $item['label'] }}
+                            </a>
+                        @endif
                     @endforeach
                 </nav>
 

@@ -70,7 +70,7 @@
     @endphp
 
     @if ($groupedSports->isNotEmpty())
-        <div class="mt-5 space-y-8" aria-label="{{ $listLabel ?? 'Sports list' }}">
+        <div id="sports-list" class="mt-5 space-y-8" aria-label="{{ $listLabel ?? 'Sports list' }}">
             @foreach ($groupedSports as $group)
                 <section class="ops-sport-group" data-sport-group="{{ $group['key'] }}" aria-labelledby="sport-group-{{ $group['key'] }}">
                     <div class="ops-sport-group-heading">
