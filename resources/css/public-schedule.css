@@ -94,6 +94,37 @@
     .schedule-match-card dt { color: #9cb2cd; }
     .schedule-match-card dd { text-align: right; color: #c0d0e4; overflow-wrap: anywhere; min-width: 0; }
 }
+
+/* Keep public schedules readable by event category instead of compressing every
+ * sport and cultural programme into one oversized table. */
+.schedule-boards {
+    display: grid;
+    gap: 22px;
+}
+
+.schedule-boards .schedule-board + .schedule-board {
+    margin-top: 0;
+}
+
+.schedule-board--sports {
+    border-top-color: #35b46f;
+}
+
+.schedule-board--cultural {
+    border-top-color: #d9b87d;
+}
+
+.schedule-board--activities {
+    border-top-color: #77b4e8;
+}
+
+.schedule-board--cultural .schedule-section-label {
+    color: #f1cf89;
+}
+
+.schedule-board--activities .schedule-section-label {
+    color: #9bcfff;
+}
 @media (max-width: 640px) {
     .schedule-page { padding: 0 14px 22px; }
     .schedule-page::after { inset: 6px; }

@@ -149,6 +149,7 @@ class PublicScheduleService
 
                     return [
                         'event' => $isActivity ? ($schedule->title ?: 'School Activity') : $this->eventName($sport?->name ?? 'Event'),
+                        'category' => $isActivity ? 'activities' : ($isCultural ? 'cultural' : 'sports'),
                         'sport_group' => $sportGroup,
                         'sport_group_label' => $sportGroup ? $sport?->catalogue_group_label : null,
                         'game' => $isActivity ? '' : ($schedule->title ?: ($schedule->bracketMatch ? 'Game '.$schedule->bracketMatch->match_number : '')),
