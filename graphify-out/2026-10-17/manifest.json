@@ -1386,9 +1386,9 @@
     "semantic_hash": "62bfb59371c073b4ec966528fdd9c3f9"
   },
   "routes/web.php": {
-    "mtime": 1792033255.9333167,
-    "seen": 1792033427.8932147,
-    "ast_hash": "27cab90163d4219d9ba944c429c28bb0",
+    "mtime": 1792216131.7334282,
+    "seen": 1792216147.914959,
+    "ast_hash": "7997d8f8179679bbe5b515dfc86f6a13",
     "semantic_hash": ""
   },
   "tailwind.config.js": {

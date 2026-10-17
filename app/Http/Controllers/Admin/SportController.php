@@ -108,7 +108,11 @@ class SportController extends Controller
         $edition = $this->selectedEdition($request);
         abort_unless($edition !== null, 422, 'Create an edition before adding sports.');
         $sport = $this->service->create($request->validated());
-        EditionSport::query()->firstOrCreate(['edition_id' => $edition->id, 'sport_id' => $sport->id], ['participant_type' => $request->input('participant_type', 'team'), 'game_mechanic' => $request->input('game_mechanic', 'round_robin'), 'rules' => $request->input('rules'), 'status' => $request->input('configuration_status', 'preparation')]);
+        $gameMechanic = $request->input('game_mechanic', 'round_robin');
+        if ($sport->participant_category === 'custom' && $gameMechanic === 'round_robin') {
+            $gameMechanic = 'custom';
+        }
+        EditionSport::query()->firstOrCreate(['edition_id' => $edition->id, 'sport_id' => $sport->id], ['participant_type' => $request->input('participant_type', 'team'), 'game_mechanic' => $gameMechanic, 'rules' => $request->input('rules'), 'status' => $request->input('configuration_status', 'preparation')]);
 
         return redirect()->route('admin.sports.index', ['edition_id' => $edition->id])->with('success', 'Sport created for '.$edition->name.'.');
     }
@@ -128,7 +132,11 @@ class SportController extends Controller
         $edition = $this->selectedEdition($request);
         if ($edition) {
             $editionSport = EditionSport::firstOrCreate(['edition_id' => $edition->id, 'sport_id' => $sport->id], ['participant_type' => 'team', 'game_mechanic' => 'round_robin', 'status' => 'preparation']);
-            $editionSport->update(['participant_type' => $data['participant_type'], 'game_mechanic' => $data['game_mechanic'], 'rules' => $data['rules'], 'status' => $data['configuration_status']]);
+            $gameMechanic = $data['game_mechanic'];
+            if ($sport->participant_category === 'custom' && $gameMechanic === 'round_robin') {
+                $gameMechanic = 'custom';
+            }
+            $editionSport->update(['participant_type' => $data['participant_type'], 'game_mechanic' => $gameMechanic, 'rules' => $data['rules'], 'status' => $data['configuration_status']]);
         }
 
         return redirect()->route('admin.sports.index', ['edition_id' => $edition?->id])->with('success', 'Sport and mechanics updated.');

@@ -12,7 +12,13 @@
 <script>
     const participantCategory = document.getElementById('participant_category');
     const participantCategoryLabel = document.getElementById('participant-category-label');
+    const gameMechanic = document.querySelector('[name="game_mechanic"]');
     const toggleCustomCategory = () => participantCategoryLabel.classList.toggle('hidden', participantCategory.value !== 'custom');
-    participantCategory.addEventListener('change', toggleCustomCategory);
+    participantCategory.addEventListener('change', () => {
+        toggleCustomCategory();
+        if (participantCategory.value === 'custom' && gameMechanic?.value === 'round_robin') {
+            gameMechanic.value = 'custom';
+        }
+    });
     toggleCustomCategory();
 </script>
