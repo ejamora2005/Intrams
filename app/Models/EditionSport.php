@@ -18,11 +18,13 @@ class EditionSport extends Model
         'scoring_rules',
         'rules',
         'status',
+        'bracket_lineup_configured_at',
     ];
 
     protected $casts = [
         'match_rules' => 'array',
         'scoring_rules' => 'array',
+        'bracket_lineup_configured_at' => 'datetime',
     ];
 
     public function edition()

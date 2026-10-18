@@ -25,6 +25,7 @@ class BracketService
 
         DB::transaction(function () use ($editionSport): void {
             $this->generate($editionSport);
+            $editionSport->update(['bracket_lineup_configured_at' => null]);
         });
     }
 
@@ -72,7 +73,8 @@ class BracketService
                 ->where('edition_sport_id', $editionSport->id)
                 ->lockForUpdate()
                 ->get();
-            abort_if($matches->contains(fn (BracketMatch $match): bool => $match->status !== 'pending'), 422, 'The lineup cannot be changed after a bracket result has been recorded.');
+            $initialAssignment = $editionSport->bracket_lineup_configured_at === null;
+            abort_if(! $initialAssignment && $matches->contains(fn (BracketMatch $match): bool => $match->status !== 'pending'), 422, 'The lineup cannot be changed after a bracket result has been recorded.');
 
             $competitors = BracketCompetitor::query()
                 ->where('edition_sport_id', $editionSport->id)
@@ -86,6 +88,7 @@ class BracketService
             $before = $matches->flatMap(fn (BracketMatch $match) => [$match->competitor_one_id, $match->competitor_two_id])->filter()->unique()->values()->all();
             BracketMatch::query()->where('edition_sport_id', $editionSport->id)->delete();
             $this->generate($editionSport, $ordered);
+            $editionSport->update(['bracket_lineup_configured_at' => now()]);
 
             $this->auditService->record('bracket.reordered', $editionSport, ['competitor_ids' => $before], [
                 'competitor_ids' => $ordered->pluck('id')->all(),

@@ -261,6 +261,7 @@ class SportController extends Controller
             ->where('edition_sport_id', $editionSport->id)
             ->orderBy('label')
             ->get();
+        $bracketBlank = $editionSport->bracket_lineup_configured_at === null;
         $lineupIds = $matches->flatten(1)
             ->sortBy(fn (BracketMatch $match) => [$match->bracket === 'winners' ? 0 : 1, $match->round_number, $match->match_number])
             ->flatMap(fn (BracketMatch $match) => [$match->competitor_one_id, $match->competitor_two_id])
@@ -274,10 +275,12 @@ class SportController extends Controller
         if ($lineup->isEmpty()) {
             $lineup = $bracketCompetitors->values();
         }
-        $selectedCompetitors = $lineup;
-        $availableCompetitors = $bracketCompetitors->whereNotIn('id', $lineup->pluck('id'))->values();
+        $selectedCompetitors = $bracketBlank ? collect() : $lineup;
+        $availableCompetitors = $bracketBlank
+            ? $bracketCompetitors->values()
+            : $bracketCompetitors->whereNotIn('id', $lineup->pluck('id'))->values();
 
-        return view('admin.sports.bracket', compact('sport', 'edition', 'editionSport', 'matches', 'selectedCompetitors', 'availableCompetitors'));
+        return view('admin.sports.bracket', compact('sport', 'edition', 'editionSport', 'matches', 'selectedCompetitors', 'availableCompetitors', 'bracketBlank'));
     }
 
     public function basketballScoreSheet(Request $request, Sport $sport): View

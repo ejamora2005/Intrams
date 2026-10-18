@@ -1,15 +1,20 @@
+@php
+    $bracketBlank = $bracketBlank ?? false;
+    $displayStatus = $bracketBlank ? 'unassigned' : $match->status;
+    $matchCompetitors = $bracketBlank ? [null, null] : [$match->competitorOne, $match->competitorTwo];
+@endphp
 <article class="relative w-64 rounded-lg border border-slate-300 bg-white shadow-sm" data-bracket-match>
     <div class="flex items-center justify-between border-b border-slate-200 bg-slate-50 px-3 py-2">
         <p class="text-xs font-semibold uppercase tracking-wide text-slate-600">Game {{ $match->match_number }}</p>
-        <span class="rounded border px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide {{ $match->status === 'completed' ? 'border-green-200 bg-green-50 text-green-700' : ($match->status === 'bye' ? 'border-blue-200 bg-blue-50 text-blue-700' : 'border-slate-200 bg-white text-slate-500') }}">{{ $match->status }}</span>
+        <span class="rounded border px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide {{ $displayStatus === 'completed' ? 'border-green-200 bg-green-50 text-green-700' : ($displayStatus === 'bye' ? 'border-blue-200 bg-blue-50 text-blue-700' : 'border-slate-200 bg-white text-slate-500') }}">{{ $displayStatus }}</span>
     </div>
     <div class="divide-y divide-slate-200">
-        @foreach ([$match->competitorOne, $match->competitorTwo] as $competitor)
+        @foreach ($matchCompetitors as $competitor)
             @php
                 $bracketSlotIndex = isset($bracketSlotStart) && $bracketSlotStart !== null
                     ? $bracketSlotStart + $loop->index
                     : null;
-                $canDragBracketSlot = $bracketSlotIndex !== null && $match->status === 'pending';
+                $canDragBracketSlot = $bracketSlotIndex !== null && ($bracketBlank || $match->status === 'pending');
             @endphp
             @if ($competitor)
                 <button type="button" data-match="{{ $match->id }}" data-competitor-id="{{ $competitor->id }}" @if ($bracketSlotIndex !== null) data-bracket-slot-card data-bracket-slot-index="{{ $bracketSlotIndex }}" @endif aria-pressed="false" class="bracket-team flex w-full items-center justify-between gap-3 px-3 py-2.5 text-left text-sm font-semibold {{ $match->winner_competitor_id === $competitor->id ? 'bg-green-50 text-green-800' : 'bg-white text-slate-800' }} {{ $canDragBracketSlot ? 'cursor-grab active:cursor-grabbing' : '' }}" @if ($canDragBracketSlot) draggable="true" @endif @disabled($match->status !== 'pending' || ! $match->competitor_one_id || ! $match->competitor_two_id)>
@@ -27,12 +32,12 @@
                     </span>
                 </button>
             @else
-                <div @if ($bracketSlotIndex !== null) data-bracket-slot-card data-bracket-slot-index="{{ $bracketSlotIndex }}" @endif class="px-3 py-2.5 text-sm text-slate-400 {{ $canDragBracketSlot ? 'bracket-slot-empty' : '' }}">{{ $match->status === 'bye' ? 'Bye' : 'Awaiting competitor' }}</div>
+                <div @if ($bracketSlotIndex !== null) data-bracket-slot-card data-bracket-slot-index="{{ $bracketSlotIndex }}" @endif class="px-3 py-2.5 text-sm text-slate-400 {{ $canDragBracketSlot ? 'bracket-slot-empty' : '' }}">@if ($bracketBlank && $bracketSlotIndex !== null)<span data-bracket-slot-label>Drop team here</span>@else{{ $match->status === 'bye' ? 'Bye' : 'Awaiting competitor' }}@endif</div>
             @endif
         @endforeach
     </div>
 
-    @if ($match->status === 'pending' && $match->competitor_one_id && $match->competitor_two_id)
+    @if (! $bracketBlank && $match->status === 'pending' && $match->competitor_one_id && $match->competitor_two_id)
         <div id="match-actions-{{ $match->id }}" class="match-actions hidden border-t border-blue-100 bg-blue-50 p-3 text-xs text-blue-900">
             <p class="mb-2 font-semibold">Record the selected competitor</p>
             <div class="flex flex-wrap gap-2">
@@ -74,9 +79,9 @@
                 <button class="w-full rounded bg-blue-700 px-3 py-2 font-semibold text-white hover:bg-blue-800">Save schedule</button>
             </form>
         </div>
-    @elseif ($match->status === 'bye')
+    @elseif (! $bracketBlank && $match->status === 'bye')
         <p class="border-t border-slate-200 px-3 py-2 text-xs font-medium text-blue-700">Advanced by bye</p>
-    @elseif ($match->status === 'completed')
+    @elseif (! $bracketBlank && $match->status === 'completed')
         <p class="border-t border-slate-200 px-3 py-2 text-xs font-medium text-green-700">{{ $match->bracket === 'round_robin' ? 'Winner recorded' : 'Winner advanced automatically' }}</p>
     @endif
 </article>

@@ -43,14 +43,14 @@
 
         @if (in_array($editionSport->game_mechanic, ['single_elimination', 'double_elimination', 'round_robin', 'custom'], true) && ($selectedCompetitors->isNotEmpty() || $availableCompetitors->isNotEmpty()))
             @php
-                $lineupLocked = $matches->flatten(1)->contains(fn ($match) => $match->status !== 'pending');
+                $lineupLocked = ! $bracketBlank && $matches->flatten(1)->contains(fn ($match) => $match->status !== 'pending');
             @endphp
             <section class="border-b border-slate-200 bg-slate-50 px-5 py-5 sm:px-6" aria-labelledby="lineup-heading">
                 <div class="flex flex-col justify-between gap-3 sm:flex-row sm:items-start">
                     <div>
                         <p class="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Manual bracket entry</p>
-                        <h3 id="lineup-heading" class="mt-1 text-base font-semibold text-slate-900">Choose and order competitors</h3>
-                        <p class="mt-1 max-w-3xl text-sm text-slate-600">Drag teams, pairs, or athletes into the bracket lineup. The order controls the opening slots for elimination brackets and the selected field for round robin and custom events.</p>
+                        <h3 id="lineup-heading" class="mt-1 text-base font-semibold text-slate-900">Assign competitors to bracket slots</h3>
+                        <p class="mt-1 max-w-3xl text-sm text-slate-600">The bracket opens empty. Drag a registered team, pair, or athlete from Available onto an empty opening slot, then save the lineup.</p>
                     </div>
                     <span class="rounded-full border border-slate-300 bg-white px-3 py-1 text-xs font-semibold text-slate-600"><span data-lineup-count>{{ $selectedCompetitors->count() }}</span> selected</span>
                 </div>
@@ -65,7 +65,7 @@
                                 <div class="mb-2 flex items-center justify-between"><h4 class="text-sm font-semibold text-slate-800">Available</h4><span class="text-xs text-slate-500">Drag to add</span></div>
                                 <div class="min-h-28 space-y-2 rounded-xl border-2 border-dashed border-slate-300 bg-white p-3" data-lineup-dropzone="available" aria-label="Available competitors">
                                     @foreach ($availableCompetitors as $competitor)
-                                        <button type="button" draggable="true" data-lineup-card data-competitor-id="{{ $competitor->id }}" class="flex w-full cursor-grab items-center justify-between gap-3 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-left text-sm font-medium text-slate-800 shadow-sm transition hover:border-blue-300 hover:bg-blue-50 active:cursor-grabbing" aria-label="Add {{ $competitor->label }} to bracket">
+                                        <button type="button" draggable="true" data-lineup-card data-competitor-id="{{ $competitor->id }}" data-competitor-label="{{ $competitor->label }}" class="flex w-full cursor-grab items-center justify-between gap-3 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-left text-sm font-medium text-slate-800 shadow-sm transition hover:border-blue-300 hover:bg-blue-50 active:cursor-grabbing" aria-label="Add {{ $competitor->label }} to bracket">
                                             <span class="truncate">{{ $competitor->label }}</span><span class="text-xs text-slate-400">+</span>
                                         </button>
                                     @endforeach
@@ -73,14 +73,14 @@
                                 </div>
                             </div>
                             <div>
-                                <div class="mb-2 flex items-center justify-between"><h4 class="text-sm font-semibold text-slate-800">Bracket lineup</h4><span class="text-xs text-slate-500">Drag to reorder · drop to remove</span></div>
+                                <div class="mb-2 flex items-center justify-between"><h4 class="text-sm font-semibold text-slate-800">Assigned slots</h4><span class="text-xs text-slate-500">Drop teams into the bracket below</span></div>
                                 <div class="min-h-28 space-y-2 rounded-xl border-2 border-blue-200 bg-blue-50/60 p-3" data-lineup-dropzone="selected" aria-label="Selected bracket lineup">
                                     @foreach ($selectedCompetitors as $competitor)
-                                        <button type="button" draggable="true" data-lineup-card data-competitor-id="{{ $competitor->id }}" class="flex w-full cursor-grab items-center justify-between gap-3 rounded-lg border border-blue-200 bg-white px-3 py-2 text-left text-sm font-medium text-slate-800 shadow-sm transition hover:border-blue-400 hover:bg-blue-50 active:cursor-grabbing" aria-label="Reorder {{ $competitor->label }}">
+                                        <button type="button" draggable="true" data-lineup-card data-competitor-id="{{ $competitor->id }}" data-competitor-label="{{ $competitor->label }}" class="flex w-full cursor-grab items-center justify-between gap-3 rounded-lg border border-blue-200 bg-white px-3 py-2 text-left text-sm font-medium text-slate-800 shadow-sm transition hover:border-blue-400 hover:bg-blue-50 active:cursor-grabbing" aria-label="Reorder {{ $competitor->label }}">
                                             <span class="flex min-w-0 items-center gap-2"><span class="lineup-position inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-blue-100 text-[11px] font-bold text-blue-800"></span><span class="truncate">{{ $competitor->label }}</span></span><span class="text-xs text-slate-400">↕</span>
                                         </button>
                                     @endforeach
-                                    <p data-lineup-empty="selected" class="{{ $selectedCompetitors->isNotEmpty() ? 'hidden ' : '' }}px-2 py-3 text-center text-xs text-slate-400">Drop at least two competitors here.</p>
+                                    <p data-lineup-empty="selected" class="{{ $selectedCompetitors->isNotEmpty() ? 'hidden ' : '' }}px-2 py-3 text-center text-xs text-slate-400">No bracket slots assigned yet.</p>
                                 </div>
                             </div>
                         </div>
@@ -240,6 +240,7 @@
         [data-bracket-slot-card].is-bracket-dragging { opacity: .45; }
         [data-bracket-slot-card].is-bracket-drop-target { background-color: #E0F2FE; box-shadow: inset 0 0 0 2px #0284C7; }
         .bracket-slot-empty { min-height: 2.75rem; border: 2px dashed #BAE6FD; background: #F0F9FF; }
+        .bracket-slot-empty.has-bracket-assignment { border-style: solid; border-color: #93C5FD; background: #EFF6FF; color: #1E3A8A; font-weight: 600; }
         .bracket-team.is-click-selected { background-color: #9CD5FF; box-shadow: inset 4px 0 0 #355872; color: #355872; }
         .bracket-team.is-click-selected:focus-visible { outline: 2px solid #355872; outline-offset: -2px; }
         .bracket-canvas.has-bracket-focus .bracket-node:not(.is-highlighted):not(.is-competitor-highlighted) { opacity: .42; }
@@ -261,6 +262,18 @@
             let draggedSource = null;
             let draggedCompetitorId = null;
             const bracketDragFeedback = document.querySelector('[data-bracket-drag-feedback]');
+            let bracketSlotAssignments = [...selectedZone.querySelectorAll('[data-lineup-card]')].map((card) => card.dataset.competitorId);
+
+            const syncBracketPreview = () => {
+                const labels = new Map([...selectedZone.querySelectorAll('[data-lineup-card]')].map((card) => [card.dataset.competitorId, card.dataset.competitorLabel || 'Assigned team']));
+                document.querySelectorAll('[data-bracket-slot-card][data-bracket-slot-index]').forEach((slot) => {
+                    const label = slot.querySelector('[data-bracket-slot-label]');
+                    if (! label) return;
+                    const competitorId = bracketSlotAssignments[Number.parseInt(slot.dataset.bracketSlotIndex || '', 10)];
+                    label.textContent = competitorId ? labels.get(competitorId) : 'Drop team here';
+                    slot.classList.toggle('has-bracket-assignment', Boolean(competitorId));
+                });
+            };
 
             const refreshLineup = () => {
                 const selectedCards = [...selectedZone.querySelectorAll('[data-lineup-card]')];
@@ -273,6 +286,7 @@
                 lineupForm.querySelector('[data-lineup-empty="available"]')?.classList.toggle('hidden', availableCards.length > 0);
                 lineupCount.textContent = String(selectedCards.length);
                 submitLineup.disabled = selectedCards.length < 2;
+                syncBracketPreview();
             };
 
             const moveCard = (card, zone, before = null) => {
@@ -297,21 +311,20 @@
             };
 
             const applyBracketDrop = (sourceId, targetIndex) => {
-                const ids = selectedCompetitorIds();
-                const sourceIndex = ids.indexOf(String(sourceId));
+                const normalizedSourceId = String(sourceId);
+                const sourceIndex = bracketSlotAssignments.indexOf(normalizedSourceId);
 
                 if (sourceIndex === -1) {
                     const availableCard = availableZone.querySelector(`[data-lineup-card][data-competitor-id="${CSS.escape(String(sourceId))}"]`);
                     if (! availableCard) return;
-                    if (targetIndex >= ids.length) ids.push(String(sourceId));
-                    else ids[targetIndex] = String(sourceId);
-                } else if (targetIndex >= ids.length) {
-                    ids.push(String(sourceId));
+                    while (bracketSlotAssignments.length <= targetIndex) bracketSlotAssignments.push(null);
+                    bracketSlotAssignments[targetIndex] = normalizedSourceId;
                 } else if (sourceIndex !== targetIndex) {
-                    [ids[sourceIndex], ids[targetIndex]] = [ids[targetIndex], ids[sourceIndex]];
+                    while (bracketSlotAssignments.length <= targetIndex) bracketSlotAssignments.push(null);
+                    [bracketSlotAssignments[sourceIndex], bracketSlotAssignments[targetIndex]] = [bracketSlotAssignments[targetIndex], bracketSlotAssignments[sourceIndex]];
                 }
 
-                setSelectedCompetitorIds(ids);
+                setSelectedCompetitorIds(bracketSlotAssignments.filter(Boolean));
                 if (bracketDragFeedback) bracketDragFeedback.hidden = false;
             };
 
