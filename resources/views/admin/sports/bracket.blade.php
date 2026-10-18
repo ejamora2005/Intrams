@@ -111,7 +111,7 @@
                                     <div class="space-y-6">
                                         @foreach ($roundMatches as $match)
                                             <div class="bracket-node relative" data-bracket-node data-match-id="{{ $match->id }}">
-                                                @include('admin.sports.partials.bracket-match', ['match' => $match, 'bracketSlotStart' => $roundNumber === 1 ? (($match->match_number - 1) * 2) : null])
+                                                @include('admin.sports.partials.bracket-match', ['match' => $match, 'bracketSlotStart' => (int) $roundNumber === 1 ? (($match->match_number - 1) * 2) : null])
                                             </div>
                                         @endforeach
                                     </div>
@@ -147,13 +147,13 @@
                                                     : ($editionSport->game_mechanic === 'double_elimination' ? $finalMatches->firstWhere('round_number', 1) : null);
                                                 $loserNext = null;
                                                 if ($editionSport->game_mechanic === 'double_elimination') {
-                                                    $loserNext = $roundNumber === 1
+                                                    $loserNext = (int) $roundNumber === 1
                                                         ? $loserRounds->get(1, collect())->firstWhere('match_number', (int) ceil($match->match_number / 2))
                                                         : $loserRounds->get((2 * $roundNumber) - 2, collect())->firstWhere('match_number', $match->match_number);
                                                 }
                                             @endphp
                                             <div class="bracket-node relative flex items-center" data-bracket-node data-match-id="{{ $match->id }}" data-winner-next-id="{{ $winnerNext?->id }}" data-loser-next-id="{{ $loserNext?->id }}">
-                                                @include('admin.sports.partials.bracket-match', ['match' => $match, 'bracketSlotStart' => $roundNumber === 1 ? (($match->match_number - 1) * 2) : null])
+                                                @include('admin.sports.partials.bracket-match', ['match' => $match, 'bracketSlotStart' => (int) $roundNumber === 1 ? (($match->match_number - 1) * 2) : null])
                                             </div>
                                         @endforeach
                                     </div>

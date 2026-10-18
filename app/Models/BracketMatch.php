@@ -6,6 +6,15 @@ use Illuminate\Database\Eloquent\Model;
 
 class BracketMatch extends Model
 {
+    protected $casts = [
+        'round_number' => 'integer',
+        'match_number' => 'integer',
+        'competitor_one_id' => 'integer',
+        'competitor_two_id' => 'integer',
+        'winner_competitor_id' => 'integer',
+        'loser_competitor_id' => 'integer',
+    ];
+
     protected $fillable = [
         'edition_sport_id',
         'bracket',
