@@ -243,6 +243,11 @@
         .bracket-canvas [id$="-heading"] { scroll-margin-top: 7rem; }
         main:has([data-bracket-lineup-form]) { scroll-padding-top: 7rem; }
         [data-lineup-card][hidden], [data-bracket-drag-feedback][hidden] { display: none !important; }
+        .bracket-slot-remove[hidden] { display: none !important; }
+        .bracket-slot-remove { position: absolute; top: 50%; right: .5rem; transform: translateY(-50%); padding: .3rem .4rem; border: 1px solid #FCA5A5; border-radius: .3rem; background: #FEF2F2 !important; color: #991B1B !important; font-size: .7rem; font-weight: 600; line-height: 1.2; }
+        .bracket-slot-remove:hover { background: #FEE2E2 !important; }
+        .bracket-slot-remove:focus-visible { outline: 2px solid #991B1B; outline-offset: 2px; }
+        [data-bracket-slot-row]:has(.bracket-slot-remove:not([hidden])) [data-bracket-slot-content] { padding-right: 3.5rem; }
         [data-lineup-content] img, [data-bracket-slot-content] img { pointer-events: none; }
         .bracket-team.is-click-selected { background-color: #9CD5FF; box-shadow: inset 4px 0 0 #355872; color: #355872; }
         .bracket-team.is-click-selected:focus-visible { outline: 2px solid #355872; outline-offset: -2px; }
@@ -263,6 +268,7 @@
             const hiddenInputs = lineupForm.querySelector('[data-lineup-inputs]');
             const bracketDragFeedback = document.querySelector('[data-bracket-drag-feedback]');
             const bracketSlots = [...document.querySelectorAll('[data-bracket-slot-card]')];
+            const removeButtons = [...document.querySelectorAll('[data-remove-bracket-slot]')];
             // Keep the client usable if an older cached view omitted the
             // numeric index: opening slots are rendered in bracket order.
             bracketSlots.forEach((slot, position) => {
@@ -332,6 +338,12 @@
                 });
                 lineupForm.querySelector('[data-lineup-empty="available"]')?.classList.toggle('hidden', [...availableZone.querySelectorAll('[data-lineup-card]:not([hidden])')].length > 0);
                 if (lineupCount) lineupCount.textContent = String(selected.size);
+                removeButtons.forEach((button) => {
+                    const id = bracketSlotAssignments[Number(button.dataset.removeBracketSlot)];
+                    button.hidden = ! id;
+                    button.disabled = saving;
+                    button.setAttribute('aria-label', id ? `Remove ${labels.get(id) || 'competitor'} from bracket` : 'Remove competitor from this slot');
+                });
                 submitLineup.disabled = selected.size < 2 || saving;
                 syncHiddenInputs();
                 syncBracketPreview();
@@ -385,6 +397,24 @@
                 }
                 refreshLineup();
             };
+
+            removeButtons.forEach((button) => {
+                button.addEventListener('click', (event) => {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    if (saving) return;
+                    const index = Number(button.dataset.removeBracketSlot);
+                    const id = bracketSlotAssignments[index];
+                    if (! id) return;
+                    bracketSlotAssignments[index] = null;
+                    refreshLineup();
+                    bracketDragFeedback.hidden = false;
+                    bracketDragFeedback.classList.remove('text-red-700');
+                    bracketDragFeedback.classList.add('text-blue-700');
+                    bracketDragFeedback.textContent = `${labels.get(id) || 'Competitor'} returned to Available. Save the bracket lineup when finished.`;
+                    lineupForm.querySelector(`[data-lineup-card][data-competitor-id="${id}"]`)?.focus({ preventScroll: true });
+                });
+            });
 
             lineupForm.querySelectorAll('[data-lineup-card]').forEach((card) => {
                 card.addEventListener('dragstart', (event) => {

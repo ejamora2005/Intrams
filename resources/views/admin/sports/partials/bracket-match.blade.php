@@ -16,6 +16,7 @@
                     : null);
                 $canDragBracketSlot = $bracketSlotIndex !== null && ($bracketBlank || $match->status === 'pending');
             @endphp
+            <div data-bracket-slot-row class="relative">
             @if ($competitor)
                 <button type="button" data-match="{{ $match->id }}" data-competitor-id="{{ $competitor->id }}" data-competitor-label="{{ $competitor->label }}" @if ($bracketSlotIndex !== null) data-bracket-slot-card data-bracket-slot-index="{{ $bracketSlotIndex }}" @endif aria-pressed="false" class="bracket-team flex w-full items-center justify-between gap-3 px-3 py-2.5 text-left text-sm font-semibold {{ $match->winner_competitor_id === $competitor->id ? 'bg-green-50 text-green-800' : 'bg-white text-slate-800' }} {{ $canDragBracketSlot ? 'cursor-grab active:cursor-grabbing' : '' }}" @if ($canDragBracketSlot) draggable="true" @endif @disabled($match->status !== 'pending' || ! $match->competitor_one_id || ! $match->competitor_two_id)>
                     <span data-bracket-slot-content class="flex min-w-0 items-center gap-2">
@@ -34,6 +35,10 @@
             @else
                 <div @if ($bracketSlotIndex !== null) data-bracket-slot-card data-bracket-slot-index="{{ $bracketSlotIndex }}" @endif class="px-3 py-2.5 text-sm text-slate-400 {{ $canDragBracketSlot ? 'bracket-slot-empty' : '' }}"><span data-bracket-slot-content class="flex min-w-0 items-center gap-2">{{ $bracketBlank && $bracketSlotIndex !== null ? 'Drop team here' : ($match->status === 'bye' ? 'Bye' : 'Awaiting competitor') }}</span></div>
             @endif
+            @if ($canDragBracketSlot)
+                <button type="button" data-remove-bracket-slot="{{ $bracketSlotIndex }}" hidden class="bracket-slot-remove" aria-label="Remove competitor from this slot">Remove</button>
+            @endif
+            </div>
         @endforeach
     </div>
 
