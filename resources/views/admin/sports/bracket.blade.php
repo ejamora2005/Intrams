@@ -64,7 +64,7 @@
                             <div class="mb-2 flex items-center justify-between"><h4 class="text-sm font-semibold text-slate-800">Available competitors</h4><span class="text-xs text-slate-500">Drag directly to an opening bracket slot</span></div>
                             <div class="min-h-28 space-y-2 rounded-xl border-2 border-dashed border-slate-300 bg-white p-3" data-lineup-dropzone="available" aria-label="Available competitors">
                                 @foreach ($availableCompetitors as $competitor)
-                                    <button type="button" draggable="true" data-lineup-card data-competitor-id="{{ $competitor->id }}" data-competitor-label="{{ $competitor->label }}" class="flex w-full cursor-grab items-center justify-between gap-3 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-left text-sm font-medium text-slate-800 shadow-sm transition hover:border-blue-300 hover:bg-blue-50 active:cursor-grabbing" aria-label="Add {{ $competitor->label }} to bracket">
+                                    <div role="button" tabindex="0" draggable="true" data-lineup-card data-competitor-id="{{ $competitor->id }}" data-competitor-label="{{ $competitor->label }}" class="flex w-full cursor-grab items-center justify-between gap-3 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-left text-sm font-medium text-slate-800 shadow-sm transition hover:border-blue-300 hover:bg-blue-50 active:cursor-grabbing" aria-label="Add {{ $competitor->label }} to bracket">
                                         <span class="flex min-w-0 items-center gap-2">
                                             @if ($competitor->team)
                                                 <x-team-badge :team="$competitor->team" size="xs" :logo-only="true" class="shrink-0" />
@@ -72,7 +72,7 @@
                                             <span class="truncate">{{ $competitor->label }}</span>
                                         </span>
                                         <span class="shrink-0 text-xs text-slate-400">Drag →</span>
-                                    </button>
+                                    </div>
                                 @endforeach
                                 <p data-lineup-empty="available" class="{{ $availableCompetitors->isNotEmpty() ? 'hidden ' : '' }}px-2 py-3 text-center text-xs text-slate-400">All registered competitors are selected.</p>
                             </div>
@@ -235,6 +235,7 @@
         [data-bracket-slot-card].is-bracket-drop-target { background-color: #E0F2FE; box-shadow: inset 0 0 0 2px #0284C7; }
         .bracket-slot-empty { min-height: 2.75rem; border: 2px dashed #BAE6FD; background: #F0F9FF; }
         .bracket-slot-empty.has-bracket-assignment { border-style: solid; border-color: #93C5FD; background: #EFF6FF; color: #1E3A8A; font-weight: 600; }
+        [data-lineup-card] { touch-action: none; user-select: none; }
         .bracket-team.is-click-selected { background-color: #9CD5FF; box-shadow: inset 4px 0 0 #355872; color: #355872; }
         .bracket-team.is-click-selected:focus-visible { outline: 2px solid #355872; outline-offset: -2px; }
         .bracket-canvas.has-bracket-focus .bracket-node:not(.is-highlighted):not(.is-competitor-highlighted) { opacity: .42; }
@@ -456,6 +457,29 @@
                     const targetIndex = Number.parseInt(slot.dataset.bracketSlotIndex || '-1', 10);
                     if (sourceId && Number.isInteger(targetIndex)) placeCompetitor(sourceId, targetIndex, draggedSource === 'bracket' ? draggedSlotIndex : -1);
                 });
+            });
+
+            // Keep the drop target working when the browser dispatches the
+            // drag event on a child element inside the slot instead of on the
+            // slot itself. This is common with Chromium when a logo or label
+            // is under the pointer at release time.
+            const bracketCanvas = document.querySelector('[data-bracket-canvas]');
+            bracketCanvas?.addEventListener('dragover', (event) => {
+                if (! draggedCompetitorId) return;
+                const slot = event.target.closest?.('[data-bracket-slot-card]');
+                if (! slot) return;
+                event.preventDefault();
+                event.dataTransfer.dropEffect = 'move';
+                slot.classList.add('is-bracket-drop-target');
+            });
+            bracketCanvas?.addEventListener('drop', (event) => {
+                const slot = event.target.closest?.('[data-bracket-slot-card]');
+                if (! slot) return;
+                event.preventDefault();
+                const sourceId = draggedCompetitorId || event.dataTransfer.getData('text/plain');
+                const targetIndex = Number.parseInt(slot.dataset.bracketSlotIndex || '-1', 10);
+                bracketSlots.forEach((target) => target.classList.remove('is-bracket-drop-target'));
+                if (sourceId && Number.isInteger(targetIndex)) placeCompetitor(sourceId, targetIndex, draggedSource === 'bracket' ? draggedSlotIndex : -1);
             });
 
             lineupForm.addEventListener('submit', (event) => {
