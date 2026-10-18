@@ -490,7 +490,7 @@ test('multiple tabulators can access the tabulator dashboard', function () {
         ->assertSee('INTRAMURALS 2026: STUDENT FESTIVAL')
         ->assertSee('Compete. Create. Lead. Connect. Express.')
         ->assertSee('Possible DQ')
-        ->assertSee('Declare Sports')
+        ->assertSee('Declare Results')
         ->assertSee('Rules & Guidelines')
         ->assertSee('data-ops-view-panel="dashboard-overview"', false)
         ->assertSee('data-ops-view-panel="declared-results"', false)

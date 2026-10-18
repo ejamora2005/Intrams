@@ -1,7 +1,7 @@
 <div class="tab-stack" data-tab-filter-list>
     <div class="tab-toolbar">
         <label class="tab-search"><span>Find an event</span><input type="search" data-tab-search placeholder="Search event, category, or faction" autocomplete="off"></label>
-        <label><span>Category</span><select data-tab-category><option value="">All categories</option><option value="sports">Sports</option><option value="cultural">Cultural</option><option value="track-field">Track &amp; field</option></select></label>
+        <label><span>Category</span><select data-tab-category><option value="">All categories</option><option value="sports" @selected(request('category') === 'sports')>Sports</option><option value="cultural" @selected(request('category') === 'cultural')>Cultural</option><option value="track-field" @selected(request('category') === 'track-field')>Track &amp; field</option></select></label>
         <label><span>Result status</span><select data-tab-status><option value="">All results</option><option value="pending">Pending</option><option value="declared">Declared</option></select></label>
     </div>
     <p data-tab-count class="tab-muted tab-small" aria-live="polite"></p>

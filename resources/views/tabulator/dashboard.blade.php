@@ -19,7 +19,7 @@
         @if ($selectedSport)
             @include('tabulator.partials.score-editor')
         @else
-            <div class="tab-section-heading"><div><p class="tab-eyebrow">Declare Sports</p><h2>Choose an event to score</h2><p class="tab-muted">Sports and cultural events use the points configured by the administrator.</p></div><span class="tab-pill">{{ $pendingCount }} awaiting results</span></div>
+            <div class="tab-section-heading"><div><p class="tab-eyebrow">Sports &amp; cultural results</p><h2>Choose an event to score</h2><p class="tab-muted">Sports and cultural events use the points configured by the administrator.</p></div><span class="tab-pill">{{ $pendingCount }} awaiting results</span></div>
             @include('tabulator.partials.event-cards', ['monitor' => false])
         @endif
     </section>

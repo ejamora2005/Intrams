@@ -85,6 +85,47 @@ test('editing placements replaces the event totals instead of adding duplicate p
         ->and((float) TeamTally::where('team_id', $teams[1]->id)->value('points'))->toBe(10.0);
 });
 
+test('tabulators declare and correct every configured cultural event and bonus award with its own points', function () {
+    $user = User::factory()->create(['role' => 'tabulator', 'status' => 'active']);
+    $this->actingAs($user);
+    app(DefaultSportsSeeder::class)->run();
+    $edition = app(StandingsService::class)->activeEdition();
+    $teams = collect(['Sea Dragons', 'Terraquatic Eagles', 'Trojan Warriors'])->map(fn ($name, $i) => Team::create(['edition_id' => $edition->id, 'name' => $name, 'code' => 'CULT-SCORE-'.$i, 'status' => 'active']));
+    $cultural = $edition->editionSports()->with('sport')->whereHas('sport', fn ($query) => $query->where('code', 'like', 'CULT-%'))->get()
+        ->filter(fn ($event) => ! ($event->scoring_rules['non_scoring'] ?? false));
+    $expectedCodes = collect(config('intramurals.default_competitions'))->filter(fn ($sport) => str_starts_with($sport['code'], 'CULT-') && ! ($sport['scoring_rules']['non_scoring'] ?? false))->pluck('code')->sort()->values()->all();
+    $this->get(route('tabulator.dashboard', ['category' => 'cultural']))->assertOk()->assertSee('Score cultural events')
+        ->assertSee('<option value="cultural" selected>', false)
+        ->assertViewHas('editionSports', fn ($events) => $events->filter(fn ($event) => str_starts_with($event->sport->code, 'CULT-'))->pluck('sport.code')->sort()->values()->all() === $expectedCodes);
+
+    $expectedTotals = [0.0, 0.0, 0.0];
+    foreach ($cultural as $event) {
+        $placements = collect($event->scoring_rules['placements'])->mapWithKeys(fn ($rule, $i) => [$rule['placement'] => $teams[$i]->id])->all();
+        $this->post(route('tabulator.sport-results.store'), ['edition_sport_id' => $event->id, 'placements' => $placements, 'tabulator_password' => 'password'])
+            ->assertSessionHasNoErrors()->assertRedirect(route('tabulator.dashboard', ['edition_sport_id' => $event->id]).'#declare-sports');
+        $result = SportResult::where('edition_sport_id', $event->id)->firstOrFail();
+        expect($result->placements_json)->toBe($placements)->and($result->submitted_by)->toBe($user->id);
+        foreach ($event->scoring_rules['placements'] as $i => $rule) {
+            $expectedTotals[$i] += $rule['points'];
+            expect((float) $result->points_json[$rule['placement']]['points'])->toBe((float) $rule['points']);
+        }
+    }
+    foreach ($teams as $i => $team) {
+        expect((float) TeamTally::where('team_id', $team->id)->value('points'))->toBe($expectedTotals[$i]);
+    }
+
+    $event = $cultural->firstWhere('sport.code', 'CULT-FEST-DANCE');
+    $this->get(route('tabulator.dashboard', ['edition_sport_id' => $event->id]))->assertOk()->assertSee('Cultural event')->assertSee('Editing declared results');
+    $this->post(route('tabulator.sport-results.store'), ['edition_sport_id' => $event->id, 'placements' => [1 => $teams[2]->id], 'tabulator_password' => 'password'])->assertSessionHasNoErrors();
+    $expectedTotals[0] -= 25;
+    $expectedTotals[1] -= 20;
+    $expectedTotals[2] += 25 - 15;
+    foreach ($teams as $i => $team) {
+        expect((float) TeamTally::where('team_id', $team->id)->value('points'))->toBe($expectedTotals[$i]);
+    }
+    expect(SportResult::count())->toBe($cultural->count());
+});
+
 test('all default gender divisions replace generic and explicit open entries in tabulator cards and counts', function () {
     $this->actingAs(User::factory()->create(['role' => 'tabulator', 'status' => 'active']));
     app(DefaultSportsSeeder::class)->run();

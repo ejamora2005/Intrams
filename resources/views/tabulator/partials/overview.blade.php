@@ -8,7 +8,7 @@
     <div class="tab-alert"><strong>{{ $flaggedStudents->count() }} {{ Str::plural('registration', $flaggedStudents->count()) }} {{ $flaggedStudents->count() === 1 ? 'needs' : 'need' }} eligibility review.</strong> {{ $flaggedStudents->take(3)->map(fn ($evaluation) => $evaluation['student']->full_name)->implode(', ') }}. <a href="{{ route('tabulator.possible-dq.index') }}" class="tab-text-link">Open Possible DQ watchlist →</a></div>
 @endif
 <div class="tab-panel tab-start">
-    <div><p class="tab-eyebrow">Start here</p><h3>Record event placements</h3><p class="tab-muted">Choose a sport or cultural event, assign factions to places, then review the points before confirming.</p></div>
+    <div><p class="tab-eyebrow">Start here</p><h3>Record event placements</h3><p class="tab-muted">Choose a sport or cultural event, assign factions to places, then review the points before confirming.</p><a href="{{ route('tabulator.dashboard', ['category' => 'cultural']) }}#declare-sports" class="tab-text-link">Score cultural events →</a></div>
     <a href="#declare-sports" data-ops-view-shortcut="declare-sports" class="tab-button">Score an event <span aria-hidden="true">→</span></a>
 </div>
 @include('tabulator.partials.standings')

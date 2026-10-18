@@ -16,6 +16,8 @@ The Tabulator workspace has card views for the overview, event scoring, match wi
 
 The scoring catalogue excludes archived/inactive sports, archived edition configurations, and generic/Open entries replaced by Men/Women divisions in that edition. This also applies to match scoring and submitted results, so an outdated link cannot score a retired event. Distinct formats, mixed events, and cultural events remain available. Default synchronization skips retired and superseded system sports; existing historical records and points are retained.
 
+Tabulators can declare cultural placements and bonus awards from **Declare Results**, using the **Cultural** category filter or the overview's **Score cultural events** link. Cultural events use their own configured points and update the overall standings; saved declarations can be corrected through the same review and password confirmation flow.
+
 Each sport includes a participant manager that groups active registered athletes by team, including a safe empty state when no athletes are registered.
 
 For automated tournament sports, a dedicated bracket page generates and persists current seeding or round-robin pairings from registrations. Brackets treat a team, a two-athlete dual pair, or an individual athlete as one competitor.
