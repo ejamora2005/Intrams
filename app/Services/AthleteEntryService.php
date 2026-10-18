@@ -131,7 +131,7 @@ class AthleteEntryService
             }
         }
 
-        return $editionSports->map(function (EditionSport $editionSport) use ($student, $edition, $team): AthleteEntry {
+        return $editionSports->map(function (EditionSport $editionSport) use ($student, $edition, $team, $existingEntries): AthleteEntry {
             try {
                 $this->eligibilityService->assertStudentsMatchSportCategory(collect([$student]), $editionSport->sport);
                 $this->eligibilityService->assertStudentsCanJoin(collect([$student]), $edition, $editionSport);

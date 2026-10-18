@@ -2,6 +2,10 @@ import './bootstrap';
 import './pwa';
 import './ops-interactions';
 
+if (document.querySelector('[data-tabulator-workspace]')) {
+    void import('./tabulator');
+}
+
 // Shared in-page search for long GAM, Tabulator, and Admin lists. Each search
 // is scoped to its nearest container, so separate panels never affect one
 // another's rows or result count.

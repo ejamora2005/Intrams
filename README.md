@@ -12,6 +12,8 @@ Use the edition selector at the top of Sports to switch the sport catalogue, par
 
 Sport editing updates the catalogue details and current edition mechanics without requiring a manual sport code.
 
+The Tabulator workspace has card views for the overview, event scoring, match winners, results, and overall standings. Event cards can be searched and filtered by category and result status; match cards appear only after an administrator saves the bracket lineup. Placement review shows each faction and its configured points before password confirmation. Validation errors reopen the relevant task with the selections retained and the password cleared. Results corrections replace that event's placements and recalculate overall points. The tabulator Rules and Possible DQ screens use the same card layout and link back to scoring.
+
 Each sport includes a participant manager that groups active registered athletes by team, including a safe empty state when no athletes are registered.
 
 For automated tournament sports, a dedicated bracket page generates and persists current seeding or round-robin pairings from registrations. Brackets treat a team, a two-athlete dual pair, or an individual athlete as one competitor.

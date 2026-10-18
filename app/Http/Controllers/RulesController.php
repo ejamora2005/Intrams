@@ -69,7 +69,7 @@ class RulesController extends Controller
             $flaggedStudents = $this->eligibilityService->flaggedStudents($edition, $managedTeam);
         }
 
-        return view('rules.index', [
+        return view($homeRoute === 'tabulator.dashboard' ? 'tabulator.rules' : 'rules.index', [
             'layout' => $layout,
             'homeRoute' => $homeRoute,
             'workspaceLabel' => $workspaceLabel,
@@ -94,7 +94,7 @@ class RulesController extends Controller
             ? $this->eligibilityService->flaggedStudents($edition, $managedTeam)
             : collect();
 
-        return view('rules.possible-dq', [
+        return view($homeRoute === 'tabulator.dashboard' ? 'tabulator.possible-dq' : 'rules.possible-dq', [
             'layout' => $layout,
             'homeRoute' => $homeRoute,
             'workspaceLabel' => $workspaceLabel,
