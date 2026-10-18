@@ -8,6 +8,7 @@ use App\Models\BracketMatch;
 use App\Models\EditionSport;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use TournamentGenerator\Constants;
 use TournamentGenerator\Group;
 
@@ -25,7 +26,9 @@ class BracketService
 
         DB::transaction(function () use ($editionSport): void {
             $this->generate($editionSport);
-            $editionSport->update(['bracket_lineup_configured_at' => null]);
+            if ($this->supportsManualLineupMarker()) {
+                $editionSport->update(['bracket_lineup_configured_at' => null]);
+            }
         });
     }
 
@@ -73,7 +76,7 @@ class BracketService
                 ->where('edition_sport_id', $editionSport->id)
                 ->lockForUpdate()
                 ->get();
-            $initialAssignment = $editionSport->bracket_lineup_configured_at === null;
+            $initialAssignment = $this->supportsManualLineupMarker() && $editionSport->bracket_lineup_configured_at === null;
             abort_if(! $initialAssignment && $matches->contains(fn (BracketMatch $match): bool => $match->status !== 'pending'), 422, 'The lineup cannot be changed after a bracket result has been recorded.');
 
             $competitors = BracketCompetitor::query()
@@ -88,7 +91,9 @@ class BracketService
             $before = $matches->flatMap(fn (BracketMatch $match) => [$match->competitor_one_id, $match->competitor_two_id])->filter()->unique()->values()->all();
             BracketMatch::query()->where('edition_sport_id', $editionSport->id)->delete();
             $this->generate($editionSport, $ordered);
-            $editionSport->update(['bracket_lineup_configured_at' => now()]);
+            if ($this->supportsManualLineupMarker()) {
+                $editionSport->update(['bracket_lineup_configured_at' => now()]);
+            }
 
             $this->auditService->record('bracket.reordered', $editionSport, ['competitor_ids' => $before], [
                 'competitor_ids' => $ordered->pluck('id')->all(),
@@ -149,6 +154,11 @@ class BracketService
         }
 
         $this->settleAutomaticMatches($editionSport);
+    }
+
+    private function supportsManualLineupMarker(): bool
+    {
+        return Schema::hasColumn('edition_sports', 'bracket_lineup_configured_at');
     }
 
     private function synchronizeCompetitors(EditionSport $editionSport): Collection

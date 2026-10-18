@@ -25,6 +25,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 use Symfony\Component\HttpFoundation\Response;
@@ -261,7 +262,8 @@ class SportController extends Controller
             ->where('edition_sport_id', $editionSport->id)
             ->orderBy('label')
             ->get();
-        $bracketBlank = $editionSport->bracket_lineup_configured_at === null;
+        $bracketBlank = Schema::hasColumn('edition_sports', 'bracket_lineup_configured_at')
+            && $editionSport->bracket_lineup_configured_at === null;
         $lineupIds = $matches->flatten(1)
             ->sortBy(fn (BracketMatch $match) => [$match->bracket === 'winners' ? 0 : 1, $match->round_number, $match->match_number])
             ->flatMap(fn (BracketMatch $match) => [$match->competitor_one_id, $match->competitor_two_id])
