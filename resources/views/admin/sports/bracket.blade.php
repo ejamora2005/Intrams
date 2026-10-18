@@ -315,24 +315,8 @@
                 if (saving || selectedIds().length < 2) return;
                 saving = true;
                 refreshLineup();
-                fetch(lineupForm.action, {
-                    method: 'POST',
-                    body: new FormData(lineupForm),
-                    headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'text/html' },
-                    credentials: 'same-origin',
-                }).then((response) => {
-                    if (!response.ok) throw new Error('The bracket lineup could not be saved.');
-                    window.location.reload();
-                }).catch(() => {
-                    saving = false;
-                    if (bracketDragFeedback) {
-                        bracketDragFeedback.hidden = false;
-                        bracketDragFeedback.textContent = 'The lineup could not be saved. Try again.';
-                        bracketDragFeedback.classList.remove('text-blue-700');
-                        bracketDragFeedback.classList.add('text-red-700');
-                    }
-                    refreshLineup();
-                });
+                syncHiddenInputs();
+                HTMLFormElement.prototype.submit.call(lineupForm);
             };
 
             const placeCompetitor = (sourceId, targetIndex, sourceIndex = -1) => {
@@ -417,11 +401,13 @@
                     draggedSlotIndex = null;
                     bracketSlots.forEach((target) => target.classList.remove('is-bracket-drop-target'));
                 });
-                slot.addEventListener('dragover', (event) => {
+                const allowBracketDrop = (event) => {
                     if (! draggedCompetitorId || (draggedSource === 'bracket' && draggedSlotIndex === null)) return;
                     event.preventDefault();
                     slot.classList.add('is-bracket-drop-target');
-                });
+                };
+                slot.addEventListener('dragenter', allowBracketDrop);
+                slot.addEventListener('dragover', allowBracketDrop);
                 slot.addEventListener('dragleave', () => slot.classList.remove('is-bracket-drop-target'));
                 slot.addEventListener('drop', (event) => {
                     event.preventDefault();
