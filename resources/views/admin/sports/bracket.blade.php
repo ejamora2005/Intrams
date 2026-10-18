@@ -244,10 +244,13 @@
         main:has([data-bracket-lineup-form]) { scroll-padding-top: 7rem; }
         [data-lineup-card][hidden], [data-bracket-drag-feedback][hidden] { display: none !important; }
         .bracket-slot-remove[hidden] { display: none !important; }
-        .bracket-slot-remove { position: absolute; top: 50%; right: .5rem; transform: translateY(-50%); padding: .3rem .4rem; border: 1px solid #FCA5A5; border-radius: .3rem; background: #FEF2F2 !important; color: #991B1B !important; font-size: .7rem; font-weight: 600; line-height: 1.2; }
+        [data-bracket-slot-row] { display: flex; align-items: center; gap: .5rem; }
+        [data-bracket-slot-row] > :first-child { flex: 1 1 0%; min-width: 0; }
+        [data-bracket-slot-row] > .bracket-team { flex-direction: column; align-items: stretch; gap: .25rem; }
+        [data-bracket-slot-row] .bracket-selection-indicator { align-self: flex-start; }
+        .bracket-slot-remove { flex: 0 0 auto; margin-right: .5rem; padding: .3rem .4rem; border: 1px solid #FCA5A5; border-radius: .3rem; background: #FEF2F2 !important; color: #991B1B !important; font-size: .7rem; font-weight: 600; line-height: 1.2; }
         .bracket-slot-remove:hover { background: #FEE2E2 !important; }
         .bracket-slot-remove:focus-visible { outline: 2px solid #991B1B; outline-offset: 2px; }
-        [data-bracket-slot-row]:has(.bracket-slot-remove:not([hidden])) [data-bracket-slot-content] { padding-right: 3.5rem; }
         [data-lineup-content] img, [data-bracket-slot-content] img { pointer-events: none; }
         .bracket-team.is-click-selected { background-color: #9CD5FF; box-shadow: inset 4px 0 0 #355872; color: #355872; }
         .bracket-team.is-click-selected:focus-visible { outline: 2px solid #355872; outline-offset: -2px; }
@@ -408,6 +411,14 @@
                     if (! id) return;
                     bracketSlotAssignments[index] = null;
                     refreshLineup();
+                    selectedBracketFocus = null;
+                    clearBracketFocus();
+                    document.querySelectorAll('.bracket-team').forEach((candidate) => {
+                        candidate.classList.remove('is-click-selected');
+                        candidate.setAttribute('aria-pressed', 'false');
+                        candidate.querySelector('.bracket-selection-indicator')?.classList.add('hidden');
+                    });
+                    document.querySelectorAll('.match-actions').forEach((panel) => panel.classList.add('hidden'));
                     bracketDragFeedback.hidden = false;
                     bracketDragFeedback.classList.remove('text-red-700');
                     bracketDragFeedback.classList.add('text-blue-700');
@@ -610,6 +621,7 @@
         });
 
         document.querySelectorAll('.bracket-team').forEach((button) => button.addEventListener('click', () => {
+            if (! button.dataset.competitorId) return;
             const match = button.closest('[data-bracket-match]');
             const panel = document.getElementById(`match-actions-${button.dataset.match}`);
             const other = [...match.querySelectorAll('.bracket-team')].find((candidate) => candidate !== button);

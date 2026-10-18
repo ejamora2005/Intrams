@@ -25,12 +25,10 @@
                         @endif
                         <span class="truncate">{{ $competitor->label }}</span>
                     </span>
-                    <span class="flex shrink-0 items-center gap-2">
-                        <span class="bracket-selection-indicator hidden rounded bg-blue-700 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white">Selected</span>
-                        @if ($match->winner_competitor_id === $competitor->id)
-                            <span class="text-xs text-green-700">Winner</span>
-                        @endif
-                    </span>
+                    <span class="bracket-selection-indicator hidden rounded bg-blue-700 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white">Selected</span>
+                    @if ($match->winner_competitor_id === $competitor->id)
+                        <span class="text-xs text-green-700">Winner</span>
+                    @endif
                 </button>
             @else
                 <div @if ($bracketSlotIndex !== null) data-bracket-slot-card data-bracket-slot-index="{{ $bracketSlotIndex }}" @endif class="px-3 py-2.5 text-sm text-slate-400 {{ $canDragBracketSlot ? 'bracket-slot-empty' : '' }}"><span data-bracket-slot-content class="flex min-w-0 items-center gap-2">{{ $bracketBlank && $bracketSlotIndex !== null ? 'Drop team here' : ($match->status === 'bye' ? 'Bye' : 'Awaiting competitor') }}</span></div>
