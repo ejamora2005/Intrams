@@ -81,6 +81,9 @@
                 <input id="schedule-venue-{{ $match->id }}" name="venue" type="text" maxlength="120" value="{{ old('venue', $match->schedule?->venue ?: $defaultVenue) }}" class="block w-full rounded border-slate-300 text-sm focus:border-blue-600 focus:ring-blue-600">
                 <button class="w-full rounded bg-blue-700 px-3 py-2 font-semibold text-white hover:bg-blue-800">Save schedule</button>
             </form>
+            @if ($match->schedule)
+                <x-delete-schedule-button :schedule="$match->schedule" :schedule-name="$sport->name.' · Game '.$match->match_number" return-to="bracket" label="Remove schedule" class="mt-2 w-full" />
+            @endif
         </div>
     @elseif (! $bracketBlank && $match->status === 'bye')
         <p class="border-t border-slate-200 px-3 py-2 text-xs font-medium text-blue-700">Advanced by bye</p>

@@ -7,7 +7,7 @@
 
     @if ($errors->any())
         <div class="mb-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
-            <p class="font-semibold">Schedule was not saved.</p>
+            <p class="font-semibold">The schedule could not be updated.</p>
             <ul class="mt-2 list-disc space-y-1 pl-5">
                 @foreach ($errors->all() as $error)
                     <li>{{ $error }}</li>
@@ -89,11 +89,12 @@
                                 <span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold capitalize text-slate-700">{{ $schedule->status }}</span>
                             </td>
                             <td class="px-5 py-4">
-                                <details class="group min-w-80">
+                                <div class="flex items-start gap-2">
+                                <details class="group">
                                     <summary class="inline-flex cursor-pointer list-none items-center justify-center rounded-lg border border-blue-200 bg-white px-3.5 py-2 text-sm font-semibold text-blue-700 transition hover:border-blue-300 hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-600 [&::-webkit-details-marker]:hidden">
                                         Edit
                                     </summary>
-                                    <form method="POST" action="{{ route('admin.competition.schedules.update', $schedule) }}" class="mt-3 grid gap-3 rounded-xl border border-slate-200 bg-slate-50 p-4 shadow-sm sm:grid-cols-2">
+                                    <form method="POST" action="{{ route('admin.competition.schedules.update', $schedule) }}" class="mt-3 grid w-80 gap-3 rounded-xl border border-slate-200 bg-slate-50 p-4 shadow-sm sm:grid-cols-2">
                                         @csrf
                                         @method('PUT')
 
@@ -135,6 +136,8 @@
                                         </div>
                                     </form>
                                 </details>
+                                <x-delete-schedule-button :schedule="$schedule" />
+                                </div>
                             </td>
                         </tr>
                     @empty
@@ -151,4 +154,5 @@
             {{ $schedules->links() }}
         </div>
     </section>
+    <x-delete-schedule-dialog />
 @endsection

@@ -349,7 +349,7 @@
 
             const refreshLineup = () => {
                 bracketLineupDirty = JSON.stringify(bracketSlotAssignments) !== savedAssignments;
-                document.querySelectorAll('[data-bracket-result-form] button, [data-schedule-toggle], [data-schedule-form] button').forEach((button) => {
+                document.querySelectorAll('[data-bracket-result-form] button, [data-schedule-toggle], [data-schedule-form] button, [data-delete-schedule]').forEach((button) => {
                     button.disabled = bracketLineupDirty || saving;
                 });
                 if (bracketLineupDirty) {
@@ -714,4 +714,5 @@
             if ('ResizeObserver' in window) new ResizeObserver(drawBracketConnections).observe(bracketCanvas);
         }
     </script>
+    <x-delete-schedule-dialog />
 @endsection

@@ -7,7 +7,9 @@ use App\Models\CompetitionSchedule;
 use App\Services\AuditService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
 class CompetitionController extends Controller
@@ -70,6 +72,34 @@ class CompetitionController extends Controller
         $this->auditService->record('competition_schedule.venue_updated', $schedule, $before, $schedule->only(['venue']));
 
         return back()->with('success', 'Schedule venue updated.');
+    }
+
+    public function destroySchedule(Request $request, CompetitionSchedule $schedule): RedirectResponse
+    {
+        $data = $request->validate([
+            'confirmation' => ['required', 'in:DELETE'],
+            'return_to' => ['nullable', 'in:competition,bracket'],
+        ], ['confirmation.required' => 'Confirm the schedule deletion before continuing.']);
+        $schedule->loadMissing('editionSport');
+        $destination = ($data['return_to'] ?? null) === 'bracket' && $schedule->bracket_match_id
+            ? route('admin.sports.bracket', ['sport' => $schedule->editionSport->sport_id, 'edition_id' => $schedule->editionSport->edition_id])
+            : route('admin.competition.index');
+
+        DB::transaction(function () use ($schedule): void {
+            $schedule = CompetitionSchedule::query()->lockForUpdate()->findOrFail($schedule->id);
+            if ($schedule->results()->exists()) {
+                throw ValidationException::withMessages([
+                    'schedule' => 'This schedule has recorded results. Set its status to Cancelled to hide it from the public schedule.',
+                ]);
+            }
+
+            $before = $schedule->only($schedule->getFillable());
+            $before['participants'] = $schedule->participants()->get(['team_id', 'athlete_entry_id', 'slot', 'status'])->toArray();
+            $this->auditService->record('competition_schedule.deleted', $schedule, $before);
+            $schedule->delete();
+        });
+
+        return redirect()->to($destination)->with('success', 'Schedule deleted.');
     }
 
     private function venueOptions(): array

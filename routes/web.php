@@ -148,6 +148,7 @@ Route::middleware([
         Route::post('/participation-rules', [RegistrationController::class, 'storeRule'])->name('participation-rules.store');
         Route::get('/competition', [CompetitionController::class, 'index'])->name('competition.index');
         Route::put('/competition/schedules/{schedule}', [CompetitionController::class, 'updateSchedule'])->name('competition.schedules.update');
+        Route::delete('/competition/schedules/{schedule}', [CompetitionController::class, 'destroySchedule'])->name('competition.schedules.destroy');
         Route::put('/competition/schedules/{schedule}/venue', [CompetitionController::class, 'updateVenue'])->name('competition.schedule-venue.update');
         Route::get('/system-logs', [SystemLogController::class, 'index'])->name('system-logs.index');
     });
