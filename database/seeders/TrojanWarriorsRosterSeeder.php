@@ -14,6 +14,11 @@ class TrojanWarriorsRosterSeeder extends TeamRosterSeeder
         return 'trojan_warriors';
     }
 
+    protected function fillsMissingFieldsWithNa(): bool
+    {
+        return true;
+    }
+
     protected function pairKey(string $name, string $sportCode): ?string
     {
         return match ([$name, $sportCode]) {

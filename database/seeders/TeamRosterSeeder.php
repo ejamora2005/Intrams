@@ -21,6 +21,7 @@ abstract class TeamRosterSeeder extends Seeder
     private const SPORT_ALIASES = [
         '100m run' => ['100M-RUN'],
         '200m run' => ['200M-RUN'],
+        '3x3' => ['BASKET-3X3'],
         '3x3 basketball' => ['BASKET-3X3'],
         '3x3 basketball men' => ['BASKET-3X3-MEN'],
         '3x3 basketball women' => ['BASKET-3X3-WOMEN'],
@@ -41,41 +42,114 @@ abstract class TeamRosterSeeder extends Seeder
         'badminton singles' => ['BADMINTON-SINGLES'],
         'badminton s men' => ['BADMINTON-SINGLES-MEN'],
         'badminton s women' => ['BADMINTON-SINGLES-WOMEN'],
+        'badminton singles men' => ['BADMINTON-SINGLES-MEN'],
+        'badminton singles women' => ['BADMINTON-SINGLES-WOMEN'],
+        'balak' => ['CULT-BALAKWERTE'],
+        'balakwerte' => ['CULT-BALAKWERTE'],
         'basketball' => ['BASKET-5X5'],
+        'basketbal 5x5' => ['BASKET-5X5'],
         'basketball 3x3' => ['BASKET-3X3'],
         'basketball 3x3 men' => ['BASKET-3X3-MEN'],
         'basketball 3x3 women' => ['BASKET-3X3-WOMEN'],
         'basketball 5x5' => ['BASKET-5X5'],
+        'basketball men 5x5' => ['BASKET-5X5-MEN'],
+        'basketball men 5 5' => ['BASKET-5X5-MEN'],
         'basketball 5x5 men' => ['BASKET-5X5-MEN'],
         'basketball 5x5 women' => ['BASKET-5X5-WOMEN'],
         'basketball 5v5' => ['BASKET-5X5'],
+        'basketball 6x6' => ['VOLLEYBALL'],
+        'basketball and triple jump' => ['BASKET-5X5', 'TRIPLE-JUMP'],
+        'basketball festival dancer sayawerte' => ['BASKET-5X5', 'CULT-FEST-DANCE', 'CULT-SAYAWERTE-DANCE'],
+        'basketball festival dancer' => ['BASKET-5X5', 'CULT-FEST-DANCE'],
         'baseball' => ['BASEBALL'],
+        'bseball' => ['BASEBALL'],
         'beach volleyball' => ['BEACH-VOLLEYBALL'],
+        'beach volley' => ['BEACH-VOLLEYBALL'],
+        'beachvolley' => ['BEACH-VOLLEYBALL'],
+        'beachvolleyball' => ['BEACH-VOLLEYBALL'],
         'beach volleyball men' => ['BEACH-VOLLEYBALL-MEN'],
         'beach volleyball women' => ['BEACH-VOLLEYBALL-WOMEN'],
         'chess' => ['CHESS'],
         'chess men' => ['CHESS-MEN'],
         'chess women' => ['CHESS-WOMEN'],
+        'charcoal rendering' => ['CULT-CHARCOAL'],
+        'collaborative painting' => ['CULT-COLLAB-PAINT'],
+        'digital photography' => ['CULT-DIGI-PHOTO'],
+        'digital photograpy' => ['CULT-DIGI-PHOTO'],
+        'digital poster making' => ['CULT-DIGITAL-POSTER'],
+        'discus singswerte' => ['DISCUS-THROW', 'CULT-SING-SOLO'],
+        'basketball shotput festival' => ['BASKET-5X5', 'SHOT-PUT', 'CULT-FEST-DANCE'],
+        'discuss throw food committee' => ['DISCUS-THROW'],
         'discuss' => ['DISCUS-THROW'],
         'discuss throw' => ['DISCUS-THROW'],
         'discus throw' => ['DISCUS-THROW'],
+        'duet' => ['CULT-SING-DUET'],
+        'digital poster' => ['CULT-DIGITAL-POSTER'],
         'e sport' => ['ESPORT-ML'],
+        'e esport mlbb' => ['ESPORT-ML'],
+        'e sport mlbb' => ['ESPORT-ML'],
+        'e sport mobile legend' => ['ESPORT-ML'],
         'e sport men' => ['ESPORT-ML-MEN'],
         'e sport women' => ['ESPORT-ML-WOMEN'],
+        'e sport mlbb men' => ['ESPORT-ML-MEN'],
+        'e sport mlbb girls' => ['ESPORT-ML-WOMEN'],
+        'e sports mobile legend' => ['ESPORT-ML'],
+        'e espor t' => ['ESPORT-ML'],
         'esports' => ['ESPORT-ML'],
+        'film' => ['CULT-SHORT-FILM'],
         'festival' => ['CULT-FEST-DANCE'],
+        'festival dancer' => ['CULT-FEST-DANCE'],
+        'festival dancers' => ['CULT-FEST-DANCE'],
+        'festival dance' => ['CULT-FEST-DANCE'],
+        'festival dance dancer' => ['CULT-FEST-DANCE'],
+        'festival dance props' => [],
+        'festival queen' => ['CULT-STUDENT-PAGEANT'],
+        'festival props' => [],
+        'festival propsmen' => [],
+        'festival propswoman tikarol creare' => [],
+        'festival props men' => [],
+        'festival props pakulo' => ['CULT-FACTION-PAKULO'],
+        'festival props men pakulo' => ['CULT-FACTION-PAKULO'],
+        'festival dancer basketball' => ['CULT-FEST-DANCE', 'BASKET-5X5'],
+        'festival dancer runs' => ['CULT-FEST-DANCE', 'RUNS'],
+        'festival dancer sayawerte' => ['CULT-FEST-DANCE', 'CULT-SAYAWERTE-DANCE'],
+        'festival dancer basketball sayawerte' => ['CULT-FEST-DANCE', 'BASKET-5X5', 'CULT-SAYAWERTE-DANCE'],
+        'food committee' => [],
+        'food com' => [],
+        'faction pakulo' => ['CULT-FACTION-PAKULO'],
+        'gen z balitaw' => ['CULT-MASHUP-BALITAW'],
         'high jump' => ['HIGH-JUMP'],
+        'infographics' => ['CULT-INFOGRAPHICS'],
+        'isiphenyo' => ['CULT-QUIZ'],
+        'isphenyo' => ['CULT-QUIZ'],
         'javelin' => ['JAVELIN-THROW'],
         'javelin throw' => ['JAVELIN-THROW'],
+        'javelin throw food committee' => ['JAVELIN-THROW'],
         'long jump' => ['LONG-JUMP'],
         'mobile legend' => ['ESPORT-ML'],
         'mobile legends men' => ['ESPORT-ML-MEN'],
         'mobile legends women' => ['ESPORT-ML-WOMEN'],
         'mobile legends' => ['ESPORT-ML'],
+        'balitaw' => ['CULT-MASHUP-BALITAW'],
+        'modified volleyball pageant assistant' => ['MODIFIED-VOLLEYBALL'],
+        'modified voleyball pageant assistant' => ['MODIFIED-VOLLEYBALL'],
+        'pageant' => ['CULT-STUDENT-PAGEANT'],
+        'pageant candidate' => ['CULT-STUDENT-PAGEANT'],
+        'pageant assistant' => [],
+        'pageant committee' => [],
+        'pageant festival' => ['CULT-STUDENT-PAGEANT', 'CULT-FEST-DANCE'],
+        'pakulo' => ['CULT-FACTION-PAKULO'],
+        'propsmen pakulo' => ['CULT-FACTION-PAKULO'],
+        'photography' => ['CULT-DIGI-PHOTO'],
+        'propsmen' => [],
+        'russian baseball' => ['RUSSIAN-SOFTBALL'],
+        'russian festival props' => ['RUSSIAN-SOFTBALL'],
+        'russian festival props pakulo' => ['RUSSIAN-SOFTBALL', 'CULT-FACTION-PAKULO'],
         'modified volleyball' => ['MODIFIED-VOLLEYBALL'],
         'modified volleyball men' => ['MODIFIED-VOLLEYBALL-MEN'],
         'modified volleyball women' => ['MODIFIED-VOLLEYBALL-WOMEN'],
         'modified voleyball' => ['MODIFIED-VOLLEYBALL'],
+        'pencil drawing' => ['CULT-PENCIL-DRAWING'],
         'run' => ['RUNS'],
         'run 100m' => ['100M-RUN'],
         'run 200m' => ['200M-RUN'],
@@ -83,11 +157,24 @@ abstract class TeamRosterSeeder extends Seeder
         'run 400m' => ['400M-RUN'],
         'relay 4x100' => ['RELAY-4X100'],
         'relay 4x400' => ['RELAY-4X400'],
+        '400m dash' => ['400M-RUN'],
+        'runs' => ['RUNS'],
+        'runs 100mm dash' => ['100M-RUN'],
+        'run festival dancer' => ['RUNS', 'CULT-FEST-DANCE'],
         'russian' => ['RUSSIAN-SOFTBALL'],
         'russian soft ball' => ['RUSSIAN-SOFTBALL'],
         'russian softball' => ['RUSSIAN-SOFTBALL'],
         'shot put' => ['SHOT-PUT'],
         'shotput' => ['SHOT-PUT'],
+        'short film' => ['CULT-SHORT-FILM'],
+        'shortfilm' => ['CULT-SHORT-FILM'],
+        'modern balitaw' => ['CULT-MASHUP-BALITAW'],
+        'sayawerte' => ['CULT-SAYAWERTE-DANCE'],
+        'sing swerte' => ['CULT-SING-SOLO'],
+        'singswerte' => ['CULT-SING-SOLO'],
+        'singswerte duet' => ['CULT-SING-DUET'],
+        'singwerte duet' => ['CULT-SING-DUET'],
+        'singswerte solo' => ['CULT-SING-SOLO'],
         'table tennis' => ['TABLE-TENNIS'],
         'table tennis double men' => ['TABLE-TENNIS-DOUBLES-MEN'],
         'table tennis double women' => ['TABLE-TENNIS-DOUBLES-WOMEN'],
@@ -98,10 +185,29 @@ abstract class TeamRosterSeeder extends Seeder
         'table tennis singles' => ['TABLE-TENNIS-SINGLES'],
         'table tennis singles men' => ['TABLE-TENNIS-SINGLES-MEN'],
         'table tennis singles women' => ['TABLE-TENNIS-SINGLES-WOMEN'],
+        'throws javelin' => ['JAVELIN-THROW'],
+        'throws shotput' => ['SHOT-PUT'],
+        'tikarol creare' => [],
+        'tikarol' => [],
+        'treasurehenyo' => ['CULT-TREASURE'],
         'triple jump' => ['TRIPLE-JUMP'],
         'volleyball' => ['VOLLEYBALL'],
+        'volleyball 6x6' => ['VOLLEYBALL'],
         'volleyball men' => ['VOLLEYBALL-MEN'],
         'volleyball women' => ['VOLLEYBALL-WOMEN'],
+        'mlbb girls' => ['ESPORT-ML-WOMEN'],
+        'mlbb men' => ['ESPORT-ML-MEN'],
+        'and pageant' => ['CULT-STUDENT-PAGEANT'],
+        'women coach' => [],
+        '6x6 volleyball' => ['VOLLEYBALL'],
+        'table tennis doubles' => ['TABLE-TENNIS-DOUBLES'],
+        'treasure hunt' => ['CULT-TREASURE'],
+        'vocal solo' => ['CULT-SING-SOLO'],
+        'festival dancer short film' => ['CULT-FEST-DANCE', 'CULT-SHORT-FILM'],
+        'food com.' => [],
+        'food comm' => [],
+        'tikarol creae' => [],
+        'visual arts' => ['CULT-DIGITAL-POSTER'],
     ];
 
     abstract protected function teamCode(): string;
@@ -111,6 +217,11 @@ abstract class TeamRosterSeeder extends Seeder
     protected function pairKey(string $name, string $sportCode): ?string
     {
         return null;
+    }
+
+    protected function fillsMissingFieldsWithNa(): bool
+    {
+        return false;
     }
 
     public function run(): void
@@ -229,18 +340,40 @@ abstract class TeamRosterSeeder extends Seeder
 
         $roster = [];
         foreach ($rows as $row) {
-            if (! is_array($row) || ! is_string($row['name'] ?? null) || ! is_string($row['gender'] ?? null) || ! is_string($row['year_section'] ?? null) || ! is_string($row['sports'] ?? null)) {
+            if (! is_array($row) || ! is_string($row['name'] ?? null)) {
                 throw new RuntimeException('Roster data contains an invalid row: '.$path);
             }
 
-            $name = $this->canonicalName($row['name']);
-            $gender = ucfirst(Str::lower(trim($row['gender'])));
-            if (! in_array($gender, ['Male', 'Female'], true)) {
-                throw new RuntimeException('Invalid gender for '.$name.': '.$row['gender']);
+            $fillsMissingFieldsWithNa = $this->fillsMissingFieldsWithNa();
+            foreach (['gender', 'year_section', 'sports'] as $field) {
+                if (isset($row[$field]) && ! is_string($row[$field])) {
+                    throw new RuntimeException('Roster data contains an invalid '.$field.' for '.$row['name'].'.');
+                }
+                if (! $fillsMissingFieldsWithNa && ! is_string($row[$field] ?? null)) {
+                    throw new RuntimeException('Roster data contains an invalid row: '.$path);
+                }
             }
 
-            $academicDetails = $this->academicDetails($row['year_section'], $name);
-            $sports = $this->sportCodes($row['sports'], $name, $gender);
+            $name = $this->canonicalName($row['name']);
+            $genderValue = trim($row['gender'] ?? '');
+            $gender = $genderValue === '' && $fillsMissingFieldsWithNa
+                ? 'N/A'
+                : ucfirst(Str::lower($genderValue));
+            if (! in_array($gender, ['Male', 'Female', 'N/A'], true)) {
+                throw new RuntimeException('Invalid gender for '.$name.': '.$genderValue);
+            }
+
+            $yearSection = trim($row['year_section'] ?? '');
+            if ($yearSection === '' && $fillsMissingFieldsWithNa) {
+                $yearSection = 'N/A';
+            }
+            $sportsValue = trim($row['sports'] ?? '');
+            if ($sportsValue === '' && $fillsMissingFieldsWithNa) {
+                $sportsValue = 'N/A';
+            }
+
+            $academicDetails = $this->academicDetails($yearSection, $name, $fillsMissingFieldsWithNa);
+            $sports = $this->sportCodes($sportsValue, $name, $gender);
             $nameKey = $this->normalizeName($name);
 
             if (isset($roster[$nameKey])) {
@@ -267,21 +400,29 @@ abstract class TeamRosterSeeder extends Seeder
     }
 
     /** @return array{year_level: string, section: ?string} */
-    private function academicDetails(string $value, string $name): array
+    private function academicDetails(string $value, string $name, bool $fillsMissingFieldsWithNa): array
     {
         $value = trim($value);
-        if (preg_match('/([1-4])\s*-?\s*([A-D])\s*$/i', $value, $matches) === 1) {
+        if ($fillsMissingFieldsWithNa && ($value === '' || Str::upper($value) === 'N/A')) {
+            $yearLevel = 'N/A';
+            $section = 'N/A';
+        } elseif ($fillsMissingFieldsWithNa && preg_match('/^([A-D])$/i', $value, $matches) === 1) {
+            $yearLevel = 'N/A';
+            $section = strtoupper($matches[1]);
+        } elseif (preg_match('/([1-4])\s*-?\s*([A-D])\s*$/i', $value, $matches) === 1) {
             $year = (int) $matches[1];
             $section = strtoupper($matches[2]);
+            $yearLevel = [1 => '1st', 2 => '2nd', 3 => '3rd', 4 => '4th'][$year];
         } elseif (preg_match('/([1-4])\s*$/', $value, $matches) === 1) {
             $year = (int) $matches[1];
-            $section = null;
+            $section = $fillsMissingFieldsWithNa ? 'N/A' : null;
+            $yearLevel = [1 => '1st', 2 => '2nd', 3 => '3rd', 4 => '4th'][$year];
         } else {
             throw new RuntimeException('Unable to parse year/section "'.$value.'" for '.$name.'.');
         }
 
         return [
-            'year_level' => [1 => '1st', 2 => '2nd', 3 => '3rd', 4 => '4th'][$year],
+            'year_level' => $yearLevel,
             'section' => $section,
         ];
     }
@@ -289,7 +430,11 @@ abstract class TeamRosterSeeder extends Seeder
     /** @return array<int, string> */
     private function sportCodes(string $value, string $name, string $gender): array
     {
-        $labels = preg_split('/\s*(?:,|&)\s*/u', trim($value), -1, PREG_SPLIT_NO_EMPTY);
+        if (trim($value) === '' || Str::upper(trim($value)) === 'N/A') {
+            return [];
+        }
+
+        $labels = preg_split('/\s*(?:,|&|\+|\/)\s*|\s+(?:and)\s+|\s+-\s+/iu', trim($value), -1, PREG_SPLIT_NO_EMPTY);
         if ($labels === false || $labels === []) {
             throw new RuntimeException('No sports listed for '.$name.'.');
         }
@@ -303,29 +448,38 @@ abstract class TeamRosterSeeder extends Seeder
 
             foreach (self::SPORT_ALIASES[$key] as $code) {
                 $codes[] = match ($code) {
-                    'VOLLEYBALL' => $gender === 'Male' ? 'VOLLEYBALL-MEN' : 'VOLLEYBALL-WOMEN',
-                    'MODIFIED-VOLLEYBALL' => $gender === 'Male' ? 'MODIFIED-VOLLEYBALL-MEN' : 'MODIFIED-VOLLEYBALL-WOMEN',
-                    'CHESS' => $gender === 'Male' ? 'CHESS-MEN' : 'CHESS-WOMEN',
-                    'ESPORT-ML' => $gender === 'Male' ? 'ESPORT-ML-MEN' : 'ESPORT-ML-WOMEN',
-                    'BASKET-3X3' => $gender === 'Male' ? 'BASKET-3X3-MEN' : 'BASKET-3X3-WOMEN',
-                    'BASKET-5X5' => $gender === 'Male' ? 'BASKET-5X5-MEN' : 'BASKET-5X5-WOMEN',
-                    'BEACH-VOLLEYBALL' => $gender === 'Male' ? 'BEACH-VOLLEYBALL-MEN' : 'BEACH-VOLLEYBALL-WOMEN',
-                    'BADMINTON' => $gender === 'Male' ? 'BADMINTON-DOUBLES-MEN' : 'BADMINTON-DOUBLES-WOMEN',
-                    'BADMINTON-TEAM' => $gender === 'Male' ? 'BADMINTON-TEAM-MEN' : 'BADMINTON-TEAM-WOMEN',
-                    'BADMINTON-DOUBLES' => $gender === 'Male' ? 'BADMINTON-DOUBLES-MEN' : 'BADMINTON-DOUBLES-WOMEN',
-                    'BADMINTON-SINGLES' => $gender === 'Male' ? 'BADMINTON-SINGLES-MEN' : 'BADMINTON-SINGLES-WOMEN',
-                    'TABLE-TENNIS' => $gender === 'Male' ? 'TABLE-TENNIS-SINGLES-MEN' : 'TABLE-TENNIS-SINGLES-WOMEN',
-                    'TABLE-TENNIS-TEAM' => $gender === 'Male' ? 'TABLE-TENNIS-TEAM-MEN' : 'TABLE-TENNIS-TEAM-WOMEN',
-                    'TABLE-TENNIS-DOUBLES' => $gender === 'Male' ? 'TABLE-TENNIS-DOUBLES-MEN' : 'TABLE-TENNIS-DOUBLES-WOMEN',
-                    'TABLE-TENNIS-SINGLES' => $gender === 'Male' ? 'TABLE-TENNIS-SINGLES-MEN' : 'TABLE-TENNIS-SINGLES-WOMEN',
+                    'VOLLEYBALL' => $this->genderedSportCode('VOLLEYBALL-MEN', 'VOLLEYBALL-WOMEN', $gender, $name),
+                    'MODIFIED-VOLLEYBALL' => $this->genderedSportCode('MODIFIED-VOLLEYBALL-MEN', 'MODIFIED-VOLLEYBALL-WOMEN', $gender, $name),
+                    'CHESS' => $this->genderedSportCode('CHESS-MEN', 'CHESS-WOMEN', $gender, $name),
+                    'ESPORT-ML' => $this->genderedSportCode('ESPORT-ML-MEN', 'ESPORT-ML-WOMEN', $gender, $name),
+                    'BASKET-3X3' => $this->genderedSportCode('BASKET-3X3-MEN', 'BASKET-3X3-WOMEN', $gender, $name),
+                    'BASKET-5X5' => $this->genderedSportCode('BASKET-5X5-MEN', 'BASKET-5X5-WOMEN', $gender, $name),
+                    'BEACH-VOLLEYBALL' => $this->genderedSportCode('BEACH-VOLLEYBALL-MEN', 'BEACH-VOLLEYBALL-WOMEN', $gender, $name),
+                    'BADMINTON' => $this->genderedSportCode('BADMINTON-DOUBLES-MEN', 'BADMINTON-DOUBLES-WOMEN', $gender, $name),
+                    'BADMINTON-TEAM' => $this->genderedSportCode('BADMINTON-TEAM-MEN', 'BADMINTON-TEAM-WOMEN', $gender, $name),
+                    'BADMINTON-DOUBLES' => $this->genderedSportCode('BADMINTON-DOUBLES-MEN', 'BADMINTON-DOUBLES-WOMEN', $gender, $name),
+                    'BADMINTON-SINGLES' => $this->genderedSportCode('BADMINTON-SINGLES-MEN', 'BADMINTON-SINGLES-WOMEN', $gender, $name),
+                    'TABLE-TENNIS' => $this->genderedSportCode('TABLE-TENNIS-SINGLES-MEN', 'TABLE-TENNIS-SINGLES-WOMEN', $gender, $name),
+                    'TABLE-TENNIS-TEAM' => $this->genderedSportCode('TABLE-TENNIS-TEAM-MEN', 'TABLE-TENNIS-TEAM-WOMEN', $gender, $name),
+                    'TABLE-TENNIS-DOUBLES' => $this->genderedSportCode('TABLE-TENNIS-DOUBLES-MEN', 'TABLE-TENNIS-DOUBLES-WOMEN', $gender, $name),
+                    'TABLE-TENNIS-SINGLES' => $this->genderedSportCode('TABLE-TENNIS-SINGLES-MEN', 'TABLE-TENNIS-SINGLES-WOMEN', $gender, $name),
                     default => in_array($code, ['RUNS', '100M-RUN', '200M-RUN', '400M-RUN', 'RELAY-4X100', 'RELAY-4X400', 'THROWS', 'SHOT-PUT', 'DISCUS-THROW', 'JAVELIN-THROW', 'JUMP', 'LONG-JUMP', 'TRIPLE-JUMP', 'HIGH-JUMP'], true)
-                        ? $code.'-'.($gender === 'Male' ? 'MEN' : 'WOMEN')
+                        ? $this->genderedSportCode($code.'-MEN', $code.'-WOMEN', $gender, $name)
                         : $code,
                 };
             }
         }
 
         return array_values(array_unique($codes));
+    }
+
+    private function genderedSportCode(string $maleCode, string $femaleCode, string $gender, string $name): string
+    {
+        if (! in_array($gender, ['Male', 'Female'], true)) {
+            throw new RuntimeException('A valid gender is required to assign gender-specific sports to '.$name.'.');
+        }
+
+        return $gender === 'Male' ? $maleCode : $femaleCode;
     }
 
     private function canonicalName(string $name): string
@@ -345,7 +499,7 @@ abstract class TeamRosterSeeder extends Seeder
 
     private function normalizeName(string $name): string
     {
-        $normalized = Str::lower($this->canonicalName($name));
+        $normalized = Str::ascii(Str::lower($this->canonicalName($name)));
         $normalized = preg_replace('/[^\pL\pN]+/u', ' ', $normalized) ?? $normalized;
 
         return trim(preg_replace('/\s+/u', ' ', $normalized) ?? $normalized);

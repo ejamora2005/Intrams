@@ -57,7 +57,7 @@ test('default Trojan roster includes the supplied sport mappings', function () {
     $assertEntry('Jay-R', 'Danas', 'BASEBALL');
     $assertEntry('Anna Mae', 'Guzon', 'VOLLEYBALL-WOMEN');
     $assertEntry('Jericho', 'Bisnar', 'LONG-JUMP-MEN');
-    $assertEntry('Grace', 'Gula', 'RUSSIAN-SOFTBALL');
+    $assertEntry('Grace Bilag', 'Gula', 'RUSSIAN-SOFTBALL');
     $assertEntry('Jhon Kristian', 'Cundangan', 'ESPORT-ML-MEN');
 });
 

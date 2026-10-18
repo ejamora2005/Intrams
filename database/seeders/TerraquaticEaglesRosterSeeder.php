@@ -13,4 +13,9 @@ class TerraquaticEaglesRosterSeeder extends TeamRosterSeeder
     {
         return 'terraquatic_eagles';
     }
+
+    protected function fillsMissingFieldsWithNa(): bool
+    {
+        return true;
+    }
 }

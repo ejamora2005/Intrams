@@ -13,4 +13,9 @@ class SeaDragonsRosterSeeder extends TeamRosterSeeder
     {
         return 'sea_dragons';
     }
+
+    protected function fillsMissingFieldsWithNa(): bool
+    {
+        return true;
+    }
 }

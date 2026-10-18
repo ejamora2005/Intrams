@@ -26,6 +26,20 @@ DEPLOY_SEED_DEFAULT_COMPETITIONS=true
 
 9. Deploy. After the first successful deploy, set the seed flags back to `false`.
 
+## Update the supplied roster
+
+Redeploy the latest code before running these commands in the `intrams` app container terminal:
+
+```bash
+cd /var/www/html
+php artisan migrate --force
+php artisan db:seed --class=DefaultIntramuralsSeeder --force
+```
+
+The current roster contains 191 Sea Dragons, 161 Terraquatic Eagles, and 143 Trojan Warriors (495 faction members). The seeder synchronizes their sports and cultural registrations with the supplied JSON sheets. Support-only members remain on the faction roster without an event registration; missing academic details use `N/A`.
+
+Run this import once, then keep `DEPLOY_SEED_DEFAULT_COMPETITIONS=false` so subsequent deployments preserve roster edits made in the app. This command does not run the account seeder. If an outdated athlete registration is already used in a schedule, the affected faction import stops with a message instead of removing that scheduled registration.
+
 ## Notes
 
 - Dokploy should expose the `intrams` service, not the `mysql` service.
