@@ -58,6 +58,10 @@ if (document.querySelector('[data-volleyball-score-sheet]')) {
     void import('./volleyball-score-sheet');
 }
 
+if (document.querySelector('[data-sport-score-sheet]')) {
+    void import('./sport-score-sheets');
+}
+
 if (document.querySelector('[data-login-modal]')) {
     void import('./login-modal');
 }

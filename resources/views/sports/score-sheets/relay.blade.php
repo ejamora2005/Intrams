@@ -1,0 +1,9 @@
+<div class="ss-meta"><label>Distance / heat<x-score-sheet.cell label="Relay distance and heat" :value="$sport->name" /></label><label>Timing method<x-score-sheet.cell label="Relay timing method" /></label><label>Actual start time<x-score-sheet.cell label="Relay start time" /></label><label>Chief timekeeper<x-score-sheet.cell label="Relay chief timekeeper" /></label></div>
+<h3>Relay team declaration and result</h3>
+<table class="ss-tall"><thead><tr><th style="width:10mm">Lane</th><th style="width:38mm">Faction</th>@foreach(range(1,4) as $leg)<th>Leg {{ $leg }} athlete / bib</th>@endforeach<th style="width:24mm">Time</th><th style="width:14mm">Place</th><th style="width:22mm">Status</th></tr></thead><tbody>
+@foreach(range(0,max(5,$teams->count()-1)) as $row)@php($team=$teams->get($row))<tr><td><x-score-sheet.cell label="Relay lane {{ $row+1 }}" /></td><td><x-score-sheet.cell label="Relay faction {{ $row+1 }}" :value="$team['name'] ?? ''" /></td>@foreach(range(1,4) as $leg)<td><x-score-sheet.cell label="Relay team {{ $row+1 }} leg {{ $leg }} athlete and bib" /></td>@endforeach@foreach(['Time','Place','Status'] as $field)<td><x-score-sheet.cell label="Relay team {{ $row+1 }} {{ $field }}" /></td>@endforeach</tr>@endforeach
+</tbody></table>
+<h3>Registered relay athletes · enter the confirmed running order above</h3>
+<div class="ss-grid ss-three">@foreach($teams as $team)<div class="ss-note"><strong>{{ $team['name'] }}</strong>@foreach($team['players'] as $player)<p>{{ $player['name'] }}</p>@endforeach</div>@endforeach</div>
+<label class="ss-block">Changeover faults / leg splits / disqualification rules / protests<x-score-sheet.cell label="Relay changeover faults splits and protests" /></label>
+<div class="ss-note">Confirm all four athletes and their order before the start. DNS / DNF / DQ are recorded in the status column; no knockout bracket is used.</div>

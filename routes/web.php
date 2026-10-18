@@ -18,6 +18,7 @@ use App\Http\Controllers\Admin\TeamController;
 use App\Http\Controllers\Coordinator\DashboardController as CoordinatorDashboardController;
 use App\Http\Controllers\Gam\DashboardController as GamDashboardController;
 use App\Http\Controllers\RulesController;
+use App\Http\Controllers\SportScoreSheetController;
 use App\Http\Controllers\Tabulator\DashboardController as TabulatorDashboardController;
 use App\Services\StandingsService;
 use Illuminate\Support\Facades\Route;
@@ -123,6 +124,8 @@ Route::middleware([
         Route::get('/possible-dq', [RulesController::class, 'possibleDqAdmin'])->name('possible-dq.index');
         Route::post('/rules-guidelines/repair-registrations', [RulesController::class, 'repair'])->name('rules.repair-registrations');
         Route::get('/sports/{sport}/bracket', [SportController::class, 'bracket'])->name('sports.bracket');
+        Route::get('/sports/{sport}/score-sheet', [SportScoreSheetController::class, 'show'])->name('sports.score-sheet');
+        Route::post('/sports/{sport}/score-sheet/download', [SportScoreSheetController::class, 'download'])->name('sports.score-sheet.download');
         Route::post('/sports/{sport}/bracket/order', [SportController::class, 'reorderBracket'])->name('sports.bracket.order');
         Route::get('/sports/{sport}/basketball-score-sheet', [SportController::class, 'basketballScoreSheet'])->name('sports.basketball-score-sheet');
         Route::post('/sports/{sport}/basketball-score-sheet/download', [SportController::class, 'downloadBasketballScoreSheet'])->name('sports.basketball-score-sheet.download');
@@ -172,6 +175,8 @@ Route::middleware([
 
     Route::prefix('tabulator')->as('tabulator.')->middleware('role:tabulator')->group(function () {
         Route::get('/dashboard', [TabulatorDashboardController::class, 'index'])->name('dashboard');
+        Route::get('/sports/{sport}/score-sheet', [SportScoreSheetController::class, 'show'])->name('sports.score-sheet');
+        Route::post('/sports/{sport}/score-sheet/download', [SportScoreSheetController::class, 'download'])->name('sports.score-sheet.download');
         Route::get('/rules-guidelines', [RulesController::class, 'tabulator'])->name('rules.index');
         Route::get('/possible-dq', [RulesController::class, 'possibleDqTabulator'])->name('possible-dq.index');
         Route::post('/sport-results', [TabulatorDashboardController::class, 'declareSportWinners'])->name('sport-results.store');

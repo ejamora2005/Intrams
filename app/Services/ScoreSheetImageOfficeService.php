@@ -17,6 +17,8 @@ class ScoreSheetImageOfficeService
         $cy = $landscape ? 7560000 : 10692000;
         $pageWidth = $landscape ? 16838 : 11906;
         $pageHeight = $landscape ? 11906 : 16838;
+        // Excel worksheet titles are limited to 31 characters and exclude these symbols.
+        $sheetName = mb_substr(str_replace(['[', ']', ':', '*', '?', '/', '\\'], ' ', $sheetName), 0, 31);
         $sheetName = htmlspecialchars($sheetName, ENT_XML1 | ENT_QUOTES, 'UTF-8');
         if ($format === 'docx') {
             $main = 'word/document.xml';
@@ -42,12 +44,19 @@ class ScoreSheetImageOfficeService
         $files['[Content_Types].xml'] = '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Default Extension="png" ContentType="image/png"/>'.$overrides.'</Types>';
         $files['_rels/.rels'] = '<Relationships xmlns="'.$rels.'"><Relationship Id="rId1" Type="'.$office.'/officeDocument" Target="'.$main.'"/></Relationships>';
         $path = tempnam(sys_get_temp_dir(), 'a4-sheet-');
-        if ($path === false) throw new RuntimeException('Cannot create export.');
+        if ($path === false) {
+            throw new RuntimeException('Cannot create export.');
+        }
         try {
-            $zip = new ZipArchive();
-            if ($zip->open($path, ZipArchive::OVERWRITE) !== true) throw new RuntimeException('Cannot open export.');
-            foreach ($files as $name => $content) $zip->addFromString($name, $content);
+            $zip = new ZipArchive;
+            if ($zip->open($path, ZipArchive::OVERWRITE) !== true) {
+                throw new RuntimeException('Cannot open export.');
+            }
+            foreach ($files as $name => $content) {
+                $zip->addFromString($name, $content);
+            }
             $zip->close();
+
             return file_get_contents($path);
         } finally {
             unlink($path);

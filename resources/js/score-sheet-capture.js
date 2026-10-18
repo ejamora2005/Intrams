@@ -7,6 +7,9 @@ export const scoreSheetCaptureOptions = {
     style: { margin: '0', transform: 'none', boxShadow: 'none' },
     includeStyleProperties: [
         'display', 'position', 'box-sizing', 'width', 'height',
+        'grid-template-columns', 'grid-template-rows', 'grid-column', 'grid-row',
+        'gap', 'column-gap', 'row-gap', 'align-items', 'align-self', 'justify-content',
+        'flex', 'flex-direction', 'flex-wrap', 'flex-grow', 'flex-shrink', 'flex-basis',
         'min-width', 'min-height', 'max-width', 'max-height',
         'top', 'right', 'bottom', 'left', 'float', 'clear',
         'margin-top', 'margin-right', 'margin-bottom', 'margin-left',

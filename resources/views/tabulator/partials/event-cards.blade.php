@@ -22,6 +22,9 @@
                     <p class="tab-muted tab-small">{{ count($eventPointRules->get($event->id, [])) }} placements · {{ $eventPointRules->get($event->id)[0]['points'] ?? 0 }} points for first place</p>
                 @endif
                 <a class="tab-button {{ $result ? 'tab-button-secondary' : '' }}" href="{{ route('tabulator.dashboard', ['edition_sport_id' => $event->id]) }}#declare-sports">{{ $result ? 'Review / edit results' : 'Enter placements' }} <span aria-hidden="true">→</span></a>
+                @if ($category !== 'cultural')
+                    <a class="tab-button tab-button-secondary" href="{{ route('tabulator.sports.score-sheet', ['sport' => $event->sport_id, 'edition_id' => $event->edition_id]) }}">Score sheet</a>
+                @endif
             </article>
         @empty
             <div class="tab-empty"><strong>No scoring events configured</strong><p>Ask an administrator to configure the events and their points for the active edition.</p></div>

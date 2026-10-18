@@ -289,13 +289,19 @@ class SportController extends Controller
         return view('admin.sports.bracket', compact('sport', 'edition', 'editionSport', 'matches', 'selectedCompetitors', 'availableCompetitors', 'bracketBlank'));
     }
 
-    public function basketballScoreSheet(Request $request, Sport $sport): View
+    public function basketballScoreSheet(Request $request, Sport $sport): View|RedirectResponse
     {
+        if (app(\App\Services\SportScoreSheetService::class)->profile($sport)['key'] === 'basketball-3x3') {
+            return redirect()->route('admin.sports.score-sheet', ['sport' => $sport, 'edition_id' => $request->input('edition_id')]);
+        }
         return view('admin.sports.basketball-score-sheet', $this->basketballScoreSheetContext($request, $sport));
     }
 
-    public function volleyballScoreSheet(Request $request, Sport $sport): View
+    public function volleyballScoreSheet(Request $request, Sport $sport): View|RedirectResponse
     {
+        if (in_array(app(\App\Services\SportScoreSheetService::class)->profile($sport)['key'], ['beach-volleyball', 'school-volleyball'], true)) {
+            return redirect()->route('admin.sports.score-sheet', ['sport' => $sport, 'edition_id' => $request->input('edition_id')]);
+        }
         return view('admin.sports.volleyball-score-sheet', $this->volleyballScoreSheetContext($request, $sport));
     }
 

@@ -1,0 +1,13 @@
+@include('sports.score-sheets.teams')
+<div class="ss-grid ss-block">@foreach(['a'=>'A','b'=>'B'] as $side=>$letter)<div><h3>Team {{ $letter }} · players</h3><table><thead><tr><th style="width:10mm">No.</th><th>Player</th><th style="width:25mm">Captain</th></tr></thead><tbody>@for($row=0;$row<2;$row++)<tr><td><x-score-sheet.cell label="{{ $letter }} beach player {{ $row+1 }} number" :value="$row+1" /></td><td><x-score-sheet.cell label="{{ $letter }} beach player {{ $row+1 }} name" :side="$side" :row="$row" kind="name" /></td><td><x-score-sheet.cell label="{{ $letter }} player {{ $row+1 }} captain" /></td></tr>@endfor</tbody></table></div>@endforeach</div>
+<div class="ss-grid ss-three ss-block">
+@foreach(range(1,3) as $set)
+<section><h3>Set {{ $set }} · {{ $set===3 ? '15' : '21' }} points</h3><table><thead><tr><th>Start</th><th>End</th><th>Duration</th></tr></thead><tbody><tr>@foreach(['Start','End','Duration'] as $field)<td><x-score-sheet.cell label="Beach set {{ $set }} {{ $field }}" /></td>@endforeach</tr></tbody></table>
+<table class="ss-block"><thead><tr><th>Team</th><th>First serve (1/2)</th><th>Service order</th></tr></thead><tbody>@foreach(['A','B'] as $letter)<tr><th>{{ $letter }}</th><td><x-score-sheet.cell label="Set {{ $set }} {{ $letter }} first server" /></td><td><x-score-sheet.cell label="Set {{ $set }} {{ $letter }} service order" /></td></tr>@endforeach</tbody></table>
+@foreach([[1,10],[11,20],[21,30]] as [$first,$last])<table class="ss-score-grid ss-block"><thead><tr><th style="width:8mm">Pts</th>@foreach(range($first,$last) as $point)<th>{{ $point }}</th>@endforeach</tr></thead><tbody>@foreach(['A','B'] as $letter)<tr><th>{{ $letter }}</th>@foreach(range($first,$last) as $point)<td><x-score-sheet.cell label="Beach set {{ $set }} {{ $letter }} point {{ $point }}" /></td>@endforeach</tr>@endforeach</tbody></table>@endforeach
+<table class="ss-block"><thead><tr><th>Team</th><th>Timeout at</th><th>Final points</th></tr></thead><tbody>@foreach(['A','B'] as $letter)<tr><th>{{ $letter }}</th><td><x-score-sheet.cell label="Beach set {{ $set }} {{ $letter }} timeout score" /></td><td><x-score-sheet.cell label="Beach set {{ $set }} {{ $letter }} final points" /></td></tr>@endforeach</tbody></table>
+<label class="ss-block">Court switches / extended score<x-score-sheet.cell label="Set {{ $set }} court switches and extended score" /></label></section>
+@endforeach</div>
+<div class="ss-note">Record service order, side changes and timeouts for each set. Use remarks for extended points, sanctions, medical timeouts or interruption details.</div>
+<label class="ss-block">Sanctions / medical timeouts / remarks<x-score-sheet.cell label="Beach sanctions and remarks" /></label>
+@include('sports.score-sheets.result')

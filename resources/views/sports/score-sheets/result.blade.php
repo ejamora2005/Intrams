@@ -1,0 +1,2 @@
+<div class="ss-grid ss-block"><label>Final result / winning team or player<x-score-sheet.cell label="Final result and winner" /></label><label>End time / duration<x-score-sheet.cell label="End time and duration" /></label></div>
+<div class="ss-grid ss-block"><label>Team A / player signature<x-score-sheet.cell label="Team A or player signature" /></label><label>Team B / player signature<x-score-sheet.cell label="Team B or player signature" /></label></div>

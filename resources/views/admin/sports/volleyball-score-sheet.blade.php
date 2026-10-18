@@ -1,18 +1,18 @@
-@extends('layouts.admin', [
+@extends($scoreSheetLayout ?? 'layouts.admin', [
     'title' => 'Volleyball score sheet',
     'subtitle' => 'Reference score sheet for '.$edition->name.' — '.$sport->name,
 ])
 
 @section('content')
     <div class="mb-6 flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
-        <a href="{{ route('admin.sports.index', ['edition_id' => $edition->id]) }}" class="w-fit text-sm font-semibold text-blue-700 hover:text-blue-900">← Back to Sports</a>
+        <a href="{{ $scoreSheetBackUrl ?? route('admin.sports.index', ['edition_id' => $edition->id]) }}" class="w-fit text-sm font-semibold text-blue-700 hover:text-blue-900">← Back to Sports</a>
         <div class="flex gap-2">
             <button type="reset" form="volleyball-score-sheet" class="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50">Clear form</button>
             <button type="button" id="open-score-sheet-download" aria-haspopup="dialog" aria-controls="score-sheet-download-drawer" class="w-fit rounded-lg bg-blue-700 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">Download</button>
         </div>
     </div>
 
-    <form id="volleyball-score-sheet" data-score-sheet-export data-volleyball-score-sheet data-download-prefix="volleyball-score-sheet" method="POST" action="{{ route('admin.sports.volleyball-score-sheet.download', $sport) }}">
+    <form id="volleyball-score-sheet" data-score-sheet-export data-volleyball-score-sheet data-download-prefix="volleyball-score-sheet" method="POST" action="{{ route($scoreSheetDownloadRoute ?? 'admin.sports.volleyball-score-sheet.download', $sport) }}">
         @csrf
         <input type="hidden" name="edition_id" value="{{ $edition->id }}" />
 

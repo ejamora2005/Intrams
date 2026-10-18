@@ -46,6 +46,7 @@ if (form && drawer) {
                 await document.fonts.ready;
                 await Promise.all([...paper.querySelectorAll('img')].map(img => img.decode()));
                 fitPaper();
+                form.dispatchEvent(new Event('score-sheet:prepare'));
                 const { toBlob } = await import('html-to-image');
                 const image = await toBlob(paper, scoreSheetCaptureOptions);
                 if (!image) throw new Error('Could not capture the sheet. Please try again.');

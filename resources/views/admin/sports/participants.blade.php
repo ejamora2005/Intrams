@@ -18,7 +18,12 @@
                 <h2 id="participants-heading" class="text-lg font-semibold text-slate-900">Manage participants</h2>
                 <p class="mt-1 text-sm text-slate-500">{{ number_format($competitors->count()) }} registered {{ Str::plural('competitor', $competitors->count()) }} for {{ $sport->name }}.</p>
             </div>
-            <a href="{{ route('admin.sports.participants.assign', ['sport' => $sport, 'edition_id' => $edition->id]) }}" class="relative z-10 w-fit shrink-0 rounded-lg bg-blue-700 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-800">Add participants</a>
+            <div class="flex flex-wrap gap-2">
+                @if (! str_starts_with(strtoupper($sport->code), 'CULT-'))
+                    <a href="{{ route('admin.sports.score-sheet', ['sport' => $sport, 'edition_id' => $edition->id]) }}" class="w-fit rounded-lg border border-blue-200 bg-white px-4 py-2.5 text-sm font-semibold text-blue-700">Score sheet</a>
+                @endif
+                <a href="{{ route('admin.sports.participants.assign', ['sport' => $sport, 'edition_id' => $edition->id]) }}" class="relative z-10 w-fit shrink-0 rounded-lg bg-blue-700 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-800">Add participants</a>
+            </div>
         </header>
 
         @if ($teamGroups->isNotEmpty())
