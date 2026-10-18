@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use TournamentGenerator\Constants;
 use TournamentGenerator\Group;
+use TournamentGenerator\Helpers\Generator;
 
 class BracketService
 {
@@ -250,30 +251,42 @@ class BracketService
     private function createRoundRobinSchedule(EditionSport $editionSport, Collection $competitors): void
     {
         $group = new Group($editionSport->sport?->name ?? 'Round robin');
+        $teams = [];
 
         foreach ($competitors as $competitor) {
-            $group->team($competitor->label, $competitor->id);
+            $teams[] = $group->team($competitor->label, $competitor->id);
         }
 
-        $games = array_values($group
-            ->setInGame(2)
-            ->setType(Constants::ROUND_ROBIN)
-            ->genGames());
-        // The generator emits n*(n-1)/2 games. For an odd field, keeping
-        // floor(n/2) games per round yields the expected n rounds with one
-        // idle competitor rotating through each round.
-        $gamesPerRound = max(1, intdiv($competitors->count(), 2));
+        if (count($teams) % 2 !== 0) {
+            $teams[] = Constants::DUMMY_TEAM;
+        }
 
-        foreach ($games as $index => $game) {
-            [$oneId, $twoId] = $game->getTeamsIds();
-            $this->createMatch(
-                $editionSport,
-                'round_robin',
-                intdiv($index, $gamesPerRound) + 1,
-                ($index % $gamesPerRound) + 1,
-                $competitors->firstWhere('id', $oneId),
-                $competitors->firstWhere('id', $twoId),
-            );
+        // Match adjacent manual slots in the opening round. The engine's
+        // genGames() shuffles teams, so use its circle helpers directly to
+        // preserve the administrator's chosen matchups when saving.
+        $evenSlots = $oddSlots = [];
+        foreach ($teams as $index => $team) {
+            if ($index % 2 === 0) {
+                $evenSlots[] = $team;
+            } else {
+                $oddSlots[] = $team;
+            }
+        }
+        $teams = array_merge($evenSlots, array_reverse($oddSlots));
+
+        for ($round = 1; $round < count($teams); $round++) {
+            foreach (Generator::circle_saveBracket($teams, $group) as $index => $game) {
+                [$oneId, $twoId] = $game->getTeamsIds();
+                $this->createMatch(
+                    $editionSport,
+                    'round_robin',
+                    $round,
+                    $index + 1,
+                    $competitors->firstWhere('id', $oneId),
+                    $competitors->firstWhere('id', $twoId),
+                );
+            }
+            $teams = Generator::circle_rotateBracket($teams);
         }
     }
 

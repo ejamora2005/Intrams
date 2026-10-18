@@ -21,6 +21,7 @@ use App\Services\BracketService;
 use App\Services\EligibilityService;
 use App\Services\ScoreSheetImageOfficeService;
 use App\Services\SportService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -454,7 +455,7 @@ class SportController extends Controller
             ->with('success', 'Bracket reset. Athlete registrations and team rosters were not changed.');
     }
 
-    public function reorderBracket(Request $request, Sport $sport): RedirectResponse
+    public function reorderBracket(Request $request, Sport $sport): RedirectResponse|JsonResponse
     {
         $edition = $this->selectedEdition($request);
         abort_unless($edition !== null, 404);
@@ -468,6 +469,12 @@ class SportController extends Controller
         ]);
 
         $this->bracketService->reorder($editionSport, $data['competitor_ids']);
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'redirect_url' => route('admin.sports.bracket', ['sport' => $sport, 'edition_id' => $edition->id]),
+            ]);
+        }
 
         return redirect()
             ->route('admin.sports.bracket', ['sport' => $sport, 'edition_id' => $edition->id])

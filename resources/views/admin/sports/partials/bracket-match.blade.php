@@ -3,22 +3,22 @@
     $displayStatus = $bracketBlank ? 'unassigned' : $match->status;
     $matchCompetitors = $bracketBlank ? [null, null] : [$match->competitorOne, $match->competitorTwo];
 @endphp
-<article class="relative w-64 rounded-lg border border-slate-300 bg-white shadow-sm" data-bracket-match>
+<article class="relative w-64 rounded-lg border border-slate-300 bg-white shadow-sm" data-bracket-match @if ($bracketBlank) data-bracket-draft @endif>
     <div class="flex items-center justify-between border-b border-slate-200 bg-slate-50 px-3 py-2">
         <p class="text-xs font-semibold uppercase tracking-wide text-slate-600">Game {{ $match->match_number }}</p>
-        <span class="rounded border px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide {{ $displayStatus === 'completed' ? 'border-green-200 bg-green-50 text-green-700' : ($displayStatus === 'bye' ? 'border-blue-200 bg-blue-50 text-blue-700' : 'border-slate-200 bg-white text-slate-500') }}">{{ $displayStatus }}</span>
+        <span data-bracket-match-status class="rounded border px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide {{ $displayStatus === 'completed' ? 'border-green-200 bg-green-50 text-green-700' : ($displayStatus === 'bye' ? 'border-blue-200 bg-blue-50 text-blue-700' : 'border-slate-200 bg-white text-slate-500') }}">{{ $displayStatus }}</span>
     </div>
     <div class="divide-y divide-slate-200">
         @foreach ($matchCompetitors as $competitor)
             @php
-                $bracketSlotIndex = isset($bracketSlotStart) && $bracketSlotStart !== null
+                $bracketSlotIndex = $bracketSlotIndexes[$loop->index] ?? (isset($bracketSlotStart) && $bracketSlotStart !== null
                     ? $bracketSlotStart + $loop->index
-                    : null;
+                    : null);
                 $canDragBracketSlot = $bracketSlotIndex !== null && ($bracketBlank || $match->status === 'pending');
             @endphp
             @if ($competitor)
                 <button type="button" data-match="{{ $match->id }}" data-competitor-id="{{ $competitor->id }}" data-competitor-label="{{ $competitor->label }}" @if ($bracketSlotIndex !== null) data-bracket-slot-card data-bracket-slot-index="{{ $bracketSlotIndex }}" @endif aria-pressed="false" class="bracket-team flex w-full items-center justify-between gap-3 px-3 py-2.5 text-left text-sm font-semibold {{ $match->winner_competitor_id === $competitor->id ? 'bg-green-50 text-green-800' : 'bg-white text-slate-800' }} {{ $canDragBracketSlot ? 'cursor-grab active:cursor-grabbing' : '' }}" @if ($canDragBracketSlot) draggable="true" @endif @disabled($match->status !== 'pending' || ! $match->competitor_one_id || ! $match->competitor_two_id)>
-                    <span class="flex min-w-0 items-center gap-2">
+                    <span data-bracket-slot-content class="flex min-w-0 items-center gap-2">
                         @if ($competitor->team)
                             <x-team-badge :team="$competitor->team" size="xs" :logo-only="true" />
                         @endif
@@ -32,7 +32,7 @@
                     </span>
                 </button>
             @else
-                <div @if ($bracketSlotIndex !== null) data-bracket-slot-card data-bracket-slot-index="{{ $bracketSlotIndex }}" @endif class="px-3 py-2.5 text-sm text-slate-400 {{ $canDragBracketSlot ? 'bracket-slot-empty' : '' }}">@if ($bracketBlank && $bracketSlotIndex !== null)<span data-bracket-slot-label>Drop team here</span>@else{{ $match->status === 'bye' ? 'Bye' : 'Awaiting competitor' }}@endif</div>
+                <div @if ($bracketSlotIndex !== null) data-bracket-slot-card data-bracket-slot-index="{{ $bracketSlotIndex }}" @endif class="px-3 py-2.5 text-sm text-slate-400 {{ $canDragBracketSlot ? 'bracket-slot-empty' : '' }}"><span data-bracket-slot-content class="flex min-w-0 items-center gap-2">{{ $bracketBlank && $bracketSlotIndex !== null ? 'Drop team here' : ($match->status === 'bye' ? 'Bye' : 'Awaiting competitor') }}</span></div>
             @endif
         @endforeach
     </div>
