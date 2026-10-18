@@ -11,6 +11,7 @@ if (form && source) {
     // Keep the full sport form above its signature area, including long event titles.
     // Scaling is also captured in exports; A4 paper itself is never resized.
     const fitSheet = () => {
+        if (!content.offsetHeight) return;
         content.style.transform = 'none';
         content.style.marginLeft = '0';
         const available = footer.offsetTop - content.offsetTop - 8;

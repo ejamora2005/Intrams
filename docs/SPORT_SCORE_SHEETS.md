@@ -10,6 +10,8 @@ Registered active athletes prefill names, including individual entries whose fac
 
 Choose a scheduled session to prefill its exact date, time and venue. All result, scoring and official fields remain editable. Download **PDF**, **Word** or **Excel** from the download dialog. Each export preserves the complete A4 page as an image; Word and Excel are printable copies, not formula-driven workbooks. Sheet entries are not stored as match results and never award points or declare winners. Use the existing result declaration workflow for standings.
 
+The preview starts at **Fit width** on phones, tablets and desktop screens. Use **+**, **−** or **100%** to enlarge fields while entering scores, then return to **Fit width** to see the complete page. These controls scale the screen preview without changing the paper, table columns or exports. **Print** and browser printing produce only the filled A4 sheet in its portrait or landscape orientation; navigation and preview controls are excluded.
+
 Format references are linked on the individual sheets:
 
 | Discipline | Reference / structure |

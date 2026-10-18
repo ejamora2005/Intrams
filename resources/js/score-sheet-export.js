@@ -1,4 +1,5 @@
 import { scoreSheetCaptureOptions } from './score-sheet-capture';
+import './score-sheet-preview';
 
 const form = document.querySelector('[data-score-sheet-export]');
 const drawer = document.getElementById('score-sheet-download-drawer');
@@ -8,12 +9,13 @@ if (form && drawer) {
     const sheet = form.querySelector('.fiba-sheet');
     const content = form.querySelector('.score-sheet-paper-content');
     const fitPaper = () => {
-        if (!sheet || !content) return;
+        if (!sheet || !content || !sheet.offsetWidth || !sheet.offsetHeight) return;
         const scale = Math.min(content.clientWidth / sheet.offsetWidth, content.clientHeight / sheet.offsetHeight);
         sheet.style.transform = `scale(${scale})`;
         sheet.style.left = `${(content.clientWidth - sheet.offsetWidth * scale) / 2}px`;
     };
     fitPaper();
+    form.addEventListener('score-sheet:prepare', fitPaper);
     if (sheet) new ResizeObserver(fitPaper).observe(sheet);
     document.fonts.ready.then(fitPaper);
     const open = document.getElementById('open-score-sheet-download');

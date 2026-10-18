@@ -37,7 +37,7 @@
             <nav class="ss-controls ss-pagination" aria-label="Participant sheet pages"><span>{{ $participantCount }} athletes · sheet {{ $sheetPage }} of {{ $pageCount }} (16 athletes per sheet)</span>@foreach(range(1, $pageCount) as $page)<a href="{{ route($scoreSheetShowRoute, ['sport' => $sport, 'edition_id' => $edition->id, 'schedule_id' => $sheetSchedule?->id, 'sheet_page' => $page]) }}" @if($page === $sheetPage) aria-current="page" @endif>Sheet {{ $page }}</a>@endforeach</nav>
         @endif
         <p class="ss-preview-caption">A4 {{ $profile['orientation'] }} · editable preview · @if($profile['key'] === 'russian-softball') School variant: confirm local innings and pairing rules. @elseif($profile['template'] === 'scorebook') One batting team per sheet; download a separate sheet for the opponent. @else Blank fields may be completed by hand. @endif</p>
-        <div class="ss-preview-scroll">
+        <x-score-sheet.preview :orientation="$profile['orientation']">
             <div class="score-sheet-paper ss-paper ss-{{ $profile['orientation'] }}" aria-label="{{ $profile['title'] }} A4 preview" data-sheet-format="{{ $profile['key'] }}">
                 <div class="ss-content">
                 <header class="ss-heading"><div><p>{{ $edition->name }}</p><h1>{{ $profile['title'] }}</h1><h2>{{ $sport->name }}</h2></div><div class="ss-page-label">{{ strtoupper($profile['orientation']) }} · A4 @if($profile['is_athletics'] && $profile['key'] !== 'relay')<br>Sheet {{ $sheetPage }} / {{ $pageCount }}@endif</div></header>
@@ -51,7 +51,7 @@
                 </div>
                 <footer class="ss-signatures"><label>Scorer / recorder<x-score-sheet.cell label="Scorer name and signature" /></label><label>Umpire / referee / chief judge<x-score-sheet.cell label="Official name and signature" /></label><label>Checked by / protest notes<x-score-sheet.cell label="Checked by or protest notes" /></label></footer>
             </div>
-        </div>
+        </x-score-sheet.preview>
     </form>
     <dialog id="score-sheet-download-drawer" aria-labelledby="download-drawer-title" class="ss-download">
         <div class="ss-toolbar"><h2 id="download-drawer-title">Download score sheet</h2><button type="button" id="close-score-sheet-download" aria-label="Close download options">✕</button></div>

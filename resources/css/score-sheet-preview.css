@@ -1,0 +1,25 @@
+.score-sheet-preview { width:100%; max-width:100%; min-width:0; margin:0 auto; }
+.score-sheet-preview-toolbar { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:12px; padding:12px; border:1px solid #49637b; border-radius:10px 10px 0 0; background:#0b243d; }
+.score-sheet-preview-zoom,.score-sheet-preview-actions { display:flex; align-items:center; gap:6px; }
+.score-sheet-preview .score-sheet-preview-toolbar button { min-width:44px; min-height:44px; margin:0; padding:8px 12px; border:1px solid #6d879e; border-radius:7px; background:#16344f!important; color:#edf5ff!important; font:600 14px/1.2 Arial,sans-serif; cursor:pointer; }
+.score-sheet-preview .score-sheet-preview-toolbar button[aria-pressed="true"] { background:#e7c685!important; border-color:#e7c685; color:#091c2e!important; }
+.score-sheet-preview .score-sheet-preview-toolbar button:focus-visible,.score-sheet-preview-viewport:focus-visible { outline:3px solid #e7c685; outline-offset:2px; }
+.score-sheet-preview .score-sheet-preview-toolbar button:disabled { opacity:.45; cursor:default; }
+.score-sheet-preview-zoom output { min-width:60px; color:#edf5ff!important; font:600 14px/1.2 Arial,sans-serif; text-align:center; font-variant-numeric:tabular-nums; }
+.score-sheet-preview-help { padding:8px 12px; margin:0!important; border-inline:1px solid #49637b; background:#0b243d; color:#bed1e3!important; font-size:12px; }
+.score-sheet-preview-viewport { max-width:100%; padding:24px; overflow:auto; overscroll-behavior-x:contain; border:1px solid #49637b; border-radius:0 0 10px 10px; background:#8091a1; }
+.score-sheet-preview-frame { position:relative; width:fit-content; margin-inline:auto; }
+.score-sheet-preview-frame[data-preview-ready] { overflow:hidden; box-shadow:0 4px 18px #0003; }
+.score-sheet-preview-scaler { transform-origin:top left; }
+.score-sheet-preview-frame[data-preview-ready] > .score-sheet-preview-scaler { position:absolute; left:0; top:0; }
+.score-sheet-preview-scaler > .score-sheet-paper { margin:0!important; }
+#score-sheet-print-root { display:none; }
+@media (max-width:640px) { .score-sheet-preview-viewport { padding:10px; } .score-sheet-preview-toolbar { padding:10px; } }
+@media print {
+    html[data-score-sheet-printing] { background:#fff!important; }
+    html[data-score-sheet-printing] body { min-height:0!important; margin:0!important; padding:0!important; background:#fff!important; }
+    html[data-score-sheet-printing] body > :not(#score-sheet-print-root) { display:none!important; }
+    html[data-score-sheet-printing] #score-sheet-print-root { display:block!important; margin:0!important; padding:0!important; background:#fff!important; }
+    #score-sheet-print-root .score-sheet-paper { margin:0!important; transform:none!important; box-shadow:none!important; break-inside:avoid; print-color-adjust:exact; -webkit-print-color-adjust:exact; }
+    #score-sheet-print-root input { outline:none!important; box-shadow:none!important; }
+}

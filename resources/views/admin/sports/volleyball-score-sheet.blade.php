@@ -38,7 +38,7 @@
         </div>
 
         <p class="mb-2 text-center text-xs text-slate-500">A4 landscape · 297 × 210 mm</p>
-        <div class="overflow-x-auto rounded-lg bg-slate-200 p-4 sm:p-6">
+        <x-score-sheet.preview orientation="landscape">
             <div class="score-sheet-paper" aria-label="A4 landscape paper preview">
                 <div class="volleyball-sheet-art">
                     <img src="{{ asset('images/volleyball-score-sheet-reference.png') }}" width="1584" height="1224" decoding="async" fetchpriority="high" alt="Volleyball score sheet reference layout" />
@@ -53,7 +53,7 @@
                     @endforeach
                 </div>
             </div>
-        </div>
+        </x-score-sheet.preview>
     </form>
 
     <dialog id="score-sheet-download-drawer" aria-labelledby="download-drawer-title" class="fixed inset-y-0 left-auto right-0 m-0 h-screen max-h-none w-full max-w-sm border-l border-slate-200 bg-white p-6 shadow-xl backdrop:bg-slate-900/40">
