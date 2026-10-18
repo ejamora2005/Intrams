@@ -71,7 +71,7 @@
                                             @endif
                                             <span class="truncate">{{ $competitor->label }}</span>
                                         </span>
-                                        <span class="shrink-0 text-xs text-slate-400">Drag →</span>
+                                        <span class="shrink-0 text-xs text-slate-400">Drag or click →</span>
                                     </div>
                                 @endforeach
                                 <p data-lineup-empty="available" class="{{ $availableCompetitors->isNotEmpty() ? 'hidden ' : '' }}px-2 py-3 text-center text-xs text-slate-400">All registered competitors are selected.</p>
