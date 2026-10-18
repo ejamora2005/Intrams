@@ -261,6 +261,7 @@ class SportController extends Controller
 
         $bracketCompetitors = BracketCompetitor::query()
             ->where('edition_sport_id', $editionSport->id)
+            ->with('team')
             ->orderBy('label')
             ->get();
         $bracketBlank = Schema::hasColumn('edition_sports', 'bracket_lineup_configured_at')

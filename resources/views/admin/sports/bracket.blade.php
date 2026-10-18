@@ -65,7 +65,13 @@
                             <div class="min-h-28 space-y-2 rounded-xl border-2 border-dashed border-slate-300 bg-white p-3" data-lineup-dropzone="available" aria-label="Available competitors">
                                 @foreach ($availableCompetitors as $competitor)
                                     <button type="button" draggable="true" data-lineup-card data-competitor-id="{{ $competitor->id }}" data-competitor-label="{{ $competitor->label }}" class="flex w-full cursor-grab items-center justify-between gap-3 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-left text-sm font-medium text-slate-800 shadow-sm transition hover:border-blue-300 hover:bg-blue-50 active:cursor-grabbing" aria-label="Add {{ $competitor->label }} to bracket">
-                                        <span class="truncate">{{ $competitor->label }}</span><span class="text-xs text-slate-400">Drag →</span>
+                                        <span class="flex min-w-0 items-center gap-2">
+                                            @if ($competitor->team)
+                                                <x-team-badge :team="$competitor->team" size="xs" :logo-only="true" class="shrink-0" />
+                                            @endif
+                                            <span class="truncate">{{ $competitor->label }}</span>
+                                        </span>
+                                        <span class="shrink-0 text-xs text-slate-400">Drag →</span>
                                     </button>
                                 @endforeach
                                 <p data-lineup-empty="available" class="{{ $availableCompetitors->isNotEmpty() ? 'hidden ' : '' }}px-2 py-3 text-center text-xs text-slate-400">All registered competitors are selected.</p>
