@@ -110,7 +110,7 @@ class SportController extends Controller
         abort_unless($edition !== null, 422, 'Create an edition before adding sports.');
         $sport = $this->service->create($request->validated());
         $gameMechanic = $request->input('game_mechanic', 'round_robin');
-        if ($sport->participant_category === 'custom' && $gameMechanic === 'round_robin') {
+        if ($sport->isTrackAndField() || ($sport->participant_category === 'custom' && $gameMechanic === 'round_robin')) {
             $gameMechanic = 'custom';
         }
         EditionSport::query()->firstOrCreate(['edition_id' => $edition->id, 'sport_id' => $sport->id], ['participant_type' => $request->input('participant_type', 'team'), 'game_mechanic' => $gameMechanic, 'rules' => $request->input('rules'), 'status' => $request->input('configuration_status', 'preparation')]);
@@ -121,7 +121,7 @@ class SportController extends Controller
     public function edit(Request $request, Sport $sport): View
     {
         $edition = $this->selectedEdition($request);
-        $editionSport = $edition ? EditionSport::firstOrCreate(['edition_id' => $edition->id, 'sport_id' => $sport->id], ['participant_type' => 'team', 'game_mechanic' => 'round_robin', 'status' => 'preparation']) : null;
+        $editionSport = $edition ? EditionSport::firstOrCreate(['edition_id' => $edition->id, 'sport_id' => $sport->id], ['participant_type' => 'team', 'game_mechanic' => $sport->isTrackAndField() ? 'custom' : 'round_robin', 'status' => 'preparation']) : null;
 
         return view('admin.sports.edit', compact('sport', 'editionSport', 'edition'));
     }
@@ -134,7 +134,7 @@ class SportController extends Controller
         if ($edition) {
             $editionSport = EditionSport::firstOrCreate(['edition_id' => $edition->id, 'sport_id' => $sport->id], ['participant_type' => 'team', 'game_mechanic' => 'round_robin', 'status' => 'preparation']);
             $gameMechanic = $data['game_mechanic'];
-            if ($sport->participant_category === 'custom' && $gameMechanic === 'round_robin') {
+            if ($sport->isTrackAndField() || ($sport->participant_category === 'custom' && $gameMechanic === 'round_robin')) {
                 $gameMechanic = 'custom';
             }
             $editionSport->update(['participant_type' => $data['participant_type'], 'game_mechanic' => $gameMechanic, 'rules' => $data['rules'], 'status' => $data['configuration_status']]);
@@ -214,7 +214,7 @@ class SportController extends Controller
         };
 
         $bracketRounds = collect();
-        if (in_array($editionSport->game_mechanic, ['single_elimination', 'double_elimination', 'round_robin', 'custom'], true) && $competitors->isNotEmpty()) {
+        if ($this->bracketService->usesBracketEngine($editionSport) && $competitors->isNotEmpty()) {
             $bracketSize = 2 ** (int) ceil(log(max($competitors->count(), 2), 2));
             $slots = $competitors->pluck('name')->pad($bracketSize, 'Bye')->all();
             $bracketRounds->push($slots);
@@ -248,6 +248,7 @@ class SportController extends Controller
             ->where('edition_id', $edition->id)
             ->where('sport_id', $sport->id)
             ->firstOrFail();
+        abort_if(! $this->bracketService->usesBracketEngine($editionSport), 422, 'Track and field events use manual results and do not have a tournament bracket.');
         $this->bracketService->initialize($editionSport);
         $matches = BracketMatch::query()
             ->where('edition_sport_id', $editionSport->id)

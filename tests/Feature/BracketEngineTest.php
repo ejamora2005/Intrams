@@ -93,6 +93,38 @@ test('an odd-sized double-elimination bracket advances byes and completes every 
     expect(BracketMatch::query()->where('edition_sport_id', $editionSport->id)->where('bracket', 'finals')->where('round_number', 1)->value('winner_competitor_id'))->not->toBeNull();
 });
 
+test('track and field custom events stay manual and never initialize a bracket', function () {
+    $edition = bracketEngineEdition();
+    $sport = Sport::query()->create([
+        'name' => '100m Run (Men)',
+        'code' => '100M-RUN-MEN',
+        'participant_category' => 'male',
+        'status' => 'active',
+    ]);
+    $editionSport = EditionSport::query()->create([
+        'edition_id' => $edition->id,
+        'sport_id' => $sport->id,
+        'participant_type' => 'individual',
+        'game_mechanic' => 'custom',
+        'status' => 'active',
+    ]);
+
+    foreach (range(1, 2) as $number) {
+        AthleteEntry::query()->create([
+            'edition_sport_id' => $editionSport->id,
+            'student_id' => Student::factory()->create(['gender' => 'Male'])->id,
+            'status' => 'active',
+            'assigned_at' => now(),
+        ]);
+    }
+
+    app(BracketService::class)->initialize($editionSport);
+
+    expect(app(BracketService::class)->usesBracketEngine($editionSport->fresh()))->toBeFalse()
+        ->and(BracketMatch::query()->where('edition_sport_id', $editionSport->id)->exists())->toBeFalse()
+        ->and(BracketCompetitor::query()->where('edition_sport_id', $editionSport->id)->exists())->toBeFalse();
+});
+
 test('the open-source engine creates and records an odd-sized round-robin schedule', function () {
     $admin = User::factory()->create(['role' => 'admin', 'status' => 'active']);
     $edition = bracketEngineEdition();

@@ -97,13 +97,17 @@ class EditionService
         $catalogItem = collect(config('intramurals.default_competitions', []))
             ->firstWhere('code', $sport->code);
 
-        $defaultMechanic = $sport->participant_category === 'custom' ? 'custom' : 'round_robin';
+        $defaultMechanic = $sport->isTrackAndField() || $sport->participant_category === 'custom'
+            ? 'custom'
+            : 'round_robin';
 
         return [
             'participant_type' => $catalogItem['participant_type'] ?? 'team',
             // Sports start with a complete league schedule. Administrators can
             // still choose elimination or custom rules per edition when needed.
-            'game_mechanic' => $catalogItem['game_mechanic'] ?? $defaultMechanic,
+            'game_mechanic' => $sport->isTrackAndField()
+                ? 'custom'
+                : ($catalogItem['game_mechanic'] ?? $defaultMechanic),
             'scoring_rules' => $catalogItem['scoring_rules'] ?? StandingsService::defaultScoringRules(),
             'rules' => $catalogItem['rules'] ?? null,
         ];

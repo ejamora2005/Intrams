@@ -528,8 +528,12 @@ class BracketService
         return 2 ** (int) ceil(log(max($competitorCount, 2), 2));
     }
 
-    private function usesBracketEngine(EditionSport $editionSport): bool
+    public function usesBracketEngine(EditionSport $editionSport): bool
     {
+        if ($editionSport->sport?->isTrackAndField()) {
+            return false;
+        }
+
         return in_array($editionSport->game_mechanic, ['single_elimination', 'double_elimination', 'round_robin', 'custom'], true);
     }
 }

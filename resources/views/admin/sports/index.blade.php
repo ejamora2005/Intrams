@@ -86,7 +86,7 @@
 
                     <div class="mt-4 grid auto-rows-fr gap-4 sm:grid-cols-2 xl:grid-cols-3">
                         @foreach ($group['sports'] as $sport)
-                            @php($cardUrl = ($cardTarget ?? 'bracket') === 'edit'
+                            @php($cardUrl = ($cardTarget ?? 'bracket') === 'edit' || $sport->isTrackAndField()
                                 ? route('admin.sports.edit', ['sport' => $sport, 'edition_id' => $editionId])
                                 : route('admin.sports.bracket', ['sport' => $sport, 'edition_id' => $editionId]))
                             <article role="link" tabindex="0" onclick="window.location='{{ $cardUrl }}'" onkeydown="if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); window.location='{{ $cardUrl }}'; }" class="flex min-h-[18rem] cursor-pointer flex-col rounded-xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-blue-200 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2">

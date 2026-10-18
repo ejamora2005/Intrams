@@ -91,6 +91,16 @@ class Sport extends Model
         return self::CATALOGUE_GROUPS[$this->catalogue_group_key]['label'];
     }
 
+    /**
+     * Track and field entries are recorded as individual results and do not
+     * produce head-to-head tournament brackets, even when their catalogue
+     * mechanic is stored as `custom`.
+     */
+    public function isTrackAndField(): bool
+    {
+        return $this->catalogue_group_key === 'track-field';
+    }
+
     public function acceptsStudentGender(?string $gender): bool
     {
         return ! in_array($this->participant_category, ['male', 'female'], true)
