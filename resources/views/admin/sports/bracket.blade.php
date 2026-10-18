@@ -266,6 +266,8 @@
             let draggedSource = null;
             let draggedCompetitorId = null;
             let draggedSlotIndex = null;
+            let pointerCompetitorId = null;
+            let pointerDragActive = false;
             let saving = false;
 
             bracketSlots.forEach((slot) => {
@@ -378,6 +380,12 @@
             };
 
             lineupForm.querySelectorAll('[data-lineup-card]').forEach((card) => {
+                card.addEventListener('pointerdown', (event) => {
+                    if (event.button !== 0) return;
+                    pointerCompetitorId = card.dataset.competitorId;
+                    pointerDragActive = true;
+                    card.classList.add('opacity-50');
+                });
                 card.addEventListener('dragstart', (event) => {
                     draggedCard = card;
                     draggedSource = 'available';
@@ -388,9 +396,16 @@
                 });
                 card.addEventListener('dragend', () => {
                     draggedCard?.classList.remove('opacity-50');
+                    pointerDragActive = false;
+                    pointerCompetitorId = null;
                     draggedCard = null;
                     draggedSource = null;
                     draggedCompetitorId = null;
+                });
+                card.addEventListener('pointercancel', () => {
+                    pointerDragActive = false;
+                    pointerCompetitorId = null;
+                    card.classList.remove('opacity-50');
                 });
                 const placeFromKeyboard = (event) => {
                     if (event.key !== 'Enter' && event.key !== ' ') return;
@@ -405,6 +420,11 @@
                 });
                 card.addEventListener('keydown', placeFromKeyboard);
             });
+            document.addEventListener('pointerup', () => {
+                pointerDragActive = false;
+                pointerCompetitorId = null;
+                lineupForm.querySelectorAll('[data-lineup-card].opacity-50').forEach((card) => card.classList.remove('opacity-50'));
+            }, { passive: true });
 
             availableZone.addEventListener('dragover', (event) => {
                 if (draggedSource === 'bracket') {
@@ -423,6 +443,16 @@
             });
 
             bracketSlots.forEach((slot) => {
+                slot.addEventListener('pointerup', (event) => {
+                    if (! pointerDragActive || ! pointerCompetitorId) return;
+                    const targetIndex = Number.parseInt(slot.dataset.bracketSlotIndex || '-1', 10);
+                    if (! Number.isInteger(targetIndex)) return;
+                    event.preventDefault();
+                    placeCompetitor(pointerCompetitorId, targetIndex);
+                    pointerDragActive = false;
+                    pointerCompetitorId = null;
+                    slot.classList.remove('is-bracket-drop-target');
+                });
                 slot.addEventListener('dragstart', (event) => {
                     if (! slot.dataset.competitorId) {
                         event.preventDefault();
