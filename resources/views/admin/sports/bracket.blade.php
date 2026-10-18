@@ -22,6 +22,17 @@
         <div class="mb-6 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800">{{ session('success') }}</div>
     @endif
 
+    @if ($errors->any())
+        <div role="alert" class="mb-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
+            <p class="font-semibold">Please review the bracket.</p>
+            <ul class="mt-1 list-inside list-disc">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
     <section class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm" aria-labelledby="bracket-title">
         <header class="flex flex-col justify-between gap-4 border-b border-slate-200 px-5 py-4 sm:flex-row sm:items-center sm:px-6">
             <div>
@@ -263,6 +274,7 @@
     </style>
 
     <script>
+        let bracketLineupDirty = false;
         const lineupForm = document.querySelector('[data-bracket-lineup-form]');
         if (lineupForm) {
             const availableZone = lineupForm.querySelector('[data-lineup-dropzone="available"]');
@@ -290,6 +302,7 @@
                 const id = slot.dataset.competitorId || null;
                 if (index >= 0 && id) bracketSlotAssignments[index] = id;
             });
+            const savedAssignments = JSON.stringify(bracketSlotAssignments);
 
             const labels = new Map([...lineupForm.querySelectorAll('[data-lineup-card]'), ...bracketSlots]
                 .filter((item) => item.dataset.competitorId)
@@ -335,6 +348,14 @@
             };
 
             const refreshLineup = () => {
+                bracketLineupDirty = JSON.stringify(bracketSlotAssignments) !== savedAssignments;
+                document.querySelectorAll('[data-bracket-result-form] button, [data-schedule-toggle], [data-schedule-form] button').forEach((button) => {
+                    button.disabled = bracketLineupDirty || saving;
+                });
+                if (bracketLineupDirty) {
+                    document.querySelectorAll('.match-actions, [data-schedule-form]').forEach((panel) => panel.classList.add('hidden'));
+                    document.querySelectorAll('[data-schedule-toggle]').forEach((button) => button.setAttribute('aria-expanded', 'false'));
+                }
                 const selected = new Set(selectedIds());
                 lineupForm.querySelectorAll('[data-lineup-card]').forEach((card) => {
                     card.hidden = selected.has(card.dataset.competitorId);
@@ -370,7 +391,10 @@
                     if (! response.ok || ! data.redirect_url) throw new Error(data.message || 'The lineup could not be saved. Please try again.');
                     const destination = new URL(data.redirect_url, window.location.href);
                     destination.hash = document.getElementById('round-robin-heading') ? 'round-robin-heading' : 'winners-bracket-heading';
-                    window.location.assign(destination.toString());
+                    // Changing only the hash does not load the newly saved
+                    // match IDs. Always fetch the saved bracket document.
+                    window.history.replaceState(null, '', destination.toString());
+                    window.location.reload();
                 }).catch((error) => {
                     saving = false;
                     refreshLineup();
@@ -622,6 +646,14 @@
 
         document.querySelectorAll('.bracket-team').forEach((button) => button.addEventListener('click', () => {
             if (! button.dataset.competitorId) return;
+            if (bracketLineupDirty) {
+                const feedback = document.querySelector('[data-bracket-drag-feedback]');
+                if (feedback) {
+                    feedback.hidden = false;
+                    feedback.textContent = 'Save the bracket lineup before declaring a winner or scheduling a game.';
+                }
+                return;
+            }
             const match = button.closest('[data-bracket-match]');
             const panel = document.getElementById(`match-actions-${button.dataset.match}`);
             const other = [...match.querySelectorAll('.bracket-team')].find((candidate) => candidate !== button);
@@ -647,6 +679,10 @@
             panel.querySelector('.selected-winner').value = button.dataset.competitorId;
             panel.querySelector('.selected-loser-winner').value = other.dataset.competitorId;
             panel.classList.remove('hidden');
+        }));
+
+        document.querySelectorAll('[data-bracket-result-form], [data-schedule-form]').forEach((form) => form.addEventListener('submit', (event) => {
+            if (bracketLineupDirty) event.preventDefault();
         }));
 
         document.querySelectorAll('[data-schedule-toggle]').forEach((button) => button.addEventListener('click', () => {

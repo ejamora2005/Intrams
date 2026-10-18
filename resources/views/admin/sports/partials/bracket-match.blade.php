@@ -44,13 +44,13 @@
         <div id="match-actions-{{ $match->id }}" class="match-actions hidden border-t border-blue-100 bg-blue-50 p-3 text-xs text-blue-900">
             <p class="mb-2 font-semibold">Record the selected competitor</p>
             <div class="flex flex-wrap gap-2">
-                <form method="POST" action="{{ route('admin.sports.bracket.result', [$sport, $match]) }}">
+                <form method="POST" action="{{ route('admin.sports.bracket.result', [$sport, $match]) }}" data-bracket-result-form>
                     @csrf
                     <input type="hidden" name="edition_id" value="{{ $edition->id }}">
                     <input class="selected-winner" type="hidden" name="winner_competitor_id">
                     <button class="rounded bg-blue-700 px-2.5 py-1.5 font-semibold text-white hover:bg-blue-800">Declare win</button>
                 </form>
-                <form method="POST" action="{{ route('admin.sports.bracket.result', [$sport, $match]) }}">
+                <form method="POST" action="{{ route('admin.sports.bracket.result', [$sport, $match]) }}" data-bracket-result-form>
                     @csrf
                     <input type="hidden" name="edition_id" value="{{ $edition->id }}">
                     <input class="selected-loser-winner" type="hidden" name="winner_competitor_id">

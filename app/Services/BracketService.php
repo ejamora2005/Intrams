@@ -9,6 +9,7 @@ use App\Models\EditionSport;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Validation\ValidationException;
 use TournamentGenerator\Constants;
 use TournamentGenerator\Group;
 use TournamentGenerator\Helpers\Generator;
@@ -111,9 +112,15 @@ class BracketService
                 ->with(['editionSport', 'competitorOne', 'competitorTwo'])
                 ->findOrFail($match->id);
 
-            abort_unless($match->status === 'pending' && $match->competitor_one_id && $match->competitor_two_id, 422, 'This match is not ready for a result.');
-            abort_unless($winner->edition_sport_id === $match->edition_sport_id, 422, 'Choose a competitor from this bracket.');
-            abort_unless(in_array($winner->id, [$match->competitor_one_id, $match->competitor_two_id], true), 422, 'Choose a competitor in this match.');
+            if ($match->status === 'completed') {
+                throw ValidationException::withMessages(['winner_competitor_id' => 'This match already has a winner. Refresh the bracket to see the recorded result.']);
+            }
+            if ($match->status !== 'pending' || ! $match->competitor_one_id || ! $match->competitor_two_id) {
+                throw ValidationException::withMessages(['winner_competitor_id' => 'Save a complete bracket lineup before declaring a winner.']);
+            }
+            if ((int) $winner->edition_sport_id !== (int) $match->edition_sport_id || ! in_array($winner->id, [$match->competitor_one_id, $match->competitor_two_id], true)) {
+                throw ValidationException::withMessages(['winner_competitor_id' => 'The matchup has changed. Save the bracket lineup, then choose a competitor in this match.']);
+            }
 
             $loser = $winner->id === $match->competitor_one_id ? $match->competitorTwo : $match->competitorOne;
             $match->update([

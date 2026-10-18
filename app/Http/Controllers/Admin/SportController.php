@@ -28,6 +28,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -366,17 +367,19 @@ class SportController extends Controller
         $edition = $this->selectedEdition($request);
         abort_unless($edition !== null && $match->editionSport->edition_id === $edition->id, 404);
         $data = $request->validate([
-            'winner_competitor_id' => ['nullable', 'integer', 'exists:bracket_competitors,id'],
+            'winner_competitor_id' => ['nullable', 'required_without:winner_team_id', 'integer', 'exists:bracket_competitors,id'],
             'winner_team_id' => ['nullable', 'integer', 'exists:teams,id'],
-        ]);
-        abort_if(empty($data['winner_competitor_id']) && empty($data['winner_team_id']), 422, 'Choose the winning competitor.');
+        ], ['winner_competitor_id.required_without' => 'Choose the winning competitor.']);
         $winner = ! empty($data['winner_competitor_id'])
             ? BracketCompetitor::query()->findOrFail($data['winner_competitor_id'])
             : BracketCompetitor::query()
                 ->where('edition_sport_id', $match->edition_sport_id)
                 ->where('type', 'team')
                 ->where('team_id', $data['winner_team_id'])
-                ->firstOrFail();
+                ->first();
+        if ($winner === null) {
+            throw ValidationException::withMessages(['winner_team_id' => 'Choose a team in this match.']);
+        }
         $this->bracketService->record($match, $winner);
 
         return redirect()->route('admin.sports.bracket', ['sport' => $sport, 'edition_id' => $edition->id])->with('success', $winner->label.' was declared the winner.');
