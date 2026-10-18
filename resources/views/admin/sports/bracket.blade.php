@@ -253,7 +253,12 @@
             const submitLineup = lineupForm.querySelector('[data-lineup-submit]');
             const hiddenInputs = lineupForm.querySelector('[data-lineup-inputs]');
             const bracketDragFeedback = document.querySelector('[data-bracket-drag-feedback]');
-            const bracketSlots = [...document.querySelectorAll('[data-bracket-slot-card][data-bracket-slot-index]')];
+            const bracketSlots = [...document.querySelectorAll('[data-bracket-slot-card]')];
+            // Keep the client usable if an older cached view omitted the
+            // numeric index: opening slots are rendered in bracket order.
+            bracketSlots.forEach((slot, position) => {
+                if (! slot.dataset.bracketSlotIndex) slot.dataset.bracketSlotIndex = String(position);
+            });
             const slotCount = bracketSlots.reduce((count, slot) => Math.max(count, Number.parseInt(slot.dataset.bracketSlotIndex || '-1', 10) + 1), 0);
             let bracketSlotAssignments = Array.from({ length: slotCount }, () => null);
             let draggedCard = null;
