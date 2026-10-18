@@ -412,7 +412,7 @@
                     bracketSlots.forEach((target) => target.classList.remove('is-bracket-drop-target'));
                 });
                 slot.addEventListener('dragover', (event) => {
-                    if (! draggedCompetitorId || draggedSlotIndex === null) return;
+                    if (! draggedCompetitorId || (draggedSource === 'bracket' && draggedSlotIndex === null)) return;
                     event.preventDefault();
                     slot.classList.add('is-bracket-drop-target');
                 });
