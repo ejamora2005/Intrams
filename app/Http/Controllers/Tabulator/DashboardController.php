@@ -29,13 +29,8 @@ class DashboardController extends Controller
     {
         $edition = $this->standingsService->activeEdition();
         $standings = $this->standingsService->standingsFor($edition);
-        $editionSportIds = $edition?->editionSports()->pluck('id') ?? collect();
-        $editionSports = $edition?->editionSports()
-            ->with(['sport', 'sportResult.submitter'])
-            ->get()
-            ->filter(fn (EditionSport $editionSport): bool => $editionSport->sport !== null && $this->standingsService->pointRulesFor($editionSport) !== [])
-            ->sortBy(fn (EditionSport $editionSport): string => $editionSport->sport?->name ?? '')
-            ->values() ?? collect();
+        $editionSports = $this->standingsService->scoringEventsFor($edition);
+        $editionSportIds = $editionSports->pluck('id');
         $selectedSport = $editionSports->firstWhere('id', (int) $request->input('edition_sport_id', $request->old('edition_sport_id', 0)));
         $teams = $edition?->teams()
             ->with('course')
@@ -88,6 +83,7 @@ class DashboardController extends Controller
             if ($rules === [] || array_diff(array_map('strval', array_keys($data['placements'])), array_map(fn ($rule) => (string) $rule['placement'], $rules)) !== []) {
                 throw ValidationException::withMessages(['placements' => 'Choose only the placements configured for this event.']);
             }
+            $this->ensureCurrentScoringEvent($editionSport);
             $allowRepeatedWinners = count($rules) > 3;
 
             $selectedTeamIds = collect($data['placements'] ?? [])
@@ -146,6 +142,7 @@ class DashboardController extends Controller
             ]);
             $this->ensureCurrentPassword($request, $data['tabulator_password']);
 
+            $this->ensureCurrentScoringEvent($match->editionSport);
             $winner = BracketCompetitor::query()->findOrFail($data['winner_competitor_id']);
             $this->bracketService->record($match, $winner);
 
@@ -164,6 +161,15 @@ class DashboardController extends Controller
         if (! Hash::check($password, (string) $request->user()?->password)) {
             throw ValidationException::withMessages([
                 'tabulator_password' => 'The tabulator password did not match.',
+            ]);
+        }
+    }
+
+    private function ensureCurrentScoringEvent(EditionSport $event): void
+    {
+        if (! $this->standingsService->scoringEventsFor($event->edition)->contains('id', $event->id)) {
+            throw ValidationException::withMessages([
+                'edition_sport_id' => 'This event is archived or has been replaced. Choose a current event from the scoring catalogue, using its Men or Women division when available.',
             ]);
         }
     }

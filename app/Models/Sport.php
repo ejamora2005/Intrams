@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 
 class Sport extends Model
 {
@@ -105,6 +107,50 @@ class Sport extends Model
     {
         return ! in_array($this->participant_category, ['male', 'female'], true)
             || strcasecmp((string) $gender, $this->participant_category) === 0;
+    }
+
+    /**
+     * Keep only the current versions of sports in the supplied catalogue.
+     * Callers supply one edition's sports so divisions in another edition do
+     * not hide an event here. Mixed events and cultural events remain separate.
+     *
+     * @param  Collection<int, Sport>  $sports
+     * @return Collection<int, Sport>
+     */
+    public static function withoutSupersededOpenSports(Collection $sports): Collection
+    {
+        $divisionKeys = $sports
+            ->filter(fn (Sport $sport): bool => ! str_starts_with(strtoupper($sport->code), 'CULT-') && $sport->hasGenderDivision())
+            ->flatMap(fn (Sport $sport): array => $sport->divisionKeys())
+            ->flip();
+
+        return $sports->reject(fn (Sport $sport): bool => ! str_starts_with(strtoupper($sport->code), 'CULT-')
+            && in_array($sport->participant_category, [null, '', 'open'], true)
+            && ! $sport->hasGenderDivision()
+            && collect($sport->divisionKeys())->contains(fn (string $key): bool => $divisionKeys->has($key)))
+            ->values();
+    }
+
+    private function hasGenderDivision(): bool
+    {
+        return in_array($this->participant_category, ['male', 'female'], true)
+            || preg_match('/-(MEN|WOMEN|MALE|FEMALE)$/i', $this->code) === 1
+            || preg_match('/\b(Men|Women|Male|Female)\s*\)?$/i', $this->name) === 1;
+    }
+
+    /** @return array<int, string> */
+    private function divisionKeys(): array
+    {
+        $code = preg_replace('/-(MEN|WOMEN|MALE|FEMALE|OPEN)$/i', '', strtoupper(trim($this->code)));
+        // These original entries were replaced by specific racket formats.
+        $code = match ($code) {
+            'BADMINTON' => 'BADMINTON-DOUBLES',
+            'TABLE-TENNIS' => 'TABLE-TENNIS-SINGLES',
+            default => $code,
+        };
+        $name = preg_replace('/\s*(?:[-(]\s*)?\b(Men|Women|Male|Female|Open)\s*\)?$/i', '', $this->name);
+
+        return ['code:'.$code, 'name:'.Str::slug($name)];
     }
 
     public function events()

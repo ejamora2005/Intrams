@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\EditionSport;
 use App\Models\IntramuralEdition;
+use App\Models\Sport;
 use App\Models\SportResult;
 use App\Models\Team;
 use App\Models\TeamTally;
@@ -33,6 +34,24 @@ class StandingsService
             ->orderByDesc('starts_on')
             ->orderByDesc('id')
             ->first();
+    }
+
+    /** @return Collection<int, EditionSport> */
+    public function scoringEventsFor(?IntramuralEdition $edition): Collection
+    {
+        if ($edition === null) {
+            return collect();
+        }
+
+        $events = $edition->editionSports()
+            ->whereHas('sport', fn ($query) => $query->where('status', 'active'))
+            ->with(['sport', 'sportResult.submitter'])
+            ->get();
+        $currentSportIds = Sport::withoutSupersededOpenSports($events->pluck('sport'))->pluck('id');
+
+        return $events->filter(fn (EditionSport $event): bool => $event->status !== 'archived' && $currentSportIds->contains($event->sport_id) && $this->pointRulesFor($event) !== [])
+            ->sortBy(fn (EditionSport $event): string => $event->sport->name)
+            ->values();
     }
 
     /** @return Collection<int, array{team: Team, tally: TeamTally, rank: int}> */

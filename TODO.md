@@ -2,6 +2,8 @@
 
 ## Clean-reset direction — approved
 
+- [x] Keep the Tabulator catalogue, event counts, results cards, and match scoring aligned with current Men/Women divisions; exclude obsolete Open/generic entries and prevent default synchronization from recreating retired events while retaining history.
+
 - [x] Replace the legacy event-registration structure with an edition-centered configuration: `edition → configured sports → teams/members → athlete sport entries → schedule → live competition`.
 - [x] Reset the database schema and seed data. Legacy events, registrations, fixtures, results, flags, and coordinator assignments are replaced by configured edition sports, athlete entries, schedules, schedule participants, competition results, and tallies.
 - [ ] Keep automatic codes, capitalization/sanitization, course and roster filtering, authorization, audit logs, and server-side validation.

@@ -10,6 +10,7 @@ use App\Models\Team;
 use App\Models\TeamTally;
 use App\Models\User;
 use App\Services\StandingsService;
+use Database\Seeders\DefaultSportsSeeder;
 
 function tabulatorScoringFixture(): array
 {
@@ -82,4 +83,88 @@ test('editing placements replaces the event totals instead of adding duplicate p
     $this->post(route('tabulator.sport-results.store'), ['edition_sport_id' => $events[0]->id, 'placements' => [1 => $teams[1]->id], 'tabulator_password' => 'password'])->assertSessionHasNoErrors();
     expect(SportResult::count())->toBe(1)->and((float) TeamTally::where('team_id', $teams[0]->id)->value('points'))->toBe(0.0)
         ->and((float) TeamTally::where('team_id', $teams[1]->id)->value('points'))->toBe(10.0);
+});
+
+test('all default gender divisions replace generic and explicit open entries in tabulator cards and counts', function () {
+    $this->actingAs(User::factory()->create(['role' => 'tabulator', 'status' => 'active']));
+    app(DefaultSportsSeeder::class)->run();
+    $edition = app(StandingsService::class)->activeEdition();
+    $expectedIds = app(StandingsService::class)->scoringEventsFor($edition)->pluck('id')->sort()->values()->all();
+    $legacyEvents = collect(config('intramurals.default_competitions'))
+        ->filter(fn ($sport) => in_array($sport['participant_category'] ?? null, ['male', 'female'], true))
+        ->map(fn ($sport) => preg_replace('/-(MEN|WOMEN)$/', '', $sport['code']))->unique()
+        ->flatMap(function ($base) use ($edition) {
+            return collect(['' => 'active', '-OPEN' => 'active'])->map(function ($status, $suffix) use ($edition, $base) {
+                $sport = Sport::create(['name' => 'Legacy '.$base.$suffix, 'code' => $base.$suffix, 'participant_category' => 'open', 'status' => $status]);
+
+                return EditionSport::create(['edition_id' => $edition->id, 'sport_id' => $sport->id, 'participant_type' => 'team', 'game_mechanic' => 'round_robin', 'status' => 'preparation']);
+            })->values();
+        })->values();
+    foreach (['BADMINTON', 'TABLE-TENNIS'] as $code) {
+        $sport = Sport::create(['name' => 'Legacy '.$code, 'code' => $code, 'participant_category' => 'open', 'status' => 'active']);
+        EditionSport::create(['edition_id' => $edition->id, 'sport_id' => $sport->id, 'participant_type' => 'team', 'game_mechanic' => 'round_robin', 'status' => 'active']);
+    }
+
+    $this->get(route('tabulator.dashboard', ['edition_sport_id' => $legacyEvents[0]->id]))->assertOk()
+        ->assertViewHas('editionSports', fn ($events) => $events->pluck('id')->sort()->values()->all() === $expectedIds)
+        ->assertViewHas('pendingCount', count($expectedIds))->assertViewHas('selectedSport', null)
+        ->assertSee('Basketball 5x5 (Men)')->assertSee('Basketball 5x5 (Women)')
+        ->assertSee('Mixed Volleyball (Open)')->assertDontSee('Legacy BASKET-5X5');
+});
+
+test('archived inactive and deleted events cannot return through tabulator scoring or match winners', function () {
+    $this->actingAs(User::factory()->create(['role' => 'tabulator', 'status' => 'active']));
+    [$edition, $events, $teams] = tabulatorScoringFixture();
+    $legacy = Sport::create(['name' => 'Basketball 5x5', 'code' => 'BASKET-5X5', 'status' => 'active', 'participant_category' => 'open']);
+    $openEvent = EditionSport::create(['edition_id' => $edition->id, 'sport_id' => $legacy->id, 'participant_type' => 'team', 'game_mechanic' => 'round_robin', 'status' => 'active', 'bracket_lineup_configured_at' => now()]);
+    $competitors = $teams->take(2)->map(fn ($team) => BracketCompetitor::create(['edition_sport_id' => $openEvent->id, 'type' => 'team', 'identity_key' => 'team:'.$team->id, 'team_id' => $team->id, 'label' => $team->name]));
+    $match = BracketMatch::create(['edition_sport_id' => $openEvent->id, 'bracket' => 'round_robin', 'round_number' => 1, 'match_number' => 1, 'competitor_one_id' => $competitors[0]->id, 'competitor_two_id' => $competitors[1]->id, 'status' => 'pending']);
+    $events[1]->update(['status' => 'archived']);
+    $events[2]->sport->update(['status' => 'inactive']);
+
+    $this->get(route('tabulator.dashboard'))->assertOk()
+        ->assertViewHas('editionSports', fn ($current) => $current->pluck('id')->all() === [$events[0]->id])
+        ->assertViewHas('matches', fn ($matches) => $matches->isEmpty());
+    foreach ([$openEvent, $events[1], $events[2]] as $event) {
+        $this->post(route('tabulator.sport-results.store'), ['edition_sport_id' => $event->id, 'placements' => [1 => $teams[0]->id], 'tabulator_password' => 'password'])
+            ->assertSessionHasErrors('edition_sport_id');
+    }
+    $events[0]->update(['status' => 'archived']);
+    $this->get(route('tabulator.dashboard'))->assertOk()->assertViewHas('editionSports', fn ($current) => $current->isEmpty());
+    $events[0]->update(['status' => 'active']);
+    $events[0]->sport->update(['status' => 'archived']);
+    $openEvent->update(['status' => 'archived']);
+    $this->post(route('tabulator.sport-results.store'), ['edition_sport_id' => $events[0]->id, 'placements' => [1 => $teams[0]->id], 'tabulator_password' => 'password'])
+        ->assertSessionHasErrors('edition_sport_id');
+    $this->post(route('tabulator.matches.result', $match), ['winner_competitor_id' => $competitors[0]->id, 'tabulator_password' => 'password'])
+        ->assertSessionHasErrors('edition_sport_id');
+    $openEvent->update(['status' => 'archived']);
+    $events[0]->sport->delete();
+    $this->get(route('tabulator.dashboard'))->assertOk()->assertViewHas('editionSports', fn ($current) => $current->isEmpty());
+    expect(SportResult::count())->toBe(0)->and(TeamTally::count())->toBe(0)->and($match->fresh()->status)->toBe('pending');
+});
+
+test('open replacement is edition specific preserves formats and retains historical results', function () {
+    $this->actingAs(User::factory()->create(['role' => 'tabulator', 'status' => 'active']));
+    [$edition, $events, $teams] = tabulatorScoringFixture();
+    $otherEdition = IntramuralEdition::create(['name' => 'Other edition', 'school_year' => '2025-2026', 'starts_on' => '2025-10-19', 'ends_on' => '2025-10-23', 'status' => 'archived']);
+    $newEvents = [];
+    foreach ([
+        ['Basketball 3x3', 'BASKET-3X3', 'open'],
+        ['Mixed Volleyball (Open)', 'MIXED-VOLLEYBALL', 'mixed'],
+        ['Local Game', 'LOCAL-GAME', 'open'],
+        ['Basketball 5x5 (Open)', 'CUSTOM-OLD', 'open'],
+    ] as [$name, $code, $category]) {
+        $sport = Sport::create(['name' => $name, 'code' => $code, 'participant_category' => $category, 'status' => 'active']);
+        $newEvents[$code] = EditionSport::create(['edition_id' => $edition->id, 'sport_id' => $sport->id, 'participant_type' => 'team', 'game_mechanic' => 'round_robin', 'status' => 'active']);
+    }
+    $otherSport = Sport::create(['name' => 'Local Game (Men)', 'code' => 'LOCAL-GAME-MEN', 'participant_category' => 'male', 'status' => 'active']);
+    EditionSport::create(['edition_id' => $otherEdition->id, 'sport_id' => $otherSport->id, 'participant_type' => 'team', 'game_mechanic' => 'round_robin', 'status' => 'active']);
+    app(StandingsService::class)->recordSportResult($newEvents['CUSTOM-OLD'], [1 => $teams[0]->id], auth()->user());
+
+    $this->get(route('tabulator.dashboard'))->assertOk()
+        ->assertViewHas('editionSports', fn ($current) => $current->count() === 6 && ! $current->contains('id', $newEvents['CUSTOM-OLD']->id))
+        ->assertViewHas('declaredCount', 0)->assertViewHas('recentResults', fn ($results) => $results->isEmpty());
+    expect(SportResult::where('edition_sport_id', $newEvents['CUSTOM-OLD']->id)->exists())->toBeTrue()
+        ->and((float) TeamTally::where('team_id', $teams[0]->id)->value('points'))->toBe(10.0);
 });

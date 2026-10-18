@@ -5,12 +5,33 @@ use App\Models\EditionSport;
 use App\Models\IntramuralEdition;
 use App\Models\Sport;
 use App\Models\User;
+use App\Services\EditionService;
 use Database\Seeders\DefaultSportsSeeder;
 
 function editionSportsAdmin(): User
 {
     return User::factory()->create(['role' => 'admin', 'status' => 'active']);
 }
+
+test('default synchronization does not recreate archived or superseded open sports', function () {
+    $edition = IntramuralEdition::create(['name' => 'New catalogue', 'school_year' => '2026-2027', 'starts_on' => '2026-10-19', 'ends_on' => '2026-10-23', 'status' => 'draft']);
+    $sports = collect([
+        ['Basketball 5x5', 'BASKET-5X5', 'open', 'active'],
+        ['Basketball 5x5 (Men)', 'BASKET-5X5-MEN', 'male', 'active'],
+        ['Basketball 5x5 (Women)', 'BASKET-5X5-WOMEN', 'female', 'active'],
+        ['Chess', 'CHESS', 'open', 'archived'],
+        ['Mixed Volleyball (Open)', 'MIXED-VOLLEYBALL', 'mixed', 'active'],
+    ])->map(fn ($row) => Sport::create(['name' => $row[0], 'code' => $row[1], 'participant_category' => $row[2], 'status' => $row[3], 'is_system' => true]));
+    $retired = EditionSport::create(['edition_id' => $edition->id, 'sport_id' => $sports[0]->id, 'participant_type' => 'team', 'game_mechanic' => 'round_robin', 'status' => 'archived']);
+    $retired->delete();
+
+    app(EditionService::class)->syncDefaultSports($edition);
+    app(EditionService::class)->syncDefaultSports($edition);
+
+    expect($retired->fresh()->trashed())->toBeTrue()
+        ->and($edition->editionSports()->pluck('sport_id')->sort()->values()->all())->toBe($sports->only([1, 2, 4])->pluck('id')->sort()->values()->all());
+    $this->assertDatabaseMissing('edition_sports', ['edition_id' => $edition->id, 'sport_id' => $sports[3]->id]);
+});
 
 test('creating an edition automatically configures every default sport', function () {
     $admin = editionSportsAdmin();

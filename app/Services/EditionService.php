@@ -55,7 +55,8 @@ class EditionService
      */
     public function syncDefaultSports(IntramuralEdition $edition): void
     {
-        foreach (Sport::query()->where('is_system', true)->get(['id', 'name', 'code']) as $sport) {
+        $sports = Sport::query()->where('is_system', true)->where('status', 'active')->get();
+        foreach (Sport::withoutSupersededOpenSports($sports) as $sport) {
             $defaults = $this->defaultCompetitionConfiguration($sport);
             $configuration = $edition->editionSports()
                 ->withTrashed()
