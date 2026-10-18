@@ -49,8 +49,8 @@
                 <div class="flex flex-col justify-between gap-3 sm:flex-row sm:items-start">
                     <div>
                         <p class="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Manual bracket entry</p>
-                        <h3 id="lineup-heading" class="mt-1 text-base font-semibold text-slate-900">Assign competitors to bracket slots</h3>
-                        <p class="mt-1 max-w-3xl text-sm text-slate-600">The bracket opens empty. Drag a registered team, pair, or athlete from Available onto an empty opening slot, then save the lineup.</p>
+                        <h3 id="lineup-heading" class="mt-1 text-base font-semibold text-slate-900">Drag competitors onto the bracket</h3>
+                        <p class="mt-1 max-w-3xl text-sm text-slate-600">The bracket opens empty. Drag a registered team, pair, or athlete from Available directly onto an opening slot. The lineup saves automatically once two competitors are placed.</p>
                     </div>
                     <span class="rounded-full border border-slate-300 bg-white px-3 py-1 text-xs font-semibold text-slate-600"><span data-lineup-count>{{ $selectedCompetitors->count() }}</span> selected</span>
                 </div>
@@ -60,37 +60,25 @@
                     <form method="POST" action="{{ route('admin.sports.bracket.order', ['sport' => $sport, 'edition_id' => $edition->id]) }}" class="mt-5" data-bracket-lineup-form>
                         @csrf
                         <input type="hidden" name="edition_id" value="{{ $edition->id }}">
-                        <div class="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.35fr)]">
-                            <div>
-                                <div class="mb-2 flex items-center justify-between"><h4 class="text-sm font-semibold text-slate-800">Available</h4><span class="text-xs text-slate-500">Drag to add</span></div>
-                                <div class="min-h-28 space-y-2 rounded-xl border-2 border-dashed border-slate-300 bg-white p-3" data-lineup-dropzone="available" aria-label="Available competitors">
-                                    @foreach ($availableCompetitors as $competitor)
-                                        <button type="button" draggable="true" data-lineup-card data-competitor-id="{{ $competitor->id }}" data-competitor-label="{{ $competitor->label }}" class="flex w-full cursor-grab items-center justify-between gap-3 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-left text-sm font-medium text-slate-800 shadow-sm transition hover:border-blue-300 hover:bg-blue-50 active:cursor-grabbing" aria-label="Add {{ $competitor->label }} to bracket">
-                                            <span class="truncate">{{ $competitor->label }}</span><span class="text-xs text-slate-400">+</span>
-                                        </button>
-                                    @endforeach
-                                    <p data-lineup-empty="available" class="{{ $availableCompetitors->isNotEmpty() ? 'hidden ' : '' }}px-2 py-3 text-center text-xs text-slate-400">All registered competitors are selected.</p>
-                                </div>
-                            </div>
-                            <div>
-                                <div class="mb-2 flex items-center justify-between"><h4 class="text-sm font-semibold text-slate-800">Assigned slots</h4><span class="text-xs text-slate-500">Drop teams into the bracket below</span></div>
-                                <div class="min-h-28 space-y-2 rounded-xl border-2 border-blue-200 bg-blue-50/60 p-3" data-lineup-dropzone="selected" aria-label="Selected bracket lineup">
-                                    @foreach ($selectedCompetitors as $competitor)
-                                        <button type="button" draggable="true" data-lineup-card data-competitor-id="{{ $competitor->id }}" data-competitor-label="{{ $competitor->label }}" class="flex w-full cursor-grab items-center justify-between gap-3 rounded-lg border border-blue-200 bg-white px-3 py-2 text-left text-sm font-medium text-slate-800 shadow-sm transition hover:border-blue-400 hover:bg-blue-50 active:cursor-grabbing" aria-label="Reorder {{ $competitor->label }}">
-                                            <span class="flex min-w-0 items-center gap-2"><span class="lineup-position inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-blue-100 text-[11px] font-bold text-blue-800"></span><span class="truncate">{{ $competitor->label }}</span></span><span class="text-xs text-slate-400">↕</span>
-                                        </button>
-                                    @endforeach
-                                    <p data-lineup-empty="selected" class="{{ $selectedCompetitors->isNotEmpty() ? 'hidden ' : '' }}px-2 py-3 text-center text-xs text-slate-400">No bracket slots assigned yet.</p>
-                                </div>
+                        <div>
+                            <div class="mb-2 flex items-center justify-between"><h4 class="text-sm font-semibold text-slate-800">Available competitors</h4><span class="text-xs text-slate-500">Drag directly to an opening bracket slot</span></div>
+                            <div class="min-h-28 space-y-2 rounded-xl border-2 border-dashed border-slate-300 bg-white p-3" data-lineup-dropzone="available" aria-label="Available competitors">
+                                @foreach ($availableCompetitors as $competitor)
+                                    <button type="button" draggable="true" data-lineup-card data-competitor-id="{{ $competitor->id }}" data-competitor-label="{{ $competitor->label }}" class="flex w-full cursor-grab items-center justify-between gap-3 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-left text-sm font-medium text-slate-800 shadow-sm transition hover:border-blue-300 hover:bg-blue-50 active:cursor-grabbing" aria-label="Add {{ $competitor->label }} to bracket">
+                                        <span class="truncate">{{ $competitor->label }}</span><span class="text-xs text-slate-400">Drag →</span>
+                                    </button>
+                                @endforeach
+                                <p data-lineup-empty="available" class="{{ $availableCompetitors->isNotEmpty() ? 'hidden ' : '' }}px-2 py-3 text-center text-xs text-slate-400">All registered competitors are selected.</p>
                             </div>
                         </div>
                         <div class="mt-4 flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
                             <div>
-                                <p class="text-xs text-slate-500">Tip: drag a team directly onto an opening bracket slot below, or use Tab and Enter/Space with the + and ↕ controls.</p>
-                                <p data-bracket-drag-feedback hidden class="mt-1 text-xs font-semibold text-blue-700">Opening slots updated. Save the bracket lineup to rebuild the matches.</p>
+                                <p class="text-xs text-slate-500">You can also focus a competitor and press Enter or Space to place it in the next empty slot.</p>
+                                <p data-bracket-drag-feedback hidden class="mt-1 text-xs font-semibold text-blue-700">Opening slot updated.</p>
                             </div>
                             <button type="submit" data-lineup-submit class="rounded-lg bg-blue-700 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-800 disabled:cursor-not-allowed disabled:opacity-50">Save bracket lineup</button>
                         </div>
+                        <div data-lineup-inputs></div>
                     </form>
                 @endif
             </section>
@@ -254,88 +242,118 @@
     <script>
         const lineupForm = document.querySelector('[data-bracket-lineup-form]');
         if (lineupForm) {
-            const selectedZone = lineupForm.querySelector('[data-lineup-dropzone="selected"]');
             const availableZone = lineupForm.querySelector('[data-lineup-dropzone="available"]');
             const lineupCount = lineupForm.querySelector('[data-lineup-count]');
             const submitLineup = lineupForm.querySelector('[data-lineup-submit]');
+            const hiddenInputs = lineupForm.querySelector('[data-lineup-inputs]');
+            const bracketDragFeedback = document.querySelector('[data-bracket-drag-feedback]');
+            const bracketSlots = [...document.querySelectorAll('[data-bracket-slot-card][data-bracket-slot-index]')];
+            const slotCount = bracketSlots.reduce((count, slot) => Math.max(count, Number.parseInt(slot.dataset.bracketSlotIndex || '-1', 10) + 1), 0);
+            let bracketSlotAssignments = Array.from({ length: slotCount }, () => null);
             let draggedCard = null;
             let draggedSource = null;
             let draggedCompetitorId = null;
-            const bracketDragFeedback = document.querySelector('[data-bracket-drag-feedback]');
-            let bracketSlotAssignments = [...selectedZone.querySelectorAll('[data-lineup-card]')].map((card) => card.dataset.competitorId);
+            let draggedSlotIndex = null;
+            let saving = false;
+
+            bracketSlots.forEach((slot) => {
+                const index = Number.parseInt(slot.dataset.bracketSlotIndex || '-1', 10);
+                const id = slot.dataset.competitorId || null;
+                if (index >= 0 && id) bracketSlotAssignments[index] = id;
+            });
+
+            const labels = new Map([...lineupForm.querySelectorAll('[data-lineup-card]'), ...bracketSlots]
+                .filter((item) => item.dataset.competitorId)
+                .map((item) => [item.dataset.competitorId, item.dataset.competitorLabel || 'Competitor']));
+
+            const selectedIds = () => bracketSlotAssignments.filter(Boolean);
+
+            const syncHiddenInputs = () => {
+                hiddenInputs.replaceChildren();
+                selectedIds().forEach((id) => {
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = 'competitor_ids[]';
+                    input.value = id;
+                    hiddenInputs.append(input);
+                });
+            };
 
             const syncBracketPreview = () => {
-                const labels = new Map([...selectedZone.querySelectorAll('[data-lineup-card]')].map((card) => [card.dataset.competitorId, card.dataset.competitorLabel || 'Assigned team']));
-                document.querySelectorAll('[data-bracket-slot-card][data-bracket-slot-index]').forEach((slot) => {
+                bracketSlots.forEach((slot) => {
+                    const index = Number.parseInt(slot.dataset.bracketSlotIndex || '-1', 10);
+                    const id = index >= 0 ? bracketSlotAssignments[index] : null;
                     const label = slot.querySelector('[data-bracket-slot-label]');
-                    if (! label) return;
-                    const competitorId = bracketSlotAssignments[Number.parseInt(slot.dataset.bracketSlotIndex || '', 10)];
-                    label.textContent = competitorId ? labels.get(competitorId) : 'Drop team here';
-                    slot.classList.toggle('has-bracket-assignment', Boolean(competitorId));
+                    const text = id ? (labels.get(id) || 'Competitor') : 'Drop team here';
+                    if (label) label.textContent = text;
+                    slot.dataset.competitorId = id || '';
+                    slot.dataset.competitorLabel = id ? (labels.get(id) || 'Competitor') : '';
+                    slot.draggable = Boolean(id);
+                    slot.classList.toggle('has-bracket-assignment', Boolean(id));
                 });
             };
 
             const refreshLineup = () => {
-                const selectedCards = [...selectedZone.querySelectorAll('[data-lineup-card]')];
-                const availableCards = [...availableZone.querySelectorAll('[data-lineup-card]')];
-                selectedCards.forEach((card, index) => {
-                    const position = card.querySelector('.lineup-position');
-                    if (position) position.textContent = String(index + 1);
+                const selected = new Set(selectedIds());
+                lineupForm.querySelectorAll('[data-lineup-card]').forEach((card) => {
+                    card.hidden = selected.has(card.dataset.competitorId);
                 });
-                lineupForm.querySelector('[data-lineup-empty="selected"]')?.classList.toggle('hidden', selectedCards.length > 0);
-                lineupForm.querySelector('[data-lineup-empty="available"]')?.classList.toggle('hidden', availableCards.length > 0);
-                lineupCount.textContent = String(selectedCards.length);
-                submitLineup.disabled = selectedCards.length < 2;
+                lineupForm.querySelector('[data-lineup-empty="available"]')?.classList.toggle('hidden', [...availableZone.querySelectorAll('[data-lineup-card]:not([hidden])')].length > 0);
+                lineupCount.textContent = String(selected.size);
+                submitLineup.disabled = selected.size < 2 || saving;
+                syncHiddenInputs();
                 syncBracketPreview();
             };
 
-            const moveCard = (card, zone, before = null) => {
-                if (! card || ! zone) return;
-                if (before && before !== card && before.parentElement === zone) zone.insertBefore(card, before);
-                else zone.append(card);
+            const saveLineup = () => {
+                if (saving || selectedIds().length < 2) return;
+                saving = true;
                 refreshLineup();
+                fetch(lineupForm.action, {
+                    method: 'POST',
+                    body: new FormData(lineupForm),
+                    headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'text/html' },
+                    credentials: 'same-origin',
+                }).then((response) => {
+                    if (!response.ok) throw new Error('The bracket lineup could not be saved.');
+                    window.location.reload();
+                }).catch(() => {
+                    saving = false;
+                    if (bracketDragFeedback) {
+                        bracketDragFeedback.hidden = false;
+                        bracketDragFeedback.textContent = 'The lineup could not be saved. Try again.';
+                        bracketDragFeedback.classList.remove('text-blue-700');
+                        bracketDragFeedback.classList.add('text-red-700');
+                    }
+                    refreshLineup();
+                });
             };
 
-            const selectedCompetitorIds = () => [...selectedZone.querySelectorAll('[data-lineup-card]')].map((card) => card.dataset.competitorId);
-            const setSelectedCompetitorIds = (ids) => {
-                const cards = new Map([...lineupForm.querySelectorAll('[data-lineup-card]')].map((card) => [card.dataset.competitorId, card]));
-                const selected = new Set(ids);
-                ids.forEach((id) => {
-                    const card = cards.get(String(id));
-                    if (card) selectedZone.append(card);
-                });
-                cards.forEach((card, id) => {
-                    if (! selected.has(String(id))) availableZone.append(card);
-                });
-                refreshLineup();
-            };
-
-            const applyBracketDrop = (sourceId, targetIndex) => {
-                const normalizedSourceId = String(sourceId);
-                const sourceIndex = bracketSlotAssignments.indexOf(normalizedSourceId);
-
-                if (sourceIndex === -1) {
-                    const availableCard = availableZone.querySelector(`[data-lineup-card][data-competitor-id="${CSS.escape(String(sourceId))}"]`);
-                    if (! availableCard) return;
-                    while (bracketSlotAssignments.length <= targetIndex) bracketSlotAssignments.push(null);
-                    bracketSlotAssignments[targetIndex] = normalizedSourceId;
-                } else if (sourceIndex !== targetIndex) {
-                    while (bracketSlotAssignments.length <= targetIndex) bracketSlotAssignments.push(null);
+            const placeCompetitor = (sourceId, targetIndex, sourceIndex = -1) => {
+                const id = String(sourceId);
+                if (! Number.isInteger(targetIndex) || targetIndex < 0 || !labels.has(id)) return;
+                if (sourceIndex < 0 && bracketSlotAssignments[targetIndex]) return;
+                if (sourceIndex >= 0 && sourceIndex !== targetIndex) {
                     [bracketSlotAssignments[sourceIndex], bracketSlotAssignments[targetIndex]] = [bracketSlotAssignments[targetIndex], bracketSlotAssignments[sourceIndex]];
+                } else {
+                    bracketSlotAssignments[targetIndex] = id;
                 }
-
-                setSelectedCompetitorIds(bracketSlotAssignments.filter(Boolean));
-                if (bracketDragFeedback) bracketDragFeedback.hidden = false;
+                if (bracketDragFeedback) {
+                    bracketDragFeedback.hidden = false;
+                    bracketDragFeedback.textContent = selectedIds().length < 2 ? 'Opening slot updated. Place one more competitor to create the match.' : 'Opening slot updated. Saving the lineup?';
+                }
+                refreshLineup();
+                if (selectedIds().length >= 2) saveLineup();
             };
 
             lineupForm.querySelectorAll('[data-lineup-card]').forEach((card) => {
                 card.addEventListener('dragstart', (event) => {
                     draggedCard = card;
-                    draggedSource = 'lineup';
+                    draggedSource = 'available';
                     draggedCompetitorId = card.dataset.competitorId;
                     card.classList.add('opacity-50');
                     event.dataTransfer.effectAllowed = 'move';
-                    event.dataTransfer.setData('text/plain', card.dataset.competitorId);
+                    event.dataTransfer.setData('text/plain', draggedCompetitorId);
                 });
                 card.addEventListener('dragend', () => {
                     draggedCard?.classList.remove('opacity-50');
@@ -343,71 +361,58 @@
                     draggedSource = null;
                     draggedCompetitorId = null;
                 });
+                const placeFromKeyboard = (event) => {
+                    if (event.key !== 'Enter' && event.key !== ' ') return;
+                    const targetIndex = bracketSlotAssignments.findIndex((id) => ! id);
+                    if (targetIndex < 0) return;
+                    event.preventDefault();
+                    placeCompetitor(card.dataset.competitorId, targetIndex);
+                };
                 card.addEventListener('click', () => {
-                    if (card.parentElement === availableZone) moveCard(card, selectedZone);
+                    const targetIndex = bracketSlotAssignments.findIndex((id) => ! id);
+                    if (targetIndex >= 0) placeCompetitor(card.dataset.competitorId, targetIndex);
                 });
-                card.addEventListener('keydown', (event) => {
-                    const cards = [...selectedZone.querySelectorAll('[data-lineup-card]')];
-                    const index = cards.indexOf(card);
-                    if (card.parentElement !== selectedZone) {
-                        if (event.key === 'Enter' || event.key === ' ') {
-                            event.preventDefault();
-                            moveCard(card, selectedZone);
-                            card.focus();
-                        }
+                card.addEventListener('keydown', placeFromKeyboard);
+            });
+
+            availableZone.addEventListener('dragover', (event) => {
+                if (draggedSource === 'bracket') {
+                    event.preventDefault();
+                    availableZone.classList.add('ring-2', 'ring-blue-300');
+                }
+            });
+            availableZone.addEventListener('dragleave', () => availableZone.classList.remove('ring-2', 'ring-blue-300'));
+            availableZone.addEventListener('drop', (event) => {
+                event.preventDefault();
+                availableZone.classList.remove('ring-2', 'ring-blue-300');
+                if (draggedSource !== 'bracket' || draggedSlotIndex === null) return;
+                bracketSlotAssignments[draggedSlotIndex] = null;
+                refreshLineup();
+                if (selectedIds().length >= 2) saveLineup();
+            });
+
+            bracketSlots.forEach((slot) => {
+                slot.addEventListener('dragstart', (event) => {
+                    if (! slot.dataset.competitorId) {
+                        event.preventDefault();
                         return;
                     }
-                    if (event.key === 'ArrowUp' && index > 0) {
-                        event.preventDefault();
-                        moveCard(card, selectedZone, cards[index - 1]);
-                        card.focus();
-                    } else if (event.key === 'ArrowDown' && index < cards.length - 1) {
-                        event.preventDefault();
-                        moveCard(card, selectedZone, cards[index + 1].nextElementSibling);
-                        card.focus();
-                    } else if (event.key === 'Delete' || event.key === 'Backspace') {
-                        event.preventDefault();
-                        moveCard(card, availableZone);
-                        card.focus();
-                    }
-                });
-            });
-
-            [selectedZone, availableZone].forEach((zone) => {
-                zone.addEventListener('dragover', (event) => {
-                    event.preventDefault();
-                    zone.classList.add('ring-2', 'ring-blue-300');
-                });
-                zone.addEventListener('dragleave', () => zone.classList.remove('ring-2', 'ring-blue-300'));
-                zone.addEventListener('drop', (event) => {
-                    event.preventDefault();
-                    zone.classList.remove('ring-2', 'ring-blue-300');
-                    if (draggedSource === 'bracket') {
-                        const sourceCard = lineupForm.querySelector(`[data-lineup-card][data-competitor-id="${CSS.escape(String(draggedCompetitorId))}"]`);
-                        if (sourceCard) moveCard(sourceCard, zone);
-                    } else {
-                        const target = event.target.closest('[data-lineup-card]');
-                        moveCard(draggedCard, zone, target);
-                    }
-                });
-            });
-
-            document.querySelectorAll('[data-bracket-slot-card]').forEach((slot) => {
-                slot.addEventListener('dragstart', (event) => {
                     draggedSource = 'bracket';
-                    draggedCompetitorId = slot.dataset.competitorId || null;
+                    draggedCompetitorId = slot.dataset.competitorId;
+                    draggedSlotIndex = Number.parseInt(slot.dataset.bracketSlotIndex || '-1', 10);
                     slot.classList.add('is-bracket-dragging');
                     event.dataTransfer.effectAllowed = 'move';
-                    event.dataTransfer.setData('text/plain', draggedCompetitorId || '');
+                    event.dataTransfer.setData('text/plain', draggedCompetitorId);
                 });
                 slot.addEventListener('dragend', () => {
                     slot.classList.remove('is-bracket-dragging');
                     draggedSource = null;
                     draggedCompetitorId = null;
-                    document.querySelectorAll('[data-bracket-slot-card]').forEach((target) => target.classList.remove('is-bracket-drop-target'));
+                    draggedSlotIndex = null;
+                    bracketSlots.forEach((target) => target.classList.remove('is-bracket-drop-target'));
                 });
                 slot.addEventListener('dragover', (event) => {
-                    if (! draggedCompetitorId) return;
+                    if (! draggedCompetitorId || draggedSlotIndex === null) return;
                     event.preventDefault();
                     slot.classList.add('is-bracket-drop-target');
                 });
@@ -416,22 +421,15 @@
                     event.preventDefault();
                     slot.classList.remove('is-bracket-drop-target');
                     const sourceId = draggedCompetitorId || event.dataTransfer.getData('text/plain');
-                    const targetIndex = Number.parseInt(slot.dataset.bracketSlotIndex || '', 10);
-                    if (sourceId && Number.isInteger(targetIndex)) applyBracketDrop(sourceId, targetIndex);
+                    const targetIndex = Number.parseInt(slot.dataset.bracketSlotIndex || '-1', 10);
+                    if (sourceId && Number.isInteger(targetIndex)) placeCompetitor(sourceId, targetIndex, draggedSource === 'bracket' ? draggedSlotIndex : -1);
                 });
             });
 
             lineupForm.addEventListener('submit', (event) => {
-                lineupForm.querySelectorAll('input[data-lineup-id]').forEach((input) => input.remove());
-                [...selectedZone.querySelectorAll('[data-lineup-card]')].forEach((card) => {
-                    const input = document.createElement('input');
-                    input.type = 'hidden';
-                    input.name = 'competitor_ids[]';
-                    input.value = card.dataset.competitorId;
-                    input.dataset.lineupId = 'true';
-                    lineupForm.append(input);
-                });
-                if (selectedZone.querySelectorAll('[data-lineup-card]').length < 2) event.preventDefault();
+                event.preventDefault();
+                syncHiddenInputs();
+                saveLineup();
             });
             refreshLineup();
         }
