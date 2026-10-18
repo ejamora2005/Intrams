@@ -355,27 +355,33 @@
         ]
     },
     {
-        "name": "Danicha Gomez",
+        "name": "Danicha Jane Cabudbud Gomez",
         "gender": "Female",
         "year_section": "1A",
-        "sports": "Volleyball (Women)",
+        "sports": "Volleyball (Women), Festival Dance",
         "sport_codes": [
             "VOLLEYBALL-WOMEN"
         ],
         "source_rows": [
             "A30"
+        ],
+        "aliases": [
+            "Danicha Gomez"
         ]
     },
     {
-        "name": "Christine Alvero",
+        "name": "Christine Belinario Alvero",
         "gender": "Female",
         "year_section": "1A",
-        "sports": "Volleyball (Women)",
+        "sports": "Volleyball (Women), Dance Drama",
         "sport_codes": [
             "VOLLEYBALL-WOMEN"
         ],
         "source_rows": [
             "A31"
+        ],
+        "aliases": [
+            "Christine Alvero"
         ]
     },
     {
@@ -825,7 +831,7 @@
         "name": "Joanna Mae Maraña",
         "gender": "Female",
         "year_section": "2A",
-        "sports": "Table Tennis Doubles (Women)",
+        "sports": "Table Tennis Doubles (Women), Dance Drama",
         "sport_codes": [
             "TABLE-TENNIS-DOUBLES-WOMEN"
         ],
@@ -930,9 +936,10 @@
         "name": "Analy Sermillas",
         "gender": "Female",
         "year_section": "1A",
-        "sports": "Javelin Throw",
+        "sports": "Javelin Throw, Relay, 4x100 Relay",
         "sport_codes": [
-            "JAVELIN-THROW-WOMEN"
+            "JAVELIN-THROW-WOMEN",
+            "RELAY-4X100-WOMEN"
         ],
         "source_rows": [
             "A76"
@@ -968,7 +975,7 @@
         "name": "Rose Ann Mangubat",
         "gender": "Female",
         "year_section": "2A",
-        "sports": "100m Run, 400m Run",
+        "sports": "100m Run, 400m Run, Festival Dance",
         "sport_codes": [
             "100M-RUN-WOMEN",
             "400M-RUN-WOMEN"
@@ -1153,22 +1160,25 @@
         ]
     },
     {
-        "name": "Kristine Lapasanda",
+        "name": "Kristine Jamero Lapasanda",
         "gender": "Female",
         "year_section": "2A",
-        "sports": "Mobile Legends",
+        "sports": "Mobile Legends, Festival Dance",
         "sport_codes": [
             "ESPORT-ML-WOMEN"
         ],
         "source_rows": [
             "A94"
+        ],
+        "aliases": [
+            "Kristine Lapasanda"
         ]
     },
     {
         "name": "Lovely Regis",
         "gender": "Female",
         "year_section": "2A",
-        "sports": "Mobile Legends, Balitaw",
+        "sports": "Mobile Legends, Balitaw, Festival Dance",
         "sport_codes": [
             "ESPORT-ML-WOMEN"
         ],
@@ -1329,7 +1339,7 @@
         "name": "Mary Jean Camiguing Bihay",
         "gender": "Female",
         "year_section": "1A",
-        "sports": "Basketball 5x5",
+        "sports": "Basketball 5x5, Dance Drama",
         "sport_codes": [
             "BASKET-5X5-WOMEN"
         ],
@@ -1341,7 +1351,7 @@
         "name": "Mharjelyn Pucot Muñez",
         "gender": "Female",
         "year_section": "1A",
-        "sports": "Basketball 5x5",
+        "sports": "Basketball 5x5, Festival Dance",
         "sport_codes": [
             "BASKET-5X5-WOMEN"
         ],
@@ -1366,7 +1376,7 @@
         "name": "Lysa Taparo Payac",
         "gender": "Female",
         "year_section": "1A",
-        "sports": "Basketball 3x3, Basketball 5x5",
+        "sports": "Basketball 3x3, Basketball 5x5, Dance Drama",
         "sport_codes": [
             "BASKET-3X3-WOMEN",
             "BASKET-5X5-WOMEN"
@@ -1488,7 +1498,7 @@
         "name": "Shiela Reyes Tomimbo",
         "gender": "Female",
         "year_section": "2A",
-        "sports": "Treasure Hunt",
+        "sports": "Treasure Hunt, Dance Drama",
         "sport_codes": [],
         "source_rows": [
             "A122"
@@ -1538,7 +1548,7 @@
         "name": "Sheila Mae Lanticse Amoguis",
         "gender": "Female",
         "year_section": "2B",
-        "sports": "Collaborative Painting",
+        "sports": "Collaborative Painting, Festival Dance",
         "sport_codes": [],
         "source_rows": [
             "A127"
@@ -1548,7 +1558,7 @@
         "name": "Danilo Cascayo Mantilla",
         "gender": "Male",
         "year_section": "2B",
-        "sports": "Collaborative Painting",
+        "sports": "Collaborative Painting, Festival Dance",
         "sport_codes": [],
         "source_rows": [
             "A128"
@@ -1588,7 +1598,7 @@
         "name": "Myrha Angela Yvon Palco Ani",
         "gender": "Female",
         "year_section": "2B",
-        "sports": "Photography",
+        "sports": "Photography, Festival Dance",
         "sport_codes": [],
         "source_rows": [
             "A132"
@@ -1630,7 +1640,7 @@
         "name": "Kristine Angel Villanueva Siyas",
         "gender": "Female",
         "year_section": "2A",
-        "sports": "Short Film",
+        "sports": "Short Film, Festival Dance",
         "sport_codes": [],
         "source_rows": [
             "A136"
@@ -1685,7 +1695,7 @@
         "name": "John Brunz Camarista",
         "gender": "Male",
         "year_section": "3A",
-        "sports": "Short Film",
+        "sports": "Short Film, Festival Dance",
         "sport_codes": [],
         "source_rows": [
             "A141"
@@ -1791,6 +1801,288 @@
         ],
         "source_rows": [
             "A149"
+        ]
+    },
+    {
+        "name": "Niel John Basas",
+        "gender": "Male",
+        "year_section": "3A",
+        "sports": "Festival Dance",
+        "sport_codes": [],
+        "source_rows": [
+            "A150"
+        ]
+    },
+    {
+        "name": "Apple Terante Borlasa",
+        "gender": "Female",
+        "year_section": "2A",
+        "sports": "Festival Dance",
+        "sport_codes": [],
+        "source_rows": [
+            "A151"
+        ]
+    },
+    {
+        "name": "Jesyl Esclamado Braquil",
+        "gender": "Female",
+        "year_section": "2A",
+        "sports": "Festival Dance",
+        "sport_codes": [],
+        "source_rows": [
+            "A152"
+        ]
+    },
+    {
+        "name": "Gerves Joy Gerona Cadayona",
+        "gender": "Male",
+        "year_section": "2B",
+        "sports": "Festival Dance",
+        "sport_codes": [],
+        "source_rows": [
+            "A153"
+        ]
+    },
+    {
+        "name": "Mariane Kisteria Cagurol",
+        "gender": "Female",
+        "year_section": "1A",
+        "sports": "Festival Dance",
+        "sport_codes": [],
+        "source_rows": [
+            "A154"
+        ]
+    },
+    {
+        "name": "Graciel Lou Jubay Cala",
+        "gender": "Female",
+        "year_section": "1A",
+        "sports": "Festival Dance",
+        "sport_codes": [],
+        "source_rows": [
+            "A155"
+        ]
+    },
+    {
+        "name": "Ramila Jean Miravite Carungay",
+        "gender": "Female",
+        "year_section": "3A",
+        "sports": "Festival Dance",
+        "sport_codes": [],
+        "source_rows": [
+            "A156"
+        ]
+    },
+    {
+        "name": "Katherine P. Diola",
+        "gender": "Female",
+        "year_section": "1A",
+        "sports": "Festival Dance",
+        "sport_codes": [],
+        "source_rows": [
+            "A157"
+        ]
+    },
+    {
+        "name": "Jane Eway",
+        "gender": "Female",
+        "year_section": "1A",
+        "sports": "Festival Dance",
+        "sport_codes": [],
+        "source_rows": [
+            "A158"
+        ]
+    },
+    {
+        "name": "Jasmine Nunez Felicilda",
+        "gender": "Female",
+        "year_section": "2A",
+        "sports": "Festival Dance",
+        "sport_codes": [],
+        "source_rows": [
+            "A159"
+        ]
+    },
+    {
+        "name": "Glen Mark Tumon Garcia",
+        "gender": "Male",
+        "year_section": "3A",
+        "sports": "Festival Dance",
+        "sport_codes": [],
+        "source_rows": [
+            "A160"
+        ]
+    },
+    {
+        "name": "Jessie Boy Escartin Gerong",
+        "gender": "Male",
+        "year_section": "3A",
+        "sports": "Festival Dance",
+        "sport_codes": [],
+        "source_rows": [
+            "A161"
+        ]
+    },
+    {
+        "name": "Sharlyn Jane Caballes Golo",
+        "gender": "Female",
+        "year_section": "2A",
+        "sports": "Festival Dance",
+        "sport_codes": [],
+        "source_rows": [
+            "A162"
+        ]
+    },
+    {
+        "name": "Kiervy Opina Gozon",
+        "gender": "Male",
+        "year_section": "2A",
+        "sports": "Festival Dance",
+        "sport_codes": [],
+        "source_rows": [
+            "A163"
+        ]
+    },
+    {
+        "name": "Diana Gumapac Gula",
+        "gender": "Female",
+        "year_section": "3A",
+        "sports": "Festival Dance",
+        "sport_codes": [],
+        "source_rows": [
+            "A164"
+        ]
+    },
+    {
+        "name": "Jhastine Siega Hilo",
+        "gender": "Female",
+        "year_section": "3A",
+        "sports": "Festival Dance",
+        "sport_codes": [],
+        "source_rows": [
+            "A165"
+        ]
+    },
+    {
+        "name": "John Ariel Maloon Jamora",
+        "gender": "Male",
+        "year_section": "2A",
+        "sports": "Festival Dance",
+        "sport_codes": [],
+        "source_rows": [
+            "A166"
+        ]
+    },
+    {
+        "name": "Zyra Claire Cano Lansang",
+        "gender": "Female",
+        "year_section": "2A",
+        "sports": "Festival Dance",
+        "sport_codes": [],
+        "source_rows": [
+            "A167"
+        ]
+    },
+    {
+        "name": "Reizen Jacobe Madura",
+        "gender": "Female",
+        "year_section": "2A",
+        "sports": "Festival Dance",
+        "sport_codes": [],
+        "source_rows": [
+            "A168"
+        ]
+    },
+    {
+        "name": "Maria Sophia Palen Malinao",
+        "gender": "Female",
+        "year_section": "1B",
+        "sports": "Festival Dance",
+        "sport_codes": [],
+        "source_rows": [
+            "A169"
+        ]
+    },
+    {
+        "name": "Nerissa Joy Siona Odoc",
+        "gender": "Female",
+        "year_section": "2A",
+        "sports": "Festival Dance",
+        "sport_codes": [],
+        "source_rows": [
+            "A170"
+        ]
+    },
+    {
+        "name": "Jhane Salige Orit",
+        "gender": "Female",
+        "year_section": "1A",
+        "sports": "Festival Dance",
+        "sport_codes": [],
+        "source_rows": [
+            "A171"
+        ]
+    },
+    {
+        "name": "Rich Mae Avila Rio",
+        "gender": "Female",
+        "year_section": "1A",
+        "sports": "Festival Dance",
+        "sport_codes": [],
+        "source_rows": [
+            "A172"
+        ]
+    },
+    {
+        "name": "Jasmine Belle Lagunay Tenio",
+        "gender": "Female",
+        "year_section": "2A",
+        "sports": "Festival Dance",
+        "sport_codes": [],
+        "source_rows": [
+            "A173"
+        ]
+    },
+    {
+        "name": "Rojela Mae Reviso Tutor",
+        "gender": "Female",
+        "year_section": "2A",
+        "sports": "Festival Dance",
+        "sport_codes": [],
+        "source_rows": [
+            "A174"
+        ]
+    },
+    {
+        "name": "Niestle Rosello Lagaran",
+        "gender": "Female",
+        "year_section": "1B",
+        "sports": "Dance Drama",
+        "sport_codes": [],
+        "source_rows": [
+            "A175"
+        ]
+    },
+    {
+        "name": "Alyka Florida Palen",
+        "gender": "Female",
+        "year_section": "1A",
+        "sports": "Dance Drama",
+        "sport_codes": [],
+        "source_rows": [
+            "A176"
+        ]
+    },
+    {
+        "name": "Hannah Ajesha Parba",
+        "gender": "Female",
+        "year_section": "1A",
+        "sports": "4x100 Relay",
+        "sport_codes": [
+            "RELAY-4X100-WOMEN"
+        ],
+        "source_rows": [
+            "A177"
         ]
     }
 ]

@@ -1,21 +1,34 @@
 {
     "source_url": "https://docs.google.com/spreadsheets/d/1EuRMmxypl1DMbZNtRFzYeWp1OaAIHPxobQRRxak2Ra4/edit",
     "snapshot_date": "2026-10-18",
-    "xlsx_sha256": "c05151854a1c297816de70c70514c2d06cd41db17aea5b3e68234b15698758a8",
+    "xlsx_sha256": "f49b9827ca01bf5764533e399bc27b336dc1a270c3959116c4f256c2b5ef7ce8",
     "import_scope": "Sports registrations and all named faction members. Cultural labels remain source notes; existing cultural registrations are preserved.",
     "duplicate_policy": "Normalize name casing, accents, punctuation, whitespace and surname-first notation. Union distinct sport codes. Use explicit aliases for verified older name forms.",
     "resolutions": {
         "Ailicka Cojano": "3A, confirmed by user; combine basketball and Russian Softball",
-        "unspecified_racket_formats": "Retain existing system mappings: badminton doubles and table tennis singles; choose Men/Women from gender."
+        "unspecified_racket_formats": "Retain existing system mappings: badminton doubles and table tennis singles; choose Men/Women from gender.",
+        "expanded_trojan_names": {
+            "Christine Belinario Alvero": [
+                "Christine Alvero"
+            ],
+            "Danicha Jane Cabudbud Gomez": [
+                "Danicha Gomez"
+            ],
+            "Kristine Jamero Lapasanda": [
+                "Kristine Lapasanda"
+            ]
+        },
+        "unqualified_relay": "Analy Sermillas lists Relay and 4x100 Relay in the same source cell; assign only the explicit 4x100 relay event.",
+        "dance_drama": "Cultural source note only; keep the member without adding an event registration."
     },
     "tabs": [
         {
             "tab": "Trojan Warriors",
-            "source_rows": 148,
-            "unique_members": 148,
+            "source_rows": 176,
+            "unique_members": 176,
             "combined_duplicate_rows": 0,
-            "sports_registrations": 181,
-            "members_without_sports": 24
+            "sports_registrations": 183,
+            "members_without_sports": 51
         },
         {
             "tab": "Sea Dragons",
@@ -27,11 +40,19 @@
         },
         {
             "tab": "Terraquatic Eagles",
-            "source_rows": 161,
-            "unique_members": 161,
+            "source_rows": 163,
+            "unique_members": 163,
             "combined_duplicate_rows": 0,
-            "sports_registrations": 162,
+            "sports_registrations": 164,
             "members_without_sports": 47
         }
-    ]
+    ],
+    "snapshot_at_utc": "2026-10-18T10:21:16+00:00",
+    "refresh_changes": {
+        "previous_xlsx_sha256": "c05151854a1c297816de70c70514c2d06cd41db17aea5b3e68234b15698758a8",
+        "added_members": 30,
+        "expanded_names": 3,
+        "added_sports_registrations": 4,
+        "removed_sports_registrations": 0
+    }
 }

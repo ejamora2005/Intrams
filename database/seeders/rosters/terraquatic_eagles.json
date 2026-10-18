@@ -1884,5 +1884,29 @@
         "source_rows": [
             "A163"
         ]
+    },
+    {
+        "name": "Judea Loui M. Marfil",
+        "gender": "Female",
+        "year_section": "1A",
+        "sports": "Chess, Isiphenyo, Shortfilm, and Food Com",
+        "sport_codes": [
+            "CHESS-WOMEN"
+        ],
+        "source_rows": [
+            "A164"
+        ]
+    },
+    {
+        "name": "April Joy M. Marfil",
+        "gender": "Female",
+        "year_section": "4A",
+        "sports": "Chess and Collaborative Painting",
+        "sport_codes": [
+            "CHESS-WOMEN"
+        ],
+        "source_rows": [
+            "A165"
+        ]
     }
 ]
