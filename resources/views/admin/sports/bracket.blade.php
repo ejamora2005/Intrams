@@ -296,7 +296,14 @@
                     const id = index >= 0 ? bracketSlotAssignments[index] : null;
                     const label = slot.querySelector('[data-bracket-slot-label]');
                     const text = id ? (labels.get(id) || 'Competitor') : 'Drop team here';
-                    if (label) label.textContent = text;
+                    // Empty slots are rendered by the server as a small label,
+                    // but older cached markup can omit that span. Always write
+                    // the visible text so a drop is reflected immediately.
+                    if (label) {
+                        label.textContent = text;
+                    } else if (slot.childElementCount === 0) {
+                        slot.textContent = text;
+                    }
                     slot.dataset.competitorId = id || '';
                     slot.dataset.competitorLabel = id ? (labels.get(id) || 'Competitor') : '';
                     slot.draggable = Boolean(id);
@@ -321,7 +328,35 @@
                 saving = true;
                 refreshLineup();
                 syncHiddenInputs();
-                HTMLFormElement.prototype.submit.call(lineupForm);
+                // Submit with fetch so the browser cannot swallow a native
+                // submit while a drag operation is still finishing. Follow
+                // the redirect and then replace the page with the persisted
+                // bracket; this also surfaces a useful error instead of
+                // leaving the user looking at an unsaved preview.
+                const formData = new FormData(lineupForm);
+                fetch(lineupForm.action, {
+                    method: 'POST',
+                    body: formData,
+                    credentials: 'same-origin',
+                    redirect: 'follow',
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                }).then((response) => {
+                    if (! response.ok) throw new Error(`Bracket save failed (${response.status})`);
+                    const redirectUrl = new URL(response.url, window.location.href);
+                    // Do not let a cached bracket GET hide the newly saved
+                    // competitor assignment after the redirect.
+                    redirectUrl.searchParams.set('_lineup_refresh', Date.now().toString());
+                    window.location.assign(redirectUrl.toString());
+                }).catch(() => {
+                    saving = false;
+                    submitLineup.disabled = false;
+                    if (bracketDragFeedback) {
+                        bracketDragFeedback.hidden = false;
+                        bracketDragFeedback.textContent = 'The lineup could not be saved. Check your connection and try again.';
+                        bracketDragFeedback.classList.remove('text-blue-700');
+                        bracketDragFeedback.classList.add('text-red-700');
+                    }
+                });
             };
 
             const placeCompetitor = (sourceId, targetIndex, sourceIndex = -1) => {
