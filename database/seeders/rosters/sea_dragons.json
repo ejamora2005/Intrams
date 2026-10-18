@@ -3,1146 +3,2263 @@
         "name": "Christian Jay Ybañez",
         "gender": "Male",
         "year_section": "2B",
-        "sports": "5X5 & 3x3 Baketball"
+        "sports": "5X5 & 3x3 Baketball",
+        "sport_codes": [
+            "BASKET-3X3-MEN",
+            "BASKET-5X5-MEN"
+        ],
+        "source_rows": [
+            "A2"
+        ]
     },
     {
         "name": "Humphrey Permano",
         "gender": "Male",
         "year_section": "3B",
-        "sports": "5X5 Baketball"
+        "sports": "5X5 Baketball",
+        "sport_codes": [
+            "BASKET-5X5-MEN"
+        ],
+        "source_rows": [
+            "A3"
+        ]
     },
     {
         "name": "John Ashley Calinacion",
         "gender": "Male",
         "year_section": "2B",
-        "sports": "5X5 Baketball, Relay 4x400, Singswerte, Collaborative Painting, Pageant"
+        "sports": "5X5 Baketball, Relay 4x400, Singswerte, Collaborative Painting, Pageant",
+        "sport_codes": [
+            "BASKET-5X5-MEN",
+            "RELAY-4X400-MEN"
+        ],
+        "source_rows": [
+            "A4",
+            "A183"
+        ]
     },
     {
         "name": "Emmanuel Bagasbas",
         "gender": "Male",
         "year_section": "1A",
-        "sports": "5X5 Baketball"
+        "sports": "5X5 Baketball",
+        "sport_codes": [
+            "BASKET-5X5-MEN"
+        ],
+        "source_rows": [
+            "A5"
+        ]
     },
     {
         "name": "Jayke Beronio",
         "gender": "Male",
         "year_section": "3B",
-        "sports": "5X5 & 3x3 Baketball"
+        "sports": "5X5 & 3x3 Baketball",
+        "sport_codes": [
+            "BASKET-3X3-MEN",
+            "BASKET-5X5-MEN"
+        ],
+        "source_rows": [
+            "A6"
+        ]
     },
     {
         "name": "John Paul Entino",
         "gender": "Male",
         "year_section": "4A",
-        "sports": "5X5 & 3x3 Baketball"
+        "sports": "5X5 & 3x3 Baketball",
+        "sport_codes": [
+            "BASKET-3X3-MEN",
+            "BASKET-5X5-MEN"
+        ],
+        "source_rows": [
+            "A7"
+        ]
     },
     {
         "name": "Jessie Jones Hallera",
         "gender": "Male",
         "year_section": "1A",
-        "sports": "5X5 Baketball"
+        "sports": "5X5 Baketball",
+        "sport_codes": [
+            "BASKET-5X5-MEN"
+        ],
+        "source_rows": [
+            "A8"
+        ]
     },
     {
         "name": "Mark Angel Calubay",
         "gender": "Male",
         "year_section": "4A",
-        "sports": "5X5 Baketball, Relay 4x400"
+        "sports": "5X5 Baketball, Relay 4x400",
+        "sport_codes": [
+            "BASKET-5X5-MEN",
+            "RELAY-4X400-MEN"
+        ],
+        "source_rows": [
+            "A9"
+        ]
     },
     {
         "name": "Abrea Jhersah",
         "gender": "Male",
         "year_section": "3B",
-        "sports": "5X5 Baketball, Triple Jump, Pageant"
+        "sports": "5X5 Baketball, Triple Jump, Pageant",
+        "sport_codes": [
+            "BASKET-5X5-MEN",
+            "TRIPLE-JUMP-MEN"
+        ],
+        "source_rows": [
+            "A10",
+            "A219"
+        ]
     },
     {
         "name": "Mark Rommel Arañez",
         "gender": "Male",
         "year_section": "3A",
-        "sports": "5X5 Baketball, Relay 4x400"
+        "sports": "5X5 Baketball, Relay 4x400",
+        "sport_codes": [
+            "BASKET-5X5-MEN",
+            "RELAY-4X400-MEN"
+        ],
+        "source_rows": [
+            "A11"
+        ]
     },
     {
         "name": "Johnloy Mondal",
         "gender": "Male",
         "year_section": "2A",
-        "sports": "5X5 & 3x3 Baketball"
+        "sports": "5X5 & 3x3 Baketball",
+        "sport_codes": [
+            "BASKET-3X3-MEN",
+            "BASKET-5X5-MEN"
+        ],
+        "source_rows": [
+            "A12"
+        ]
     },
     {
         "name": "Hero Julio",
         "gender": "Male",
         "year_section": "4A",
-        "sports": "5X5 Baketball, Table Tennis"
+        "sports": "5X5 Baketball, Table Tennis",
+        "sport_codes": [
+            "BASKET-5X5-MEN",
+            "TABLE-TENNIS-SINGLES-MEN"
+        ],
+        "source_rows": [
+            "A13"
+        ]
     },
     {
         "name": "John Jacob Bautista",
         "gender": "Male",
         "year_section": "4A",
-        "sports": "5X5 Baketball"
+        "sports": "5X5 Baketball",
+        "sport_codes": [
+            "BASKET-5X5-MEN"
+        ],
+        "source_rows": [
+            "A14"
+        ]
     },
     {
         "name": "Francis Calimas",
         "gender": "Male",
         "year_section": "2A",
-        "sports": "5X5 Baketball"
+        "sports": "5X5 Baketball",
+        "sport_codes": [
+            "BASKET-5X5-MEN"
+        ],
+        "source_rows": [
+            "A15"
+        ]
     },
     {
         "name": "Liv Nathalie Delen",
         "gender": "Female",
         "year_section": "4A",
-        "sports": "5X5 Baketball, Relay 4x400, Festival Dance, Balakwerte"
+        "sports": "5X5 Baketball, Relay 4x400, Festival Dance, Balakwerte",
+        "sport_codes": [
+            "BASKET-5X5-WOMEN",
+            "RELAY-4X400-WOMEN"
+        ],
+        "source_rows": [
+            "A16",
+            "A149"
+        ]
     },
     {
         "name": "Juliet Ajoc",
         "gender": "Female",
         "year_section": "4A",
-        "sports": "5X5 Baketball, Shotput, Balakwerte, Collaborative Painting"
+        "sports": "5X5 Baketball, Shotput, Balakwerte, Collaborative Painting",
+        "sport_codes": [
+            "BASKET-5X5-WOMEN",
+            "SHOT-PUT-WOMEN"
+        ],
+        "source_rows": [
+            "A17",
+            "A187"
+        ]
     },
     {
         "name": "Jella Marie Monter",
         "gender": "Female",
         "year_section": "4A",
-        "sports": "5X5 Baketball"
+        "sports": "5X5 Baketball",
+        "sport_codes": [
+            "BASKET-5X5-WOMEN"
+        ],
+        "source_rows": [
+            "A18"
+        ]
     },
     {
         "name": "Zyra Je Supangan",
         "gender": "Female",
         "year_section": "4A",
-        "sports": "5X5 Baketball, Discuss"
+        "sports": "5X5 Baketball, Discuss",
+        "sport_codes": [
+            "BASKET-5X5-WOMEN",
+            "DISCUS-THROW-WOMEN"
+        ],
+        "source_rows": [
+            "A19"
+        ]
     },
     {
         "name": "Jazer Mae Sotto",
         "gender": "Female",
         "year_section": "4A",
-        "sports": "5X5 Baketball, Javelin"
+        "sports": "5X5 Baketball, Javelin",
+        "sport_codes": [
+            "BASKET-5X5-WOMEN",
+            "JAVELIN-THROW-WOMEN"
+        ],
+        "source_rows": [
+            "A20"
+        ]
     },
     {
         "name": "Karylle Paler",
         "gender": "Female",
         "year_section": "2A",
-        "sports": "5X5 Baketball"
+        "sports": "5X5 Baketball",
+        "sport_codes": [
+            "BASKET-5X5-WOMEN"
+        ],
+        "source_rows": [
+            "A21"
+        ]
     },
     {
         "name": "Myca Mercado",
         "gender": "Female",
         "year_section": "4A",
-        "sports": "5X5 Baketball"
+        "sports": "5X5 Baketball",
+        "sport_codes": [
+            "BASKET-5X5-WOMEN"
+        ],
+        "source_rows": [
+            "A22"
+        ]
     },
     {
         "name": "Merigen Balaguer",
         "gender": "Female",
         "year_section": "4A",
-        "sports": "5X5 Baketball, Relay 4X400"
+        "sports": "5X5 Baketball, Relay 4X400",
+        "sport_codes": [
+            "BASKET-5X5-WOMEN",
+            "RELAY-4X400-WOMEN"
+        ],
+        "source_rows": [
+            "A23"
+        ]
     },
     {
         "name": "Remafie Refugio",
         "gender": "Female",
         "year_section": "4A",
-        "sports": "5X5 Baketball, Long Jump"
+        "sports": "5X5 Baketball, Long Jump",
+        "sport_codes": [
+            "BASKET-5X5-WOMEN",
+            "LONG-JUMP-WOMEN"
+        ],
+        "source_rows": [
+            "A24"
+        ]
     },
     {
         "name": "Jesyl Gerona",
         "gender": "Female",
         "year_section": "3A",
-        "sports": "5X5 Baketball, Run 100m"
+        "sports": "5X5 Baketball, Run 100m",
+        "sport_codes": [
+            "100M-RUN-WOMEN",
+            "BASKET-5X5-WOMEN"
+        ],
+        "source_rows": [
+            "A25"
+        ]
     },
     {
         "name": "Ariana Huera",
         "gender": "Female",
         "year_section": "3B",
-        "sports": "5X5 Baketball, Relay 4x400"
+        "sports": "5X5 Baketball, Relay 4x400",
+        "sport_codes": [
+            "BASKET-5X5-WOMEN",
+            "RELAY-4X400-WOMEN"
+        ],
+        "source_rows": [
+            "A26"
+        ]
     },
     {
         "name": "Rica Nobile",
         "gender": "Female",
         "year_section": "4A",
-        "sports": "5X5 Baketball"
+        "sports": "5X5 Baketball",
+        "sport_codes": [
+            "BASKET-5X5-WOMEN"
+        ],
+        "source_rows": [
+            "A27"
+        ]
     },
     {
         "name": "Jermalyn Isaga",
         "gender": "Female",
         "year_section": "4A",
-        "sports": "5X5 Baketball"
+        "sports": "5X5 Baketball",
+        "sport_codes": [
+            "BASKET-5X5-WOMEN"
+        ],
+        "source_rows": [
+            "A28"
+        ]
     },
     {
         "name": "Jea Flor Tumanda",
         "gender": "Female",
         "year_section": "4A",
-        "sports": "5X5 & 3x3 Baketball"
+        "sports": "5X5 & 3x3 Baketball",
+        "sport_codes": [
+            "BASKET-3X3-WOMEN",
+            "BASKET-5X5-WOMEN"
+        ],
+        "source_rows": [
+            "A29"
+        ]
     },
     {
         "name": "James Coquilla",
         "gender": "Male",
         "year_section": "2A",
-        "sports": "Volleyball, Beach Volleyball, Treasurehenyo, Collaborative Painting"
+        "sports": "Volleyball, Beach Volleyball, Treasurehenyo, Collaborative Painting",
+        "sport_codes": [
+            "BEACH-VOLLEYBALL-MEN",
+            "VOLLEYBALL-MEN"
+        ],
+        "source_rows": [
+            "A30",
+            "A197"
+        ]
     },
     {
         "name": "Domingo Maimot",
         "gender": "Male",
         "year_section": "3A",
-        "sports": "Volleyball, Long Jump"
+        "sports": "Volleyball, Long Jump",
+        "sport_codes": [
+            "LONG-JUMP-MEN",
+            "VOLLEYBALL-MEN"
+        ],
+        "source_rows": [
+            "A31"
+        ]
     },
     {
         "name": "Setter Rin Yver Tabis",
         "gender": "Male",
         "year_section": "1B",
-        "sports": "Volleyball"
+        "sports": "Volleyball",
+        "sport_codes": [
+            "VOLLEYBALL-MEN"
+        ],
+        "source_rows": [
+            "A32"
+        ]
     },
     {
         "name": "Almar Casintahan",
         "gender": "Male",
         "year_section": "1A",
-        "sports": "Volleyball"
+        "sports": "Volleyball",
+        "sport_codes": [
+            "VOLLEYBALL-MEN"
+        ],
+        "source_rows": [
+            "A33"
+        ]
     },
     {
         "name": "Mark Niño Maymay",
         "gender": "Male",
         "year_section": "4A",
-        "sports": "Volleyball"
+        "sports": "Volleyball,",
+        "sport_codes": [
+            "VOLLEYBALL-MEN"
+        ],
+        "source_rows": [
+            "A34"
+        ]
     },
     {
         "name": "Warren Tomon",
         "gender": "Male",
         "year_section": "2A",
-        "sports": "Volleyball"
+        "sports": "Volleyball",
+        "sport_codes": [
+            "VOLLEYBALL-MEN"
+        ],
+        "source_rows": [
+            "A35"
+        ]
     },
     {
         "name": "Clarence Gonzales",
         "gender": "Male",
         "year_section": "1A",
-        "sports": "Volleyball, Singswerte"
+        "sports": "Volleyball, Singswerte",
+        "sport_codes": [
+            "VOLLEYBALL-MEN"
+        ],
+        "source_rows": [
+            "A36",
+            "A181"
+        ]
     },
     {
         "name": "Myko Libarios",
         "gender": "Male",
         "year_section": "1A",
-        "sports": "Volleyball"
+        "sports": "Volleyball",
+        "sport_codes": [
+            "VOLLEYBALL-MEN"
+        ],
+        "source_rows": [
+            "A37"
+        ]
     },
     {
         "name": "Antinio Labor",
         "gender": "Male",
         "year_section": "1A",
-        "sports": "Volleyball"
+        "sports": "Volleyball",
+        "sport_codes": [
+            "VOLLEYBALL-MEN"
+        ],
+        "source_rows": [
+            "A38"
+        ]
     },
     {
         "name": "Clint Hindang",
         "gender": "Male",
         "year_section": "4A",
-        "sports": "Volleyball, Infographics"
+        "sports": "Volleyball, Infographics",
+        "sport_codes": [
+            "VOLLEYBALL-MEN"
+        ],
+        "source_rows": [
+            "A39",
+            "A205"
+        ]
     },
     {
         "name": "Mekylla Lagbas",
         "gender": "Female",
         "year_section": "4A",
-        "sports": "Volleyball, Isiphenyo"
+        "sports": "Volleyball, Isiphenyo",
+        "sport_codes": [
+            "VOLLEYBALL-WOMEN"
+        ],
+        "source_rows": [
+            "A40",
+            "A188"
+        ]
     },
     {
         "name": "Jamaica Arbilon",
         "gender": "Female",
         "year_section": "2A",
-        "sports": "Volleyball, Beach Volleyball, Collaborative Painting"
+        "sports": "Volleyball, Beach Volleyball, Collaborative Painting",
+        "sport_codes": [
+            "BEACH-VOLLEYBALL-WOMEN",
+            "VOLLEYBALL-WOMEN"
+        ],
+        "source_rows": [
+            "A41",
+            "A212"
+        ]
     },
     {
         "name": "Karena Herbolingo",
         "gender": "Female",
         "year_section": "2A",
-        "sports": "Volleyball"
+        "sports": "Volleyball",
+        "sport_codes": [
+            "VOLLEYBALL-WOMEN"
+        ],
+        "source_rows": [
+            "A42"
+        ]
     },
     {
         "name": "Danica Espilla",
         "gender": "Female",
         "year_section": "1B",
-        "sports": "Volleyball, Beach Volleyball"
+        "sports": "Volleyball, Beach Volleyball",
+        "sport_codes": [
+            "BEACH-VOLLEYBALL-WOMEN",
+            "VOLLEYBALL-WOMEN"
+        ],
+        "source_rows": [
+            "A43"
+        ]
     },
     {
         "name": "Alexa Tayo",
         "gender": "Female",
         "year_section": "1B",
-        "sports": "Volleyball, Chess"
+        "sports": "Volleyball, Chess",
+        "sport_codes": [
+            "CHESS-WOMEN",
+            "VOLLEYBALL-WOMEN"
+        ],
+        "source_rows": [
+            "A44"
+        ]
     },
     {
         "name": "Ricamel Ong",
         "gender": "Female",
         "year_section": "2B",
-        "sports": "Volleyball, Chess"
+        "sports": "Volleyball, Chess",
+        "sport_codes": [
+            "CHESS-WOMEN",
+            "VOLLEYBALL-WOMEN"
+        ],
+        "source_rows": [
+            "A45"
+        ]
     },
     {
         "name": "Katrina Mae Gomez",
         "gender": "Female",
         "year_section": "3A",
-        "sports": "Volleyball"
+        "sports": "Volleyball",
+        "sport_codes": [
+            "VOLLEYBALL-WOMEN"
+        ],
+        "source_rows": [
+            "A46"
+        ]
     },
     {
         "name": "Ryza Balogo",
         "gender": "Female",
         "year_section": "1A",
-        "sports": "Volleyball, Festival Dance"
+        "sports": "Volleyball, Festival Dance",
+        "sport_codes": [
+            "VOLLEYBALL-WOMEN"
+        ],
+        "source_rows": [
+            "A47",
+            "A156"
+        ]
     },
     {
         "name": "Angeline Aguylo",
         "gender": "Female",
         "year_section": "3B",
-        "sports": "Volleyball"
+        "sports": "Volleyball",
+        "sport_codes": [
+            "VOLLEYBALL-WOMEN"
+        ],
+        "source_rows": [
+            "A48"
+        ]
     },
     {
         "name": "Ernelyn Gono",
         "gender": "Female",
         "year_section": "3B",
-        "sports": "Volleyball"
+        "sports": "Volleyball",
+        "sport_codes": [
+            "VOLLEYBALL-WOMEN"
+        ],
+        "source_rows": [
+            "A49"
+        ]
     },
     {
         "name": "Rohann John Bogate",
         "gender": "Male",
         "year_section": "4A",
-        "sports": "Baseball, Badminton (D) Men, Festival Dance, Balakwerte, Collaborative Painting"
+        "sports": "Baseball, Badminton (D) Men, Festival Dance, Balakwerte, Collaborative Painting",
+        "sport_codes": [
+            "BADMINTON-DOUBLES-MEN",
+            "BASEBALL"
+        ],
+        "source_rows": [
+            "A50",
+            "A145"
+        ]
     },
     {
         "name": "Brian Tulaytay",
         "gender": "Male",
         "year_section": "2A",
-        "sports": "Baseball, Chess"
+        "sports": "Baseball, Chess",
+        "sport_codes": [
+            "BASEBALL",
+            "CHESS-MEN"
+        ],
+        "source_rows": [
+            "A51"
+        ]
     },
     {
         "name": "Mike Kelly Bergado",
         "gender": "Male",
         "year_section": "1B",
-        "sports": "Baseball, Run 200m"
+        "sports": "Baseball, Run 200m",
+        "sport_codes": [
+            "200M-RUN-MEN",
+            "BASEBALL"
+        ],
+        "source_rows": [
+            "A52"
+        ]
     },
     {
         "name": "John David Amparo",
         "gender": "Male",
         "year_section": "1B",
-        "sports": "Baseball"
+        "sports": "Baseball",
+        "sport_codes": [
+            "BASEBALL"
+        ],
+        "source_rows": [
+            "A53"
+        ]
     },
     {
         "name": "Melvin Ebale",
         "gender": "Male",
         "year_section": "1B",
-        "sports": "Baseball"
+        "sports": "Baseball",
+        "sport_codes": [
+            "BASEBALL"
+        ],
+        "source_rows": [
+            "A54"
+        ]
     },
     {
         "name": "Kent Isar Fornis",
         "gender": "Male",
         "year_section": "1B",
-        "sports": "Baseball"
+        "sports": "Baseball",
+        "sport_codes": [
+            "BASEBALL"
+        ],
+        "source_rows": [
+            "A55"
+        ]
     },
     {
         "name": "Jushua Lebato",
         "gender": "Male",
         "year_section": "1B",
-        "sports": "Baseball"
+        "sports": "Baseball",
+        "sport_codes": [
+            "BASEBALL"
+        ],
+        "source_rows": [
+            "A56"
+        ]
     },
     {
         "name": "Joshua Gozon",
         "gender": "Male",
         "year_section": "1A",
-        "sports": "Baseball"
+        "sports": "Baseball",
+        "sport_codes": [
+            "BASEBALL"
+        ],
+        "source_rows": [
+            "A57"
+        ]
     },
     {
         "name": "Zedric Urel",
         "gender": "Male",
         "year_section": "1B",
-        "sports": "Baseball, Chess"
+        "sports": "Baseball, Chess",
+        "sport_codes": [
+            "BASEBALL",
+            "CHESS-MEN"
+        ],
+        "source_rows": [
+            "A58"
+        ]
     },
     {
         "name": "Jerome Cambalon",
         "gender": "Male",
         "year_section": "3B",
-        "sports": "Badminton (D) Men"
+        "sports": "Badminton (D) Men",
+        "sport_codes": [
+            "BADMINTON-DOUBLES-MEN"
+        ],
+        "source_rows": [
+            "A59"
+        ]
     },
     {
         "name": "Mark Anthony Lamoste",
         "gender": "Male",
         "year_section": "3B",
-        "sports": "Baseball, Run 400m"
+        "sports": "Baseball, Run 400m",
+        "sport_codes": [
+            "400M-RUN-MEN",
+            "BASEBALL"
+        ],
+        "source_rows": [
+            "A60"
+        ]
     },
     {
         "name": "Klaire Mercado",
         "gender": "Female",
         "year_section": "2A",
-        "sports": "Russian Softball, Beach Volleyball, Short film"
+        "sports": "Russian Softball, Beach Volleyball, Short film",
+        "sport_codes": [
+            "BEACH-VOLLEYBALL-WOMEN",
+            "RUSSIAN-SOFTBALL"
+        ],
+        "source_rows": [
+            "A61",
+            "A193"
+        ]
     },
     {
         "name": "Rebie Joy Gumapac",
         "gender": "Female",
         "year_section": "2B",
-        "sports": "Russian Softball, Relay 4x100"
+        "sports": "Russian Softball, Relay 4x100",
+        "sport_codes": [
+            "RELAY-4X100-WOMEN",
+            "RUSSIAN-SOFTBALL"
+        ],
+        "source_rows": [
+            "A62"
+        ]
     },
     {
         "name": "Fellisarda Cillo",
         "gender": "Female",
         "year_section": "4A",
-        "sports": "Russian Softball"
+        "sports": "Russian Softball",
+        "sport_codes": [
+            "RUSSIAN-SOFTBALL"
+        ],
+        "source_rows": [
+            "A63"
+        ]
     },
     {
         "name": "Camille Capistrano",
         "gender": "Female",
         "year_section": "4A",
-        "sports": "Russian Softball, Festival Dance"
+        "sports": "Russian Softball, Festival Dance",
+        "sport_codes": [
+            "RUSSIAN-SOFTBALL"
+        ],
+        "source_rows": [
+            "A64",
+            "A148"
+        ]
     },
     {
         "name": "Je Ann Amparo",
         "gender": "Female",
         "year_section": "2A",
-        "sports": "Russian Softball"
+        "sports": "Russian Softball",
+        "sport_codes": [
+            "RUSSIAN-SOFTBALL"
+        ],
+        "source_rows": [
+            "A65"
+        ]
     },
     {
         "name": "Marjorie Corpus",
         "gender": "Female",
         "year_section": "2A",
-        "sports": "Russian Softball"
+        "sports": "Russian Softball",
+        "sport_codes": [
+            "RUSSIAN-SOFTBALL"
+        ],
+        "source_rows": [
+            "A66"
+        ]
     },
     {
         "name": "Catherine Reducto",
         "gender": "Female",
         "year_section": "2B",
-        "sports": "Russian Softball"
+        "sports": "Russian Softball",
+        "sport_codes": [
+            "RUSSIAN-SOFTBALL"
+        ],
+        "source_rows": [
+            "A67"
+        ]
     },
     {
         "name": "April Angelie Bulabos",
         "gender": "Female",
         "year_section": "1A",
-        "sports": "Russian Softball, Singswerte Solo & Duet"
+        "sports": "Russian Softball, Singswerte Solo & Duet",
+        "sport_codes": [
+            "RUSSIAN-SOFTBALL"
+        ],
+        "source_rows": [
+            "A68",
+            "A185"
+        ]
     },
     {
         "name": "Romer Balondro",
         "gender": "Male",
         "year_section": "3B",
-        "sports": "Modified Voleyball"
+        "sports": "Modified Voleyball",
+        "sport_codes": [
+            "MODIFIED-VOLLEYBALL-MEN"
+        ],
+        "source_rows": [
+            "A69"
+        ]
     },
     {
         "name": "Cedrick Nunez",
         "gender": "Male",
         "year_section": "1A",
-        "sports": "Modified Voleyball, Festival Dance"
+        "sports": "Modified Voleyball, Festival Dance",
+        "sport_codes": [
+            "MODIFIED-VOLLEYBALL-MEN"
+        ],
+        "source_rows": [
+            "A70",
+            "A142"
+        ]
     },
     {
         "name": "Oliver Gozo",
         "gender": "Male",
         "year_section": "1A",
-        "sports": "Modified Voleyball, Festival Dance"
+        "sports": "Modified Voleyball, Festival Dance",
+        "sport_codes": [
+            "MODIFIED-VOLLEYBALL-MEN"
+        ],
+        "source_rows": [
+            "A71",
+            "A138"
+        ]
     },
     {
         "name": "Randy Elviña",
         "gender": "Male",
         "year_section": "1A",
-        "sports": "Mobile Legend"
+        "sports": "Mobile Legend",
+        "sport_codes": [
+            "ESPORT-ML-MEN"
+        ],
+        "source_rows": [
+            "A72"
+        ]
     },
     {
         "name": "Jian Carillo",
         "gender": "Male",
         "year_section": "1A",
-        "sports": "Modified Voleyball"
+        "sports": "Modified Voleyball",
+        "sport_codes": [
+            "MODIFIED-VOLLEYBALL-MEN"
+        ],
+        "source_rows": [
+            "A73"
+        ]
     },
     {
         "name": "Joseph Castolome",
         "gender": "Male",
         "year_section": "3A",
-        "sports": "Modified Voleyball, Run 400m"
+        "sports": "Modified Voleyball, Run 400m",
+        "sport_codes": [
+            "400M-RUN-MEN",
+            "MODIFIED-VOLLEYBALL-MEN"
+        ],
+        "source_rows": [
+            "A74"
+        ]
     },
     {
         "name": "Kathlenne Flores",
         "gender": "Female",
         "year_section": "3A",
-        "sports": "Modified Voleyball"
+        "sports": "Modified Voleyball",
+        "sport_codes": [
+            "MODIFIED-VOLLEYBALL-WOMEN"
+        ],
+        "source_rows": [
+            "A75"
+        ]
     },
     {
         "name": "Gemmalyn Mondala",
         "gender": "Female",
         "year_section": "3A",
-        "sports": "Modified Voleyball, Run 200m"
+        "sports": "Modified Voleyball, Run 200m",
+        "sport_codes": [
+            "200M-RUN-WOMEN",
+            "MODIFIED-VOLLEYBALL-WOMEN"
+        ],
+        "source_rows": [
+            "A76"
+        ]
     },
     {
         "name": "Yra Grace Alpas",
         "gender": "Female",
         "year_section": "3B",
-        "sports": "Modified Voleyball, Discuss"
+        "sports": "Modified Voleyball, Discuss",
+        "sport_codes": [
+            "DISCUS-THROW-WOMEN",
+            "MODIFIED-VOLLEYBALL-WOMEN"
+        ],
+        "source_rows": [
+            "A77"
+        ]
     },
     {
         "name": "Lyra Ann Cabrera",
         "gender": "Female",
         "year_section": "3A",
-        "sports": "Modified Voleyball"
+        "sports": "Modified Voleyball",
+        "sport_codes": [
+            "MODIFIED-VOLLEYBALL-WOMEN"
+        ],
+        "source_rows": [
+            "A78"
+        ]
     },
     {
         "name": "Rouela Saveedra",
         "gender": "Female",
         "year_section": "3A",
-        "sports": "Modified Voleyball"
+        "sports": "Modified Voleyball",
+        "sport_codes": [
+            "MODIFIED-VOLLEYBALL-WOMEN"
+        ],
+        "source_rows": [
+            "A79"
+        ]
     },
     {
         "name": "Jessel Terante",
         "gender": "Female",
         "year_section": "3A",
-        "sports": "Modified Voleyball"
+        "sports": "Modified Voleyball",
+        "sport_codes": [
+            "MODIFIED-VOLLEYBALL-WOMEN"
+        ],
+        "source_rows": [
+            "A80"
+        ]
     },
     {
         "name": "Rhea Catarman",
         "gender": "Female",
         "year_section": "3B",
-        "sports": "Modified Voleyball"
+        "sports": "Modified Voleyball",
+        "sport_codes": [
+            "MODIFIED-VOLLEYBALL-WOMEN"
+        ],
+        "source_rows": [
+            "A81"
+        ]
     },
     {
         "name": "Ma. Christina Cillo",
         "gender": "Female",
         "year_section": "3B",
-        "sports": "Modified Voleyball"
+        "sports": "Modified Voleyball",
+        "sport_codes": [
+            "MODIFIED-VOLLEYBALL-WOMEN"
+        ],
+        "source_rows": [
+            "A82"
+        ]
     },
     {
         "name": "Reyze Anadon",
         "gender": "Female",
         "year_section": "3A",
-        "sports": "Modified Voleyball"
+        "sports": "Modified Voleyball",
+        "sport_codes": [
+            "MODIFIED-VOLLEYBALL-WOMEN"
+        ],
+        "source_rows": [
+            "A83"
+        ]
     },
     {
         "name": "Ira-Gabriel Escamis",
         "gender": "Male",
         "year_section": "3A",
-        "sports": "Mobile Legends, Chess"
+        "sports": "Mobile Legends, Chess",
+        "sport_codes": [
+            "CHESS-MEN",
+            "ESPORT-ML-MEN"
+        ],
+        "source_rows": [
+            "A84"
+        ]
     },
     {
         "name": "Ryan Kevin Geonzon",
         "gender": "Male",
         "year_section": "3A",
-        "sports": "Mobile Legends, Chess"
+        "sports": "Mobile Legends, Chess",
+        "sport_codes": [
+            "CHESS-MEN",
+            "ESPORT-ML-MEN"
+        ],
+        "source_rows": [
+            "A85"
+        ]
     },
     {
         "name": "Reynaldo Sabalo",
         "gender": "Male",
         "year_section": "3A",
-        "sports": "Mobile Legends"
+        "sports": "Mobile Legends",
+        "sport_codes": [
+            "ESPORT-ML-MEN"
+        ],
+        "source_rows": [
+            "A86"
+        ]
     },
     {
         "name": "John Pierre Bogate",
         "gender": "Male",
         "year_section": "3B",
-        "sports": "Mobile Legends, Pakulo"
+        "sports": "Mobile Legends, Pakulo",
+        "sport_codes": [
+            "ESPORT-ML-MEN"
+        ],
+        "source_rows": [
+            "A87",
+            "A230"
+        ]
     },
     {
         "name": "Loejie Masbate",
         "gender": "Male",
         "year_section": "3B",
-        "sports": "Mobile Legends, Pakulo"
+        "sports": "Mobile Legends, Pakulo",
+        "sport_codes": [
+            "ESPORT-ML-MEN"
+        ],
+        "source_rows": [
+            "A88",
+            "A231"
+        ]
     },
     {
         "name": "Ma. Christina Quijano",
         "gender": "Female",
         "year_section": "3B",
-        "sports": "Mobile Legends, Treasurehenyo"
+        "sports": "Mobile Legends, Treasurehenyo",
+        "sport_codes": [
+            "ESPORT-ML-WOMEN"
+        ],
+        "source_rows": [
+            "A89",
+            "A202"
+        ]
     },
     {
         "name": "Neneth Mary Vete",
         "gender": "Female",
         "year_section": "1B",
-        "sports": "Mobile Legends, Festival Dance"
+        "sports": "Mobile Legends, Festival Dance",
+        "sport_codes": [
+            "ESPORT-ML-WOMEN"
+        ],
+        "source_rows": [
+            "A90",
+            "A170"
+        ]
     },
     {
         "name": "Jesel Nelimida",
         "gender": "Female",
         "year_section": "3A",
-        "sports": "Mobile Legends, Run 400m"
+        "sports": "Mobile Legends, Run 400m",
+        "sport_codes": [
+            "400M-RUN-WOMEN",
+            "ESPORT-ML-WOMEN"
+        ],
+        "source_rows": [
+            "A91"
+        ]
     },
     {
         "name": "Arianne Senoc",
         "gender": "Female",
         "year_section": "3A",
-        "sports": "Mobile Legends"
+        "sports": "Mobile Legends",
+        "sport_codes": [
+            "ESPORT-ML-WOMEN"
+        ],
+        "source_rows": [
+            "A92"
+        ]
     },
     {
         "name": "Kris Tindugan",
         "gender": "Female",
         "year_section": "3A",
-        "sports": "Mobile Legends, Badminton (D)"
+        "sports": "Mobile Legends, Badminton (D), Badminton (D)",
+        "sport_codes": [
+            "BADMINTON-DOUBLES-WOMEN",
+            "ESPORT-ML-WOMEN"
+        ],
+        "source_rows": [
+            "A93",
+            "A103"
+        ]
     },
     {
         "name": "Sophia Cyril Iligan",
         "gender": "Female",
         "year_section": "4A",
-        "sports": "Mobile Legends"
+        "sports": "Mobile Legends",
+        "sport_codes": [
+            "ESPORT-ML-WOMEN"
+        ],
+        "source_rows": [
+            "A94"
+        ]
     },
     {
         "name": "Jai Garcia",
         "gender": "Female",
         "year_section": "2A",
-        "sports": "3X3 Basketball"
+        "sports": "3X3 Basketball",
+        "sport_codes": [
+            "BASKET-3X3-WOMEN"
+        ],
+        "source_rows": [
+            "A95"
+        ]
     },
     {
         "name": "Ailicka Cojano",
         "gender": "Female",
         "year_section": "3A",
-        "sports": "3X3 Basketball, Russian Softball"
+        "sports": "3X3 Basketball, Russian Softball",
+        "sport_codes": [
+            "BASKET-3X3-WOMEN",
+            "RUSSIAN-SOFTBALL"
+        ],
+        "source_rows": [
+            "A96",
+            "A130"
+        ]
     },
     {
         "name": "Clent John Reputana",
         "gender": "Male",
         "year_section": "4A",
-        "sports": "Beach Volleyball, Isiphenyo, Treasurehenyo"
+        "sports": "Beach Volleyball, Isiphenyo, Treasurehenyo",
+        "sport_codes": [
+            "BEACH-VOLLEYBALL-MEN"
+        ],
+        "source_rows": [
+            "A97",
+            "A189"
+        ]
     },
     {
         "name": "Christian James Añavesa",
         "gender": "Male",
         "year_section": "2B",
-        "sports": "Beach Volleyball, Festival Dance, Sayawerte, Pageant"
+        "sports": "Beach Volleyball, Festival Dance, Sayawerte, Pageant",
+        "sport_codes": [
+            "BEACH-VOLLEYBALL-MEN"
+        ],
+        "source_rows": [
+            "A98",
+            "A144"
+        ]
     },
     {
         "name": "Jimuel Vertudazo",
         "gender": "Male",
         "year_section": "4B",
-        "sports": "Badminton (S), Short film"
+        "sports": "Badminton (S), Short film",
+        "sport_codes": [
+            "BADMINTON-SINGLES-MEN"
+        ],
+        "source_rows": [
+            "A99",
+            "A191"
+        ]
     },
     {
         "name": "Ned Francis Aves",
         "gender": "Male",
         "year_section": "1B",
-        "sports": "Badminton (S), Festival Dance, Pageant"
+        "sports": "Badminton (S), Festival Dance, Pageant",
+        "sport_codes": [
+            "BADMINTON-SINGLES-MEN"
+        ],
+        "source_rows": [
+            "A100",
+            "A140"
+        ]
     },
     {
         "name": "Jelian Dagaas",
         "gender": "Female",
         "year_section": "1A",
-        "sports": "Badminton (S)"
+        "sports": "Badminton (S)",
+        "sport_codes": [
+            "BADMINTON-SINGLES-WOMEN"
+        ],
+        "source_rows": [
+            "A101"
+        ]
     },
     {
         "name": "Rida Munda",
         "gender": "Female",
         "year_section": "4A",
-        "sports": "Badminton (S)"
+        "sports": "Badminton (S)",
+        "sport_codes": [
+            "BADMINTON-SINGLES-WOMEN"
+        ],
+        "source_rows": [
+            "A102"
+        ]
     },
     {
         "name": "Vinice Maya Vilbar",
         "gender": "Female",
         "year_section": "3A",
-        "sports": "Badminton (D)"
+        "sports": "Badminton (D)",
+        "sport_codes": [
+            "BADMINTON-DOUBLES-WOMEN"
+        ],
+        "source_rows": [
+            "A104"
+        ]
     },
     {
         "name": "Den Ivor Aplan",
         "gender": "Male",
         "year_section": "2A",
-        "sports": "Chess"
+        "sports": "Chess",
+        "sport_codes": [
+            "CHESS-MEN"
+        ],
+        "source_rows": [
+            "A105"
+        ]
     },
     {
         "name": "Hammiah Abonita",
         "gender": "Female",
         "year_section": "2A",
-        "sports": "Chess"
+        "sports": "Chess",
+        "sport_codes": [
+            "CHESS-WOMEN"
+        ],
+        "source_rows": [
+            "A106"
+        ]
     },
     {
         "name": "Mardie Varon",
         "gender": "Female",
         "year_section": "2A",
-        "sports": "Chess"
+        "sports": "Chess",
+        "sport_codes": [
+            "CHESS-WOMEN"
+        ],
+        "source_rows": [
+            "A107"
+        ]
     },
     {
         "name": "Sean Davin Felisilda",
         "gender": "Male",
         "year_section": "4A",
-        "sports": "Javelin"
+        "sports": "Javelin",
+        "sport_codes": [
+            "JAVELIN-THROW-MEN"
+        ],
+        "source_rows": [
+            "A108"
+        ]
     },
     {
         "name": "Julieven Leyes",
         "gender": "Male",
         "year_section": "3A",
-        "sports": "Javelin"
+        "sports": "Javelin",
+        "sport_codes": [
+            "JAVELIN-THROW-MEN"
+        ],
+        "source_rows": [
+            "A109"
+        ]
     },
     {
         "name": "Meca Serdan",
         "gender": "Female",
         "year_section": "2B",
-        "sports": "Javelin, Pakulo"
+        "sports": "Javelin, Pakulo",
+        "sport_codes": [
+            "JAVELIN-THROW-WOMEN"
+        ],
+        "source_rows": [
+            "A110",
+            "A228"
+        ]
     },
     {
         "name": "Abel Jhon Cempron",
         "gender": "Male",
         "year_section": "4A",
-        "sports": "Discuss"
+        "sports": "Discuss",
+        "sport_codes": [
+            "DISCUS-THROW-MEN"
+        ],
+        "source_rows": [
+            "A111"
+        ]
     },
     {
         "name": "Rheachell Letrero",
         "gender": "Female",
         "year_section": "4A",
-        "sports": "Shotput"
+        "sports": "Shotput",
+        "sport_codes": [
+            "SHOT-PUT-WOMEN"
+        ],
+        "source_rows": [
+            "A112"
+        ]
     },
     {
         "name": "Sandra Cillo",
         "gender": "Female",
         "year_section": "2A",
-        "sports": "Run 400m, Relay 4x400, Festival Dance"
+        "sports": "Run 400m, Relay 4x400, Festival Dance",
+        "sport_codes": [
+            "400M-RUN-WOMEN",
+            "RELAY-4X400-WOMEN"
+        ],
+        "source_rows": [
+            "A113",
+            "A172"
+        ]
     },
     {
         "name": "Algie Silvio",
         "gender": "Male",
         "year_section": "2A",
-        "sports": "Run 200m, Table Tennis, Collaborative Painting"
+        "sports": "Run 200m, Table Tennis, Collaborative Painting",
+        "sport_codes": [
+            "200M-RUN-MEN",
+            "TABLE-TENNIS-SINGLES-MEN"
+        ],
+        "source_rows": [
+            "A114",
+            "A216"
+        ]
     },
     {
         "name": "Syra Eve Ayop",
         "gender": "Female",
         "year_section": "3A",
-        "sports": "Run 200m"
+        "sports": "Run 200m",
+        "sport_codes": [
+            "200M-RUN-WOMEN"
+        ],
+        "source_rows": [
+            "A115"
+        ]
     },
     {
         "name": "Gemmalyn Majestrado",
         "gender": "Female",
         "year_section": "3A",
-        "sports": "Run 200m, Festival Dance"
+        "sports": "Run 200m, Festival Dance",
+        "sport_codes": [
+            "200M-RUN-WOMEN"
+        ],
+        "source_rows": [
+            "A116",
+            "A168"
+        ]
     },
     {
         "name": "James Basas",
         "gender": "Male",
         "year_section": "1A",
-        "sports": "Run 100m"
+        "sports": "Run 100m",
+        "sport_codes": [
+            "100M-RUN-MEN"
+        ],
+        "source_rows": [
+            "A117"
+        ]
     },
     {
         "name": "Maricar Dayola",
         "gender": "Female",
         "year_section": "2B",
-        "sports": "Run 100m, Festival Dance, Sayawerte, Pakulo"
+        "sports": "Run 100m, Festival Dance, Sayawerte, Pakulo",
+        "sport_codes": [
+            "100M-RUN-WOMEN"
+        ],
+        "source_rows": [
+            "A118",
+            "A173"
+        ]
     },
     {
         "name": "Uri John Ballos",
         "gender": "Male",
         "year_section": "3A",
-        "sports": "Triple Jump, Relay 4x100, Collaborative Painting"
+        "sports": "Triple Jump, Relay 4x100, Collaborative Painting",
+        "sport_codes": [
+            "RELAY-4X100-MEN",
+            "TRIPLE-JUMP-MEN"
+        ],
+        "source_rows": [
+            "A119",
+            "A211"
+        ]
     },
     {
         "name": "Justine Navarrosa",
         "gender": "Female",
         "year_section": "3A",
-        "sports": "Long Jump"
+        "sports": "Long Jump",
+        "sport_codes": [
+            "LONG-JUMP-WOMEN"
+        ],
+        "source_rows": [
+            "A120"
+        ]
     },
     {
         "name": "Jellybeth Gagan",
         "gender": "Female",
         "year_section": "3A",
-        "sports": "Triple Jump"
+        "sports": "Triple Jump",
+        "sport_codes": [
+            "TRIPLE-JUMP-WOMEN"
+        ],
+        "source_rows": [
+            "A121"
+        ]
     },
     {
         "name": "Francislee Moldez",
         "gender": "Male",
         "year_section": "1B",
-        "sports": "Long Jump"
+        "sports": "Long Jump",
+        "sport_codes": [
+            "LONG-JUMP-MEN"
+        ],
+        "source_rows": [
+            "A122"
+        ]
     },
     {
         "name": "Kian Eco",
         "gender": "Male",
         "year_section": "3B",
-        "sports": "Table Tennis, Baseball"
+        "sports": "Table Tennis, Baseball",
+        "sport_codes": [
+            "BASEBALL",
+            "TABLE-TENNIS-SINGLES-MEN"
+        ],
+        "source_rows": [
+            "A123"
+        ]
     },
     {
         "name": "Lawrence Gesulga",
         "gender": "Male",
         "year_section": "2A",
-        "sports": "Table Tennis, Pencil Drawing, Collaborative Painting"
+        "sports": "Table Tennis, Pencil Drawing, Collaborative Painting",
+        "sport_codes": [
+            "TABLE-TENNIS-SINGLES-MEN"
+        ],
+        "source_rows": [
+            "A124",
+            "A207"
+        ]
     },
     {
         "name": "Anne Rica Sumaya",
         "gender": "Female",
         "year_section": "4A",
-        "sports": "Table Tennis"
+        "sports": "Table Tennis",
+        "sport_codes": [
+            "TABLE-TENNIS-SINGLES-WOMEN"
+        ],
+        "source_rows": [
+            "A125"
+        ]
     },
     {
         "name": "Conching Alboleras",
         "gender": "Female",
         "year_section": "4A",
-        "sports": "Russian Softball"
+        "sports": "Russian Softball",
+        "sport_codes": [
+            "RUSSIAN-SOFTBALL"
+        ],
+        "source_rows": [
+            "A126"
+        ]
     },
     {
         "name": "Joanne Vienes",
         "gender": "Female",
         "year_section": "4A",
-        "sports": "3x3 Basketball, Russian Softball"
+        "sports": "3x3 Basketball, Russian Softball",
+        "sport_codes": [
+            "BASKET-3X3-WOMEN",
+            "RUSSIAN-SOFTBALL"
+        ],
+        "source_rows": [
+            "A127",
+            "A131"
+        ]
     },
     {
         "name": "Robert Tabis",
         "gender": "Male",
         "year_section": "3B",
-        "sports": "Russian Softball"
+        "sports": "Russian Softball",
+        "sport_codes": [
+            "RUSSIAN-SOFTBALL"
+        ],
+        "source_rows": [
+            "A128"
+        ]
     },
     {
         "name": "Jelian Vinculado",
         "gender": "Female",
         "year_section": "2A",
-        "sports": "Russian Softball, Festival Dance, Pakulo"
+        "sports": "Russian Softball, Festival Dance, Pakulo",
+        "sport_codes": [
+            "RUSSIAN-SOFTBALL"
+        ],
+        "source_rows": [
+            "A129",
+            "A155"
+        ]
     },
     {
         "name": "Jorina Dumali",
         "gender": "Female",
         "year_section": "3B",
-        "sports": "Russian Softball"
+        "sports": "Russian Softball",
+        "sport_codes": [
+            "RUSSIAN-SOFTBALL"
+        ],
+        "source_rows": [
+            "A132"
+        ]
     },
     {
         "name": "Kristine Grace Lleve",
         "gender": "Female",
         "year_section": "1B",
-        "sports": "Russian Softball, Festival Dance"
+        "sports": "Russian Softball, Festival Dance",
+        "sport_codes": [
+            "RUSSIAN-SOFTBALL"
+        ],
+        "source_rows": [
+            "A133",
+            "A164"
+        ]
     },
     {
         "name": "Emmanuela Noreen Villaro",
         "gender": "Female",
         "year_section": "1B",
-        "sports": "Russian Softball"
+        "sports": "Russian Softball",
+        "sport_codes": [
+            "RUSSIAN-SOFTBALL"
+        ],
+        "source_rows": [
+            "A134"
+        ]
+    },
+    {
+        "name": "Chenne Eunice Balogo",
+        "gender": "Female",
+        "year_section": "N/A",
+        "sports": "basketball",
+        "sport_codes": [
+            "BASKET-5X5-WOMEN"
+        ],
+        "source_rows": [
+            "A135"
+        ]
     },
     {
         "name": "Domingo Andrey Maimot",
         "gender": "Male",
         "year_section": "3A",
-        "sports": "Festival Dance, Isiphenyo, Treasurehenyo, Collaborative Painting"
+        "sports": "Festival Dance, Isiphenyo, Treasurehenyo, Collaborative Painting",
+        "sport_codes": [],
+        "source_rows": [
+            "A139"
+        ]
     },
     {
         "name": "Clint Rainiel Hindang",
         "gender": "Male",
         "year_section": "4A",
-        "sports": "Festival Dance, Treasurehenyo"
+        "sports": "Festival Dance, Treasurehenyo",
+        "sport_codes": [],
+        "source_rows": [
+            "A141"
+        ]
     },
     {
         "name": "Ejay Ello",
         "gender": "Male",
         "year_section": "2A",
-        "sports": "Festival Dance, Digital Poster Making, Pakulo"
+        "sports": "Festival Dance, Digital Poster Making, Pakulo, Digital Poster Making",
+        "sport_codes": [],
+        "source_rows": [
+            "A143",
+            "A177"
+        ]
     },
     {
         "name": "Angel Payao",
         "gender": "Female",
         "year_section": "4A",
-        "sports": "Festival Dance"
+        "sports": "Festival Dance",
+        "sport_codes": [],
+        "source_rows": [
+            "A146"
+        ]
     },
     {
         "name": "Marjorie Hermosilla",
         "gender": "Female",
         "year_section": "4A",
-        "sports": "Festival Dance, Collaborative Painting"
+        "sports": "Festival Dance, Collaborative Painting",
+        "sport_codes": [],
+        "source_rows": [
+            "A147"
+        ]
     },
     {
         "name": "Reina Comilang",
         "gender": "Female",
         "year_section": "4A",
-        "sports": "Festival Dance"
+        "sports": "Festival Dance",
+        "sport_codes": [],
+        "source_rows": [
+            "A150"
+        ]
     },
     {
         "name": "Hammiah Cane Abonita",
         "gender": "Female",
         "year_section": "2A",
-        "sports": "Festival Dance"
+        "sports": "Festival Dance",
+        "sport_codes": [],
+        "source_rows": [
+            "A151"
+        ]
     },
     {
         "name": "Rena Valdueza",
         "gender": "Female",
         "year_section": "1A",
-        "sports": "Festival Dance"
+        "sports": "Festival Dance",
+        "sport_codes": [],
+        "source_rows": [
+            "A152"
+        ]
     },
     {
         "name": "Kyle Marie Escoro",
         "gender": "Female",
         "year_section": "1A",
-        "sports": "Festival Dance"
+        "sports": "Festival Dance",
+        "sport_codes": [],
+        "source_rows": [
+            "A153"
+        ]
     },
     {
         "name": "Gia Mae Caster",
         "gender": "Female",
         "year_section": "1A",
-        "sports": "Festival Dance"
+        "sports": "Festival Dance",
+        "sport_codes": [],
+        "source_rows": [
+            "A154"
+        ]
     },
     {
         "name": "Rose Ann Orag",
         "gender": "Female",
         "year_section": "1A",
-        "sports": "Festival Dance"
+        "sports": "Festival Dance",
+        "sport_codes": [],
+        "source_rows": [
+            "A157"
+        ]
     },
     {
         "name": "Princess Ningal",
         "gender": "Female",
         "year_section": "1A",
-        "sports": "Festival Dance"
+        "sports": "Festival Dance",
+        "sport_codes": [],
+        "source_rows": [
+            "A158"
+        ]
     },
     {
         "name": "Kyte Laurise Sanoria",
         "gender": "Female",
         "year_section": "1A",
-        "sports": "Festival Dance"
+        "sports": "Festival Dance",
+        "sport_codes": [],
+        "source_rows": [
+            "A159"
+        ]
     },
     {
         "name": "Anjelica Vanzuela",
         "gender": "Female",
         "year_section": "2A",
-        "sports": "Festival Dance"
+        "sports": "Festival Dance",
+        "sport_codes": [],
+        "source_rows": [
+            "A160"
+        ]
     },
     {
         "name": "Jilliane Mae Bajao",
         "gender": "Female",
         "year_section": "1A",
-        "sports": "Festival Dance"
+        "sports": "Festival Dance",
+        "sport_codes": [],
+        "source_rows": [
+            "A161"
+        ]
     },
     {
         "name": "Jeziel Ann Sajol",
         "gender": "Female",
         "year_section": "2B",
-        "sports": "Festival Dance, Sayawerte, Gen Z Balitaw"
+        "sports": "Festival Dance, Sayawerte, Gen Z Balitaw",
+        "sport_codes": [],
+        "source_rows": [
+            "A162"
+        ]
     },
     {
         "name": "Angely Tuñacao",
         "gender": "Female",
         "year_section": "2B",
-        "sports": "Festival Dance, Pakulo"
+        "sports": "Festival Dance, Pakulo",
+        "sport_codes": [],
+        "source_rows": [
+            "A163"
+        ]
     },
     {
         "name": "Zyra Rosete",
         "gender": "Female",
         "year_section": "1B",
-        "sports": "Festival Dance"
+        "sports": "Festival Dance",
+        "sport_codes": [],
+        "source_rows": [
+            "A165"
+        ]
     },
     {
         "name": "Cristine Joy Dela Cruz",
         "gender": "Female",
         "year_section": "1B",
-        "sports": "Festival Dance"
+        "sports": "Festival Dance",
+        "sport_codes": [],
+        "source_rows": [
+            "A166"
+        ]
     },
     {
         "name": "Emmanuela Jane Villaro",
         "gender": "Female",
         "year_section": "1B",
-        "sports": "Festival Dance"
+        "sports": "Festival Dance",
+        "sport_codes": [],
+        "source_rows": [
+            "A167"
+        ]
     },
     {
         "name": "Justine Navarossa",
         "gender": "Female",
         "year_section": "3A",
-        "sports": "Festival Dance"
+        "sports": "Festival Dance",
+        "sport_codes": [],
+        "source_rows": [
+            "A169"
+        ]
     },
     {
         "name": "Angel Catarman",
         "gender": "Female",
         "year_section": "1B",
-        "sports": "Festival Dance"
+        "sports": "Festival Dance",
+        "sport_codes": [],
+        "source_rows": [
+            "A171"
+        ]
     },
     {
         "name": "Marielle Paloguer",
         "gender": "Female",
         "year_section": "2A",
-        "sports": "Festival Dance, Sayawerte, Pageant, Pakulo"
+        "sports": "Festival Dance, Sayawerte, Pageant, Pakulo",
+        "sport_codes": [],
+        "source_rows": [
+            "A174"
+        ]
     },
     {
         "name": "Katrina Gomez",
         "gender": "Female",
         "year_section": "3A",
-        "sports": "Festival Dance, Collaborative Painting"
+        "sports": "Festival Dance, Collaborative Painting",
+        "sport_codes": [],
+        "source_rows": [
+            "A175"
+        ]
     },
     {
         "name": "Jessa Cabahug",
         "gender": "Female",
         "year_section": "2A",
-        "sports": "Festival Dance"
+        "sports": "Festival Dance",
+        "sport_codes": [],
+        "source_rows": [
+            "A176"
+        ]
     },
     {
         "name": "Geraldyn Goda",
         "gender": "Female",
         "year_section": "2B",
-        "sports": "Digital Poster Making"
+        "sports": "Digital Poster Making",
+        "sport_codes": [],
+        "source_rows": [
+            "A178"
+        ]
     },
     {
         "name": "Joshua Lamoste",
         "gender": "Male",
         "year_section": "3B",
-        "sports": "Festival, Sayawerte, Treasurehenyo"
+        "sports": "Festival, Sayawerte, Treasurehenyo",
+        "sport_codes": [],
+        "source_rows": [
+            "A179"
+        ]
     },
     {
         "name": "Mary Dominguez",
         "gender": "Female",
         "year_section": "2A",
-        "sports": "Sayawerte, Pakulo"
+        "sports": "Sayawerte, Pakulo",
+        "sport_codes": [],
+        "source_rows": [
+            "A180"
+        ]
     },
     {
         "name": "Emman Albero",
         "gender": "Male",
         "year_section": "1B",
-        "sports": "Singswerte Solo & Duet"
+        "sports": "Singswerte Solo & Duet",
+        "sport_codes": [],
+        "source_rows": [
+            "A182"
+        ]
     },
     {
         "name": "Sharnet Rylen Araniego",
         "gender": "Female",
         "year_section": "1A",
-        "sports": "Singswerte Solo & Duet, Isiphenyo, Collaborative Painting"
+        "sports": "Singswerte Solo & Duet, Isiphenyo, Collaborative Painting",
+        "sport_codes": [],
+        "source_rows": [
+            "A184"
+        ]
     },
     {
         "name": "Anjelo Rusaban",
         "gender": "Male",
         "year_section": "2B",
-        "sports": "Singswerte Solo & Duet, Short Film, Collaborative Painting, Gen Z Balitaw"
+        "sports": "Singswerte Solo & Duet, Short Film, Collaborative Painting, Gen Z Balitaw",
+        "sport_codes": [],
+        "source_rows": [
+            "A186"
+        ]
     },
     {
         "name": "Christian Van Nodalo",
         "gender": "Male",
         "year_section": "3B",
-        "sports": "Short film"
+        "sports": "Short film",
+        "sport_codes": [],
+        "source_rows": [
+            "A190"
+        ]
     },
     {
         "name": "Zedric Urgel",
         "gender": "Male",
         "year_section": "1B",
-        "sports": "Short film"
+        "sports": "Short film",
+        "sport_codes": [],
+        "source_rows": [
+            "A192"
+        ]
     },
     {
         "name": "Naizy Zairah Fegi",
         "gender": "Female",
         "year_section": "2B",
-        "sports": "Short film, Pakulo"
+        "sports": "Short film, Pakulo",
+        "sport_codes": [],
+        "source_rows": [
+            "A194"
+        ]
     },
     {
         "name": "Nicole Orit",
         "gender": "Female",
         "year_section": "2B",
-        "sports": "Short film"
+        "sports": "Short film",
+        "sport_codes": [],
+        "source_rows": [
+            "A195"
+        ]
     },
     {
         "name": "Gladys Telin",
         "gender": "Female",
         "year_section": "4A",
-        "sports": "Short film"
+        "sports": "Short film",
+        "sport_codes": [],
+        "source_rows": [
+            "A196"
+        ]
     },
     {
         "name": "Divine Dacera",
         "gender": "Female",
         "year_section": "N/A",
-        "sports": "Treasurehenyo"
+        "sports": "Treasurehenyo",
+        "sport_codes": [],
+        "source_rows": [
+            "A198"
+        ]
     },
     {
         "name": "Syra Ayop",
         "gender": "Female",
         "year_section": "N/A",
-        "sports": "Treasurehenyo"
+        "sports": "Treasurehenyo",
+        "sport_codes": [],
+        "source_rows": [
+            "A199"
+        ]
     },
     {
         "name": "Kim Angela Ingente",
         "gender": "Female",
         "year_section": "N/A",
-        "sports": "Treasurehenyo"
+        "sports": "Treasurehenyo",
+        "sport_codes": [],
+        "source_rows": [
+            "A200"
+        ]
     },
     {
         "name": "Ryzie Anadon",
         "gender": "Female",
         "year_section": "N/A",
-        "sports": "Treasurehenyo"
+        "sports": "Treasurehenyo",
+        "sport_codes": [],
+        "source_rows": [
+            "A201"
+        ]
     },
     {
         "name": "Joed Macasocol",
         "gender": "Male",
         "year_section": "N/A",
-        "sports": "Digital Photograpy, Collaborative Painting"
+        "sports": "Digital Photograpy, Collaborative Painting",
+        "sport_codes": [],
+        "source_rows": [
+            "A203"
+        ]
     },
     {
         "name": "Glenys Calubag",
         "gender": "Female",
         "year_section": "N/A",
-        "sports": "Digital Photograpy, Collaborative Painting"
+        "sports": "Digital Photograpy, Collaborative Painting",
+        "sport_codes": [],
+        "source_rows": [
+            "A204"
+        ]
     },
     {
         "name": "Mekylla Jed Lagbas",
         "gender": "Female",
         "year_section": "4A",
-        "sports": "Infographics"
+        "sports": "Infographics",
+        "sport_codes": [],
+        "source_rows": [
+            "A206"
+        ]
     },
     {
         "name": "Shane Ranes",
         "gender": "Female",
         "year_section": "4A",
-        "sports": "Pencil Drawing, Collaborative Painting"
+        "sports": "Pencil Drawing, Collaborative Painting",
+        "sport_codes": [],
+        "source_rows": [
+            "A208"
+        ]
     },
     {
         "name": "Antonio Labor",
         "gender": "Male",
         "year_section": "1A",
-        "sports": "Charcoal Rendering, Collaborative Painting"
+        "sports": "Charcoal Rendering, Collaborative Painting",
+        "sport_codes": [],
+        "source_rows": [
+            "A209"
+        ]
     },
     {
         "name": "Reign Angelie Gotis",
         "gender": "Female",
         "year_section": "N/A",
-        "sports": "Charcoal Rendering, Collaborative Painting"
+        "sports": "Charcoal Rendering, Collaborative Painting",
+        "sport_codes": [],
+        "source_rows": [
+            "A210"
+        ]
     },
     {
         "name": "Emma Maymay",
         "gender": "Female",
         "year_section": "2A",
-        "sports": "Collaborative Painting"
+        "sports": "Collaborative Painting",
+        "sport_codes": [],
+        "source_rows": [
+            "A213"
+        ]
     },
     {
         "name": "Gian Nino Pattaguan",
         "gender": "Male",
         "year_section": "4A",
-        "sports": "Collaborative Painting"
+        "sports": "Collaborative Painting",
+        "sport_codes": [],
+        "source_rows": [
+            "A214"
+        ]
     },
     {
         "name": "John Mondal",
         "gender": "Male",
         "year_section": "2A",
-        "sports": "Collaborative Painting"
+        "sports": "Collaborative Painting",
+        "sport_codes": [],
+        "source_rows": [
+            "A215"
+        ]
     },
     {
         "name": "Queen Cyvel Molina",
         "gender": "Female",
         "year_section": "2B",
-        "sports": "Collaborative Painting, Pageant"
+        "sports": "Collaborative Painting, Pageant",
+        "sport_codes": [],
+        "source_rows": [
+            "A217"
+        ]
     },
     {
         "name": "Mark Aranez",
         "gender": "Male",
         "year_section": "N/A",
-        "sports": "Collaborative Painting"
+        "sports": "Collaborative Painting",
+        "sport_codes": [],
+        "source_rows": [
+            "A218"
+        ]
     },
     {
         "name": "Karylle Paloguer",
         "gender": "Male",
         "year_section": "2A",
-        "sports": "Pageant, Pakulo"
+        "sports": "Pageant, Pakulo",
+        "sport_codes": [],
+        "source_rows": [
+            "A220"
+        ]
     },
     {
         "name": "Danica Espella",
         "gender": "Female",
         "year_section": "N/A",
-        "sports": "Pageant"
+        "sports": "Pageant",
+        "sport_codes": [],
+        "source_rows": [
+            "A221"
+        ]
     },
     {
         "name": "Janjie Pacala",
         "gender": "Female",
         "year_section": "2B",
-        "sports": "Pakulo"
+        "sports": "Pakulo",
+        "sport_codes": [],
+        "source_rows": [
+            "A222"
+        ]
     },
     {
         "name": "Therese Tavera",
         "gender": "Female",
         "year_section": "2B",
-        "sports": "Pakulo"
+        "sports": "Pakulo",
+        "sport_codes": [],
+        "source_rows": [
+            "A223"
+        ]
     },
     {
         "name": "Jesryl Sampinit",
         "gender": "Female",
         "year_section": "2B",
-        "sports": "Pakulo"
+        "sports": "Pakulo",
+        "sport_codes": [],
+        "source_rows": [
+            "A224"
+        ]
     },
     {
         "name": "Honeylyn Dugos",
         "gender": "Female",
         "year_section": "2B",
-        "sports": "Pakulo"
+        "sports": "Pakulo",
+        "sport_codes": [],
+        "source_rows": [
+            "A225"
+        ]
     },
     {
         "name": "Kim Refaja",
         "gender": "Female",
         "year_section": "N/A",
-        "sports": "Pakulo"
+        "sports": "Pakulo",
+        "sport_codes": [],
+        "source_rows": [
+            "A226"
+        ]
     },
     {
         "name": "Zyra Siaton",
         "gender": "Female",
         "year_section": "2B",
-        "sports": "Pakulo"
+        "sports": "Pakulo",
+        "sport_codes": [],
+        "source_rows": [
+            "A227"
+        ]
     },
     {
         "name": "Elgie Pelobueno",
         "gender": "Female",
         "year_section": "2B",
-        "sports": "Pakulo"
+        "sports": "Pakulo",
+        "sport_codes": [],
+        "source_rows": [
+            "A229"
+        ]
     },
     {
         "name": "Jian Milano",
         "gender": "Female",
         "year_section": "N/A",
-        "sports": "Pakulo"
+        "sports": "Pakulo",
+        "sport_codes": [],
+        "source_rows": [
+            "A232"
+        ]
     }
 ]

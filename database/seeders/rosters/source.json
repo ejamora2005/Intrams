@@ -1,0 +1,37 @@
+{
+    "source_url": "https://docs.google.com/spreadsheets/d/1EuRMmxypl1DMbZNtRFzYeWp1OaAIHPxobQRRxak2Ra4/edit",
+    "snapshot_date": "2026-10-18",
+    "xlsx_sha256": "c05151854a1c297816de70c70514c2d06cd41db17aea5b3e68234b15698758a8",
+    "import_scope": "Sports registrations and all named faction members. Cultural labels remain source notes; existing cultural registrations are preserved.",
+    "duplicate_policy": "Normalize name casing, accents, punctuation, whitespace and surname-first notation. Union distinct sport codes. Use explicit aliases for verified older name forms.",
+    "resolutions": {
+        "Ailicka Cojano": "3A, confirmed by user; combine basketball and Russian Softball",
+        "unspecified_racket_formats": "Retain existing system mappings: badminton doubles and table tennis singles; choose Men/Women from gender."
+    },
+    "tabs": [
+        {
+            "tab": "Trojan Warriors",
+            "source_rows": 148,
+            "unique_members": 148,
+            "combined_duplicate_rows": 0,
+            "sports_registrations": 181,
+            "members_without_sports": 24
+        },
+        {
+            "tab": "Sea Dragons",
+            "source_rows": 229,
+            "unique_members": 192,
+            "combined_duplicate_rows": 37,
+            "sports_registrations": 175,
+            "members_without_sports": 61
+        },
+        {
+            "tab": "Terraquatic Eagles",
+            "source_rows": 161,
+            "unique_members": 161,
+            "combined_duplicate_rows": 0,
+            "sports_registrations": 162,
+            "members_without_sports": 47
+        }
+    ]
+}

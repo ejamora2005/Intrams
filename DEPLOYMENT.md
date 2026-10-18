@@ -33,12 +33,12 @@ Redeploy the latest code before running these commands in the `intrams` app cont
 ```bash
 cd /var/www/html
 php artisan migrate --force
-php artisan db:seed --class=DefaultIntramuralsSeeder --force
+php artisan db:seed --class=CurrentFactionRostersSeeder --force
 ```
 
-The current roster contains 191 Sea Dragons, 161 Terraquatic Eagles, and 143 Trojan Warriors (495 faction members). The seeder synchronizes their sports and cultural registrations with the supplied JSON sheets. Support-only members remain on the faction roster without an event registration; missing academic details use `N/A`.
+The October 18, 2026 Google Sheets snapshot contains 192 Sea Dragons, 161 Terraquatic Eagles, and 148 Trojan Warriors (501 faction members and 518 sports registrations). Duplicate source names are combined and their sports are united. Explicit sport codes match the system's formats and Men/Women categories. Cultural-only and support-only names remain faction members without new event registrations. Existing cultural registrations are preserved; missing academic details use `N/A`. Source provenance and import decisions are recorded in `database/seeders/rosters/source.json`.
 
-Run this import once, then keep `DEPLOY_SEED_DEFAULT_COMPETITIONS=false` so subsequent deployments preserve roster edits made in the app. This command does not run the account seeder. If an outdated athlete registration is already used in a schedule, the affected faction import stops with a message instead of removing that scheduled registration.
+Run this import once, then keep `DEPLOY_SEED_DEFAULT_COMPETITIONS=false` so subsequent deployments preserve roster edits made in the app. This command updates all three rosters in one transaction and does not reset accounts, schedules, wins, results, or points. Existing pair assignments are retained when the source does not specify a pair. It expects the default edition, teams, and sports to exist; for a new empty database, run `php artisan db:seed --class=DefaultIntramuralsSeeder --force` instead. If an outdated sports registration is used in a schedule, the entire roster import rolls back instead of removing that history. Known old name aliases are consolidated; ambiguous individual/pair bracket duplicates require review.
 
 ## Notes
 

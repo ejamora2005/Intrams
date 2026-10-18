@@ -17,8 +17,8 @@ test('default roster seeders import the three current team sheets', function () 
     $seaDragons = Team::query()->where('edition_id', $edition->id)->where('code', 'sea-dragons')->firstOrFail();
     $eagles = Team::query()->where('edition_id', $edition->id)->where('code', 'terraquatic-eagles')->firstOrFail();
 
-    expect(TeamMember::query()->where('team_id', $trojan->id)->count())->toBe(143)
-        ->and(TeamMember::query()->where('team_id', $seaDragons->id)->count())->toBe(191)
+    expect(TeamMember::query()->where('team_id', $trojan->id)->count())->toBe(148)
+        ->and(TeamMember::query()->where('team_id', $seaDragons->id)->count())->toBe(192)
         ->and(TeamMember::query()->where('team_id', $eagles->id)->count())->toBe(161);
 
     $graceGula = Student::query()->where('first_name', 'Grace')->where('last_name', 'Gula')->firstOrFail();
@@ -141,7 +141,7 @@ test('default roster seeders import the three current team sheets', function () 
         ->where('edition_id', $edition->id)
         ->whereHas('sport', fn ($query) => $query->where('code', 'CULT-SING-SOLO'))
         ->firstOrFail();
-    $this->assertDatabaseHas('athlete_entries', [
+    $this->assertDatabaseMissing('athlete_entries', [
         'edition_sport_id' => $singSolo->id,
         'student_id' => $seaCulturalParticipant->id,
         'team_id' => $seaDragons->id,
@@ -152,7 +152,7 @@ test('default roster seeders import the three current team sheets', function () 
         ->where('edition_id', $edition->id)
         ->whereHas('sport', fn ($query) => $query->where('code', 'CULT-FACTION-PAKULO'))
         ->firstOrFail();
-    $this->assertDatabaseHas('athlete_entries', [
+    $this->assertDatabaseMissing('athlete_entries', [
         'edition_sport_id' => $factionPakulo->id,
         'student_id' => $eagleCulturalParticipant->id,
         'team_id' => $eagles->id,
@@ -163,7 +163,7 @@ test('default roster seeders import the three current team sheets', function () 
         ->whereHas('sport', fn ($query) => $query->where('code', 'CULT-FEST-DANCE'))
         ->firstOrFail();
     $festivalStudent = Student::query()->where('last_name', 'Caadyang')->firstOrFail();
-    $this->assertDatabaseHas('athlete_entries', [
+    $this->assertDatabaseMissing('athlete_entries', [
         'edition_sport_id' => $festivalDance->id,
         'student_id' => $festivalStudent->id,
     ]);
@@ -173,7 +173,7 @@ test('default roster seeders import the three current team sheets', function () 
         ->where('edition_id', $edition->id)
         ->whereHas('sport', fn ($query) => $query->where('code', 'CULT-COLLAB-PAINT'))
         ->firstOrFail();
-    $this->assertDatabaseHas('athlete_entries', [
+    $this->assertDatabaseMissing('athlete_entries', [
         'edition_sport_id' => $painting->id,
         'student_id' => $paintingStudent->id,
     ]);
@@ -183,7 +183,7 @@ test('default roster seeders import the three current team sheets', function () 
         ->where('edition_id', $edition->id)
         ->whereHas('sport', fn ($query) => $query->where('code', 'CULT-DIGITAL-POSTER'))
         ->firstOrFail();
-    $this->assertDatabaseHas('athlete_entries', [
+    $this->assertDatabaseMissing('athlete_entries', [
         'edition_sport_id' => $digitalPoster->id,
         'student_id' => $visualArtsStudent->id,
     ]);

@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\AthleteEntry;
+use App\Models\BracketCompetitor;
 use App\Models\EditionSport;
 use App\Models\IntramuralEdition;
 use App\Models\Student;
@@ -35,6 +36,8 @@ abstract class TeamRosterSeeder extends Seeder
         '5x5 basketball women' => ['BASKET-5X5-WOMEN'],
         '5x5' => ['BASKET-5X5'],
         'badminton' => ['BADMINTON'],
+        'badminton men' => ['BADMINTON-DOUBLES-MEN'],
+        'badminton women' => ['BADMINTON-DOUBLES-WOMEN'],
         'badminton d' => ['BADMINTON-DOUBLES'],
         'badminton d men' => ['BADMINTON-DOUBLES-MEN'],
         'badminton doubles' => ['BADMINTON-DOUBLES'],
@@ -176,6 +179,8 @@ abstract class TeamRosterSeeder extends Seeder
         'singwerte duet' => ['CULT-SING-DUET'],
         'singswerte solo' => ['CULT-SING-SOLO'],
         'table tennis' => ['TABLE-TENNIS'],
+        'table tennis men' => ['TABLE-TENNIS-SINGLES-MEN'],
+        'table tennis women' => ['TABLE-TENNIS-SINGLES-WOMEN'],
         'table tennis double men' => ['TABLE-TENNIS-DOUBLES-MEN'],
         'table tennis double women' => ['TABLE-TENNIS-DOUBLES-WOMEN'],
         'table tennis doubles men' => ['TABLE-TENNIS-DOUBLES-MEN'],
@@ -278,6 +283,9 @@ abstract class TeamRosterSeeder extends Seeder
                     if ($editionSport === null) {
                         throw new RuntimeException('Sport '.$sportCode.' is not configured for '.$edition->name.'.');
                     }
+                    if ($editionSport->status === 'archived' || $editionSport->sport?->status !== 'active' || ! $editionSport->sport->acceptsStudentGender($student->gender)) {
+                        throw new RuntimeException('Sport '.$sportCode.' is unavailable or does not match '.$student->full_name.'\'s gender.');
+                    }
 
                     $requiresTeam = in_array($editionSport->participant_type, ['team', 'dual'], true);
                     $entry = AthleteEntry::query()->firstOrCreate(
@@ -296,7 +304,7 @@ abstract class TeamRosterSeeder extends Seeder
                     );
                     $entry->fill([
                         'team_id' => $requiresTeam ? $team->id : null,
-                        'pair_key' => $this->pairKey($row['name'], $sportCode),
+                        'pair_key' => $this->pairKey($row['name'], $sportCode) ?? $entry->pair_key,
                         'status' => 'active',
                     ]);
                     if ($entry->isDirty()) {
@@ -373,7 +381,18 @@ abstract class TeamRosterSeeder extends Seeder
             }
 
             $academicDetails = $this->academicDetails($yearSection, $name, $fillsMissingFieldsWithNa);
-            $sports = $this->sportCodes($sportsValue, $name, $gender);
+            if (array_key_exists('sport_codes', $row)) {
+                if (! is_array($row['sport_codes']) || ! array_is_list($row['sport_codes']) || collect($row['sport_codes'])->contains(fn ($code) => ! is_string($code) || preg_match('/^[A-Z0-9]+(?:-[A-Z0-9]+)*$/', $code) !== 1 || str_starts_with($code, 'CULT-'))) {
+                    throw new RuntimeException('Invalid sport_codes for '.$name.'.');
+                }
+                $sports = array_values(array_unique($row['sport_codes']));
+            } else {
+                $sports = $this->sportCodes($sportsValue, $name, $gender);
+            }
+            $aliases = $row['aliases'] ?? [];
+            if (! is_array($aliases) || ! array_is_list($aliases) || collect($aliases)->contains(fn ($alias) => ! is_string($alias) || trim($alias) === '')) {
+                throw new RuntimeException('Invalid name aliases for '.$name.'.');
+            }
             $nameKey = $this->normalizeName($name);
 
             if (isset($roster[$nameKey])) {
@@ -383,6 +402,7 @@ abstract class TeamRosterSeeder extends Seeder
                 }
 
                 $roster[$nameKey]['sports'] = array_values(array_unique(array_merge($existing['sports'], $sports)));
+                $roster[$nameKey]['aliases'] = array_values(array_unique(array_merge($existing['aliases'], $aliases)));
 
                 continue;
             }
@@ -393,6 +413,7 @@ abstract class TeamRosterSeeder extends Seeder
                 'year_level' => $academicDetails['year_level'],
                 'section' => $academicDetails['section'],
                 'sports' => $sports,
+                'aliases' => $aliases,
             ];
         }
 
@@ -409,7 +430,7 @@ abstract class TeamRosterSeeder extends Seeder
         } elseif ($fillsMissingFieldsWithNa && preg_match('/^([A-D])$/i', $value, $matches) === 1) {
             $yearLevel = 'N/A';
             $section = strtoupper($matches[1]);
-        } elseif (preg_match('/([1-4])\s*-?\s*([A-D])\s*$/i', $value, $matches) === 1) {
+        } elseif (preg_match('/([1-4])\s*[-\/]?\s*([A-D])\s*$/i', $value, $matches) === 1) {
             $year = (int) $matches[1];
             $section = strtoupper($matches[2]);
             $yearLevel = [1 => '1st', 2 => '2nd', 3 => '3rd', 4 => '4th'][$year];
@@ -518,6 +539,9 @@ abstract class TeamRosterSeeder extends Seeder
         $firstName = array_shift($nameParts);
         $middleName = $nameParts !== [] ? implode(' ', $nameParts) : null;
         $attributes = [
+            'first_name' => $firstName,
+            'middle_name' => $middleName,
+            'last_name' => $lastName,
             'school_year' => $edition->school_year,
             'course_id' => $team->course_id,
             'gender' => $row['gender'],
@@ -529,11 +553,6 @@ abstract class TeamRosterSeeder extends Seeder
         if ($student === null) {
             $student = new Student;
             $student->student_number = Str::upper(Str::slug($team->code.' '.$row['name']));
-            $attributes += [
-                'first_name' => $firstName,
-                'middle_name' => $middleName,
-                'last_name' => $lastName,
-            ];
             $created++;
         } elseif ($student->trashed()) {
             $student->restore();
@@ -553,20 +572,67 @@ abstract class TeamRosterSeeder extends Seeder
             throw new RuntimeException('Unable to split student name: '.$row['name'].'.');
         }
 
-        $lastName = end($nameParts);
+        $names = [$row['name'], ...($row['aliases'] ?? [])];
+        $lastNames = array_map(fn ($name) => last(preg_split('/\s+/u', $this->canonicalName($name), -1, PREG_SPLIT_NO_EMPTY)), $names);
+        $nameKeys = array_map(fn ($name) => $this->normalizeName($name), $names);
         $candidates = Student::withTrashed()
-            ->where(function ($query) use ($lastName): void {
-                $query->where('last_name', $lastName)
-                    ->orWhere('last_name', 'like', '% '.$lastName);
+            ->where(function ($query) use ($lastNames): void {
+                foreach ($lastNames as $lastName) {
+                    $query->orWhere('last_name', $lastName)->orWhere('last_name', 'like', '% '.$lastName);
+                }
             })
             ->get();
-        $matches = $candidates->filter(fn (Student $student): bool => $this->normalizeName($student->full_name) === $this->normalizeName($row['name']));
+        $matches = $candidates->filter(fn (Student $student): bool => in_array($this->normalizeName($student->full_name), $nameKeys, true));
+        $active = $matches->reject(fn (Student $student): bool => $student->trashed())
+            ->sortBy(fn (Student $student): int => $this->normalizeName($student->full_name) === $nameKeys[0] ? 0 : 1);
 
-        if ($matches->count() > 1) {
-            throw new RuntimeException('Multiple existing student records match '.$row['name'].'.');
+        if ($active->isNotEmpty()) {
+            $student = $active->first();
+            foreach ($active->skip(1) as $duplicate) {
+                $this->mergeDuplicateStudent($student, $duplicate);
+            }
+
+            return $student;
         }
 
         return $matches->first();
+    }
+
+    private function mergeDuplicateStudent(Student $student, Student $duplicate): void
+    {
+        foreach ($duplicate->teamMembers()->get() as $membership) {
+            $existing = $student->teamMembers()->where('edition_id', $membership->edition_id)->first();
+            if ($existing && $existing->team_id !== $membership->team_id) {
+                throw new RuntimeException('Duplicate '.$duplicate->full_name.' belongs to another faction; resolve the faction before importing.');
+            }
+            $existing ? $membership->delete() : $membership->update(['student_id' => $student->id]);
+        }
+        foreach ($duplicate->athleteEntries()->get() as $entry) {
+            $existing = $student->athleteEntries()->where('edition_sport_id', $entry->edition_sport_id)->first();
+            if ($existing === null) {
+                $entry->update(['student_id' => $student->id]);
+
+                continue;
+            }
+            if ($existing->team_id !== $entry->team_id || (filled($existing->pair_key) && filled($entry->pair_key) && $existing->pair_key !== $entry->pair_key)) {
+                throw new RuntimeException('Duplicate registration for '.$duplicate->full_name.' has conflicting faction or pair assignments.');
+            }
+            $competitors = BracketCompetitor::whereJsonContains('athlete_entry_ids', $entry->id)->get();
+            // Team competitors keep their identity when their roster is
+            // deduplicated. Individual/pair match history needs manual review.
+            if (DB::table('schedule_participants')->where('athlete_entry_id', $entry->id)->exists()
+                || $competitors->contains(fn ($competitor) => $competitor->type !== 'team')) {
+                throw new RuntimeException('Duplicate registration for '.$duplicate->full_name.' is used in a schedule or bracket; merge it before importing.');
+            }
+            foreach ($competitors as $competitor) {
+                $competitor->update(['athlete_entry_ids' => collect($competitor->athlete_entry_ids)->map(fn ($id) => (int) $id === $entry->id ? $existing->id : (int) $id)->unique()->values()->all()]);
+            }
+            if ($entry->medical_certificate_status === 'verified' && $existing->medical_certificate_status !== 'verified') {
+                $existing->update($entry->only(['medical_certificate_status', 'medical_certificate_reviewed_by', 'medical_certificate_reviewed_at', 'medical_certificate_notes']));
+            }
+            $entry->delete();
+        }
+        $duplicate->delete();
     }
 
     /**
@@ -579,6 +645,9 @@ abstract class TeamRosterSeeder extends Seeder
             ->where('edition_id', $edition->id)
             ->where('team_id', $team->id)
             ->whereNotIn('student_id', $expectedStudentIds)
+            ->whereDoesntHave('student.athleteEntries', fn ($query) => $query
+                ->whereHas('editionSport', fn ($configuration) => $configuration->where('edition_id', $edition->id)
+                    ->whereHas('sport', fn ($sport) => $sport->where('code', 'like', 'CULT-%'))))
             ->get(['id', 'student_id']);
         $managedStudentIds = array_values(array_unique(array_merge(
             $expectedStudentIds,
@@ -592,6 +661,10 @@ abstract class TeamRosterSeeder extends Seeder
             ->get()
             ->filter(function (AthleteEntry $entry) use ($expectedAssignments): bool {
                 $sportCode = $entry->editionSport?->sport?->code;
+
+                if ($sportCode !== null && str_starts_with($sportCode, 'CULT-')) {
+                    return false;
+                }
 
                 return $sportCode === null || ! isset($expectedAssignments[$entry->student_id][$sportCode]);
             })

@@ -2,6 +2,8 @@
 
 ## Clean-reset direction — approved
 
+- [x] Refresh all three faction snapshots from the supplied October 18 Google Sheet: 501 unique members, 518 exact sports mappings, merged repeated names and sports, source provenance, all-faction transaction, preservation of existing cultural records, and safe consolidation of known old name forms.
+
 - [x] Make cultural scoring explicit in Tabulator navigation with a direct Cultural filter link, cultural editor labels, and coverage for declaring and correcting every configured cultural event and bonus award.
 
 - [x] Keep the Tabulator catalogue, event counts, results cards, and match scoring aligned with current Men/Women divisions; exclude obsolete Open/generic entries and prevent default synchronization from recreating retired events while retaining history.
