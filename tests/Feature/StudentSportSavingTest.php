@@ -9,6 +9,7 @@ use App\Models\Student;
 use App\Models\Team;
 use App\Models\TeamMember;
 use App\Models\User;
+use App\Services\AthleteEntryService;
 use App\Services\EligibilityService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -180,4 +181,22 @@ test('identifier repair does not guess an id without history or steal a current 
     ]);
     $migration->up();
     expect($student->fresh()->student_number)->toBe('');
+});
+
+test('player selectors hide superseded open sports within the edition and reject stale open submissions', function () {
+    [$admin, $edition, $team, $student] = playerSaveScenario();
+    $open = playerSaveEvent($edition, 'CHESS', 'individual');
+    $men = playerSaveEvent($edition, 'CHESS-MEN', 'individual');
+    $women = playerSaveEvent($edition, 'CHESS-WOMEN', 'individual');
+    $service = app(AthleteEntryService::class);
+    expect($service->selectableSportsFor($edition)->pluck('id')->all())->toContain($men->id, $women->id)->not->toContain($open->id);
+    $otherEdition = IntramuralEdition::create(['name' => 'Other edition', 'school_year' => '2026-2027', 'starts_on' => '2026-11-01', 'ends_on' => '2026-11-05', 'status' => 'draft']);
+    $otherOpen = $otherEdition->editionSports()->create(['sport_id' => $open->sport_id, 'participant_type' => 'individual', 'game_mechanic' => 'round_robin', 'status' => 'active']);
+    expect($service->selectableSportsFor($otherEdition)->pluck('id')->all())->toBe([$otherOpen->id]);
+
+    $this->actingAs($admin)->put(route('admin.students.update', $student), studentSportSavePayload($student, [$open->id]))
+        ->assertSessionHasErrors('edition_sport_ids');
+    $this->assertDatabaseCount('athlete_entries', 0);
+    $this->actingAs($admin)->put(route('admin.students.update', $student), studentSportSavePayload($student, [$men->id]))->assertSessionHasNoErrors();
+    $this->assertDatabaseHas('athlete_entries', ['student_id' => $student->id, 'edition_sport_id' => $men->id, 'status' => 'active']);
 });

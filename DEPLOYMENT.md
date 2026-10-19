@@ -64,7 +64,7 @@ php artisan migrate --force
 
 Player edits now preserve the displayed student identifier when the form does not submit it. Previously, the first edit could replace it with an empty string and later edits failed with a duplicate empty identifier. The repair migration restores only empty identifiers that have a verified, unused original value in `student.updated` audit history. It leaves other profile fields, registrations, schedules, and scores alone; it does not invent an identifier if history is unavailable. Recovered identifiers are recorded as `student.identifier_restored` in System Logs.
 
-The other repair creates only missing event/coordinator assignment/request tables, which an older edition-flow migration removed although those pages still use them. Existing tables and records are retained. Sports edits also preserve cultural registrations and paired entries managed from event participant pages. Do not run a roster replacement seeder for these fixes.
+The other repair creates only missing event/coordinator assignment/request tables, which an older edition-flow migration removed although those pages still use them. Existing tables and records are retained. Sports edits also preserve cultural registrations and paired entries managed from event participant pages. Player selectors hide superseded open sports when the same edition has Men/Women divisions, and stale submissions receive validation. Do not run a roster replacement seeder for these fixes.
 
 ## Activity logging
 

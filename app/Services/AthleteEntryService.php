@@ -27,14 +27,17 @@ class AthleteEntryService
             EligibilityService::SLOT_INDIVIDUAL_DUAL => 3,
         ];
 
-        return $edition->editionSports()
+        $editionSports = $edition->editionSports()
             ->with('sport')
             ->whereIn('status', ['preparation', 'active'])
-            ->when(! $includeDual, fn ($query) => $query->where('participant_type', '!=', 'dual'))
             ->get()
             ->filter(fn (EditionSport $editionSport): bool => $editionSport->sport?->status === 'active'
-                && ($includeDual || $editionSport->participant_type !== 'dual')
-                && $this->eligibilityService->isParticipationSport($editionSport))
+                && $this->eligibilityService->isParticipationSport($editionSport));
+        $currentSportIds = Sport::withoutSupersededOpenSports($editionSports->pluck('sport'))->pluck('id');
+
+        return $editionSports
+            ->filter(fn (EditionSport $editionSport): bool => $currentSportIds->contains($editionSport->sport_id)
+                && ($includeDual || $editionSport->participant_type !== 'dual'))
             ->each(function (EditionSport $editionSport): void {
                 $editionSport->setAttribute('participation_slot', $this->eligibilityService->slotFor($editionSport));
                 $editionSport->setAttribute('counts_toward_participation_limit', $this->eligibilityService->countsTowardParticipationLimit($editionSport));
@@ -106,12 +109,14 @@ class AthleteEntryService
             ->whereIn('edition_sport_id', $editionSports->pluck('id'))
             ->get()
             ->keyBy('edition_sport_id');
+        $availableIds = $this->selectableSportsFor($edition)->pluck('id');
 
         foreach ($editionSports as $editionSport) {
             if (! $editionSport->sport instanceof Sport
                 || $editionSport->sport->status !== 'active'
                 || ! in_array($editionSport->status, ['preparation', 'active'], true)
                 || $editionSport->participant_type === 'dual'
+                || ! $availableIds->contains($editionSport->id)
                 || ! $this->eligibilityService->isParticipationSport($editionSport)) {
                 throw ValidationException::withMessages([
                     'edition_sport_ids' => ($editionSport->sport?->name ?? 'This sport').' cannot be selected while adding one student. Dual events must be assigned with both partners from sport participant management.',
@@ -185,9 +190,11 @@ class AthleteEntryService
         if ($selectedSports->count() !== $ids->count()) {
             throw ValidationException::withMessages(['edition_sport_ids' => 'Choose sports from the active intramurals edition.']);
         }
+        $availableIds = $this->selectableSportsFor($edition, true)->pluck('id');
         $invalidSports = $selectedSports->filter(fn (EditionSport $editionSport): bool => ! $editionSport->sport instanceof \App\Models\Sport
             || $editionSport->sport->status !== 'active'
             || ! in_array($editionSport->status, ['preparation', 'active'], true)
+            || ! $availableIds->contains($editionSport->id)
             || ! $this->eligibilityService->isParticipationSport($editionSport)
         );
         if ($invalidSports->isNotEmpty()) {
