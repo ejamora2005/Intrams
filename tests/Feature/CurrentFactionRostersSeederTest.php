@@ -12,7 +12,7 @@ use Database\Seeders\DefaultIntramuralsSeeder;
 test('current source snapshot imports one member per name and every exact gender matched sports registration', function () {
     $this->seed(DefaultIntramuralsSeeder::class);
     $members = TeamMember::with(['student.athleteEntries.editionSport.sport', 'team'])->get();
-    expect($members)->toHaveCount(531)->and(AthleteEntry::count())->toBe(522);
+    expect($members)->toHaveCount(557)->and(AthleteEntry::count())->toBe(536);
     foreach (['sea_dragons' => 'sea-dragons', 'terraquatic_eagles' => 'terraquatic-eagles', 'trojan_warriors' => 'trojan-warriors'] as $file => $teamCode) {
         foreach (json_decode(file_get_contents(database_path('seeders/rosters/'.$file.'.json')), true) as $row) {
             $member = $members->first(fn ($member) => $member->team->code === $teamCode && $member->student->full_name === $row['name']);
@@ -54,9 +54,9 @@ test('roster refresh merges verified name aliases and preserves existing cultura
         ->and($joel->fresh()->full_name)->toBe('Joel Capote Portugaliza')
         ->and($competitor->fresh()->athlete_entry_ids)->toBe([$baseball->id])
         ->and($badminton->fresh()->pair_key)->toBe('existing-badminton-pair')
-        ->and(Student::count())->toBe(531)->and(TeamMember::count())->toBe(531)->and(AthleteEntry::count())->toBe(523);
+        ->and(Student::count())->toBe(557)->and(TeamMember::count())->toBe(557)->and(AthleteEntry::count())->toBe(537);
     $this->seed(CurrentFactionRostersSeeder::class);
-    expect(Student::count())->toBe(531)->and(TeamMember::count())->toBe(531)->and(AthleteEntry::count())->toBe(523);
+    expect(Student::count())->toBe(557)->and(TeamMember::count())->toBe(557)->and(AthleteEntry::count())->toBe(537);
 });
 
 test('cultural only members outside the sports source retain their membership and registrations', function () {
@@ -83,7 +83,7 @@ test('a scheduled obsolete registration rolls back changes to every faction', fu
     $schedule = CompetitionSchedule::create(['edition_sport_id' => $event->id, 'starts_at' => '2026-10-20 08:00:00', 'ends_at' => '2026-10-20 10:00:00', 'status' => 'scheduled']);
     $schedule->participants()->create(['athlete_entry_id' => $entry->id, 'slot' => '1', 'status' => 'active']);
     expect(fn () => app(CurrentFactionRostersSeeder::class)->run())->toThrow(RuntimeException::class, 'used in schedules');
-    expect($seaStudent->fresh()->year_level)->toBe('4th')->and(TeamMember::count())->toBe(532);
+    expect($seaStudent->fresh()->year_level)->toBe('4th')->and(TeamMember::count())->toBe(558);
     $this->assertDatabaseHas('athlete_entries', ['id' => $entry->id]);
 });
 
@@ -124,6 +124,6 @@ test('expanded Trojan names retain student ids and scheduled registrations on re
         expect($student->full_name)->toBe($canonical)
             ->and($student->athleteEntries()->pluck('id')->all())->toBe($previous['entries']);
     }
-    expect(Student::count())->toBe(531);
+    expect(Student::count())->toBe(557);
     $this->assertDatabaseHas('schedule_participants', ['competition_schedule_id' => $schedule->id, 'athlete_entry_id' => $entry->id]);
 });

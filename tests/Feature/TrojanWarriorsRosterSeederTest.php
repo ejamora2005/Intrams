@@ -19,7 +19,7 @@ test('default roster seeders import the three current team sheets', function () 
 
     expect(TeamMember::query()->where('team_id', $trojan->id)->count())->toBe(176)
         ->and(TeamMember::query()->where('team_id', $seaDragons->id)->count())->toBe(192)
-        ->and(TeamMember::query()->where('team_id', $eagles->id)->count())->toBe(163);
+        ->and(TeamMember::query()->where('team_id', $eagles->id)->count())->toBe(189);
 
     $graceGula = Student::query()->where('first_name', 'Grace')->where('last_name', 'Gula')->firstOrFail();
     $cristinaTagoon = Student::query()->where('first_name', 'Cristina')->where('last_name', 'Tago-on')->firstOrFail();

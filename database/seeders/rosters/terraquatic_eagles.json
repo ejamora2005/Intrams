@@ -1908,5 +1908,328 @@
         "source_rows": [
             "A165"
         ]
+    },
+    {
+        "name": "Michelle I. Muñez",
+        "gender": "Female",
+        "year_section": "3A",
+        "sports": "Volleyball 6v6, Javelin, Visual art( pencil & collaborative painting",
+        "sport_codes": [
+            "JAVELIN-THROW-WOMEN",
+            "VOLLEYBALL-WOMEN"
+        ],
+        "source_rows": [
+            "A16",
+            "A150"
+        ],
+        "source_snapshot_date": "2026-10-19",
+        "aliases": [
+            "Michelle I. Munez"
+        ]
+    },
+    {
+        "name": "Ric Paul A. Jo",
+        "gender": "Male",
+        "year_section": "1A",
+        "sports": "Basketball 5v5",
+        "sport_codes": [
+            "BASKET-5X5-MEN"
+        ],
+        "source_rows": [
+            "A33"
+        ],
+        "source_snapshot_date": "2026-10-19"
+    },
+    {
+        "name": "Avegail Garcia",
+        "gender": "Female",
+        "year_section": "N/A",
+        "sports": "Basketball 5v5",
+        "sport_codes": [
+            "BASKET-5X5-WOMEN"
+        ],
+        "source_rows": [
+            "A44"
+        ],
+        "source_snapshot_date": "2026-10-19"
+    },
+    {
+        "name": "Junemil Alaisa Solverez",
+        "gender": "Female",
+        "year_section": "1A",
+        "sports": "Basketball 5v5,, Faction Pakulo, Faction Pakulo, pageant facilitator",
+        "sport_codes": [
+            "BASKET-5X5-WOMEN"
+        ],
+        "source_rows": [
+            "A46",
+            "A199",
+            "A272"
+        ],
+        "source_snapshot_date": "2026-10-19",
+        "aliases": [
+            "Junemil Solverez"
+        ]
+    },
+    {
+        "name": "Marvin Batle Jr.",
+        "gender": "Male",
+        "year_section": "1A",
+        "sports": "Baseball, Russian softball",
+        "sport_codes": [
+            "BASEBALL",
+            "RUSSIAN-SOFTBALL"
+        ],
+        "source_rows": [
+            "A48"
+        ],
+        "source_snapshot_date": "2026-10-19"
+    },
+    {
+        "name": "Airon Jay V. Cabasisi",
+        "gender": "Male",
+        "year_section": "1A",
+        "sports": "Baseball, Russian softball",
+        "sport_codes": [
+            "BASEBALL",
+            "RUSSIAN-SOFTBALL"
+        ],
+        "source_rows": [
+            "A50"
+        ],
+        "source_snapshot_date": "2026-10-19"
+    },
+    {
+        "name": "Shanice Capistrano",
+        "gender": "Female",
+        "year_section": "3A",
+        "sports": "Mobile legends",
+        "sport_codes": [
+            "ESPORT-ML-WOMEN"
+        ],
+        "source_rows": [
+            "A90"
+        ],
+        "source_snapshot_date": "2026-10-19"
+    },
+    {
+        "name": "Jowie Goda",
+        "gender": "Male",
+        "year_section": "N/A",
+        "sports": "Table tennis (SDS)",
+        "sport_codes": [
+            "TABLE-TENNIS-SINGLES-MEN"
+        ],
+        "source_rows": [
+            "A109"
+        ],
+        "source_snapshot_date": "2026-10-19"
+    },
+    {
+        "name": "Erika Mae Magpatoc",
+        "gender": "Female",
+        "year_section": "2A",
+        "sports": "100m, Festival Dance",
+        "sport_codes": [
+            "100M-RUN-WOMEN"
+        ],
+        "source_rows": [
+            "A110",
+            "A218"
+        ],
+        "source_snapshot_date": "2026-10-19"
+    },
+    {
+        "name": "Nico Gerona",
+        "gender": "Male",
+        "year_section": "1A",
+        "sports": "200m, Festival Dance",
+        "sport_codes": [
+            "200M-RUN-MEN"
+        ],
+        "source_rows": [
+            "A111",
+            "A229"
+        ],
+        "source_snapshot_date": "2026-10-19"
+    },
+    {
+        "name": "Joshua Rebecca",
+        "gender": "Male",
+        "year_section": "3A",
+        "sports": "Triple jump, Charcoal Rendering",
+        "sport_codes": [
+            "TRIPLE-JUMP-MEN"
+        ],
+        "source_rows": [
+            "A124",
+            "A190"
+        ],
+        "source_snapshot_date": "2026-10-19"
+    },
+    {
+        "name": "Dante A. Bihay Jr.",
+        "gender": "Male",
+        "year_section": "1A",
+        "sports": "Festival Dance, Sayawerte, Pageant LGBT",
+        "sport_codes": [],
+        "source_rows": [
+            "A146"
+        ],
+        "source_snapshot_date": "2026-10-19"
+    },
+    {
+        "name": "Alfred Beloy",
+        "gender": "Male",
+        "year_section": "3A",
+        "sports": "Faction Pakulo, Pageant Facilitator",
+        "sport_codes": [],
+        "source_rows": [
+            "A152"
+        ],
+        "source_snapshot_date": "2026-10-19"
+    },
+    {
+        "name": "Glazelle Jane Lovete",
+        "gender": "Female",
+        "year_section": "2",
+        "sports": "Faction Pakulo, Short Film",
+        "sport_codes": [],
+        "source_rows": [
+            "A153"
+        ],
+        "source_snapshot_date": "2026-10-19"
+    },
+    {
+        "name": "Judeah Samaco",
+        "gender": "Female",
+        "year_section": "2",
+        "sports": "Faction Pakulo, Short Film",
+        "sport_codes": [],
+        "source_rows": [
+            "A154"
+        ],
+        "source_snapshot_date": "2026-10-19"
+    },
+    {
+        "name": "Fritzie Ryden S. Diola",
+        "gender": "Male",
+        "year_section": "N/A",
+        "sports": "Festival Dance, Sayawerte",
+        "sport_codes": [],
+        "source_rows": [
+            "A160"
+        ],
+        "source_snapshot_date": "2026-10-19"
+    },
+    {
+        "name": "Maria Angelica T. Felicio",
+        "gender": "Female",
+        "year_section": "N/A",
+        "sports": "Festival Dance, Sayawerte",
+        "sport_codes": [],
+        "source_rows": [
+            "A162"
+        ],
+        "source_snapshot_date": "2026-10-19"
+    },
+    {
+        "name": "Jeryanel Alfeje Gado",
+        "gender": "Female",
+        "year_section": "N/A",
+        "sports": "Infographics, Short Film",
+        "sport_codes": [],
+        "source_rows": [
+            "A165"
+        ],
+        "source_snapshot_date": "2026-10-19"
+    },
+    {
+        "name": "Berna Zeeneth Amparo",
+        "gender": "Female",
+        "year_section": "2",
+        "sports": "Props, Faction Pakulo",
+        "sport_codes": [],
+        "source_rows": [
+            "A171"
+        ],
+        "source_snapshot_date": "2026-10-19"
+    },
+    {
+        "name": "Lawrence Compay",
+        "gender": "Male",
+        "year_section": "N/A",
+        "sports": "Big Circus",
+        "sport_codes": [],
+        "source_rows": [
+            "A189"
+        ],
+        "source_snapshot_date": "2026-10-19"
+    },
+    {
+        "name": "Irene Espere",
+        "gender": "Female",
+        "year_section": "3",
+        "sports": "Pageant Assistant",
+        "sport_codes": [],
+        "source_rows": [
+            "A206"
+        ],
+        "source_snapshot_date": "2026-10-19"
+    },
+    {
+        "name": "Kent Gabriel Tavera",
+        "gender": "Male",
+        "year_section": "N/A",
+        "sports": "Festival Dance",
+        "sport_codes": [],
+        "source_rows": [
+            "A224"
+        ],
+        "source_snapshot_date": "2026-10-19"
+    },
+    {
+        "name": "Keanna Catambacan",
+        "gender": "Female",
+        "year_section": "3",
+        "sports": "Pageant Facilitator",
+        "sport_codes": [],
+        "source_rows": [
+            "A245"
+        ],
+        "source_snapshot_date": "2026-10-19"
+    },
+    {
+        "name": "Kristina Vertudazo",
+        "gender": "Female",
+        "year_section": "N/A",
+        "sports": "Props",
+        "sport_codes": [],
+        "source_rows": [
+            "A255"
+        ],
+        "source_snapshot_date": "2026-10-19"
+    },
+    {
+        "name": "Layca Jane G. Salicinas",
+        "gender": "Female",
+        "year_section": "N/A",
+        "sports": "Props",
+        "sport_codes": [],
+        "source_rows": [
+            "A256"
+        ],
+        "source_snapshot_date": "2026-10-19"
+    },
+    {
+        "name": "Merry Ann Suralta",
+        "gender": "Female",
+        "year_section": "N/A",
+        "sports": "Props",
+        "sport_codes": [],
+        "source_rows": [
+            "A260"
+        ],
+        "source_snapshot_date": "2026-10-19"
     }
 ]

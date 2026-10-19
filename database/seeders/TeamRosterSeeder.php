@@ -229,7 +229,7 @@ abstract class TeamRosterSeeder extends Seeder
         return false;
     }
 
-    public function run(): void
+    public function run(bool $newPlayersOnly = false): void
     {
         $edition = $this->defaultEdition();
         $team = Team::query()
@@ -245,11 +245,18 @@ abstract class TeamRosterSeeder extends Seeder
             ->keyBy(fn (EditionSport $editionSport): string => $editionSport->sport?->code ?? '');
         $roster = $this->roster();
         $expectedAssignments = [];
+        $importedRows = [];
         $created = 0;
         $registrations = 0;
 
-        DB::transaction(function () use ($edition, $team, $assignedBy, $editionSports, $roster, &$expectedAssignments, &$created, &$registrations): void {
+        DB::transaction(function () use ($edition, $team, $assignedBy, $editionSports, $roster, $newPlayersOnly, &$expectedAssignments, &$importedRows, &$created, &$registrations): void {
             foreach ($roster as $row) {
+                // The additions import leaves existing people, including archived
+                // records and their manually edited registrations, untouched.
+                if ($newPlayersOnly && $this->findStudent($row, mergeDuplicates: false) !== null) {
+                    continue;
+                }
+
                 $student = $this->student($row, $edition, $team, $created);
                 $existingMembership = TeamMember::query()
                     ->where('edition_id', $edition->id)
@@ -270,12 +277,15 @@ abstract class TeamRosterSeeder extends Seeder
                 );
 
                 $expectedAssignments[$student->id] = array_fill_keys($row['sports'], true);
+                $importedRows[] = $row;
             }
 
-            $this->removeOutdatedAssignments($edition, $team, $expectedAssignments);
+            if (! $newPlayersOnly) {
+                $this->removeOutdatedAssignments($edition, $team, $expectedAssignments);
+            }
 
             $eligibility = app(EligibilityService::class);
-            foreach ($roster as $row) {
+            foreach ($importedRows as $row) {
                 $student = $this->findStudent($row);
 
                 foreach ($row['sports'] as $sportCode) {
@@ -565,7 +575,7 @@ abstract class TeamRosterSeeder extends Seeder
     }
 
     /** @param array{name: string, gender: string, year_level: string, section: ?string, sports: array<int, string>} $row */
-    private function findStudent(array $row): ?Student
+    private function findStudent(array $row, bool $mergeDuplicates = true): ?Student
     {
         $nameParts = preg_split('/\s+/u', $row['name'], -1, PREG_SPLIT_NO_EMPTY);
         if ($nameParts === false || count($nameParts) < 2) {
@@ -588,8 +598,10 @@ abstract class TeamRosterSeeder extends Seeder
 
         if ($active->isNotEmpty()) {
             $student = $active->first();
-            foreach ($active->skip(1) as $duplicate) {
-                $this->mergeDuplicateStudent($student, $duplicate);
+            if ($mergeDuplicates) {
+                foreach ($active->skip(1) as $duplicate) {
+                    $this->mergeDuplicateStudent($student, $duplicate);
+                }
             }
 
             return $student;

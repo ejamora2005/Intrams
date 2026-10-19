@@ -54,5 +54,64 @@
         "expanded_names": 3,
         "added_sports_registrations": 4,
         "removed_sports_registrations": 0
+    },
+    "additions_refresh": {
+        "snapshot_date": "2026-10-19",
+        "snapshot_at_utc": "2026-10-19T04:54:05+00:00",
+        "xlsx_sha256": "be99486cc3653ca524d8776e7cf8f5726cb3a29456f746bb4fee8371daeac019",
+        "import_scope": "Add newly listed faction members and their sports. Keep the October 18 base records and existing app edits. Cultural and support labels remain notes without event registrations.",
+        "tabs_reviewed": [
+            "Trojan Warriors",
+            "Sea Dragons",
+            "Terraquatic Eagles"
+        ],
+        "added_members": 26,
+        "added_sports_registrations": 14,
+        "added_members_without_sports": 15,
+        "current_totals": {
+            "faction_members": 557,
+            "sports_registrations": 536
+        },
+        "new_members_by_tab": {
+            "Trojan Warriors": [],
+            "Sea Dragons": [],
+            "Terraquatic Eagles": [
+                "Michelle I. Muñez",
+                "Ric Paul A. Jo",
+                "Avegail Garcia",
+                "Junemil Alaisa Solverez",
+                "Marvin Batle Jr.",
+                "Airon Jay V. Cabasisi",
+                "Shanice Capistrano",
+                "Jowie Goda",
+                "Erika Mae Magpatoc",
+                "Nico Gerona",
+                "Joshua Rebecca",
+                "Dante A. Bihay Jr.",
+                "Alfred Beloy",
+                "Glazelle Jane Lovete",
+                "Judeah Samaco",
+                "Fritzie Ryden S. Diola",
+                "Maria Angelica T. Felicio",
+                "Jeryanel Alfeje Gado",
+                "Berna Zeeneth Amparo",
+                "Lawrence Compay",
+                "Irene Espere",
+                "Kent Gabriel Tavera",
+                "Keanna Catambacan",
+                "Kristina Vertudazo",
+                "Layca Jane G. Salicinas",
+                "Merry Ann Suralta"
+            ]
+        },
+        "resolutions": {
+            "Junemil Alaisa Solverez": "Combine Junemil Solverez with the full name. Use Female from the latest complete row A272 and the female basketball row A46; A199 conflicts.",
+            "Michelle I. Muñez": "Combine accented/unaccented spellings at A16/A150 and keep 3A from A16.",
+            "Jowie Goda": "SDS does not state an exact format. Use the previously authorized unspecified-table-tennis Singles mapping, matched to Male. Do not add both Singles and Doubles.",
+            "Mark Joshua A": "Incomplete name at A28 may refer to existing Mark Joshua Vinculado. No extra person created without a complete identity.",
+            "Erika Mancio": "Treat as the existing Erica Jane L. Mancio cultural listing, not a newly added sports player.",
+            "Emman Abello": "Treat as the existing Emmanuel Justine Abello cultural listing, not a newly added sports player.",
+            "existing_name_variants": "New middle initials, shortened names, surname-first forms and small spelling changes for existing Terra members do not create additional people in this additions refresh."
+        }
     }
 }
