@@ -89,7 +89,7 @@ class StudentController extends Controller
             'student' => new Student,
             'courses' => Course::query()->where('status', 'active')->orderBy('name')->get(),
             'edition' => $edition,
-            'sportOptions' => $edition ? $this->athleteEntryService->selectableSportsFor($edition) : collect(),
+            'sportOptions' => $edition ? $this->athleteEntryService->selectableSportsFor($edition, true) : collect(),
         ]);
     }
 
@@ -141,7 +141,7 @@ class StudentController extends Controller
             'edition' => $edition,
             'currentTeam' => $currentTeam,
             'teams' => $edition ? Team::query()->where('edition_id', $edition->id)->where('status', 'active')->orderBy('name')->get() : collect(),
-            'sportOptions' => $edition ? $this->athleteEntryService->selectableSportsFor($edition) : collect(),
+            'sportOptions' => $edition ? $this->athleteEntryService->selectableSportsFor($edition, true) : collect(),
             'selectedSportIds' => $edition ? $student->athleteEntries()->where('status', 'active')->whereHas('editionSport', fn ($query) => $query->where('edition_id', $edition->id))->pluck('edition_sport_id')->map(fn ($id) => (string) $id)->values() : collect(),
         ]);
     }

@@ -59,15 +59,16 @@ class Sport extends Model
 
         return match (true) {
             str_starts_with($code, 'BASKET-'),
+            str_starts_with($code, 'BADMINTON-TEAM'),
+            $code === 'CHESS' || str_starts_with($code, 'CHESS-'),
             in_array($code, [
                 'BASEBALL', 'SOFTBALL', 'RUSSIAN-SOFTBALL',
                 'VOLLEYBALL', 'VOLLEYBALL-MEN', 'VOLLEYBALL-WOMEN', 'MODIFIED-VOLLEYBALL', 'MODIFIED-VOLLEYBALL-MEN', 'MODIFIED-VOLLEYBALL-WOMEN', 'MIXED-VOLLEYBALL',
                 'BEACH-VOLLEYBALL', 'BEACH-VOLLEYBALL-MEN', 'BEACH-VOLLEYBALL-WOMEN', 'ESPORT-ML', 'ESPORT-ML-MEN', 'ESPORT-ML-WOMEN',
             ], true) => 'team',
-            in_array($code, ['BADMINTON', 'TABLE-TENNIS', 'CHESS'], true)
+            in_array($code, ['BADMINTON', 'TABLE-TENNIS'], true)
             || str_starts_with($code, 'BADMINTON-')
-            || str_starts_with($code, 'TABLE-TENNIS-')
-            || str_starts_with($code, 'CHESS-') => 'individual',
+            || str_starts_with($code, 'TABLE-TENNIS-') => 'individual',
             in_array($code, [
                 'RUNS', '100M-RUN', '200M-RUN', '400M-RUN', 'RELAY-4X100', 'RELAY-4X400',
                 'THROWS', 'SHOT-PUT', 'DISCUS-THROW', 'JAVELIN-THROW',

@@ -189,6 +189,8 @@ test('complete sport catalogue includes gendered volleyball and individual athle
     }
 
     expect(Sport::catalogueGroupKeyFor('VOLLEYBALL-MEN'))->toBe('team')
+        ->and(Sport::catalogueGroupKeyFor('CHESS-MEN'))->toBe('team')
+        ->and(Sport::catalogueGroupKeyFor('BADMINTON-TEAM-WOMEN'))->toBe('team')
         ->and(Sport::catalogueGroupKeyFor('BADMINTON-DOUBLES-MEN'))->toBe('individual')
         ->and(Sport::catalogueGroupKeyFor('RELAY-4X100-MEN'))->toBe('track-field')
         ->and(Sport::catalogueGroupKeyFor('TRIPLE-JUMP-WOMEN'))->toBe('track-field');

@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\IntramuralEdition;
 use App\Models\Sport;
 use App\Services\EditionService;
+use App\Services\RacketEventFormatService;
 use Illuminate\Database\Seeder;
 
 class DefaultSportsSeeder extends Seeder
@@ -38,6 +39,7 @@ class DefaultSportsSeeder extends Seeder
 
         $editionService = app(EditionService::class);
         IntramuralEdition::query()->each(fn (IntramuralEdition $edition) => $editionService->syncDefaultSports($edition));
+        app(RacketEventFormatService::class)->sync();
     }
 
     private function ensureDefaultEdition(): void
@@ -63,7 +65,7 @@ class DefaultSportsSeeder extends Seeder
             ->where('school_year', $default['school_year'])
             ->whereIn('name', $names)
             ->first()
-            ?: new IntramuralEdition();
+            ?: new IntramuralEdition;
 
         $edition->fill([
             'name' => $default['name'],

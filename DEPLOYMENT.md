@@ -26,6 +26,10 @@ DEPLOY_SEED_DEFAULT_COMPETITIONS=true
 
 9. Deploy. After the first successful deploy, set the seed flags back to `false`.
 
+## Correct Chess and Badminton formats (October 20)
+
+Redeploy, then run `php artisan migrate --force` in `/var/www/html`. This makes Chess (Men/Women) team events and keeps all three Badminton formats (Singles, Doubles, Team) for Men and Women. Existing team-event entries use the player's current faction. Registration IDs, badminton pairs, schedules, scores, declared winners, and standings are preserved. No roster replacement or score reset is needed. Doubles are listed in player forms with a reminder to assign both partners from Admin sport participant management.
+
 ## Add newly listed players
 
 Redeploy the latest code, then run this in the `intrams` app container terminal:

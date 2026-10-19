@@ -51,7 +51,7 @@ class DashboardController extends Controller
             ? $this->eligibilityService->flaggedStudents($edition, $managedTeamId ? $teams->first() : null)
             : collect();
         $sportOptions = $edition && $selectedTeam
-            ? $this->athleteEntryService->selectableSportsFor($edition)
+            ? $this->athleteEntryService->selectableSportsFor($edition, true)
             : collect();
 
         $selectedTeam?->load([
