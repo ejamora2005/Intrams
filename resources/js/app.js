@@ -1,6 +1,7 @@
 import './bootstrap';
 import './pwa';
 import './ops-interactions';
+import './competition-schedule';
 
 if (document.querySelector('[data-tabulator-workspace]')) {
     void import('./tabulator');

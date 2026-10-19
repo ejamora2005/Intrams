@@ -15,6 +15,11 @@ class ReturnAdminSavesToModuleIndex
 
         if (! $request->isMethodSafe() && $response instanceof RedirectResponse && ! $request->session()->has('errors')) {
             $route = $request->route()?->getName() ?? '';
+            // Creation redirects to the page containing the new schedule.
+            // Returning to the form would make a successful save look lost.
+            if ($route === 'admin.competition.schedules.store') {
+                return $response;
+            }
             $destination = match (true) {
                 str_starts_with($route, 'admin.editions.') => 'admin.editions.index',
                 str_starts_with($route, 'admin.students.') => 'admin.students.index',

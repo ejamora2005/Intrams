@@ -7,7 +7,7 @@
 
     @if ($errors->any())
         <div class="mb-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
-            <p class="font-semibold">The schedule could not be updated.</p>
+            <p class="font-semibold">Please review the schedule details.</p>
             <ul class="mt-2 list-disc space-y-1 pl-5">
                 @foreach ($errors->all() as $error)
                     <li>{{ $error }}</li>
@@ -18,7 +18,10 @@
 
     <section class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm" data-list-search-container>
         <div class="flex flex-col justify-between gap-2 border-b border-slate-200 bg-slate-50 px-5 py-4 sm:flex-row sm:items-center">
-            <h2 class="font-semibold text-slate-950">Competition schedule</h2>
+            <div class="flex flex-wrap items-center gap-3">
+                <h2 class="font-semibold text-slate-950">Competition schedule</h2>
+                <a href="{{ route('admin.competition.create') }}" class="inline-flex items-center justify-center rounded-lg bg-blue-700 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-800">+ Add schedule</a>
+            </div>
             <label class="relative block min-w-0 sm:w-80"><span class="sr-only">Search competition schedule</span><input type="search" data-list-search-input placeholder="Search event, sport, team, venue, or status" class="block w-full rounded-lg border-slate-300 bg-white py-2.5 pl-10 pr-3 text-sm focus:border-blue-600 focus:ring-blue-600"><svg class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path stroke-linecap="round" d="m16 16 4.5 4.5"/></svg></label>
         </div>
         <div class="flex justify-end border-b border-slate-200 px-5 py-2"><span data-list-search-count class="text-xs font-medium text-slate-500" aria-live="polite"></span></div>
@@ -39,7 +42,7 @@
                         @php
                             $scheduleLabel = $schedule->title ?: ($schedule->bracketMatch ? 'Game '.$schedule->bracketMatch->match_number : 'Competition');
                             $isActivity = (bool) $schedule->is_activity;
-                            $isCultural = str_starts_with(strtoupper((string) $schedule->editionSport->sport?->code), 'CULT-');
+                            $isCultural = ! $isActivity && str_starts_with(strtoupper((string) $schedule->editionSport->sport?->code), 'CULT-');
                             $participantTeams = $isCultural
                                 ? $schedule->editionSport->edition->teams->where('status', 'active')->values()
                                 : $schedule->participants->pluck('team')->filter()->unique('id')->values();
@@ -49,7 +52,7 @@
                                 ->unique()
                                 ->values();
                         @endphp
-                        <tr data-list-search-row data-search-text="{{ Str::lower($scheduleLabel.' '.($schedule->editionSport->sport?->name ?? '').' '.($schedule->editionSport->edition?->name ?? '').' '.($schedule->venue ?? '').' '.$schedule->status.' '.$participantTeams->pluck('name')->implode(' ').' '.$participantNames->implode(' ')) }}" class="align-top">
+                        <tr id="schedule-{{ $schedule->id }}" data-list-search-row data-search-text="{{ Str::lower($scheduleLabel.' '.($schedule->editionSport->sport?->name ?? '').' '.($schedule->editionSport->edition?->name ?? '').' '.($schedule->venue ?? '').' '.$schedule->status.' '.$participantTeams->pluck('name')->implode(' ').' '.$participantNames->implode(' ')) }}" class="scroll-mt-28 align-top target:bg-blue-900/40">
                             <td class="px-5 py-4 text-slate-700">
                                 <span class="mb-2 block text-xs font-medium text-slate-400">{{ $schedule->editionSport->edition->name }}</span>
                                 @if ($isActivity)
@@ -110,7 +113,7 @@
 
                                         <label class="block text-xs font-semibold uppercase tracking-wide text-slate-500">
                                             Ends
-                                            <input name="ends_at" type="datetime-local" value="{{ $schedule->ends_at?->format('Y-m-d\TH:i') }}" class="mt-1 block w-full rounded-lg border-slate-300 px-3 py-2 text-sm font-medium normal-case tracking-normal text-slate-900 focus:border-blue-600 focus:ring-blue-600">
+                                            <input name="ends_at" type="datetime-local" value="{{ $schedule->ends_at?->format('Y-m-d\TH:i') }}" required class="mt-1 block w-full rounded-lg border-slate-300 px-3 py-2 text-sm font-medium normal-case tracking-normal text-slate-900 focus:border-blue-600 focus:ring-blue-600">
                                         </label>
 
                                         <label class="block text-xs font-semibold uppercase tracking-wide text-slate-500">

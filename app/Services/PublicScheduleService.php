@@ -117,7 +117,7 @@ class PublicScheduleService
                 ->map(function (CompetitionSchedule $schedule) use ($factionRosters): array {
                     $sport = $schedule->editionSport->sport;
                     $isActivity = (bool) $schedule->is_activity;
-                    $isCultural = str_starts_with(strtoupper((string) $sport?->code), 'CULT-');
+                    $isCultural = ! $isActivity && str_starts_with(strtoupper((string) $sport?->code), 'CULT-');
                     $competitors = $isCultural
                         ? $factionRosters->pluck('name')->values()
                         : $schedule->participants
