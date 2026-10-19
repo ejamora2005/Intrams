@@ -23,7 +23,7 @@ class UpdateStudentRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'student_number' => ['sometimes', 'nullable', 'string', 'max:255', \Illuminate\Validation\Rule::unique('students', 'student_number')->ignore($this->route('student'))],
+            'student_number' => ['sometimes', 'required', 'string', 'max:255', \Illuminate\Validation\Rule::unique('students', 'student_number')->ignore($this->route('student'))],
             'first_name' => ['required', 'string', 'max:255'],
             'middle_name' => ['nullable', 'string', 'max:255'],
             'last_name' => ['required', 'string', 'max:255'],

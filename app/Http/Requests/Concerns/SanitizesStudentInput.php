@@ -25,8 +25,7 @@ trait SanitizesStudentInput
             return $value === null ? null : Str::title(Str::lower($value));
         };
 
-        $this->merge([
-            'student_number' => Str::upper($sanitizeText($this->input('student_number')) ?? ''),
+        $attributes = [
             'first_name' => $capitalizeName($this->input('first_name')),
             'middle_name' => $capitalizeName($this->input('middle_name')),
             'last_name' => $capitalizeName($this->input('last_name')),
@@ -34,6 +33,13 @@ trait SanitizesStudentInput
             'year_level' => $sanitizeText($this->input('year_level')),
             'section' => Str::upper($sanitizeText($this->input('section')) ?? ''),
             'gender' => $sanitizeText($this->input('gender')),
-        ]);
+        ];
+        // The edit form displays this identifier without submitting it. Do not
+        // turn an absent field into an empty unique identifier during updates.
+        if ($this->exists('student_number')) {
+            $attributes['student_number'] = Str::upper($sanitizeText($this->input('student_number')) ?? '');
+        }
+
+        $this->merge($attributes);
     }
 }

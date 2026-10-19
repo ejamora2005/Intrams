@@ -26,7 +26,7 @@ document.querySelectorAll('[data-list-search-container]').forEach((container) =>
         let visible = 0;
 
         rows.forEach((row) => {
-            const matches = !query || listSearchNormalize(row.dataset.searchText || row.textContent).includes(query);
+            const matches = !row.hidden && (!query || listSearchNormalize(row.dataset.searchText || row.textContent).includes(query));
             row.classList.toggle('hidden', !matches);
             if (matches) visible += 1;
         });
@@ -36,6 +36,7 @@ document.querySelectorAll('[data-list-search-container]').forEach((container) =>
     };
 
     input.addEventListener('input', update);
+    container.addEventListener('list-search:refresh', update);
     update();
 });
 

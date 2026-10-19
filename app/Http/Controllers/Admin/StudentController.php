@@ -164,13 +164,12 @@ class StudentController extends Controller
         } catch (ValidationException $exception) {
             throw $exception;
         } catch (Throwable $exception) {
-            // A stale edit page can submit an event that was archived or
-            // reconfigured after the form loaded. Keep the user on the form
-            // with a useful message instead of exposing a generic 500 page.
+            // Preserve input on an unexpected save failure. Stale selections
+            // receive their specific validation message from the entry service.
             report($exception);
 
             return back()->withInput()->withErrors([
-                'edition_sport_ids' => 'The sport selection could not be saved. Refresh this page, choose the current sports, and try again.',
+                'edition_sport_ids' => 'The student update could not be saved because of a server error. No changes were saved. Ask an administrator to check the application logs.',
             ]);
         }
 

@@ -53,6 +53,19 @@ The full replacement uses the October 18 base snapshot plus the October 19 addit
 
 Run this import once, then keep `DEPLOY_SEED_DEFAULT_COMPETITIONS=false` so subsequent deployments preserve roster edits made in the app. This command updates all three rosters in one transaction and does not reset accounts, schedules, wins, results, or points. Existing pair assignments are retained when the source does not specify a pair. It expects the default edition, teams, and sports to exist; for a new empty database, run `php artisan db:seed --class=DefaultIntramuralsSeeder --force` instead. If an outdated sports registration is used in a schedule, the entire roster import rolls back instead of removing that history. Known old name aliases are consolidated; ambiguous individual/pair bracket duplicates require review.
 
+## Player save and coordinator repairs (October 20)
+
+Redeploy the latest code, then run in the `intrams` app terminal:
+
+```bash
+cd /var/www/html
+php artisan migrate --force
+```
+
+Player edits now preserve the displayed student identifier when the form does not submit it. Previously, the first edit could replace it with an empty string and later edits failed with a duplicate empty identifier. The repair migration restores only empty identifiers that have a verified, unused original value in `student.updated` audit history. It leaves other profile fields, registrations, schedules, and scores alone; it does not invent an identifier if history is unavailable. Recovered identifiers are recorded as `student.identifier_restored` in System Logs.
+
+The other repair creates only missing event/coordinator assignment/request tables, which an older edition-flow migration removed although those pages still use them. Existing tables and records are retained. Sports edits also preserve cultural registrations and paired entries managed from event participant pages. Do not run a roster replacement seeder for these fixes.
+
 ## Activity logging
 
 After deploying, run `php artisan migrate --force` to add indexes for the growing activity history. No existing activity records are removed.

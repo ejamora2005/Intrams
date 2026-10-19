@@ -110,8 +110,16 @@
             };
 
             const sync = () => {
-                const counts = selectedCounts();
                 const gender = (genderInput?.value || '').toLowerCase();
+
+                inputs.forEach(input => {
+                    const option = input.closest('[data-sport-option]');
+                    const category = option.dataset.sportCategory || '';
+                    const genderAllowed = !['male', 'female'].includes(category) || !gender || category === gender;
+                    option.hidden = !genderAllowed;
+                    if (!genderAllowed) input.checked = false;
+                });
+                const counts = selectedCounts();
 
                 inputs.forEach(input => {
                     const option = input.closest('[data-sport-option]');
@@ -119,20 +127,16 @@
                     const genderAllowed = !['male', 'female'].includes(category) || !gender || category === gender;
                     const slotLabel = option.querySelector('[data-sport-slot-label]');
                     if (slotLabel) slotLabel.textContent = isPairedPartnerExempt(input) ? 'Paired partner (exempt)' : slotLabel.dataset.defaultSlotLabel;
-                    option.hidden = !genderAllowed;
-                    if (!genderAllowed && input.checked) input.checked = false;
-                    if (input.checked) return;
-
                     const locked = input.dataset.sportLocked === 'true';
-                    const allowed = !locked && genderAllowed && (!countsTowardLimit(input) || canUse(counts, input.dataset.slot));
+                    const allowed = !locked && genderAllowed && (input.checked || !countsTowardLimit(input) || canUse(counts, input.dataset.slot));
                     input.disabled = !allowed;
-                    option.hidden = false;
                     option.classList.toggle('cursor-not-allowed', !allowed);
                     option.classList.toggle('opacity-50', !allowed);
                 });
 
                 summary.textContent = `Selected: Major ${counts.major} / Minor ${counts.minor} / Individual-Dual ${counts.individual_or_dual} / Relay ${selectedRelayCount()} (exempt) / Paired partner ${selectedPairedPartnerCount()} (exempt)`;
                 if (inputs.some(input => input.checked)) error.hidden = true;
+                picker.dispatchEvent(new Event('list-search:refresh'));
             };
 
             inputs.forEach(input => input.addEventListener('change', sync));

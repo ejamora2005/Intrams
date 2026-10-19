@@ -109,6 +109,7 @@ class AthleteEntryService
 
         foreach ($editionSports as $editionSport) {
             if (! $editionSport->sport instanceof Sport
+                || $editionSport->sport->status !== 'active'
                 || ! in_array($editionSport->status, ['preparation', 'active'], true)
                 || $editionSport->participant_type === 'dual'
                 || ! $this->eligibilityService->isParticipationSport($editionSport)) {
@@ -184,8 +185,8 @@ class AthleteEntryService
         if ($selectedSports->count() !== $ids->count()) {
             throw ValidationException::withMessages(['edition_sport_ids' => 'Choose sports from the active intramurals edition.']);
         }
-        $invalidSports = $selectedSports->filter(fn (EditionSport $editionSport): bool =>
-            ! $editionSport->sport instanceof \App\Models\Sport
+        $invalidSports = $selectedSports->filter(fn (EditionSport $editionSport): bool => ! $editionSport->sport instanceof \App\Models\Sport
+            || $editionSport->sport->status !== 'active'
             || ! in_array($editionSport->status, ['preparation', 'active'], true)
             || ! $this->eligibilityService->isParticipationSport($editionSport)
         );
@@ -198,10 +199,15 @@ class AthleteEntryService
             throw ValidationException::withMessages(['edition_sport_ids' => collect($exception->errors())->flatten()->implode(' ')]);
         }
         $current = AthleteEntry::query()
+            ->with('editionSport.sport')
             ->where('student_id', $student->id)
             ->where('status', 'active')
             ->whereHas('editionSport', fn ($query) => $query->where('edition_id', $edition->id))
-            ->get();
+            ->get()
+            // Cultural registrations and complete pairs are managed elsewhere;
+            // their absent checkboxes must never withdraw those registrations.
+            ->filter(fn (AthleteEntry $entry): bool => $entry->editionSport->participant_type !== 'dual'
+                && $this->eligibilityService->isParticipationSport($entry->editionSport));
 
         $remove = $current->filter(fn (AthleteEntry $entry): bool => ! $ids->contains((int) $entry->edition_sport_id));
         if ($remove->isNotEmpty()) {
