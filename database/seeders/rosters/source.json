@@ -113,5 +113,37 @@
             "Emman Abello": "Treat as the existing Emmanuel Justine Abello cultural listing, not a newly added sports player.",
             "existing_name_variants": "New middle initials, shortened names, surname-first forms and small spelling changes for existing Terra members do not create additional people in this additions refresh."
         }
+    },
+    "registration_refresh": {
+        "snapshot_date": "2026-10-19",
+        "snapshot_at_utc": "2026-10-19T12:29:37+00:00",
+        "xlsx_sha256": "9531df400785ffa4878d8ccdd2598b9e0b9e601c7097c9c8f36bb2ce47fcb244",
+        "previous_xlsx_sha256": "be99486cc3653ca524d8776e7cf8f5726cb3a29456f746bb4fee8371daeac019",
+        "scope": "Append new registrations only. Existing names, profiles, other sports, schedules and results are unchanged.",
+        "changed_source_rows": {
+            "Terraquatic Eagles": [
+                "A19",
+                "A24",
+                "A28",
+                "A35",
+                "A37"
+            ]
+        },
+        "already_registered": [
+            "Melriel Joel A. Famor",
+            "Al Reinz Pizon",
+            "Mark Joshua Vinculado",
+            "Nathaniel C. Sacro"
+        ],
+        "new_registration": {
+            "player": "Jessa Mae Arca",
+            "sport_code": "BASKET-3X3-WOMEN",
+            "source_row": "A37"
+        },
+        "current_totals": {
+            "faction_members": 557,
+            "sports_registrations": 537
+        },
+        "resolution": "Mark Joshua A. Vinculado now has a surname and matches the existing Mark Joshua Vinculado. Keep the existing profile and avoid creating a duplicate."
     }
 }

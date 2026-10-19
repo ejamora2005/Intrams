@@ -1737,8 +1737,9 @@
         "name": "Jessa Mae Arca",
         "gender": "Female",
         "year_section": "1A",
-        "sports": "Pageant, Digital Poster Making, Basketball , FESTIVAL (Props)",
+        "sports": "Pageant, Digital Poster Making, Basketball , FESTIVAL (Props), Basketball 3x3",
         "sport_codes": [
+            "BASKET-3X3-WOMEN",
             "BASKET-5X5-WOMEN"
         ],
         "source_rows": [

@@ -25,11 +25,11 @@ function removeOctober19Players(): void
 test('additions import creates new players with merged sport codes and keeps cultural only members', function () {
     $this->seed(DefaultIntramuralsSeeder::class);
     removeOctober19Players();
-    expect(Student::count())->toBe(531)->and(AthleteEntry::count())->toBe(522);
+    expect(Student::count())->toBe(531)->and(AthleteEntry::count())->toBe(523);
 
     $this->seed(NewFactionPlayersSeeder::class);
 
-    expect(Student::count())->toBe(557)->and(TeamMember::count())->toBe(557)->and(AthleteEntry::count())->toBe(536);
+    expect(Student::count())->toBe(557)->and(TeamMember::count())->toBe(557)->and(AthleteEntry::count())->toBe(537);
     foreach ([
         'Michelle I. Muñez' => ['JAVELIN-THROW-WOMEN', 'VOLLEYBALL-WOMEN'],
         'Junemil Alaisa Solverez' => ['BASKET-5X5-WOMEN'],
@@ -53,7 +53,7 @@ test('additions import creates new players with merged sport codes and keeps cul
     $junemil = Student::where('first_name', 'Junemil')->firstOrFail();
     expect($junemil->gender)->toBe('Female')->and($junemil->year_level)->toBe('1st')->and($junemil->section)->toBe('A');
     $this->seed(NewFactionPlayersSeeder::class);
-    expect(Student::count())->toBe(557)->and(AthleteEntry::count())->toBe(536);
+    expect(Student::count())->toBe(557)->and(AthleteEntry::count())->toBe(537);
 });
 
 test('additions import preserves edited and archived people and their scheduled and cultural registrations', function () {
@@ -96,5 +96,29 @@ test('unavailable new sport rolls back all player additions', function () {
     EditionSport::whereHas('sport', fn ($query) => $query->where('code', 'TRIPLE-JUMP-MEN'))->update(['status' => 'archived']);
 
     expect(fn () => $this->seed(NewFactionPlayersSeeder::class))->toThrow(RuntimeException::class, 'TRIPLE-JUMP-MEN is unavailable');
-    expect(Student::count())->toBe(531)->and(TeamMember::count())->toBe(531)->and(AthleteEntry::count())->toBe(522);
+    expect(Student::count())->toBe(531)->and(TeamMember::count())->toBe(531)->and(AthleteEntry::count())->toBe(523);
+});
+
+test('latest source adds only the newly listed registration to an existing player without replacing the roster', function () {
+    $this->seed(DefaultIntramuralsSeeder::class);
+    $student = Student::where('student_number', 'TERRAQUATIC-EAGLES-JESSA-MAE-ARCA')->firstOrFail();
+    $event = EditionSport::whereHas('sport', fn ($query) => $query->where('code', 'BASKET-3X3-WOMEN'))->firstOrFail();
+    $student->athleteEntries()->where('edition_sport_id', $event->id)->delete();
+    $student->update(['section' => 'D', 'year_level' => '4th']);
+    $beforeStudents = DB::table('students')->orderBy('id')->get()->toJson();
+    $entryIds = AthleteEntry::pluck('id');
+    $beforeEntries = DB::table('athlete_entries')->whereIn('id', $entryIds)->orderBy('id')->get()->toJson();
+    $this->seed(NewFactionPlayersSeeder::class);
+
+    $entry = $student->athleteEntries()->where('edition_sport_id', $event->id)->firstOrFail();
+    expect(DB::table('students')->orderBy('id')->get()->toJson())->toBe($beforeStudents)
+        ->and(DB::table('athlete_entries')->whereIn('id', $entryIds)->orderBy('id')->get()->toJson())->toBe($beforeEntries)
+        ->and(AthleteEntry::count())->toBe(537);
+    $this->assertDatabaseHas('audit_logs', ['action' => 'roster.registration_added', 'auditable_id' => $entry->id]);
+    $this->seed(NewFactionPlayersSeeder::class);
+    expect(AthleteEntry::count())->toBe(537);
+
+    $entry->update(['status' => 'withdrawn', 'medical_certificate_notes' => 'Keep manual edit']);
+    $this->seed(NewFactionPlayersSeeder::class);
+    expect($entry->fresh()->status)->toBe('withdrawn')->and($entry->fresh()->medical_certificate_notes)->toBe('Keep manual edit');
 });

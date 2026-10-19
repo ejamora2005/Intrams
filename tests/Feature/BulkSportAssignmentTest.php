@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\AthleteEntry;
+use App\Models\BracketCompetitor;
 use App\Models\BracketMatch;
 use App\Models\CompetitionSchedule;
 use App\Models\EditionSport;
@@ -64,7 +65,8 @@ test('an admin can bulk-assign selected roster members to a team sport', functio
     }
 
     expect(AthleteEntry::query()->where('edition_sport_id', $editionSport->id)->count())->toBe(2);
-    $this->assertDatabaseCount('audit_logs', 2);
+    expect(\App\Models\AuditLog::where('action', 'athlete_entry.created')->count())->toBe(2);
+    $this->assertDatabaseHas('audit_logs', ['action' => 'request.admin.sports.participants.store', 'outcome' => 'success']);
 });
 
 test('the universal assignment page filters students by the selected team', function () {
@@ -113,11 +115,15 @@ test('admin can select students when medical certificates are not required or we
         'assigned_at' => now(),
     ]);
 
-    $this->actingAs($admin)
+    $assignment = $this->actingAs($admin)
         ->get(route('admin.sports.participants.assign', ['sport' => $chess, 'edition_id' => $edition->id]))
-        ->assertOk()
-        ->assertSee('name="student_ids[]" value="'.$withoutCertificate->id.'" type="checkbox" class="student-checkbox', false)
-        ->assertSee('name="student_ids[]" value="'.$verifiedCertificate->id.'" type="checkbox" class="student-checkbox', false);
+        ->assertOk();
+    $dom = new DOMDocument;
+    @$dom->loadHTML($assignment->getContent());
+    $xpath = new DOMXPath($dom);
+    foreach ([$withoutCertificate, $verifiedCertificate] as $selectable) {
+        expect($xpath->query('//input[@name="student_ids[]" and @value="'.$selectable->id.'" and not(@disabled)]')->length)->toBe(1);
+    }
 
     $this->actingAs($admin)
         ->post(route('admin.sports.participants.store', $chess), [
@@ -157,7 +163,7 @@ test('an admin can create multiple tied dual pairs for one team', function () {
         ->assertSee('First pair member')
         ->assertSee('Second pair member')
         ->assertSee('Add selected pair')
-        ->assertSee('Search name or student number');
+        ->assertSee('Search name or student ID');
 
     foreach ($students->chunk(2) as $pair) {
         $this->actingAs($admin)
@@ -309,6 +315,9 @@ test('an admin schedules a selected bracket match by date and time of day', func
         AthleteEntry::query()->create(['edition_sport_id' => $editionSport->id, 'student_id' => $student->id, 'team_id' => $team->id, 'status' => 'active', 'assigned_by' => $admin->id, 'assigned_at' => now()]);
     }
 
+    app(\App\Services\BracketService::class)->initialize($editionSport);
+    app(\App\Services\BracketService::class)->reorder($editionSport, BracketCompetitor::where('edition_sport_id', $editionSport->id)->orderBy('id')->pluck('id')->all());
+
     $this->actingAs($admin)
         ->get(route('admin.sports.bracket', ['sport' => $editionSport->sport, 'edition_id' => $edition->id]))
         ->assertOk()
@@ -378,6 +387,8 @@ test('basketball bracket schedules default to MPCC', function () {
         app(\App\Services\BracketService::class)->initialize($editionSport);
         $match = BracketMatch::query()->where('edition_sport_id', $editionSport->id)->where('status', 'pending')->firstOrFail();
     }
+    app(\App\Services\BracketService::class)->reorder($editionSport, BracketCompetitor::where('edition_sport_id', $editionSport->id)->orderBy('id')->pluck('id')->all());
+    $match = BracketMatch::where('edition_sport_id', $editionSport->id)->where('status', 'pending')->firstOrFail();
 
     $this->actingAs($admin)
         ->get(route('admin.sports.bracket', ['sport' => $sport, 'edition_id' => $edition->id]))

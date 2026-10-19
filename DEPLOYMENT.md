@@ -35,9 +35,9 @@ cd /var/www/html
 php artisan db:seed --class=NewFactionPlayersSeeder --force
 ```
 
-The October 19 Google Sheets additions contain 26 new Terraquatic members and 14 sports registrations. Repeated names are combined, sports match the system's Men/Women categories, and cultural/support-only names remain roster members. There are no new Trojan or Sea Dragons names. The bundled roster now has 557 members and 536 sports registrations: Sea Dragons 192, Terraquatic Eagles 189, and Trojan Warriors 176.
+The October 19 Google Sheets additions contain 26 new Terraquatic members and 14 sports registrations. The later update also adds Basketball 3x3 (Women) to Jessa Mae Arca; four other updated basketball listings already exist. Repeated new names are combined, sports match the system's Men/Women categories, and cultural/support-only names remain roster members. There are no new Trojan or Sea Dragons names. The bundled roster now has 557 members and 537 sports registrations: Sea Dragons 192, Terraquatic Eagles 189, and Trojan Warriors 176.
 
-This additions seeder creates missing players only. Existing people (including archived records), their sports, and manual edits are skipped. It does not remove memberships or registrations or reset accounts, schedules, wins, results, or points. Rerunning it is safe. Keep `DEPLOY_SEED_DEFAULT_COMPETITIONS=false` after setup so deployments do not run the full replacement import. Source rows and the additions import decisions are recorded in `database/seeders/rosters/source.json`.
+This additions seeder creates missing players and appends only the specific new registration in `database/seeders/rosters/registration_additions.json`. Existing profiles and unrelated sports stay untouched. Existing entries, including withdrawn registrations, are never reactivated. Missing/inactive players are skipped for registration updates. It does not remove memberships or registrations or reset accounts, schedules, wins, results, or points. Rerunning it is safe. Imports and added registrations are recorded in System Logs. Keep `DEPLOY_SEED_DEFAULT_COMPETITIONS=false` after setup so deployments do not run the full replacement import. Source rows and import decisions are recorded in `database/seeders/rosters/source.json`.
 
 ## Replace the supplied roster
 
@@ -49,9 +49,17 @@ php artisan migrate --force
 php artisan db:seed --class=CurrentFactionRostersSeeder --force
 ```
 
-The full replacement uses the October 18 base snapshot plus the October 19 additions (557 members and 536 sports registrations). Expanded names for Christine Belinario Alvero, Danicha Jane Cabudbud Gomez, and Kristine Jamero Lapasanda are linked to their earlier names so rerunning the seeder retains their existing records. Duplicate source names are combined and their sports are united. Explicit sport codes match the system's formats and Men/Women categories. Cultural-only and support-only names remain faction members without new event registrations. Existing cultural registrations are preserved; missing academic details use `N/A`. Source provenance and import decisions are recorded in `database/seeders/rosters/source.json`.
+The full replacement uses the October 18 base snapshot plus the October 19 additions (557 members and 537 sports registrations). Expanded names for Christine Belinario Alvero, Danicha Jane Cabudbud Gomez, and Kristine Jamero Lapasanda are linked to their earlier names so rerunning the seeder retains their existing records. Duplicate source names are combined and their sports are united. Explicit sport codes match the system's formats and Men/Women categories. Cultural-only and support-only names remain faction members without new event registrations. Existing cultural registrations are preserved; missing academic details use `N/A`. Source provenance and import decisions are recorded in `database/seeders/rosters/source.json`.
 
 Run this import once, then keep `DEPLOY_SEED_DEFAULT_COMPETITIONS=false` so subsequent deployments preserve roster edits made in the app. This command updates all three rosters in one transaction and does not reset accounts, schedules, wins, results, or points. Existing pair assignments are retained when the source does not specify a pair. It expects the default edition, teams, and sports to exist; for a new empty database, run `php artisan db:seed --class=DefaultIntramuralsSeeder --force` instead. If an outdated sports registration is used in a schedule, the entire roster import rolls back instead of removing that history. Known old name aliases are consolidated; ambiguous individual/pair bracket duplicates require review.
+
+## Activity logging
+
+After deploying, run `php artisan migrate --force` to add indexes for the growing activity history. No existing activity records are removed.
+
+System Logs records staff page visits, searches, form submissions, exports, authentication, and failed or denied requests across all workspaces. Request details include the actor, route, IP, outcome, and model changes with before/after values. Related records from one action share a request ID. Passwords, tokens, recovery codes, and file contents are redacted. Date filters and displayed times use UTC+8. Health checks and anonymous public page views are excluded. New activity is captured from deployment onward; previously unrecorded history cannot be reconstructed.
+
+Roster additions and their imports are also logged. Audit storage failures fall back to the Laravel application log without interrupting scoring or roster saves.
 
 ## Notes
 

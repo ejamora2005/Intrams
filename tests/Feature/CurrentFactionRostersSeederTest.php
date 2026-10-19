@@ -12,7 +12,7 @@ use Database\Seeders\DefaultIntramuralsSeeder;
 test('current source snapshot imports one member per name and every exact gender matched sports registration', function () {
     $this->seed(DefaultIntramuralsSeeder::class);
     $members = TeamMember::with(['student.athleteEntries.editionSport.sport', 'team'])->get();
-    expect($members)->toHaveCount(557)->and(AthleteEntry::count())->toBe(536);
+    expect($members)->toHaveCount(557)->and(AthleteEntry::count())->toBe(537);
     foreach (['sea_dragons' => 'sea-dragons', 'terraquatic_eagles' => 'terraquatic-eagles', 'trojan_warriors' => 'trojan-warriors'] as $file => $teamCode) {
         foreach (json_decode(file_get_contents(database_path('seeders/rosters/'.$file.'.json')), true) as $row) {
             $member = $members->first(fn ($member) => $member->team->code === $teamCode && $member->student->full_name === $row['name']);
@@ -54,9 +54,9 @@ test('roster refresh merges verified name aliases and preserves existing cultura
         ->and($joel->fresh()->full_name)->toBe('Joel Capote Portugaliza')
         ->and($competitor->fresh()->athlete_entry_ids)->toBe([$baseball->id])
         ->and($badminton->fresh()->pair_key)->toBe('existing-badminton-pair')
-        ->and(Student::count())->toBe(557)->and(TeamMember::count())->toBe(557)->and(AthleteEntry::count())->toBe(537);
+        ->and(Student::count())->toBe(557)->and(TeamMember::count())->toBe(557)->and(AthleteEntry::count())->toBe(538);
     $this->seed(CurrentFactionRostersSeeder::class);
-    expect(Student::count())->toBe(557)->and(TeamMember::count())->toBe(557)->and(AthleteEntry::count())->toBe(537);
+    expect(Student::count())->toBe(557)->and(TeamMember::count())->toBe(557)->and(AthleteEntry::count())->toBe(538);
 });
 
 test('cultural only members outside the sports source retain their membership and registrations', function () {
