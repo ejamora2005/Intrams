@@ -23,6 +23,8 @@ class PublicScheduleService
         $todaySchedules = collect();
         $factionRosters = collect();
         $availableDates = [];
+        $programmeSource = null;
+        $programmeService = app(PublicProgrammeService::class);
 
         if ($currentEdition) {
             $factionRosters = $currentEdition->teams()
@@ -92,75 +94,81 @@ class PublicScheduleService
                 ->values()
                 ->all();
 
-            $todaySchedules = CompetitionSchedule::query()
-                ->select(['id', 'edition_sport_id', 'bracket_match_id', 'title', 'is_activity', 'starts_at', 'venue', 'coordinator_id', 'status'])
-                ->whereIn('edition_sport_id', $currentEdition->editionSports()->select('id'))
-                ->whereDate('starts_at', $selectedDate->toDateString())
-                ->whereNotIn('status', ['cancelled', 'canceled'])
-                ->with([
-                    'editionSport:id,edition_id,sport_id',
-                    'editionSport.sport:id,name,code',
-                    'bracketMatch:id,match_number',
-                    'coordinator:id,name',
-                    'participants' => fn ($query) => $query
-                        ->select(['id', 'competition_schedule_id', 'team_id', 'athlete_entry_id', 'slot'])
-                        ->where('status', 'active')
-                        ->orderBy('slot')
-                        ->with([
-                            'team:id,name,code',
-                            'athleteEntry:id,student_id',
-                            'athleteEntry.student:id,first_name,middle_name,last_name',
-                        ]),
-                ])
-                ->orderBy('starts_at')
-                ->get()
-                ->map(function (CompetitionSchedule $schedule) use ($factionRosters): array {
-                    $sport = $schedule->editionSport->sport;
-                    $isActivity = (bool) $schedule->is_activity;
-                    $isCultural = ! $isActivity && str_starts_with(strtoupper((string) $sport?->code), 'CULT-');
-                    $competitors = $isCultural
-                        ? $factionRosters->pluck('name')->values()
-                        : $schedule->participants
-                            ->map(fn ($participant) => $participant->team?->name
-                                ?: $participant->athleteEntry?->student?->full_name)
-                            ->filter()
-                            ->unique()
-                            ->values();
-                    $competitorTeams = $isCultural
-                        ? $factionRosters->map(fn (array $faction): array => [
-                            'name' => $faction['name'],
-                            'code' => $faction['code'],
-                            'logo_path' => $faction['logo_path'],
-                        ])->all()
-                        : $schedule->participants
-                            ->pluck('team')
-                            ->filter()
-                            ->unique('id')
-                            ->values()
-                            ->map(fn (Team $team): array => [
-                                'name' => $team->name,
-                                'code' => $team->code,
-                                'logo_path' => $team->logo_path,
-                            ])
-                            ->all();
+            if ($programmeService->appliesTo($currentEdition)) {
+                $availableDates = $programmeService->datesFor($currentEdition);
+                $todaySchedules = $programmeService->forDate($selectedDate->toDateString(), $factionRosters);
+                $programmeSource = config('public_programme.source');
+            } else {
+                $todaySchedules = CompetitionSchedule::query()
+                    ->select(['id', 'edition_sport_id', 'bracket_match_id', 'title', 'is_activity', 'starts_at', 'venue', 'coordinator_id', 'status'])
+                    ->whereIn('edition_sport_id', $currentEdition->editionSports()->select('id'))
+                    ->whereDate('starts_at', $selectedDate->toDateString())
+                    ->whereNotIn('status', ['cancelled', 'canceled'])
+                    ->with([
+                        'editionSport:id,edition_id,sport_id',
+                        'editionSport.sport:id,name,code',
+                        'bracketMatch:id,match_number',
+                        'coordinator:id,name',
+                        'participants' => fn ($query) => $query
+                            ->select(['id', 'competition_schedule_id', 'team_id', 'athlete_entry_id', 'slot'])
+                            ->where('status', 'active')
+                            ->orderBy('slot')
+                            ->with([
+                                'team:id,name,code',
+                                'athleteEntry:id,student_id',
+                                'athleteEntry.student:id,first_name,middle_name,last_name',
+                            ]),
+                    ])
+                    ->orderBy('starts_at')
+                    ->get()
+                    ->map(function (CompetitionSchedule $schedule) use ($factionRosters): array {
+                        $sport = $schedule->editionSport->sport;
+                        $isActivity = (bool) $schedule->is_activity;
+                        $isCultural = ! $isActivity && str_starts_with(strtoupper((string) $sport?->code), 'CULT-');
+                        $competitors = $isCultural
+                            ? $factionRosters->pluck('name')->values()
+                            : $schedule->participants
+                                ->map(fn ($participant) => $participant->team?->name
+                                    ?: $participant->athleteEntry?->student?->full_name)
+                                ->filter()
+                                ->unique()
+                                ->values();
+                        $competitorTeams = $isCultural
+                            ? $factionRosters->map(fn (array $faction): array => [
+                                'name' => $faction['name'],
+                                'code' => $faction['code'],
+                                'logo_path' => $faction['logo_path'],
+                            ])->all()
+                            : $schedule->participants
+                                ->pluck('team')
+                                ->filter()
+                                ->unique('id')
+                                ->values()
+                                ->map(fn (Team $team): array => [
+                                    'name' => $team->name,
+                                    'code' => $team->code,
+                                    'logo_path' => $team->logo_path,
+                                ])
+                                ->all();
 
-                    $sportCode = strtoupper((string) $sport?->code);
-                    $sportGroup = $isActivity || str_starts_with($sportCode, 'CULT-') ? null : $sport?->catalogue_group_key;
+                        $sportCode = strtoupper((string) $sport?->code);
+                        $sportGroup = $isActivity || str_starts_with($sportCode, 'CULT-') ? null : $sport?->catalogue_group_key;
 
-                    return [
-                        'event' => $isActivity ? ($schedule->title ?: 'School Activity') : $this->eventName($sport?->name ?? 'Event'),
-                        'category' => $isActivity ? 'activities' : ($isCultural ? 'cultural' : 'sports'),
-                        'sport_group' => $sportGroup,
-                        'sport_group_label' => $sportGroup ? $sport?->catalogue_group_label : null,
-                        'game' => $isActivity ? '' : ($schedule->title ?: ($schedule->bracketMatch ? 'Game '.$schedule->bracketMatch->match_number : '')),
-                        'time' => $schedule->starts_at->format('g:i A'),
-                        'period' => $schedule->starts_at->hour < 12 ? 'Morning' : 'Afternoon',
-                        'competitors' => $competitors->isEmpty() ? 'To be announced' : $competitors->implode(' VS '),
-                        'competitor_teams' => $competitorTeams,
-                        'venue' => $schedule->venue ?: 'TBA',
-                        'facilitator' => $schedule->coordinator?->name ?? 'Unassigned',
-                    ];
-                });
+                        return [
+                            'event' => $isActivity ? ($schedule->title ?: 'School Activity') : $this->eventName($sport?->name ?? 'Event'),
+                            'category' => $isActivity ? 'activities' : ($isCultural ? 'cultural' : 'sports'),
+                            'sport_group' => $sportGroup,
+                            'sport_group_label' => $sportGroup ? $sport?->catalogue_group_label : null,
+                            'game' => $isActivity ? '' : ($schedule->title ?: ($schedule->bracketMatch ? 'Game '.$schedule->bracketMatch->match_number : '')),
+                            'time' => $schedule->starts_at->format('g:i A'),
+                            'period' => $schedule->starts_at->hour < 12 ? 'Morning' : 'Afternoon',
+                            'competitors' => $competitors->isEmpty() ? 'To be announced' : $competitors->implode(' VS '),
+                            'competitor_teams' => $competitorTeams,
+                            'venue' => $schedule->venue ?: 'TBA',
+                            'facilitator' => $schedule->coordinator?->name ?? 'Unassigned',
+                        ];
+                    });
+            }
         }
 
         return [
@@ -170,6 +178,7 @@ class PublicScheduleService
             'availableDates' => $availableDates,
             'todaySchedules' => $todaySchedules,
             'factionRosters' => $factionRosters,
+            'programmeSource' => $programmeSource,
         ];
     }
 

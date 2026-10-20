@@ -7,6 +7,8 @@
     $eventCount = $todaySchedules->pluck('event')->unique()->count();
     $morningCount = $todaySchedules->where('period', 'Morning')->count();
     $afternoonCount = $todaySchedules->where('period', 'Afternoon')->count();
+    $eveningCount = $todaySchedules->where('period', 'Evening')->count();
+    $programmeSource = $programmeSource ?? null;
     $themeTitle = config('intramurals.theme.title');
     $themeTagline = config('intramurals.theme.tagline');
     $selectedDate = $selectedDate ?? now()->format('Y-m-d');
@@ -38,10 +40,11 @@
                 <p class="schedule-description">{{ $themeTagline }} Official event board for the SLSU Bontoc Intramural Meet.</p>
                 <p class="schedule-edition"><span aria-hidden="true"></span>{{ $currentEdition?->name ?? 'No active intramurals edition' }}</p>
                 <ul class="schedule-metrics" aria-label="Event summary">
-                    <li><strong>{{ $scheduleCount }}</strong><span>Matches</span></li>
-                    <li><strong>{{ $eventCount }}</strong><span>Events</span></li>
+                    <li><strong>{{ $scheduleCount }}</strong><span>{{ $programmeSource ? 'Sessions' : 'Matches' }}</span></li>
+                    @if (! $programmeSource || ! $eveningCount)<li><strong>{{ $eventCount }}</strong><span>Events</span></li>@endif
                     <li><strong>{{ $morningCount }}</strong><span>Morning</span></li>
                     <li><strong>{{ $afternoonCount }}</strong><span>Afternoon</span></li>
+                    @if ($eveningCount)<li><strong>{{ $eveningCount }}</strong><span>Evening</span></li>@endif
                 </ul>
             </div>
             <div class="schedule-date">
@@ -49,7 +52,10 @@
                 <div>
                     <p>SLSU event desk</p>
                     <strong>{{ $todayLabel }}</strong>
-                    <span>Morning &amp; afternoon competitions</span>
+                    <span>Daily event programme</span>
+                    @if ($programmeSource)
+                        <a class="schedule-home" href="{{ $programmeSource['url'] }}" target="_blank" rel="noopener noreferrer">View programme sheet</a>
+                    @endif
                     @if (! empty($availableDates))
                         <form method="GET" action="{{ route('login') }}" class="schedule-date-picker">
                             <label for="schedule-date">View date</label>

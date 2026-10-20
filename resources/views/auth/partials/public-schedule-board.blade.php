@@ -39,6 +39,7 @@
                         <td>
                             <div class="schedule-session-stack">
                                 <span class="schedule-time">{{ $schedule['time'] }}</span>
+                                @if (! empty($schedule['cutoff']))<span class="schedule-game">{{ $schedule['cutoff'] }}</span>@endif
                                 <span class="schedule-session {{ $schedule['period'] === 'Morning' ? 'schedule-session--morning' : 'schedule-session--afternoon' }}"><span aria-hidden="true"></span>{{ $schedule['period'] }}</span>
                             </div>
                         </td>
@@ -74,6 +75,7 @@
                             <span class="schedule-sport-group"><x-sport-group-icon :group="$schedule['sport_group']" /></span>
                         @endif
                         <h3>{{ $schedule['event'] }}</h3><time>{{ $schedule['time'] }}</time>
+                        @if (! empty($schedule['cutoff']))<span class="schedule-game">{{ $schedule['cutoff'] }}</span>@endif
                     </div>
                     <span class="schedule-session {{ $schedule['period'] === 'Morning' ? 'schedule-session--morning' : 'schedule-session--afternoon' }}"><span aria-hidden="true"></span>{{ $schedule['period'] }}</span>
                 </header>
@@ -99,7 +101,7 @@
     </div>
 
     <footer class="schedule-board-footer">
-        <p id="{{ $refreshNoteId }}">Updates appear as coordinator entries are published.</p>
+        <p id="{{ $refreshNoteId }}">{{ ! empty($programmeSource) ? 'AM/PM follow the published programme. Exact hours are shown where provided.' : 'Updates appear as coordinator entries are published.' }}</p>
         <span>{{ $schedules->count() }} {{ \Illuminate\Support\Str::plural('event', $schedules->count()) }}</span>
     </footer>
 </section>

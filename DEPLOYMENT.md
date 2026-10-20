@@ -34,6 +34,12 @@ Bundled/local roster imports are disabled when `APP_ENV=production`, even with `
 
 Keep `DEPLOY_SEED_DEFAULT_COMPETITIONS=false` and `DEPLOY_SEED_DEFAULT_ACCOUNTS=false` after first setup. Add or edit live players through Admin/GAM. Do not change `APP_ENV` to bypass this protection or use `migrate:fresh` on Dokploy. This protection does not delete any names already in production or reset scores, winners or schedules.
 
+## Public programme from the Sked sheet (October 20)
+
+Redeploy only; no migration or seeder is needed. For the current 2026 edition, the login/schedule page uses the October 19–23 `Sked` snapshot in `config/public_programme.php`. The source spreadsheet URL and cell ranges are recorded there. Repeated cells are grouped by session and venue. AM/PM remain session labels where no exact hour is supplied. Day 1 Badminton ends at 3:00 PM, Day 2 Basketball 3x3 ends at 2:00 PM, and Day 3 Awarding Mugna starts at 7:00 PM (Philippine time). Day 1's unspecified venue stays TBA.
+
+The public board displays only the supplied programme, with separate sports, cultural and campus activity sections. Existing sport/bracket schedules stay linked and accessible internally; they are not displayed on this edition's public board. Sports, registrations, brackets, declared results, score details and standings are not updated or deleted. This is a reviewed snapshot, not an automatic Google Sheets sync; later sheet changes require updating the snapshot and redeploying. Other editions retain their existing schedule behavior.
+
 ## Doubles selections in student forms (October 20)
 
 Redeploy the latest code; no roster seeding or new migration is required. Admin and GAM can add, keep, remove and reselect Badminton/Table Tennis doubles from student sport forms. Keeping a doubles selection preserves its pair key and medical review. Removing it deactivates only that student's entry and retains history; the other player is not automatically withdrawn. Sport management can pair registered players who do not have a complete active pair, reusing their existing entries. Complete pairs cannot be reassigned through a stale pairing form. Gender and participation limits still apply.
