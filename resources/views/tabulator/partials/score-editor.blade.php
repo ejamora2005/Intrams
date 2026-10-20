@@ -6,9 +6,9 @@
 <div class="tab-section-heading"><a class="tab-text-link" href="{{ route('tabulator.dashboard') }}#declare-sports">← All scoring events</a>@if ($nextPendingSport)<a class="tab-text-link" href="{{ route('tabulator.dashboard', ['edition_sport_id' => $nextPendingSport->id]) }}#declare-sports">Next pending event →</a>@endif</div>
 <section class="tab-panel tab-stack">
     <div class="tab-section-heading"><div><p class="tab-eyebrow">{{ str_starts_with(strtoupper($selectedSport->sport->code), 'CULT-') ? 'Cultural event' : $selectedSport->sport->catalogue_group_label }}</p><h2>{{ $selectedSport->sport->name }}</h2><p class="tab-muted">Assign the placed factions, then review your declaration.</p></div><span class="tab-state" data-state="{{ $hasResult ? 'declared' : 'pending' }}">{{ $hasResult ? 'Editing declared results' : 'Not yet declared' }}</span></div>
-    @if ($hasResult)<p class="tab-alert">These results were saved by {{ $selectedSport->sportResult->submitter?->name ?? 'a tabulator' }} on {{ $selectedSport->sportResult->submitted_at?->format('M j, Y g:i A') }}. Saving will replace this event’s placements and recalculate the standings.</p>@endif
+    @if ($hasResult)<p class="tab-alert">These results were saved by {{ $selectedSport->sportResult->submitter?->name ?? 'a tabulator' }} on <x-result-time :value="$selectedSport->sportResult->submitted_at" />. Saving will replace this event’s placements and recalculate the standings.</p>@endif
     @if ($teams->isEmpty())<p class="tab-empty">No active factions are available. Ask an administrator to add factions before scoring.</p>@else
-    <form method="POST" action="{{ route('tabulator.sport-results.store') }}" data-ops-form data-tab-score-form data-declare-winners data-allow-repeated-winners="{{ count($pointRules) > 3 ? 'true' : 'false' }}" data-review-modal="tabulator-declare-sports-modal" class="tab-stack">
+    <form method="POST" action="{{ route('tabulator.sport-results.store') }}" data-ops-form data-tab-score-form data-declare-winners data-allow-repeated-winners="{{ $allowRepeatedWinners ? 'true' : 'false' }}" data-review-modal="tabulator-declare-sports-modal" class="tab-stack">
         @csrf
         <input type="hidden" name="edition_sport_id" value="{{ $selectedSport->id }}">
         <div class="tab-placement-grid">
@@ -22,7 +22,7 @@
                 </label>
             @endforeach
         </div>
-        <p class="tab-muted tab-small">{{ count($pointRules) > 3 ? 'This event allows a faction to receive more than one placement.' : 'Each faction can receive one placement in this event.' }} Only selected placements receive points.</p>
+        <p class="tab-muted tab-small">{{ $allowRepeatedWinners ? 'This event allows a faction to receive more than one placement.' : 'Each faction can receive one placement in this event.' }} Only selected placements receive points.</p>
         <p data-tab-score-error hidden role="alert" class="tab-alert"></p>
         <div class="tab-review-bar"><span data-tab-selected-count class="tab-muted">Choose at least one placement.</span><button type="button" data-tab-review class="tab-button">Review placements →</button></div>
         <dialog id="tabulator-declare-sports-modal" data-ops-modal class="tab-dialog" aria-labelledby="placement-review-title">

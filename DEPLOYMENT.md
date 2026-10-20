@@ -26,6 +26,10 @@ DEPLOY_SEED_DEFAULT_COMPETITIONS=true
 
 9. Deploy. After the first successful deploy, set the seed flags back to `false`.
 
+## Three-place scoring and declaration times (October 20)
+
+Redeploy, then run `php artisan migrate --force` in `/var/www/html`. Current athletics events and other current four-place scoring rules become Champion / 1st Runner-up / 2nd Runner-up with 10 / 7 / 5 points. Other three-place scoring groups keep their values. The migration recalculates standings from existing declared winners; it does not reset results or bracket wins. Original fourth-place assignments remain as history and no longer earn points. Submission times and submitters are preserved. New declaration times are stored in UTC and displayed as Philippine time, explicitly marked PHT (UTC+8).
+
 ## Correct Chess and Badminton formats (October 20)
 
 Redeploy, then run `php artisan migrate --force` in `/var/www/html`. This makes Chess (Men/Women) team events and keeps all three Badminton formats (Singles, Doubles, Team) for Men and Women. Existing team-event entries use the player's current faction. Registration IDs, badminton pairs, schedules, scores, declared winners, and standings are preserved. No roster replacement or score reset is needed. Doubles are listed in player forms with a reminder to assign both partners from Admin sport participant management.

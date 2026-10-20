@@ -53,6 +53,7 @@ class DashboardController extends Controller
             'editionSports' => $editionSports,
             'selectedSport' => $selectedSport,
             'pointRules' => $selectedSport ? $this->standingsService->pointRulesFor($selectedSport) : [],
+            'allowRepeatedWinners' => $selectedSport && $this->standingsService->allowsRepeatedWinnersFor($selectedSport),
             'teams' => $teams,
             'teamsById' => $teams->keyBy('id'),
             'eventPointRules' => $editionSports->mapWithKeys(fn ($sport) => [$sport->id => $this->standingsService->pointRulesFor($sport)]),
@@ -84,7 +85,7 @@ class DashboardController extends Controller
                 throw ValidationException::withMessages(['placements' => 'Choose only the placements configured for this event.']);
             }
             $this->ensureCurrentScoringEvent($editionSport);
-            $allowRepeatedWinners = count($rules) > 3;
+            $allowRepeatedWinners = $this->standingsService->allowsRepeatedWinnersFor($editionSport);
 
             $selectedTeamIds = collect($data['placements'] ?? [])
                 ->filter(fn ($teamId): bool => filled($teamId))

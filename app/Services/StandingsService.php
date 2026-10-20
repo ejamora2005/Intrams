@@ -168,9 +168,14 @@ class StandingsService
             ->all();
     }
 
-    /**
-     * @param  array<int|string, int|string|null>  $placements
-     */
+    /** More than one placed athlete can represent a faction in track and field. */
+    public function allowsRepeatedWinnersFor(EditionSport $editionSport): bool
+    {
+        // Several placed athletes can represent the same faction, even with only three places.
+        return $editionSport->sport?->isTrackAndField() || count($this->pointRulesFor($editionSport)) > 3;
+    }
+
+    /** @param array<int|string, int|string|null> $placements */
     public function recordSportResult(EditionSport $editionSport, array $placements, User $submittedBy): SportResult
     {
         $editionSport->loadMissing('edition');
@@ -192,7 +197,7 @@ class StandingsService
                     'submitted_by' => $submittedBy->id,
                     'placements_json' => $normalizedPlacements,
                     'points_json' => $points,
-                    'submitted_at' => now(),
+                    'submitted_at' => now('UTC'),
                 ],
             );
 

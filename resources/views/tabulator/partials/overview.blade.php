@@ -18,7 +18,7 @@
         @forelse ($recentResults as $event)
             <a class="tab-card tab-event" href="{{ route('tabulator.dashboard', ['edition_sport_id' => $event->id]) }}#declare-sports">
                 <span class="tab-state" data-state="declared">Declared</span><h4>{{ $event->sport->name }}</h4>
-                <p class="tab-muted tab-small">{{ $event->sportResult->submitted_at?->format('M j, g:i A') }} · {{ $event->sportResult->submitter?->name ?? 'Tabulator' }}</p><span class="tab-text-link">Review placements →</span>
+                <p class="tab-muted tab-small"><x-result-time :value="$event->sportResult->submitted_at" /> · {{ $event->sportResult->submitter?->name ?? 'Tabulator' }}</p><span class="tab-text-link">Review placements →</span>
             </a>
         @empty
             <div class="tab-empty"><strong>No results declared yet</strong><p>Start with Score events. Saved placements and updated points will appear here.</p></div>

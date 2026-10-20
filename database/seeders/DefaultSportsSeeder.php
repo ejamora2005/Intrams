@@ -6,6 +6,7 @@ use App\Models\IntramuralEdition;
 use App\Models\Sport;
 use App\Services\EditionService;
 use App\Services\RacketEventFormatService;
+use App\Services\ThreePlaceScoringService;
 use Illuminate\Database\Seeder;
 
 class DefaultSportsSeeder extends Seeder
@@ -40,6 +41,7 @@ class DefaultSportsSeeder extends Seeder
         $editionService = app(EditionService::class);
         IntramuralEdition::query()->each(fn (IntramuralEdition $edition) => $editionService->syncDefaultSports($edition));
         app(RacketEventFormatService::class)->sync();
+        app(ThreePlaceScoringService::class)->sync();
     }
 
     private function ensureDefaultEdition(): void

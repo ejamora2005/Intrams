@@ -39,7 +39,7 @@ $pointSystems = [
     'sports_athletics' => [
         'label' => 'Sports Athletics Events',
         'category' => 'sports',
-        'description' => 'Runs, throws, and jump events use the 5-3-2-1 proposal scale.',
+        'description' => 'Runs, relays, throws, and jumps award 10, 7, and 5 points for the top three places.',
         'codes' => [
             'RUNS', '100M-RUN', '200M-RUN', '400M-RUN',
             'RELAY-4X100', 'RELAY-4X400',
@@ -51,10 +51,9 @@ $pointSystems = [
             'JUMP-MEN', 'JUMP-WOMEN', 'LONG-JUMP-MEN', 'LONG-JUMP-WOMEN', 'TRIPLE-JUMP-MEN', 'TRIPLE-JUMP-WOMEN', 'HIGH-JUMP-MEN', 'HIGH-JUMP-WOMEN',
         ],
         'placements' => [
-            ['placement' => 1, 'label' => '1st Place', 'points' => 5.0, 'medal' => 'gold'],
-            ['placement' => 2, 'label' => '2nd Place', 'points' => 3.0, 'medal' => 'silver'],
-            ['placement' => 3, 'label' => '3rd Place', 'points' => 2.0, 'medal' => 'bronze'],
-            ['placement' => 4, 'label' => '4th Place', 'points' => 1.0, 'medal' => 'none'],
+            ['placement' => 1, 'label' => 'Champion', 'points' => 10.0, 'medal' => 'gold'],
+            ['placement' => 2, 'label' => '1st Runner-up', 'points' => 7.0, 'medal' => 'silver'],
+            ['placement' => 3, 'label' => '2nd Runner-up', 'points' => 5.0, 'medal' => 'bronze'],
         ],
     ],
     'cultural_festival_dance' => [
