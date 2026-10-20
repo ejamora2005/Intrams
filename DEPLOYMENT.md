@@ -4,9 +4,11 @@ This project is ready for a Dokploy Docker Compose deployment on `slsubc.tech`.
 
 ## Multiple sport registrations and Possible DQ
 
-Admin and GAM player forms allow multiple sport selections, including combinations beyond the participation limits. The former five-selection cap is removed. Additional major/minor events, too many events, invalid combinations, and relays without a qualifying run are saved and flagged on the Possible DQ Watchlist. Flags reflect the current registrations and clear when corrected; they do not automatically disqualify a player.
+Admin and GAM player forms allow multiple sport selections, including combinations beyond the participation limits. The former five-selection cap is removed. Additional major/minor events, too many events, and invalid combinations are saved and flagged on the Possible DQ Watchlist. Flags reflect the current registrations and clear when corrected; they do not automatically disqualify a player.
 
-The sport picker shows a warning while selecting. After a flagged save, a notification links to the watchlist. Sport participant assignment also keeps flagged athletes selectable, including doubles pairing. Gender categories, faction access, current-edition validation, complete-pair protections, and existing result safeguards still apply. Deploy the code; no migration, roster seeder, or score reset is needed.
+The sport picker shows a warning while selecting. After a flagged save, a notification links to the watchlist. Sport participant assignment also keeps flagged athletes selectable, including doubles pairing. Gender categories, faction access, current-edition validation, complete-pair protections, and existing result safeguards still apply. These registration changes do not require a roster seeder or score reset. The relay category migration is described below.
+
+Relay events accept every gender as Open. With an active 100m, 200m, or 400m run in the same edition, relays are exempt from participation counts. Without a qualifying run, each distinct relay distance counts once as Individual/Dual, regardless of its scoring group; it is never Major or Minor. Legacy gender divisions and duplicate relay records share that count. A missing run alone does not flag Possible DQ. The relay migration updates categories in place while retaining event and registration IDs, schedules, declared results, points and statuses. Unique legacy names/codes stay internal; relay names display Open throughout the application. Keep `DEPLOY_RUN_MIGRATIONS=true` to apply it; no roster import is required.
 
 ## Formal activity register
 

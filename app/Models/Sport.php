@@ -44,6 +44,44 @@ class Sport extends Model
 
     protected $fillable = ['name', 'code', 'description', 'participant_category', 'participant_category_label', 'status', 'is_system'];
 
+    protected static function booted(): void
+    {
+        static::saving(function (Sport $sport): void {
+            if ($sport->isRelay()) {
+                $sport->participant_category = 'open';
+                $sport->participant_category_label = null;
+            }
+        });
+    }
+
+    public function isRelay(): bool
+    {
+        return preg_match('/(?:^|[-\s])RELAYS?(?:[-\s(]|$)/i', (string) $this->code.' '.(string) ($this->attributes['name'] ?? '')) === 1;
+    }
+
+    /** Keep unique legacy catalogue names internally while displaying Open relays. */
+    public function getNameAttribute(?string $value): ?string
+    {
+        return $this->isRelay() ? $this->openRelayName($value) : $value;
+    }
+
+    public function openRelayName(?string $value = null): string
+    {
+        $name = preg_replace('/\s*(?:[-(]\s*)?\b(?:Men|Women|Male|Female|Open)\s*\)?$/i', '', trim($value ?? (string) ($this->attributes['name'] ?? '')));
+
+        return trim($name).' (Open)';
+    }
+
+    /** Legacy gender divisions and duplicate entries share one participation slot. */
+    public function relayParticipationKey(): string
+    {
+        if (preg_match('/(\d+)\s*[x×]\s*(\d+)/iu', (string) $this->code.' '.(string) $this->name, $distance) === 1) {
+            return 'relay:'.$distance[1].'x'.$distance[2];
+        }
+
+        return 'relay:'.Str::slug(preg_replace('/-(MEN|WOMEN|MALE|FEMALE|OPEN)$/i', '', (string) $this->code));
+    }
+
     public function getParticipantCategoryLabelAttribute(): string
     {
         if ($this->participant_category === 'custom' && filled($this->attributes['participant_category_label'] ?? null)) {
@@ -86,7 +124,7 @@ class Sport extends Model
 
     public function getCatalogueGroupKeyAttribute(): string
     {
-        return self::catalogueGroupKeyFor($this->code);
+        return $this->isRelay() ? 'track-field' : self::catalogueGroupKeyFor($this->code);
     }
 
     public function getCatalogueGroupLabelAttribute(): string
@@ -101,7 +139,7 @@ class Sport extends Model
      */
     public function isTrackAndField(): bool
     {
-        return $this->catalogue_group_key === 'track-field';
+        return $this->isRelay() || $this->catalogue_group_key === 'track-field';
     }
 
     public function acceptsStudentGender(?string $gender): bool
@@ -134,6 +172,10 @@ class Sport extends Model
 
     private function hasGenderDivision(): bool
     {
+        if ($this->isRelay()) {
+            return false;
+        }
+
         return in_array($this->participant_category, ['male', 'female'], true)
             || preg_match('/-(MEN|WOMEN|MALE|FEMALE)$/i', $this->code) === 1
             || preg_match('/\b(Men|Women|Male|Female)\s*\)?$/i', $this->name) === 1;

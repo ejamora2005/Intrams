@@ -211,8 +211,8 @@ $participationRules = [
         'RUSSIAN-SOFTBALL' => ['Male'],
         'RUSSIAN-SOFTBALL-MEN' => ['Male'],
     ],
-    // Relay runners represent their faction in addition to their individual run.
-    // They do not use one of the student's participation-rule event slots.
+    // Relays are exempt when the student has an active qualifying run.
+    // Otherwise each distinct relay distance uses one individual/dual slot.
     'relay_exempt_sport_codes' => ['RELAY-4X100', 'RELAY-4X400', 'RELAY-4X100-MEN', 'RELAY-4X100-WOMEN', 'RELAY-4X400-MEN', 'RELAY-4X400-WOMEN'],
     'relay_qualifying_run_sport_codes' => ['100M-RUN', '200M-RUN', '400M-RUN', '100M-RUN-MEN', '100M-RUN-WOMEN', '200M-RUN-MEN', '200M-RUN-WOMEN', '400M-RUN-MEN', '400M-RUN-WOMEN'],
     'allowed_combinations' => [
@@ -277,7 +277,7 @@ return [
             ['Discus Throw', 'DISCUS-THROW', 'individual'], ['Javelin Throw', 'JAVELIN-THROW', 'individual'], ['Jump', 'JUMP', 'individual'], ['Long Jump', 'LONG-JUMP', 'individual'],
             ['Triple Jump', 'TRIPLE-JUMP', 'individual'], ['High Jump', 'HIGH-JUMP', 'individual'],
         ])->flatMap(fn (array $sport): array => collect(['Men' => 'male', 'Women' => 'female'])->map(fn (string $category, string $label): array => [
-            'name' => $sport[0].' ('.$label.')', 'code' => $sport[1].'-'.strtoupper($label), 'participant_category' => $category, 'participant_type' => $sport[2], 'game_mechanic' => 'custom', 'scoring_rules' => $rules('sports_athletics'),
+            'name' => $sport[0].' ('.$label.')', 'code' => $sport[1].'-'.strtoupper($label), 'participant_category' => str_starts_with($sport[1], 'RELAY-') ? 'open' : $category, 'participant_type' => $sport[2], 'game_mechanic' => 'custom', 'scoring_rules' => $rules('sports_athletics'),
         ])->values()->all())->values()->all(),
 
         $cultural('Festival Dance Competition', 'CULT-FEST-DANCE', 'Students: 40 minimum; props or propsmen excluded. Employees: none.', 'cultural_festival_dance'),

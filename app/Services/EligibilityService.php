@@ -44,6 +44,10 @@ class EligibilityService
 
     public function slotFor(EditionSport $editionSport): string
     {
+        if ($this->isRelayEvent($editionSport)) {
+            return self::SLOT_INDIVIDUAL_DUAL;
+        }
+
         $pointSystem = $this->pointSystemKey($editionSport);
 
         return match ($pointSystem) {
@@ -80,18 +84,29 @@ class EligibilityService
     }
 
     /**
-     * Relays are available to runners but do not use a participation-rule event slot.
+     * Relay classification is independent of the configured scoring point system.
      */
     public function isRelayEvent(EditionSport $editionSport): bool
     {
-        return $this->sportCodeIsIn($editionSport, config('intramurals.participation_rules.relay_exempt_sport_codes', []));
+        $editionSport->loadMissing('sport');
+
+        return $editionSport->sport?->isRelay() === true
+            || $this->sportCodeIsIn($editionSport, config('intramurals.participation_rules.relay_exempt_sport_codes', []));
     }
 
     public function countsTowardParticipationLimit(EditionSport $editionSport, ?Student $student = null): bool
     {
         return $this->isParticipationSport($editionSport)
-            && ! $this->isRelayEvent($editionSport)
+            && (! $this->isRelayEvent($editionSport) || ! $student || ! $this->hasQualifyingRun($student, $editionSport->edition_id))
             && ! $this->isPairedPartnerExempt($editionSport, $student);
+    }
+
+    private function hasQualifyingRun(Student $student, int $editionId): bool
+    {
+        return $student->athleteEntries()->where('status', 'active')
+            ->whereHas('editionSport', fn ($query) => $query->where('edition_id', $editionId)
+                ->whereHas('sport', fn ($sportQuery) => $sportQuery->whereIn('code', config('intramurals.participation_rules.relay_qualifying_run_sport_codes', []))))
+            ->exists();
     }
 
     /** @return array<int, string> */
@@ -298,6 +313,17 @@ class EligibilityService
             $items->push($this->participationItem($additionalSport, $student));
         }
 
+        $hasQualifyingRun = $items->contains('is_qualifying_run', true);
+        $items = $items->map(function (array $item) use ($hasQualifyingRun): array {
+            if ($item['is_relay']) {
+                $item['counts_toward_limit'] = ! $hasQualifyingRun;
+                $item['slot_label'] = $hasQualifyingRun ? 'Relay (exempt)' : 'Relay (Individual/Dual)';
+            }
+
+            return $item;
+        });
+        $countedItems = $items->where('counts_toward_limit', true)->unique('participation_key');
+
         $counts = [
             self::SLOT_MAJOR => 0,
             self::SLOT_MINOR => 0,
@@ -305,12 +331,12 @@ class EligibilityService
             self::SLOT_OTHER => 0,
         ];
 
-        foreach ($items->where('counts_toward_limit', true) as $item) {
+        foreach ($countedItems as $item) {
             $counts[$item['slot']] = ($counts[$item['slot']] ?? 0) + 1;
         }
 
         $issues = [];
-        $total = $items->where('counts_toward_limit', true)->count();
+        $total = $countedItems->count();
         $hasMajorOrMinor = $counts[self::SLOT_MAJOR] > 0 || $counts[self::SLOT_MINOR] > 0;
         $maxEvents = $hasMajorOrMinor ? $this->maxEvents() : $this->individualDualOnlyMaxEvents();
 
@@ -332,10 +358,6 @@ class EligibilityService
 
         if ($total === $maxEvents && ! $this->matchesAllowedCombination($counts)) {
             $issues[] = 'Event combination does not match the allowed pairings.';
-        }
-
-        if ($items->contains('is_relay', true) && ! $items->contains('is_qualifying_run', true)) {
-            $issues[] = 'Relay registration requires a 100m, 200m, or 400m run.';
         }
 
         return [
@@ -449,10 +471,11 @@ class EligibilityService
 
         return [
             'edition_sport_id' => (int) $editionSport->id,
+            'participation_key' => $isRelay ? $editionSport->sport->relayParticipationKey() : 'event:'.$editionSport->id,
             'name' => $editionSport->sport?->name ?? 'Unknown event',
             'slot' => $slot,
-            'slot_label' => $isRelay ? 'Relay (exempt)' : ($isPairedPartner ? 'Paired partner (exempt)' : $this->slotLabel($slot)),
-            'counts_toward_limit' => ! $isRelay && ! $isPairedPartner,
+            'slot_label' => $isRelay ? 'Relay (Individual/Dual)' : ($isPairedPartner ? 'Paired partner (exempt)' : $this->slotLabel($slot)),
+            'counts_toward_limit' => ! $isPairedPartner,
             'is_relay' => $isRelay,
             'is_paired_partner' => $isPairedPartner,
             'is_qualifying_run' => $this->sportCodeIsIn($editionSport, config('intramurals.participation_rules.relay_qualifying_run_sport_codes', [])),

@@ -16,9 +16,16 @@ class UpdateSportRequest extends FormRequest
 
     protected function prepareForValidation(): void
     {
-        $participantCategory = $this->input('participant_category', 'open');
+        $sport = $this->route('sport');
+        $participantCategory = $sport instanceof Sport && $sport->isRelay() ? 'open' : $this->input('participant_category', 'open');
+        $name = Str::title(Str::squish(strip_tags((string) $this->input('name'))));
+        if ($sport instanceof Sport && $sport->isRelay() && strcasecmp($name, (string) $sport->name) === 0) {
+            // Preserve unique stored names when an unchanged Open display label
+            // is submitted for one of the original relay event records.
+            $name = $sport->getRawOriginal('name');
+        }
 
-        $this->merge(['name' => Str::title(Str::squish(strip_tags((string) $this->input('name')))), 'participant_category' => $participantCategory, 'participant_category_label' => $participantCategory === 'custom' ? Str::squish(strip_tags((string) $this->input('participant_category_label'))) : null]);
+        $this->merge(['name' => $name, 'participant_category' => $participantCategory, 'participant_category_label' => $participantCategory === 'custom' ? Str::squish(strip_tags((string) $this->input('participant_category_label'))) : null]);
     }
 
     public function rules(): array

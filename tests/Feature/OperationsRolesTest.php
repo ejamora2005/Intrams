@@ -192,7 +192,7 @@ test('GAM users select joined sports while adding a player and two major sports 
     $this->get(route('gam.possible-dq.index'))->assertOk()->assertSee('Taylor Rivera')->assertSee('More than 1 major event.');
 });
 
-test('relay entries are exempt from event limits but a missing qualifying run is flagged after saving', function () {
+test('relay entries are exempt with a qualifying run and otherwise count as individual without an automatic DQ flag', function () {
     $edition = operationsEdition();
     $team = operationsTeam($edition);
     $major = operationsSport($edition, 'Baseball', 'BASEBALL');
@@ -212,7 +212,7 @@ test('relay entries are exempt from event limits but a missing qualifying run is
         ->get(route('gam.teams.players.create', $team))
         ->assertOk()
         ->assertSee('Relay (exempt)')
-        ->assertSee('Relay events do not use an event slot');
+        ->assertSee('Without one, each relay distance counts once as Individual/Dual');
 
     $this->actingAs($gam)
         ->post(route('gam.teams.players.store', $team), [
@@ -256,14 +256,15 @@ test('relay entries are exempt from event limits but a missing qualifying run is
             'team_id' => $team->id,
             'student_ids' => [$nonRunner->id],
         ])
-        ->assertSessionHasNoErrors()->assertSessionHas('participation_warning');
+        ->assertSessionHasNoErrors()->assertSessionMissing('participation_warning');
 
     $this->assertDatabaseHas('athlete_entries', ['edition_sport_id' => $relay->id, 'student_id' => $nonRunner->id, 'status' => 'active']);
 
-    expect(app(\App\Services\EligibilityService::class)->evaluateStudent($nonRunner, $edition)['possible_dq'])->toBeTrue();
+    $evaluation = app(\App\Services\EligibilityService::class)->evaluateStudent($nonRunner, $edition);
+    expect($evaluation['possible_dq'])->toBeFalse()->and($evaluation['counts']['individual_or_dual'])->toBe(1);
     $this->actingAs($admin)->get(route('admin.rules.index'))
         ->assertOk()
-        ->assertSee('Morgan Santos')->assertSee('Relay registration requires a 100m, 200m, or 400m run.');
+        ->assertDontSee('Morgan Santos');
     $this->post(route('admin.sports.participants.store', $run->sport), ['edition_id' => $edition->id, 'student_ids' => [$nonRunner->id]])
         ->assertSessionHasNoErrors()->assertSessionMissing('participation_warning');
     expect(app(\App\Services\EligibilityService::class)->evaluateStudent($nonRunner, $edition)['possible_dq'])->toBeFalse();
