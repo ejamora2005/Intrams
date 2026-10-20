@@ -77,7 +77,7 @@
         </div>
 
         <p data-sport-picker-warning hidden role="status" aria-live="polite" class="mt-3 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900"></p>
-        <p class="mt-3 text-xs text-slate-500">Allowed combinations: 1 Major + 1 Minor, 1 Major + 1 Individual/Dual, 1 Minor + 1 Individual/Dual, or up to 3 Individual/Dual events. You can select additional sports; violations are flagged for Possible DQ review after saving. Relays are Open. With a 100m, 200m, or 400m run, relays are exempt. Without one, each relay distance counts once as Individual/Dual; duplicate relay entries do not add another slot. {{ $teamSportNote }} Doubles selections can be added or removed here; existing partner assignments are kept while selected.</p>
+        <p class="mt-3 text-xs text-slate-500">Allowed combinations: 1 Major + 1 Minor, 1 Major + 1 Individual/Dual, 1 Minor + 1 Individual/Dual, or up to 3 Individual/Dual events. You can select additional sports; violations are flagged for Possible DQ review after saving. Relays are Open. With a 100m, 200m, or 400m run, relays do not use an event slot. Without one, each relay distance counts once as Individual/Dual; duplicate relay entries do not add another slot. {{ $teamSportNote }} Doubles selections can be added or removed here; existing partner assignments are kept while selected.</p>
         <p data-sport-picker-client-error hidden class="mt-2 text-sm text-red-600">Choose at least one sport.</p>
         @error('edition_sport_ids')<p class="mt-2 text-sm text-red-600">{{ $message }}</p>@enderror
         @error('edition_sport_ids.*')<p class="mt-2 text-sm text-red-600">{{ $message }}</p>@enderror
@@ -126,13 +126,13 @@
                     const category = option.dataset.sportCategory || '';
                     const genderAllowed = !['male', 'female'].includes(category) || !gender || category === gender;
                     const slotLabel = option.querySelector('[data-sport-slot-label]');
-                    if (slotLabel) slotLabel.textContent = input.dataset.relay === 'true' ? (hasQualifyingRun() ? 'Relay (exempt)' : 'Relay (Individual/Dual)') : (isPairedPartnerExempt(input) ? 'Paired partner (exempt)' : slotLabel.dataset.defaultSlotLabel);
+                    if (slotLabel) slotLabel.textContent = input.dataset.relay === 'true' ? (hasQualifyingRun() ? 'Relay' : 'Relay (Individual/Dual)') : (isPairedPartnerExempt(input) ? 'Paired partner (exempt)' : slotLabel.dataset.defaultSlotLabel);
                     input.disabled = !genderAllowed;
                     option.classList.toggle('cursor-not-allowed', !genderAllowed);
                     option.classList.toggle('opacity-50', !genderAllowed);
                 });
 
-                summary.textContent = `Selected: Major ${counts.major} / Minor ${counts.minor} / Individual-Dual ${counts.individual_or_dual} / Relay ${selectedRelayCount()} (${hasQualifyingRun() ? 'exempt' : 'included in Individual-Dual'}) / Paired partner ${selectedPairedPartnerCount()} (exempt)`;
+                summary.textContent = `Selected: Major ${counts.major} / Minor ${counts.minor} / Individual-Dual ${counts.individual_or_dual} / Relay ${selectedRelayCount()} (${hasQualifyingRun() ? 'not counted' : 'included in Individual-Dual'}) / Paired partner ${selectedPairedPartnerCount()} (exempt)`;
                 const maximum = counts.major || counts.minor ? maxEvents : individualMaxEvents;
                 const issues = [];
                 if (total(counts) > maximum) issues.push(`More than ${maximum} events selected.`);

@@ -317,7 +317,7 @@ class EligibilityService
         $items = $items->map(function (array $item) use ($hasQualifyingRun): array {
             if ($item['is_relay']) {
                 $item['counts_toward_limit'] = ! $hasQualifyingRun;
-                $item['slot_label'] = $hasQualifyingRun ? 'Relay (exempt)' : 'Relay (Individual/Dual)';
+                $item['slot_label'] = $hasQualifyingRun ? 'Relay' : 'Relay (Individual/Dual)';
             }
 
             return $item;

@@ -87,7 +87,7 @@ test('qualifying runs exempt every relay and withdrawing the run restores indivi
     $evaluation = $service->evaluateStudent($student, $edition);
     expect($evaluation['total'])->toBe(1)->and($evaluation['counts']['individual_or_dual'])->toBe(1)
         ->and($evaluation['possible_dq'])->toBeFalse()->and($service->countsTowardParticipationLimit($relay, $student))->toBeFalse();
-    expect(collect($evaluation['entries'])->where('is_relay', true)->pluck('slot_label')->unique()->all())->toBe(['Relay (exempt)']);
+    expect(collect($evaluation['entries'])->where('is_relay', true)->pluck('slot_label')->unique()->all())->toBe(['Relay']);
     $entry->update(['status' => 'inactive']);
     expect($service->evaluateStudent($student, $edition)['total'])->toBe(2)
         ->and($service->evaluateStudent($student, $edition)['possible_dq'])->toBeFalse()

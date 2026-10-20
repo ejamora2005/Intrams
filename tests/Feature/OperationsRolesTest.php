@@ -211,7 +211,7 @@ test('relay entries are exempt with a qualifying run and otherwise count as indi
     $this->actingAs($gam)
         ->get(route('gam.teams.players.create', $team))
         ->assertOk()
-        ->assertSee('Relay (exempt)')
+        ->assertSee('Relay (Individual/Dual)')
         ->assertSee('Without one, each relay distance counts once as Individual/Dual');
 
     $this->actingAs($gam)
@@ -231,7 +231,7 @@ test('relay entries are exempt with a qualifying run and otherwise count as indi
         ->and($evaluation['total'])->toBe(2)
         ->and($evaluation['counts']['major'])->toBe(1)
         ->and($evaluation['counts']['individual_or_dual'])->toBe(1)
-        ->and(collect($evaluation['entries'])->firstWhere('edition_sport_id', $relay->id)['slot_label'])->toBe('Relay (exempt)');
+        ->and(collect($evaluation['entries'])->firstWhere('edition_sport_id', $relay->id)['slot_label'])->toBe('Relay');
 
     $admin = User::factory()->create(['role' => 'admin', 'status' => 'active']);
     $nonRunner = Student::query()->create([

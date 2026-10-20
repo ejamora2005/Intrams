@@ -39,7 +39,7 @@
                     </article>
                 @endforeach
             </div>
-            <p class="mt-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">Sports can be saved even when these rules are exceeded. Students outside these combinations are flagged as Possible DQ for review. Relays are Open and exempt with a 100m, 200m, or 400m run. Without one, each relay distance counts once as Individual/Dual; a missing run alone does not create a Possible DQ flag.</p>
+            <p class="mt-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">Sports can be saved even when these rules are exceeded. Students outside these combinations are flagged as Possible DQ for review. Relays are Open and do not use an event slot with a 100m, 200m, or 400m run. Without one, each relay distance counts once as Individual/Dual; a missing run alone does not create a Possible DQ flag.</p>
         </div>
 
         <div class="rounded-lg border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
