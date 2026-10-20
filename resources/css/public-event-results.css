@@ -1,0 +1,62 @@
+.public-results-dialog { width: min(1080px, calc(100vw - 32px)); height: min(860px, calc(100dvh - 48px)); max-width: none; max-height: none; padding: 0; margin: auto; border: 1px solid #385471; border-top: 4px solid #218365; border-radius: 18px; background: #081d33; color: #edf4ff; font: 400 15px/1.5 'Barlow', 'Segoe UI', sans-serif; box-shadow: 0 28px 100px #0009; overflow: hidden; }
+.public-results-dialog[open] { display: flex; flex-direction: column; }
+.public-results-dialog::backdrop { background: #020b19c9; backdrop-filter: blur(7px); }
+.public-results-dialog [hidden] { display: none !important; }
+.public-results-dialog h2, .public-results-dialog h3, .public-results-dialog p { margin: 0; }
+.public-results-dialog button, .public-results-dialog input, .public-results-dialog select { font: inherit; }
+.public-results-dialog a, .public-results-dialog button, .public-results-dialog input, .public-results-dialog select { outline-offset: 3px; }
+.public-results-dialog :focus-visible { outline: 2px solid #f3d29d; }
+.public-results-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; padding: 24px 28px 20px; background: linear-gradient(115deg, #123b57, #0b223b); }
+.public-results-eyebrow { color: #e0bd7a; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .13em; }
+.public-results-header h2 { margin: 3px 0 7px; font-family: 'Barlow Condensed', 'Arial Narrow', sans-serif; font-size: clamp(27px, 4vw, 36px); line-height: 1.15; }
+.public-results-header p:last-child { max-width: 680px; color: #b9cce2; font-size: 14px; }
+.public-results-header form { margin: 0; }
+.public-results-close { display: grid; place-items: center; width: 44px; height: 44px; padding: 0; border: 1px solid #718ba76b; border-radius: 50%; background: #ffffff08; color: #e8effa; font-size: 28px !important; cursor: pointer; }
+.public-results-close:hover { background: #ffffff18; }
+.public-results-toolbar { padding: 18px 28px 14px; border-block: 1px solid #38547180; }
+.public-results-filters { display: grid; grid-template-columns: minmax(0, 1fr) 200px auto; align-items: end; gap: 14px; }
+.public-results-filters label { display: grid; gap: 5px; min-width: 0; font-size: 12px; font-weight: 600; color: #b9cce2; }
+.public-results-filters input, .public-results-filters select { width: 100%; min-width: 0; height: 44px; padding: 8px 12px; border: 1px solid #496381; border-radius: 8px; background: #102b46; color: #f0f5ff; color-scheme: dark; }
+.public-results-filters input::placeholder { color: #9fb3ca; opacity: 1; }
+.public-results-refresh { display: flex; align-items: center; justify-content: center; min-height: 44px; padding: 9px 14px; border: 1px solid #d9b87880; border-radius: 8px; color: #f1d7a4; font-size: 13px; font-weight: 600; text-decoration: none; white-space: nowrap; }
+.public-results-refresh:hover { background: #e6c38412; }
+.public-results-status { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 12px; margin-top: 11px; color: #a9bed6; font-size: 12px; }
+.public-results-status p { color: #dbebff; }
+.public-results-content { flex: 1; min-height: 0; padding: 22px 28px; overflow-y: auto; overscroll-behavior: contain; scrollbar-color: #56738f #10253d; }
+.public-results-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; gap: 18px; }
+.public-result-card { min-width: 0; overflow: hidden; border: 1px solid #3a526c; border-radius: 12px; background: #102b45; }
+.public-result-card header { padding: 18px 18px 14px; border-bottom: 1px solid #38547180; background: #ffffff03; }
+.public-result-category { display: inline-block; color: #e6c58b; font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; }
+.public-result-card h3 { margin: 5px 0 8px; font-family: 'Barlow Condensed', 'Arial Narrow', sans-serif; font-size: 23px; line-height: 1.2; overflow-wrap: anywhere; }
+.public-result-time { color: #a9c0da; font-size: 12px; line-height: 1.5; }
+.public-result-placements { display: grid; gap: 0; padding: 0; margin: 0; list-style: none; }
+.public-result-placements li { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 13px 18px; }
+.public-result-placements li + li { border-top: 1px solid #38547170; }
+.public-result-faction { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.public-result-faction img { flex: 0 0 36px; width: 36px; height: 36px; object-fit: contain; }
+.public-result-faction div { min-width: 0; }
+.public-result-faction strong { display: block; font-size: 14px; line-height: 1.35; overflow-wrap: anywhere; }
+.public-result-place { display: block; margin-bottom: 2px; color: #afc4dd; font-size: 11px; }
+.public-result-placements li:first-child .public-result-place { color: #ecd397; }
+.public-result-points { flex-shrink: 0; color: #f0d6a1; font-size: 17px; font-weight: 600; white-space: nowrap; }
+.public-result-points small { color: #a9bed6; font-size: 11px; font-weight: 400; }
+.public-results-empty { padding: 48px 20px; border: 1px dashed #496381; border-radius: 12px; color: #b9cce2; text-align: center; }
+.public-results-empty h3 { margin-bottom: 8px; color: #edf4ff; font-size: 20px; }
+.public-results-footer { padding: 12px 28px; border-top: 1px solid #38547180; color: #9fb6d0; font-size: 12px; }
+@media (max-width: 760px) { .landing-actions { flex-wrap: wrap; justify-content: center; } .utility-rail { max-width: 100%; } }
+@media (max-width: 640px) {
+    .public-results-dialog { width: calc(100vw - 20px); height: calc(100dvh - 24px); border-radius: 12px; }
+    .public-results-header { gap: 10px; padding: 18px 16px 16px; }
+    .public-results-header p:last-child { font-size: 12px; }
+    .public-results-toolbar { padding: 14px 16px; }
+    .public-results-filters { grid-template-columns: minmax(0, 1fr) auto; gap: 10px; }
+    .public-results-filters label:first-child { grid-column: 1 / -1; }
+    .public-results-filters label { font-size: 11px; }
+    .public-results-refresh { padding-inline: 10px; font-size: 12px; }
+    .public-results-status { font-size: 11px; }
+    .public-results-content { padding: 16px; }
+    .public-results-grid { grid-template-columns: minmax(0, 1fr); gap: 14px; }
+    .public-results-footer { padding: 10px 16px; font-size: 11px; }
+    .public-result-card header { padding-inline: 14px; }
+    .public-result-placements li { padding-inline: 14px; }
+}

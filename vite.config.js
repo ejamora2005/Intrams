@@ -10,6 +10,7 @@ export default defineConfig({
                 'resources/css/landing.css',
                 'resources/css/public-schedule.css',
                 'resources/js/landing.js',
+                'resources/js/public-event-results.js',
             ],
             refresh: true,
         }),

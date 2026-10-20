@@ -25,6 +25,7 @@
                 <span>SLSU INTRAMURALS<small>Southern Leyte State University</small></span>
             </a>
             <nav class="schedule-links" aria-label="Event navigation">
+                <a href="{{ url('/') }}#event-results" class="schedule-home">Event results</a>
                 <a href="{{ url('/') }}" class="schedule-home" aria-label="Back to team standings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="m14 6-6 6 6 6M8 12h13" /></svg><span>Standings</span></a>
                 <button type="button" data-open-login class="schedule-login"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M14 4h5v16h-5M3 12h12m-4-4 4 4-4 4" /></svg>Login</button>
             </nav>

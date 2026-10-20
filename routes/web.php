@@ -44,6 +44,8 @@ Route::get('/', function (StandingsService $standingsService) {
             'teams' => config('landing.teams', []),
             'preview' => config('landing.preview', true),
             'updatedAt' => config('landing.updatedAt'),
+            'results' => collect(),
+            'resultsUnavailable' => true,
         ];
     }
 
@@ -51,6 +53,8 @@ Route::get('/', function (StandingsService $standingsService) {
         'landingTeams' => $landing['teams'],
         'landingPreview' => $landing['preview'],
         'landingUpdatedAt' => $landing['updatedAt'],
+        'declaredEventResults' => $landing['results'],
+        'eventResultsUnavailable' => $landing['resultsUnavailable'] ?? false,
     ]);
 });
 

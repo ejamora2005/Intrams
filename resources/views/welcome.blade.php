@@ -4,10 +4,10 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <x-pwa-meta theme="#06152c" />
-        <meta name="description" content="{{ config('intramurals.theme.title') }} - {{ config('intramurals.theme.tagline') }} Southern Leyte State University Bontoc Campus standings and event schedule.">
+        <meta name="description" content="{{ config('intramurals.theme.title') }} - {{ config('intramurals.theme.tagline') }} Southern Leyte State University Bontoc Campus standings, declared event results, and schedule.">
         <title>{{ config('intramurals.theme.title') }} | SLSU Bontoc Campus</title>
         <link rel="preload" as="image" href="{{ asset(config('landing.background')) }}">
-        @vite(['resources/css/landing.css', 'resources/js/landing.js'])
+        @vite(['resources/css/landing.css', 'resources/js/landing.js', 'resources/js/public-event-results.js'])
     </head>
     <body class="landing-body">
         <main class="meet-landing" style="--stadium-image: url('{{ asset(config('landing.background')) }}')">
@@ -48,6 +48,10 @@
             </section>
             <aside class="utility-rail" aria-label="Event utilities">
                 <nav class="landing-actions" aria-label="Event navigation">
+                    <a class="landing-button schedule-button" href="#event-results" data-open-event-results aria-haspopup="dialog" aria-controls="event-results" aria-label="View all declared event results">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M8 3h8v5a4 4 0 0 1-8 0V3Zm4 9v6m-4 3h8M8 5H4v2a4 4 0 0 0 4 4m8-6h4v2a4 4 0 0 1-4 4"/></svg>
+                        <span>Results</span>
+                    </a>
                     <a class="landing-button schedule-button" href="{{ route('login') }}#schedule-heading">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="4" y="5" width="16" height="16" rx="2"/><path d="M8 3v4m8-4v4M4 11h16m-11 4h2m2 0h2m-6 3h2"/></svg>
                         <span>Schedule</span>
@@ -75,5 +79,6 @@
                 </div>
             </aside>
         </main>
+        <x-landing.event-results :results="$declaredEventResults ?? collect()" :unavailable="$eventResultsUnavailable ?? false" />
     </body>
 </html>

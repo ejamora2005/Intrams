@@ -105,11 +105,54 @@ class StandingsService
             });
     }
 
-    /** @return array{teams: array<int, array<string, mixed>>, preview: bool, updatedAt: mixed} */
+    /** @return Collection<int, array<string, mixed>> */
+    public function declaredResultsFor(?IntramuralEdition $edition): Collection
+    {
+        if ($edition === null) {
+            return collect();
+        }
+
+        $teams = Team::withTrashed()->where('edition_id', $edition->id)->get()->keyBy('id');
+
+        return $this->scoringEventsFor($edition)
+            ->filter(fn (EditionSport $event): bool => $event->sportResult !== null)
+            ->sortByDesc(fn (EditionSport $event): int => $event->sportResult->submitted_at?->timestamp ?? 0)
+            ->map(function (EditionSport $event) use ($teams): array {
+                $rules = collect($this->pointRulesFor($event))->keyBy('placement');
+                $placements = collect($event->sportResult->placements_json ?? [])
+                    ->map(function ($teamId, $place) use ($rules, $teams): ?array {
+                        $rule = $rules->get((int) $place);
+                        if ($rule === null) {
+                            return null;
+                        }
+                        $team = $teams->get((int) $teamId);
+
+                        return [
+                            ...$rule,
+                            'team_name' => $team?->name ?? 'Faction unavailable',
+                            'team_logo' => $team?->logo_path,
+                        ];
+                    })->filter()->sortBy('placement')->values();
+                $category = str_starts_with(strtoupper($event->sport->code), 'CULT-')
+                    ? 'cultural' : ($event->sport->isTrackAndField() ? 'track-field' : 'sports');
+
+                return [
+                    'id' => $event->id,
+                    'name' => preg_replace('/^Cultural(?: Bonus)?:\s*/i', '', $event->sport->name),
+                    'category' => $category,
+                    'category_label' => ['sports' => 'Sports', 'cultural' => 'Cultural', 'track-field' => 'Track & Field'][$category],
+                    'declared_at' => $event->sportResult->submitted_at,
+                    'placements' => $placements,
+                ];
+            })->values();
+    }
+
+    /** @return array{teams: array<int, array<string, mixed>>, preview: bool, updatedAt: mixed, results: Collection} */
     public function landingData(): array
     {
         $configuredTeams = collect(config('landing.teams', []));
-        $standings = $this->standingsFor($this->activeEdition());
+        $edition = $this->activeEdition();
+        $standings = $this->standingsFor($edition);
         $standingByName = $standings->keyBy(fn (array $row): string => Str::lower($row['team']->name));
         $updatedAt = $standings
             ->map(fn (array $row) => $row['tally']->updated_at)
@@ -131,6 +174,7 @@ class StandingsService
                 ->all(),
             'preview' => $updatedAt === null,
             'updatedAt' => $updatedAt,
+            'results' => $this->declaredResultsFor($edition),
         ];
     }
 
