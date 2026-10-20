@@ -5,6 +5,7 @@ use App\Models\IntramuralEdition;
 use App\Models\Sport;
 use App\Models\SportResult;
 use App\Models\Team;
+use App\Models\TeamTally;
 use App\Models\User;
 use App\Services\StandingsService;
 use Carbon\Carbon;
@@ -102,4 +103,21 @@ test('public results have clear empty and unavailable states', function () {
     $this->get('/')->assertOk()->assertSee('No declared results yet');
     $this->mock(StandingsService::class)->shouldReceive('landingData')->once()->andThrow(new RuntimeException('Database unavailable'));
     $this->get('/')->assertOk()->assertSee('Results are temporarily unavailable')->assertDontSee('No declared results yet');
+});
+
+test('live standings last updated displays the tally timestamp in Philippine time without changing stored times', function () {
+    [$edition, $user, $teams] = publicResultsFixture();
+    $event = publicResultsEvent($edition, 'Volleyball (Men)', 'VOLLEYBALL-MEN');
+    $this->travelTo(Carbon::parse('2026-10-20 23:15:42', 'UTC'));
+    app(StandingsService::class)->recordSportResult($event, [1 => $teams[0]->id], $user);
+    $before = TeamTally::where('edition_id', $edition->id)->get()->toJson();
+    $response = $this->get('/')->assertOk();
+    $document = new DOMDocument;
+    @$document->loadHTML($response->getContent());
+    $timestamp = (new DOMXPath($document))->query('//p[contains(@class, "update-status")]/time')->item(0);
+    expect($timestamp)->not->toBeNull()
+        ->and($timestamp->textContent)->toContain('Oct 21, 2026 7:15:42 AM', 'PHT (UTC+8)')
+        ->and($timestamp->getAttribute('datetime'))->toBe('2026-10-21T07:15:42+08:00')
+        ->and(TeamTally::where('edition_id', $edition->id)->get()->toJson())->toBe($before);
+    $this->travelBack();
 });

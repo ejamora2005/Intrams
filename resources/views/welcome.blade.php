@@ -73,7 +73,7 @@
                             <p class="preview-disclaimer">Scores start at 0. Rankings will appear when official results are available.</p>
                         @endif
                         @if (! ($landingPreview ?? config('landing.preview')) && ($landingUpdatedAt ?? config('landing.updatedAt')))
-                            <p class="update-status"><span aria-hidden="true"></span> Live Standings &bull; Last Updated: <time datetime="{{ \Carbon\Carbon::parse($landingUpdatedAt ?? config('landing.updatedAt'))->toIso8601String() }}">{{ \Carbon\Carbon::parse($landingUpdatedAt ?? config('landing.updatedAt'))->format('M j, Y, g:i A T') }}</time></p>
+                            <p class="update-status"><span aria-hidden="true"></span> Live Standings &bull; Last Updated: <x-result-time :value="\Carbon\Carbon::parse($landingUpdatedAt ?? config('landing.updatedAt'), 'UTC')" /></p>
                         @endif
                     </aside>
                 </div>
