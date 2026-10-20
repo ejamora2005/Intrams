@@ -62,7 +62,7 @@ On desktop, the sidebar stays fixed while only the main display panel scrolls, s
 
 ## Test data
 
-`php artisan db:seed` provides the **SLSUBC INTRAMURALS 2026** edition, default factions/teams, sports, cultural events, schedules, point systems, and the supplied student roster. Operation accounts are seeded when `INTRAMURALS_DEFAULT_ACCOUNT_PASSWORD` is set.
+In local development, `php artisan db:seed` provides the **SLSUBC INTRAMURALS 2026** edition, default factions/teams, sports, cultural events, schedules, point systems, and the supplied student roster. Production skips bundled player imports and existing competition setup. Operation accounts are seeded when `INTRAMURALS_DEFAULT_ACCOUNT_PASSWORD` is set.
 
 ## Current implementation state
 
@@ -225,7 +225,7 @@ When assigning a roster, administrators can filter available athletes by course,
 
 The **Sports & Events** module now manages active/inactive sports and their edition-specific events. Event codes are generated internally, so administrators only provide the event name, competition type, venue, schedule, result mode, and capacity. For team events, capacity is the maximum number of athletes each team may register; for individual events, it is the maximum number of athletes overall. The event lifecycle only allows `draft → scheduled → live → completed`, with cancellation available before completion. Every change is audited.
 
-`php artisan db:seed` also creates the default sports, athletics events, cultural events, default schedules, and the supplied student roster. The October 18, 2026 Google Sheets snapshot contains 501 faction members and 518 sports registrations. Repeated names are combined with the union of their sports. Gender and explicit event codes resolve to the current sport categories. Cultural-only and support-only names stay on the roster without new registrations; an existing database retains its cultural registrations. The three-faction import runs atomically and preserves scoring data. For an existing Dokploy deployment, use `CurrentFactionRostersSeeder` as described in [DEPLOYMENT.md](DEPLOYMENT.md#update-the-supplied-roster).
+In local/testing environments, `php artisan db:seed` also creates default sports, athletics events, cultural events, schedules, and the bundled student roster. Repeated names are combined with the union of their sports. Cultural-only and support-only names stay on the roster without new registrations. **Production never imports bundled player names:** faction roster seeders are disabled there, and default competition setup skips an existing production edition. Manage live players in Admin/GAM. See [production roster protection](DEPLOYMENT.md#keep-the-live-dokploy-roster-authoritative).
 
 When an administrator creates a new intramurals edition, these default sports are automatically linked to that edition. Additional events can then be created for that edition under its linked sports.
 

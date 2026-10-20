@@ -9,6 +9,7 @@ use App\Models\Team;
 use App\Models\User;
 use App\Services\AuditService;
 use App\Services\EligibilityService;
+use Database\Seeders\Concerns\SkipsProductionRosterImports;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use RuntimeException;
@@ -17,8 +18,14 @@ use Throwable;
 /** Add missing source players without replacing existing roster edits or results. */
 class NewFactionPlayersSeeder extends Seeder
 {
+    use SkipsProductionRosterImports;
+
     public function run(): void
     {
+        if ($this->skipsProductionRosterImport()) {
+            return;
+        }
+
         $studentsBefore = Student::count();
         $entriesBefore = AthleteEntry::count();
         try {

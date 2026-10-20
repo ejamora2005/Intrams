@@ -14,9 +14,11 @@ class TestIntramuralsDataSeeder extends Seeder
 {
     public function run(): void
     {
-        Student::query()
-            ->where('student_number', 'like', 'TEST-%')
-            ->delete();
+        if (! app()->environment('production')) {
+            Student::query()
+                ->where('student_number', 'like', 'TEST-%')
+                ->delete();
+        }
 
         $defaultEdition = config('intramurals.default_edition');
         $edition = IntramuralEdition::updateOrCreate(

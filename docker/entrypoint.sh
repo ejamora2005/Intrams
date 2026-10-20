@@ -71,6 +71,8 @@ fi
 
 if [ "${DEPLOY_SEED_DEFAULT_COMPETITIONS:-false}" = "true" ]; then
     wait_for_mysql
+    # Bootstrap only: existing production competitions are never reseeded.
+    # Bundled/local player imports are disabled in production, including first setup.
     run_artisan db:seed --class=DefaultIntramuralsSeeder --force
 fi
 

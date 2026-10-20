@@ -26,6 +26,14 @@ DEPLOY_SEED_DEFAULT_COMPETITIONS=true
 
 9. Deploy. After the first successful deploy, set the seed flags back to `false`.
 
+## Keep the live Dokploy roster authoritative
+
+Bundled/local roster imports are disabled when `APP_ENV=production`, even with `db:seed --force`. This covers `CurrentFactionRostersSeeder`, `NewFactionPlayersSeeder`, all three individual faction seeders, and the legacy roster cleanup. They print a skip message and leave live players, memberships and registrations alone. They cannot restore a removed source name or overwrite a player edited in Admin/GAM. Local and testing environments retain their development seed data.
+
+`DefaultIntramuralsSeeder` also skips all competition setup when any production edition already exists. If the deployment seed flag is accidentally left enabled, restarting or redeploying does not replay setup over the live competition. A fresh production database receives only competition configuration and factions, without bundled players. The setup seeder does not delete production players whose identifier starts with `TEST-`.
+
+Keep `DEPLOY_SEED_DEFAULT_COMPETITIONS=false` and `DEPLOY_SEED_DEFAULT_ACCOUNTS=false` after first setup. Add or edit live players through Admin/GAM. Do not change `APP_ENV` to bypass this protection or use `migrate:fresh` on Dokploy. This protection does not delete any names already in production or reset scores, winners or schedules.
+
 ## Basketball 3x3 points correction (October 20)
 
 Redeploy, then run `php artisan migrate --force` in `/var/www/html`. Basketball 3x3 Men and Women receive their own 15 / 10 / 7 point group while remaining Minor events for participation rules. Existing winner placements, declaration times, bracket wins, schedules and rosters are kept. The migration updates the declared point details and recalculates standings. Other minor sports retain their point values. Subsequent changes saved in Admin > Points System recalculate already declared points and standings without changing winners; no redeclaration or roster seeding is needed.
@@ -38,32 +46,21 @@ Redeploy, then run `php artisan migrate --force` in `/var/www/html`. Current ath
 
 Redeploy, then run `php artisan migrate --force` in `/var/www/html`. This makes Chess (Men/Women) team events and keeps all three Badminton formats (Singles, Doubles, Team) for Men and Women. Existing team-event entries use the player's current faction. Registration IDs, badminton pairs, schedules, scores, declared winners, and standings are preserved. No roster replacement or score reset is needed. Doubles are listed in player forms with a reminder to assign both partners from Admin sport participant management.
 
-## Add newly listed players
+## Bundled roster additions (local development only)
 
-Redeploy the latest code, then run this in the `intrams` app container terminal:
-
-```bash
-cd /var/www/html
-php artisan db:seed --class=NewFactionPlayersSeeder --force
-```
+`NewFactionPlayersSeeder` is a local/testing data tool. It is blocked in production; use Admin/GAM for live additions.
 
 The October 19 Google Sheets additions contain 26 new Terraquatic members and 14 sports registrations. The later update also adds Basketball 3x3 (Women) to Jessa Mae Arca; four other updated basketball listings already exist. Repeated new names are combined, sports match the system's Men/Women categories, and cultural/support-only names remain roster members. There are no new Trojan or Sea Dragons names. The bundled roster now has 557 members and 537 sports registrations: Sea Dragons 192, Terraquatic Eagles 189, and Trojan Warriors 176.
 
-This additions seeder creates missing players and appends only the specific new registration in `database/seeders/rosters/registration_additions.json`. Existing profiles and unrelated sports stay untouched. Existing entries, including withdrawn registrations, are never reactivated. Missing/inactive players are skipped for registration updates. It does not remove memberships or registrations or reset accounts, schedules, wins, results, or points. Rerunning it is safe. Imports and added registrations are recorded in System Logs. Keep `DEPLOY_SEED_DEFAULT_COMPETITIONS=false` after setup so deployments do not run the full replacement import. Source rows and import decisions are recorded in `database/seeders/rosters/source.json`.
+In local/testing environments, this additions seeder creates missing source players and appends only the specific new registration in `database/seeders/rosters/registration_additions.json`. Existing profiles and unrelated sports stay untouched. Existing entries, including withdrawn registrations, are never reactivated. Missing/inactive players are skipped for registration updates. Imports and added registrations are recorded in System Logs. Source rows and import decisions are recorded in `database/seeders/rosters/source.json`.
 
-## Replace the supplied roster
+## Bundled roster replacement (local development only)
 
-Redeploy the latest code before running these commands in the `intrams` app container terminal:
-
-```bash
-cd /var/www/html
-php artisan migrate --force
-php artisan db:seed --class=CurrentFactionRostersSeeder --force
-```
+`CurrentFactionRostersSeeder` is blocked in production. Do not run local roster replacement commands against Dokploy.
 
 The full replacement uses the October 18 base snapshot plus the October 19 additions (557 members and 537 sports registrations). Expanded names for Christine Belinario Alvero, Danicha Jane Cabudbud Gomez, and Kristine Jamero Lapasanda are linked to their earlier names so rerunning the seeder retains their existing records. Duplicate source names are combined and their sports are united. Explicit sport codes match the system's formats and Men/Women categories. Cultural-only and support-only names remain faction members without new event registrations. Existing cultural registrations are preserved; missing academic details use `N/A`. Source provenance and import decisions are recorded in `database/seeders/rosters/source.json`.
 
-Run this import once, then keep `DEPLOY_SEED_DEFAULT_COMPETITIONS=false` so subsequent deployments preserve roster edits made in the app. This command updates all three rosters in one transaction and does not reset accounts, schedules, wins, results, or points. Existing pair assignments are retained when the source does not specify a pair. It expects the default edition, teams, and sports to exist; for a new empty database, run `php artisan db:seed --class=DefaultIntramuralsSeeder --force` instead. If an outdated sports registration is used in a schedule, the entire roster import rolls back instead of removing that history. Known old name aliases are consolidated; ambiguous individual/pair bracket duplicates require review.
+In local/testing environments, this importer updates all three rosters in one transaction. Existing pair assignments are retained when the source does not specify a pair. It expects the default edition, teams, and sports to exist. If an outdated sports registration is used in a schedule, the entire roster import rolls back instead of removing that history. Known old name aliases are consolidated; ambiguous individual/pair bracket duplicates require review.
 
 ## Player save and coordinator repairs (October 20)
 
@@ -94,4 +91,4 @@ Roster additions and their imports are also logged. Audit storage failures fall 
 - MySQL data is persisted in the `intrams_mysql` Docker volume.
 - The container runs `config:cache`, `event:cache`, and `view:cache` at startup. Routes are not cached because this project still uses closure routes.
 - The account seeder only creates default Admin, GAM, and Tabulator accounts when `INTRAMURALS_DEFAULT_ACCOUNT_PASSWORD` is set.
-- `DEPLOY_SEED_DEFAULT_COMPETITIONS=true` creates the default event/edition named `SLSUBC INTRAMURALS 2026`, then attaches the default teams, sports, cultural events, point systems, proposal schedules, and the supplied student roster.
+- `DEPLOY_SEED_DEFAULT_COMPETITIONS=true` bootstraps the default edition, factions, sports, cultural events, point systems and proposal schedules only on an empty production setup. Existing production editions are skipped, and bundled student rosters are never imported in production.

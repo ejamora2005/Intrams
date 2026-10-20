@@ -11,6 +11,7 @@ use App\Models\Team;
 use App\Models\TeamMember;
 use App\Models\User;
 use App\Services\EligibilityService;
+use Database\Seeders\Concerns\SkipsProductionRosterImports;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
@@ -19,6 +20,8 @@ use RuntimeException;
 
 abstract class TeamRosterSeeder extends Seeder
 {
+    use SkipsProductionRosterImports;
+
     private const SPORT_ALIASES = [
         '100m run' => ['100M-RUN'],
         '200m run' => ['200M-RUN'],
@@ -231,6 +234,10 @@ abstract class TeamRosterSeeder extends Seeder
 
     public function run(bool $newPlayersOnly = false): void
     {
+        if ($this->skipsProductionRosterImport()) {
+            return;
+        }
+
         $edition = $this->defaultEdition();
         $team = Team::query()
             ->where('edition_id', $edition->id)
