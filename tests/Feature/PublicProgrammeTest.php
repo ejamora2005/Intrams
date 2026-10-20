@@ -79,7 +79,7 @@ test('public programme replaces only the public October timetable and leaves all
     $tables = ['intramural_editions', 'sports', 'edition_sports', 'students', 'team_members', 'athlete_entries', 'competition_schedules', 'schedule_participants', 'competition_results', 'bracket_matches', 'bracket_competitors', 'sport_results', 'team_tallies'];
     $snapshot = fn () => collect($tables)->mapWithKeys(fn ($table) => [$table => DB::table($table)->orderBy('id')->get()->toJson()])->all();
     $before = $snapshot();
-    foreach (['2026-10-19' => 2, '2026-10-20' => 7, '2026-10-21' => 8, '2026-10-22' => 6, '2026-10-23' => 5] as $date => $count) {
+    foreach (['2026-10-19' => 2, '2026-10-20' => 6, '2026-10-21' => 8, '2026-10-22' => 5, '2026-10-23' => 5] as $date => $count) {
         $data = app(PublicScheduleService::class)->today($date);
         expect($data['todaySchedules'])->toHaveCount($count)
             ->and($data['programmeSource']['worksheet'])->toBe('Sked')

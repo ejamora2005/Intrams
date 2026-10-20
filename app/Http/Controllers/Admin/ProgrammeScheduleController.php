@@ -27,6 +27,8 @@ class ProgrammeScheduleController extends Controller
         $edition = $this->activeEdition();
         $available = $edition && $this->programmeService->appliesTo($edition);
         $allEvents = $available ? $this->programmeService->eventsFor($edition) : collect();
+        $teamOptions = $this->programmeService->teamOptions($edition);
+        $allEvents = $allEvents->map(fn (array $event): array => [...$event, 'matchups' => $this->programmeService->matchupsFor($event['games'] ?? [], $teamOptions)]);
         $search = trim($filters['search'] ?? '');
         $date = $filters['date'] ?? '';
         $category = $filters['category'] ?? '';
@@ -40,6 +42,7 @@ class ProgrammeScheduleController extends Controller
             'total' => $allEvents->count(), 'visibleCount' => $events->count(),
             'dates' => $allEvents->pluck('date')->unique()->sort()->values(),
             'search' => $search, 'date' => $date, 'category' => $category,
+            'teamOptions' => $teamOptions,
         ]);
     }
 
@@ -49,8 +52,11 @@ class ProgrammeScheduleController extends Controller
         abort_unless($edition && $edition->id === $request->integer('edition_id') && $this->programmeService->appliesTo($edition), 404);
         $data = $request->validated();
         $data['is_published'] = $request->boolean('is_published');
+        if ($request->boolean('games_present') || $request->has('games')) {
+            $data['games'] = array_values($data['games'] ?? []);
+        }
         $updated = $this->programmeService->updateEvent($edition, $entryKey,
-            Arr::only($data, ['event', 'date', 'session', 'starts_at', 'ends_at', 'category', 'venue', 'is_published']),
+            Arr::only($data, ['event', 'date', 'session', 'starts_at', 'ends_at', 'category', 'venue', 'is_published', 'games']),
             (int) $data['version'], $request->user());
 
         return redirect()->to(route('admin.schedules.index', ['date' => $updated['date']]).'#schedule-'.$entryKey)

@@ -45,7 +45,9 @@
                         </td>
                         <td class="schedule-match">
                             @if ($schedule['game'])<span class="schedule-game">{{ $schedule['game'] }}</span>@endif
-                            @if (! empty($schedule['competitor_teams']))
+                            @if (! empty($schedule['matchups']))
+                                <x-programme-matchups :games="$schedule['matchups']" />
+                            @elseif (! empty($schedule['competitor_teams']))
                                 <span class="schedule-competitor-list" aria-label="{{ $schedule['competitors'] }}">
                                     @foreach ($schedule['competitor_teams'] as $team)
                                         <x-team-badge :team="$team" :show-subtitle="false" :logo-only="count($schedule['competitor_teams']) > 2" class="schedule-team-badge" />
@@ -81,7 +83,9 @@
                 </header>
                 <div class="schedule-mobile-match">
                     @if ($schedule['game'])<span class="schedule-game">{{ $schedule['game'] }}</span>@endif
-                    @if (! empty($schedule['competitor_teams']))
+                    @if (! empty($schedule['matchups']))
+                        <x-programme-matchups :games="$schedule['matchups']" />
+                    @elseif (! empty($schedule['competitor_teams']))
                         <p class="schedule-competitor-list" aria-label="{{ $schedule['competitors'] }}">
                             @foreach ($schedule['competitor_teams'] as $team)
                                 <x-team-badge :team="$team" :show-subtitle="false" :logo-only="count($schedule['competitor_teams']) > 2" class="schedule-team-badge" />

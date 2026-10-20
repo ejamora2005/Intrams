@@ -34,7 +34,7 @@ test('Schedules lists the public events with search date category edit dialogs a
         ->assertSee('Schedules')->assertSee('Showing 28 of 28 sessions')->assertSee('Edit schedule')
         ->assertSee('name="starts_at"', false)->assertSee('data-ops-modal', false)->assertSee('Philippine time (UTC+8)');
     $this->get(route('admin.schedules.index', ['search' => 'jumps', 'date' => '2026-10-21', 'category' => 'sports']))
-        ->assertOk()->assertSee('Showing 1 of 28 sessions')->assertSee('Jumps MW')->assertDontSee('Awarding Mugna');
+        ->assertOk()->assertSee('Showing 1 of 28 sessions')->assertSee('Jumps M/W')->assertDontSee('Awarding Mugna');
     $this->get(route('public.schedule', ['date' => '2026-10-21']))->assertOk()->assertSee('Awarding Mugna')->assertSee('Dashboard');
     $this->get(route('public.schedule', ['date' => ['invalid']]))->assertOk();
     $this->assertDatabaseCount('public_programmes', 0);

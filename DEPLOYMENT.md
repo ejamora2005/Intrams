@@ -50,6 +50,14 @@ php artisan migrate --path=database/migrations/2026_10_20_060000_create_public_p
 
 No seeder or score reset is needed. Opening the page does not create programme records; only an authorized save does.
 
+## Game schedule and logos (October 20)
+
+`Schedule-Games-2026.txt` adds the confirmed October 21–23 hours, venues and Game 1–3 pairings in `config/public_programme_games.php`. The user confirmed October 23 Modified Volleyball starts at **11 AM**, followed by the employee event at 1 PM. Russian Softball moves to October 22 at 1 PM. The old separate afternoon Basketball 5x5 and Beach Volleyball placeholders are hidden because their new three-game series already covers them; they remain editable in Admin. Unlisted events keep their existing details.
+
+With `DEPLOY_RUN_MIGRATIONS=true`, migration `2026_10_20_070000_update_public_programme_game_schedule.php` amends only the matching sessions in any saved active 2026 public programme. It records a one-time marker and audit entry, preserves unrelated Admin edits and public visibility, and never changes sports, internal schedules, brackets, participants or scores. Programmes without a saved copy use the amended defaults immediately. Later redeployments do not replay the file over subsequent Admin changes.
+
+Admin → Schedules → Edit schedule now includes **Games / matchups**. Add or remove games and select factions or the winner/loser of an earlier game. Faction logos and names render on Admin cards, in the editor preview and on the public timetable. Undecided opponents stay labeled as winner/loser placeholders; no result is invented or declared. Times are session start times from the file; no separate hours are invented for subsequent games.
+
 ## Doubles selections in student forms (October 20)
 
 Redeploy the latest code; no roster seeding or new migration is required. Admin and GAM can add, keep, remove and reselect Badminton/Table Tennis doubles from student sport forms. Keeping a doubles selection preserves its pair key and medical review. Removing it deactivates only that student's entry and retains history; the other player is not automatically withdrawn. Sport management can pair registered players who do not have a complete active pair, reusing their existing entries. Complete pairs cannot be reassigned through a stale pairing form. Gender and participation limits still apply.

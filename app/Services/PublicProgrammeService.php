@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\IntramuralEdition;
 use App\Models\PublicProgramme;
+use App\Models\Team;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
@@ -55,14 +56,97 @@ class PublicProgrammeService
     /** @return Collection<int, array<string, mixed>> */
     private function initialEvents(): Collection
     {
-        return collect(config('public_programme.events', []))->map(fn (array $event, int $index): array => [
+        $events = collect(config('public_programme.events', []))->map(fn (array $event, int $index): array => [
             ...$event,
             'key' => substr(hash('sha256', $event['cells']), 0, 24),
             'category' => $event['category'] ?? 'sports',
             'is_published' => true,
             'version' => 0,
             'position' => $index,
+            'games' => [],
         ])->values();
+
+        return $this->applyGameSchedule($events);
+    }
+
+    /** Apply the supplied file to its matching public sessions only. */
+    public function applyGameSchedule(Collection $events): Collection
+    {
+        $updates = config('public_programme_games.events', []);
+
+        return $events->map(function (array $event) use ($updates): array {
+            $patch = $updates[$event['cells'] ?? ''] ?? null;
+            if (! $patch) {
+                return $event;
+            }
+            if (isset($patch['starts_at'], $event['ends_at']) && $event['ends_at'] <= $patch['starts_at']) {
+                $patch['ends_at'] = null;
+            }
+
+            return [...$event, ...$patch, 'version' => ((int) ($event['version'] ?? 0)) + 1];
+        })->values();
+    }
+
+    /** A one-time amendment of saved public programmes, never sports or scores. */
+    public function importGameSchedule(): int
+    {
+        $count = 0;
+        $updateId = config('public_programme_games.id');
+        foreach (PublicProgramme::with('edition')->get() as $candidate) {
+            $edition = $candidate->edition;
+            $names = collect(config('intramurals.default_edition.aliases', []))->push(config('intramurals.default_edition.name'));
+            if (! $edition || $edition->status !== 'active' || $edition->school_year !== config('public_programme.school_year') || ! $names->contains($edition->name)) {
+                continue;
+            }
+            $count += DB::transaction(function () use ($candidate, $updateId): int {
+                IntramuralEdition::whereKey($candidate->edition_id)->lockForUpdate()->firstOrFail();
+                $programme = PublicProgramme::whereKey($candidate->id)->lockForUpdate()->firstOrFail();
+                $source = $programme->source ?? config('public_programme.source');
+                if (in_array($updateId, $source['applied_updates'] ?? [], true)) {
+                    return 0;
+                }
+                $before = $programme->events;
+                $source['applied_updates'][] = $updateId;
+                $programme->update(['events' => $this->applyGameSchedule(collect($before))->all(), 'source' => $source]);
+                app(AuditService::class)->record('public_schedule.file_updated', $programme, ['events' => $before], ['events' => $programme->events, 'file' => config('public_programme_games.filename')]);
+
+                return 1;
+            });
+        }
+
+        return $count;
+    }
+
+    /** @return array<string, array{name: string, logo_path: ?string}> */
+    public function teamOptions(?IntramuralEdition $edition): array
+    {
+        $options = collect(config('landing.teams', []))->mapWithKeys(fn (array $team): array => ['team:'.Team::logoKey($team['name']) => ['name' => $team['name'], 'logo_path' => $team['image']]])->all();
+        if ($edition) {
+            foreach ($edition->teams()->where('status', 'active')->orderBy('name')->get() as $team) {
+                $options['team:'.Team::logoKey($team->name)] = ['name' => $team->name, 'logo_path' => $team->logo_path];
+            }
+        }
+
+        return $options;
+    }
+
+    /** @return array<int, array<string, mixed>> */
+    public function matchupsFor(array $games, array $teams): array
+    {
+        $participant = function (?string $reference) use ($teams): array {
+            if (isset($teams[$reference])) {
+                return [...$teams[$reference], 'short' => null];
+            }
+            if (preg_match('/^(winner|loser):(\d+)$/', $reference ?? '', $match)) {
+                return ['name' => ucfirst($match[1]).' of Game '.$match[2], 'short' => ($match[1] === 'winner' ? 'W' : 'L').$match[2], 'logo_path' => null];
+            }
+
+            return ['name' => 'To be announced', 'short' => 'TBA', 'logo_path' => null];
+        };
+
+        return collect($games)->values()->map(fn (array $game, int $index): array => [
+            'number' => $index + 1, 'home' => $participant($game['home'] ?? null), 'away' => $participant($game['away'] ?? null),
+        ])->all();
     }
 
     /** @return array<string, mixed> */
@@ -82,7 +166,7 @@ class PublicProgrammeService
             }
             $updated = [...$before, ...$attributes, 'version' => $version + 1];
             $events[$index] = $updated;
-            $programme ??= new PublicProgramme(['edition_id' => $edition->id, 'source' => config('public_programme.source')]);
+            $programme ??= new PublicProgramme(['edition_id' => $edition->id, 'source' => [...config('public_programme.source'), 'applied_updates' => [config('public_programme_games.id')]]]);
             $programme->fill(['events' => $events->values()->all(), 'updated_by' => $actor->id])->save();
             app(AuditService::class)->record('public_schedule.updated', $programme,
                 ['event' => $before], ['event' => $updated], actor: $actor);
@@ -94,8 +178,10 @@ class PublicProgrammeService
     /** @return Collection<int, array<string, mixed>> */
     public function forDate(IntramuralEdition $edition, string $date, Collection $factions): Collection
     {
+        $teams = $this->teamOptions($edition);
+
         return $this->eventsFor($edition)->where('is_published', true)->where('date', $date)
-            ->map(function (array $event) use ($factions): array {
+            ->map(function (array $event) use ($factions, $teams): array {
                 $category = $event['category'] ?? 'sports';
                 $isCultural = $category === 'cultural';
 
@@ -105,6 +191,7 @@ class PublicProgrammeService
                     'sport_group' => null,
                     'sport_group_label' => null,
                     'game' => '',
+                    'matchups' => $this->matchupsFor($event['games'] ?? [], $teams),
                     'time' => isset($event['starts_at']) ? $this->formatTime($event['starts_at']) : $event['session'],
                     'cutoff' => isset($event['ends_at']) ? 'Until '.$this->formatTime($event['ends_at']) : null,
                     'period' => match ($event['session']) {

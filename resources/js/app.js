@@ -1,4 +1,5 @@
 import './bootstrap';
+import './public-programme-editor';
 import './pwa';
 import './ops-interactions';
 import './competition-schedule';

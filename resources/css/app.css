@@ -2,6 +2,21 @@
 @tailwind components;
 @tailwind utilities;
 
+.programme-matchups { display: grid; gap: 7px; min-width: 0; margin-block: 12px; }
+.programme-matchup { display: grid; grid-template-columns: 25px minmax(0, 1fr) 18px minmax(0, 1fr); align-items: center; gap: 6px; border: 1px solid #b6c9df30; border-radius: 9px; padding: 9px 7px; background: #ffffff05; }
+.programme-game-number { color: #efd29c; font-size: 11px; font-weight: 700; }
+.programme-game-vs { color: #9fb6cf; font-size: 10px; text-align: center; }
+.programme-game-team { display: flex; align-items: center; gap: 6px; min-width: 0; color: #e7f1fd; font-size: 12px; font-weight: 600; line-height: 1.35; }
+.programme-game-team > span:last-child { overflow-wrap: anywhere; }
+.programme-game-team img { width: 30px; height: 30px; flex-shrink: 0; object-fit: contain; }
+.programme-game-placeholder { display: inline-grid; place-items: center; min-width: 27px; min-height: 27px; flex-shrink: 0; border: 1px dashed #b6c9df60; border-radius: 7px; font-size: 10px; color: #d9b87d; }
+.ops-dashboard dialog .programme-matchup { background: #f1f5f9; border-color: #cbd5e1; }
+.ops-dashboard dialog .programme-game-team { color: #0f172a; }
+.ops-dashboard dialog .programme-game-number, .ops-dashboard dialog .programme-game-placeholder { color: #854d0e; }
+@media (max-width: 400px) {
+    .programme-game-team { flex-direction: column; align-items: flex-start; font-size: 11px; }
+}
+
 :root {
     --intrams-base: #355872;
     --intrams-accent: #7AAACE;

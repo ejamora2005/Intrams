@@ -61,6 +61,8 @@
                         $period = ['AM' => 'Morning', 'PM' => 'Afternoon', 'Evening' => 'Evening'][$event['session']];
                         $time = filled($event['starts_at'] ?? null) ? \Carbon\Carbon::createFromFormat('!H:i', $event['starts_at'], 'Asia/Manila')->format('g:i A') : $event['session'];
                         $categoryLabel = ['sports' => 'Sports', 'cultural' => 'Cultural', 'activities' => 'Campus activity'][$event['category']];
+                        $gameRows = $editing ? old('games', old('games_present') ? [] : ($event['games'] ?? [])) : ($event['games'] ?? []);
+                        $gameRows = is_array($gameRows) ? array_values(array_filter($gameRows, 'is_array')) : ($event['games'] ?? []);
                     @endphp
                     <article id="schedule-{{ $key }}" data-public-schedule-card class="flex scroll-mt-28 flex-col rounded-xl border border-slate-200 bg-white p-5 shadow-sm target:ring-2 target:ring-blue-500">
                         <div class="flex flex-wrap items-center gap-2 text-xs font-semibold">
@@ -71,11 +73,12 @@
                         <p class="mt-3 text-sm font-semibold text-slate-800">{{ $time }} <span class="font-normal text-slate-500">· {{ $period }}</span></p>
                         @if (filled($event['ends_at'] ?? null))<p class="mt-1 text-sm text-slate-500">Until {{ \Carbon\Carbon::createFromFormat('!H:i', $event['ends_at'], 'Asia/Manila')->format('g:i A') }}</p>@endif
                         <p class="mb-5 mt-2 break-words text-sm text-slate-600">Venue: {{ $event['venue'] ?: 'TBA' }}</p>
+                        @if ($event['matchups'])<x-programme-matchups :games="$event['matchups']" />@endif
                         <button type="button" data-ops-modal-open="{{ $modalId }}" class="mt-auto rounded-lg border border-blue-200 bg-blue-50 px-4 py-2.5 text-sm font-semibold text-blue-800 hover:bg-blue-100">Edit schedule</button>
                     </article>
 
                     <dialog id="{{ $modalId }}" aria-labelledby="{{ $modalId }}-title" data-ops-modal class="w-[min(40rem,calc(100vw-2rem))] max-h-[calc(100dvh-2rem)] overflow-y-auto rounded-2xl border-0 bg-white p-0 text-slate-900 shadow-2xl backdrop:bg-slate-950/60">
-                        <form method="POST" action="{{ route('admin.schedules.update', $key) }}" data-ops-form>
+                        <form method="POST" action="{{ route('admin.schedules.update', $key) }}" data-ops-form data-programme-editor>
                             @csrf
                             @method('PUT')
                             <input type="hidden" name="edition_id" value="{{ $edition->id }}">
@@ -115,6 +118,21 @@
                                     </label>
                                 </div>
                                 <p class="text-xs text-slate-500">Leave the start time blank to show only the selected session.</p>
+                                <section class="border-t border-slate-200 pt-4" aria-label="Edit game matchups">
+                                    <input type="hidden" name="games_present" value="1">
+                                    <div class="flex items-center justify-between gap-3">
+                                        <h3 class="text-base font-semibold">Games / matchups</h3>
+                                        <button type="button" data-programme-game-add class="rounded-lg border border-blue-200 px-3 py-2 text-sm font-semibold text-blue-700">Add game</button>
+                                    </div>
+                                    <p class="mt-2 text-xs text-slate-500">Choose factions or the winner/loser of an earlier game. Logos appear automatically. Changes here update the public timetable.</p>
+                                    <div data-programme-game-list class="mt-3 space-y-3">
+                                        @foreach ($gameRows as $index => $game)
+                                            @include('admin.schedules._game-row', ['index' => $index, 'game' => $game])
+                                        @endforeach
+                                    </div>
+                                    <template data-programme-game-template>@include('admin.schedules._game-row', ['index' => 0, 'game' => []])</template>
+                                    <p data-programme-game-empty class="mt-3 text-sm text-slate-500" @if ($gameRows) hidden @endif>No game matchups yet. Use Add game to set the opponents.</p>
+                                </section>
                                 <input type="hidden" name="is_published" value="0">
                                 <label class="flex items-start gap-3 rounded-lg border border-slate-200 p-3 text-sm font-medium"><input name="is_published" type="checkbox" value="1" @checked((bool) $value('is_published', true)) class="mt-0.5 rounded border-slate-300 text-blue-700 focus:ring-blue-600"><span>Show on the public schedule</span></label>
                             </div>
