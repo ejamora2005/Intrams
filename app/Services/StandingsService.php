@@ -282,6 +282,17 @@ class StandingsService
                 $rules = collect($this->pointRulesFor($editionSport))
                     ->keyBy(fn (array $rule): string => (string) $rule['placement']);
 
+                // Changing points must update saved result details as well as totals,
+                // while keeping the original winners, submitter, and declaration time.
+                if ($result->points_json != $rules->all()) {
+                    $oldPoints = $result->points_json;
+                    $result->timestamps = false;
+                    $result->points_json = $rules->all();
+                    $result->saveQuietly();
+                    app(AuditService::class)->record('sport_result.points_recalculated', $result,
+                        ['points_json' => $oldPoints], ['points_json' => $result->points_json]);
+                }
+
                 foreach (($result->placements_json ?? []) as $placement => $teamId) {
                     $teamId = (int) $teamId;
                     if (! array_key_exists($teamId, $totals)) {

@@ -77,7 +77,7 @@ test('re-seeding default sports synchronizes them to existing editions and sport
         ->assertDontSee('First Edition Only');
 });
 
-test('re-seeding default sports moves basketball 3x3 to the minor point system', function () {
+test('re-seeding default sports moves basketball 3x3 to its dedicated point system', function () {
     $edition = IntramuralEdition::query()->create([
         'name' => 'Legacy 3x3 Edition',
         'school_year' => '2026-2027',
@@ -105,7 +105,7 @@ test('re-seeding default sports moves basketball 3x3 to the minor point system',
 
     app(DefaultSportsSeeder::class)->run();
 
-    expect($configuration->fresh()->scoring_rules['point_system'])->toBe('sports_minor');
+    expect($configuration->fresh()->scoring_rules['point_system'])->toBe('sports_basketball_3x3');
 });
 
 test('sports catalogue is organized into visible competition groups', function () {
@@ -223,7 +223,7 @@ test('proposal defaults seed scoring groups and cultural schedule items', functi
     $festivalDance = EditionSport::query()->where('edition_id', $edition->id)->whereHas('sport', fn ($query) => $query->where('code', 'CULT-FEST-DANCE'))->firstOrFail();
     $festivalProgram = EditionSport::query()->where('edition_id', $edition->id)->whereHas('sport', fn ($query) => $query->where('code', 'CULT-FESTIVAL-PROGRAM'))->firstOrFail();
 
-    expect($basketball3x3->scoring_rules['point_system'])->toBe('sports_minor')
+    expect($basketball3x3->scoring_rules['point_system'])->toBe('sports_basketball_3x3')
         ->and($basketball->scoring_rules['point_system'])->toBe('sports_major')
         ->and((float) $basketball->scoring_rules['placements'][0]['points'])->toBe(25.0)
         ->and($chess->scoring_rules['point_system'])->toBe('sports_minor')

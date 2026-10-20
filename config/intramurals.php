@@ -21,7 +21,7 @@ $pointSystems = [
         'category' => 'sports',
         'description' => 'Minor athletic events listed in the proposal.',
         'codes' => [
-            'BASKET-3X3', 'BASKET-3X3-MEN', 'BASKET-3X3-WOMEN', 'CHESS', 'CHESS-MEN', 'CHESS-WOMEN',
+            'CHESS', 'CHESS-MEN', 'CHESS-WOMEN',
             'BADMINTON', 'BADMINTON-TEAM', 'BADMINTON-DOUBLES', 'BADMINTON-SINGLES',
             'BADMINTON-TEAM-MEN', 'BADMINTON-TEAM-WOMEN', 'BADMINTON-DOUBLES-MEN', 'BADMINTON-DOUBLES-WOMEN',
             'BADMINTON-SINGLES-MEN', 'BADMINTON-SINGLES-WOMEN',
@@ -34,6 +34,17 @@ $pointSystems = [
             ['placement' => 1, 'label' => 'Champion', 'points' => 20.0, 'medal' => 'gold'],
             ['placement' => 2, 'label' => '1st Placer', 'points' => 15.0, 'medal' => 'silver'],
             ['placement' => 3, 'label' => '2nd Placer', 'points' => 10.0, 'medal' => 'bronze'],
+        ],
+    ],
+    'sports_basketball_3x3' => [
+        'label' => 'Basketball 3x3 (Men & Women)',
+        'category' => 'sports',
+        'description' => 'Basketball 3x3 awards 15, 10, and 7 points independently of other minor sports.',
+        'codes' => ['BASKET-3X3', 'BASKET-3X3-MEN', 'BASKET-3X3-WOMEN'],
+        'placements' => [
+            ['placement' => 1, 'label' => 'Champion', 'points' => 15.0, 'medal' => 'gold'],
+            ['placement' => 2, 'label' => '1st Runner-up', 'points' => 10.0, 'medal' => 'silver'],
+            ['placement' => 3, 'label' => '2nd Runner-up', 'points' => 7.0, 'medal' => 'bronze'],
         ],
     ],
     'sports_athletics' => [
@@ -230,8 +241,8 @@ return [
     'point_systems' => $pointSystems,
 
     'default_competitions' => [
-        ['name' => 'Basketball 3x3 (Men)', 'code' => 'BASKET-3X3-MEN', 'participant_category' => 'male', 'scoring_rules' => $rules('sports_minor')],
-        ['name' => 'Basketball 3x3 (Women)', 'code' => 'BASKET-3X3-WOMEN', 'participant_category' => 'female', 'scoring_rules' => $rules('sports_minor')],
+        ['name' => 'Basketball 3x3 (Men)', 'code' => 'BASKET-3X3-MEN', 'participant_category' => 'male', 'scoring_rules' => $rules('sports_basketball_3x3')],
+        ['name' => 'Basketball 3x3 (Women)', 'code' => 'BASKET-3X3-WOMEN', 'participant_category' => 'female', 'scoring_rules' => $rules('sports_basketball_3x3')],
         ['name' => 'Basketball 5x5 (Men)', 'code' => 'BASKET-5X5-MEN', 'participant_category' => 'male', 'scoring_rules' => $rules('sports_major')],
         ['name' => 'Basketball 5x5 (Women)', 'code' => 'BASKET-5X5-WOMEN', 'participant_category' => 'female', 'scoring_rules' => $rules('sports_major')],
         ['name' => 'Volleyball (Men)', 'code' => 'VOLLEYBALL-MEN', 'participant_category' => 'male', 'scoring_rules' => $rules('sports_major')],

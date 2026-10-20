@@ -26,6 +26,10 @@ DEPLOY_SEED_DEFAULT_COMPETITIONS=true
 
 9. Deploy. After the first successful deploy, set the seed flags back to `false`.
 
+## Basketball 3x3 points correction (October 20)
+
+Redeploy, then run `php artisan migrate --force` in `/var/www/html`. Basketball 3x3 Men and Women receive their own 15 / 10 / 7 point group while remaining Minor events for participation rules. Existing winner placements, declaration times, bracket wins, schedules and rosters are kept. The migration updates the declared point details and recalculates standings. Other minor sports retain their point values. Subsequent changes saved in Admin > Points System recalculate already declared points and standings without changing winners; no redeclaration or roster seeding is needed.
+
 ## Three-place scoring and declaration times (October 20)
 
 Redeploy, then run `php artisan migrate --force` in `/var/www/html`. Current athletics events and other current four-place scoring rules become Champion / 1st Runner-up / 2nd Runner-up with 10 / 7 / 5 points. Other three-place scoring groups keep their values. The migration recalculates standings from existing declared winners; it does not reset results or bracket wins. Original fourth-place assignments remain as history and no longer earn points. Submission times and submitters are preserved. New declaration times are stored in UTC and displayed as Philippine time, explicitly marked PHT (UTC+8).

@@ -48,7 +48,7 @@ class EligibilityService
 
         return match ($pointSystem) {
             'sports_major' => self::SLOT_MAJOR,
-            'sports_minor' => self::SLOT_MINOR,
+            'sports_minor', 'sports_basketball_3x3' => self::SLOT_MINOR,
             'sports_athletics' => self::SLOT_INDIVIDUAL_DUAL,
             default => in_array($editionSport->participant_type, ['individual', 'dual'], true)
                 ? self::SLOT_INDIVIDUAL_DUAL

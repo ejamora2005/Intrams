@@ -4,9 +4,12 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\EditionSport;
+use App\Models\Sport;
+use App\Services\AuditService;
 use App\Services\StandingsService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
@@ -14,9 +17,7 @@ use Illuminate\View\View;
 
 class SportPointController extends Controller
 {
-    public function __construct(private readonly StandingsService $standingsService)
-    {
-    }
+    public function __construct(private readonly StandingsService $standingsService) {}
 
     public function index(): View
     {
@@ -94,14 +95,19 @@ class SportPointController extends Controller
         $editionSports = $this->editionSportsForSystem($edition, $definition);
         abort_if($editionSports->isEmpty(), 422, $definition['empty']);
 
-        $editionSports->each(
-            fn (EditionSport $editionSport) => $editionSport->update(['scoring_rules' => ['point_system' => $system, 'placements' => $placements]])
-        );
-        $this->standingsService->recalculateTallies($edition);
+        DB::transaction(function () use ($editionSports, $system, $placements, $edition): void {
+            foreach ($editionSports as $editionSport) {
+                $before = $editionSport->scoring_rules;
+                $editionSport->update(['scoring_rules' => [...($before ?? []), 'point_system' => $system, 'placements' => $placements]]);
+                app(AuditService::class)->record('edition_sport.scoring_rules_updated', $editionSport,
+                    ['scoring_rules' => $before], ['scoring_rules' => $editionSport->scoring_rules]);
+            }
+            $this->standingsService->recalculateTallies($edition);
+        });
 
         return back()->with(
             'success',
-            $definition['label'].' was updated for '.$editionSports->count().' configured item(s).',
+            $definition['label'].' was updated for '.$editionSports->count().' configured item(s). Declared points and standings were recalculated; winner placements were kept.',
         );
     }
 
@@ -137,13 +143,17 @@ class SportPointController extends Controller
             return collect();
         }
 
-        return $edition->editionSports()
+        $events = $edition->editionSports()
             ->with(['sport', 'sportResult'])
+            ->whereIn('status', ['preparation', 'active'])
             ->whereHas(
                 'sport',
-                fn ($query) => $query->whereIn('code', $codes)
+                fn ($query) => $query->whereIn('code', $codes)->where('status', 'active')
             )
-            ->get()
+            ->get();
+        $currentIds = Sport::withoutSupersededOpenSports($events->pluck('sport'))->pluck('id');
+
+        return $events->filter(fn (EditionSport $event): bool => $currentIds->contains($event->sport_id))
             ->sortBy(fn (EditionSport $editionSport): string => $editionSport->sport?->name ?? '')
             ->values();
     }
