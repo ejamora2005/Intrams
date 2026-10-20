@@ -30,7 +30,7 @@
         <div class="flex flex-col justify-between gap-3 border-b border-red-100 bg-red-50 px-4 py-4 sm:flex-row sm:items-end sm:px-6">
             <div>
                 <h2 id="possible-dq-heading" class="text-base font-semibold text-red-950">Students requiring review</h2>
-                <p class="mt-1 text-sm text-red-900/75">These registrations currently exceed the participation rules for the active edition.</p>
+                <p class="mt-1 text-sm text-red-900/75">These registrations were saved with participation-rule issues for review. A Possible DQ flag does not automatically disqualify a student.</p>
             </div>
             <div class="flex flex-col gap-2 sm:items-end">
                 <label class="relative block min-w-0 sm:w-72">

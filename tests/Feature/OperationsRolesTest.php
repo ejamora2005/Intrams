@@ -145,7 +145,7 @@ test('GAM add-player page lists every active edition sport', function () {
         ->assertDontSee('data-sport-locked="true"', false);
 });
 
-test('GAM users select joined sports while adding a player and the selection rules reject two major sports', function () {
+test('GAM users select joined sports while adding a player and two major sports are saved with a Possible DQ flag', function () {
     $edition = operationsEdition();
     $team = operationsTeam($edition);
     $major = operationsSport($edition, 'Volleyball', 'VOLLEYBALL');
@@ -186,12 +186,13 @@ test('GAM users select joined sports while adding a player and the selection rul
             'course_id' => $team->course_id,
             'edition_sport_ids' => [$major->id, $secondMajor->id],
         ])
-        ->assertSessionHasErrors('edition_sport_ids');
+        ->assertSessionHasNoErrors()->assertSessionHas('participation_warning');
 
-    $this->assertDatabaseMissing('students', ['student_number' => 'GAM-SPORT-002']);
+    $this->assertDatabaseHas('students', ['student_number' => 'GAM-SPORT-002']);
+    $this->get(route('gam.possible-dq.index'))->assertOk()->assertSee('Taylor Rivera')->assertSee('More than 1 major event.');
 });
 
-test('relay entries do not create a DQ but new relay registrations require an individual run', function () {
+test('relay entries are exempt from event limits but a missing qualifying run is flagged after saving', function () {
     $edition = operationsEdition();
     $team = operationsTeam($edition);
     $major = operationsSport($edition, 'Baseball', 'BASEBALL');
@@ -255,26 +256,17 @@ test('relay entries do not create a DQ but new relay registrations require an in
             'team_id' => $team->id,
             'student_ids' => [$nonRunner->id],
         ])
-        ->assertSessionHasErrors('student_ids');
+        ->assertSessionHasNoErrors()->assertSessionHas('participation_warning');
 
-    $this->assertDatabaseMissing('athlete_entries', [
-        'edition_sport_id' => $relay->id,
-        'student_id' => $nonRunner->id,
-    ]);
+    $this->assertDatabaseHas('athlete_entries', ['edition_sport_id' => $relay->id, 'student_id' => $nonRunner->id, 'status' => 'active']);
 
-    AthleteEntry::query()->create([
-        'edition_sport_id' => $relay->id,
-        'student_id' => $nonRunner->id,
-        'team_id' => $team->id,
-        'status' => 'active',
-        'assigned_by' => $admin->id,
-        'assigned_at' => now(),
-    ]);
-
-    expect(app(\App\Services\EligibilityService::class)->evaluateStudent($nonRunner, $edition)['possible_dq'])->toBeFalse();
+    expect(app(\App\Services\EligibilityService::class)->evaluateStudent($nonRunner, $edition)['possible_dq'])->toBeTrue();
     $this->actingAs($admin)->get(route('admin.rules.index'))
         ->assertOk()
-        ->assertDontSee('Morgan Santos');
+        ->assertSee('Morgan Santos')->assertSee('Relay registration requires a 100m, 200m, or 400m run.');
+    $this->post(route('admin.sports.participants.store', $run->sport), ['edition_id' => $edition->id, 'student_ids' => [$nonRunner->id]])
+        ->assertSessionHasNoErrors()->assertSessionMissing('participation_warning');
+    expect(app(\App\Services\EligibilityService::class)->evaluateStudent($nonRunner, $edition)['possible_dq'])->toBeFalse();
 });
 
 test('tabulators declare sport winners and standings use admin point rules', function () {
@@ -499,7 +491,7 @@ test('multiple tabulators can access the tabulator dashboard', function () {
     $this->actingAs($secondTabulator)->get(route('tabulator.dashboard'))->assertOk()->assertSee('Tabulator dashboard');
 });
 
-test('participation rules prevent invalid sport assignments and flag legacy registrations across operations dashboards', function () {
+test('participation rules flag saved sport assignments across operations dashboards without blocking registration', function () {
     $admin = User::factory()->create(['role' => 'admin', 'status' => 'active']);
     $tabulator = User::factory()->create(['role' => 'tabulator', 'status' => 'active']);
     $edition = operationsEdition();
@@ -534,35 +526,21 @@ test('participation rules prevent invalid sport assignments and flag legacy regi
         'assigned_at' => now(),
     ]);
 
-    $this->actingAs($admin)->get(route('admin.sports.participants.assign', [
+    $page = $this->actingAs($admin)->get(route('admin.sports.participants.assign', [
         'sport' => $volleyball->sport,
         'edition_id' => $edition->id,
         'team_id' => $team->id,
     ]))->assertOk()
         ->assertSee('Possible DQ')
-        ->assertSee('Students who would exceed the participation rules are unavailable.')
-        ->assertSee('disabled', false);
+        ->assertSee('Students who exceed the participation rules can still be registered');
+    preg_match('/<input[^>]+name="student_ids\[\]"[^>]*>/', $page->getContent(), $checkbox);
+    expect($checkbox[0])->not->toMatch('/\sdisabled(?:\s|=|>)/');
 
     $this->actingAs($admin)->post(route('admin.sports.participants.store', $volleyball->sport), [
         'edition_id' => $edition->id,
         'team_id' => $team->id,
         'student_ids' => [$student->id],
-    ])->assertSessionHasErrors('student_ids');
-
-    $this->assertDatabaseMissing('athlete_entries', [
-        'edition_sport_id' => $volleyball->id,
-        'student_id' => $student->id,
-    ]);
-
-    AthleteEntry::query()->create([
-        'edition_sport_id' => $volleyball->id,
-        'student_id' => $student->id,
-        'team_id' => $team->id,
-        'status' => 'active',
-        'medical_certificate_status' => 'pending',
-        'assigned_by' => $admin->id,
-        'assigned_at' => now(),
-    ]);
+    ])->assertSessionHasNoErrors()->assertSessionHas('participation_warning');
 
     $this->assertDatabaseHas('athlete_entries', [
         'edition_sport_id' => $volleyball->id,

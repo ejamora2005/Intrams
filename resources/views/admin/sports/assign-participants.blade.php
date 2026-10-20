@@ -12,7 +12,7 @@
         <div class="flex flex-col justify-between gap-2 sm:flex-row sm:items-center">
             <div>
                 <h2 id="participant-filters-heading" class="font-semibold text-slate-900">Filter students</h2>
-                <p class="mt-1 text-sm text-slate-500">This sport is configured as <span class="font-semibold text-slate-700">{{ ucfirst($editionSport->participant_type) }}</span> with a <span class="font-semibold text-slate-700">{{ $sport->participant_category_label }}</span> participant category. Students who would exceed the participation rules are unavailable.</p>
+                <p class="mt-1 text-sm text-slate-500">This sport is configured as <span class="font-semibold text-slate-700">{{ ucfirst($editionSport->participant_type) }}</span> with a <span class="font-semibold text-slate-700">{{ $sport->participant_category_label }}</span> participant category. Students who exceed the participation rules can still be registered and will be flagged on the Possible DQ Watchlist.</p>
             </div>
             <a href="{{ route('admin.sports.participants', ['sport' => $sport, 'edition_id' => $edition->id]) }}" class="text-sm font-semibold text-blue-700 hover:text-blue-900">Back to participants</a>
         </div>
@@ -91,8 +91,8 @@
                                 @foreach ($students as $student)
                                     @php($eligibility = $eligibilityPreviewByStudentId->get($student->id))
                                     @php($flagged = $eligibility['possible_dq'] ?? false)
-                                    <label data-pair-row data-search="{{ Str::lower($student->full_name.' '.$student->student_number.' '.$student->course?->name) }}" @class(['flex cursor-pointer items-center gap-3 px-4 py-3 text-sm transition hover:bg-white/10 has-[:checked]:bg-white/10', 'cursor-not-allowed opacity-50' => $flagged, 'border-l-4 border-red-500 bg-red-50 hover:bg-red-100' => $flagged])>
-                                        <input name="student_ids[{{ $side }}]" value="{{ $student->id }}" type="radio" data-pair-radio data-student-name="{{ $student->full_name }}" @disabled($flagged) class="rounded-full border-slate-300 text-blue-700 focus:ring-blue-600 disabled:cursor-not-allowed disabled:bg-slate-200">
+                                    <label data-pair-row data-search="{{ Str::lower($student->full_name.' '.$student->student_number.' '.$student->course?->name) }}" @class(['flex cursor-pointer items-center gap-3 px-4 py-3 text-sm transition hover:bg-white/10 has-[:checked]:bg-white/10', 'border-l-4 border-red-500 bg-red-50 hover:bg-red-100' => $flagged])>
+                                        <input name="student_ids[{{ $side }}]" value="{{ $student->id }}" type="radio" data-pair-radio data-student-name="{{ $student->full_name }}" class="rounded-full border-slate-300 text-blue-700 focus:ring-blue-600 disabled:cursor-not-allowed disabled:bg-slate-200">
                                         <span class="min-w-0">
                                             <span class="flex flex-wrap items-center gap-2 font-medium text-slate-900">
                                                 <span class="truncate">{{ $student->full_name }}</span>
@@ -123,8 +123,8 @@
                     @foreach ($students as $student)
                         @php($eligibility = $eligibilityPreviewByStudentId->get($student->id))
                         @php($flagged = $eligibility['possible_dq'] ?? false)
-                        <label @class(['flex cursor-pointer items-center gap-3 px-5 py-3 text-sm transition hover:bg-white/10', 'cursor-not-allowed opacity-50' => $flagged, 'border-l-4 border-red-500 bg-red-50 hover:bg-red-100' => $flagged])>
-                            <input name="student_ids[]" value="{{ $student->id }}" type="checkbox" @disabled($flagged) class="student-checkbox rounded border-slate-300 text-blue-700 focus:ring-blue-600">
+                        <label @class(['flex cursor-pointer items-center gap-3 px-5 py-3 text-sm transition hover:bg-white/10', 'border-l-4 border-red-500 bg-red-50 hover:bg-red-100' => $flagged])>
+                            <input name="student_ids[]" value="{{ $student->id }}" type="checkbox" class="student-checkbox rounded border-slate-300 text-blue-700 focus:ring-blue-600">
                             <span>
                                 <span class="flex flex-wrap items-center gap-2 font-medium text-slate-900">
                                     {{ $student->full_name }}

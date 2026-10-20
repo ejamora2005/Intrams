@@ -78,7 +78,7 @@ test('staff can add a new player with doubles selected before assigning a partne
     ['gam', 'Male', 'TABLE-TENNIS-DOUBLES-MEN'], ['gam', 'Female', 'BADMINTON-DOUBLES-WOMEN'],
 ]);
 
-test('doubles editing keeps gender and participation validation with no partial changes', function () {
+test('doubles editing keeps gender validation but saves participation violations for review', function () {
     [$edition, $team, $user, $student, $event] = doublesSelectionScenario('admin', 'Male', 'BADMINTON-DOUBLES-MEN');
     $entry = AthleteEntry::create(['student_id' => $student->id, 'edition_sport_id' => $event->id, 'team_id' => $team->id, 'status' => 'active']);
     $sport = Sport::create(['code' => 'TABLE-TENNIS-DOUBLES-WOMEN', 'name' => 'Table Tennis (Doubles - Women)', 'participant_category' => 'female', 'status' => 'active']);
@@ -89,8 +89,9 @@ test('doubles editing keeps gender and participation validation with no partial 
     expect($student->fresh()->first_name)->toBe($profile['first_name'])->and($entry->fresh()->getAttributes())->toBe($before);
 
     $sport->update(['participant_category' => 'male']);
-    $this->actingAs($user)->put(route('admin.students.update', $student), [...$profile, 'edition_sport_ids' => [$event->id, $wrongGender->id]])->assertSessionHasErrors('edition_sport_ids');
-    expect($entry->fresh()->getAttributes())->toBe($before)->and(AthleteEntry::count())->toBe(1);
+    $this->actingAs($user)->put(route('admin.students.update', $student), [...$profile, 'edition_sport_ids' => [$event->id, $wrongGender->id]])->assertSessionHasNoErrors()->assertSessionHas('participation_warning');
+    expect($entry->fresh()->getAttributes())->toBe($before)->and(AthleteEntry::count())->toBe(2);
+    $this->get(route('admin.possible-dq.index'))->assertOk()->assertSee($student->full_name)->assertSee('More than 1 minor event.');
 });
 
 test('registered doubles players can be paired using their existing rows and medical reviews', function () {
@@ -108,6 +109,27 @@ test('registered doubles players can be paired using their existing rows and med
         ->and($entry->fresh()->medical_certificate_status)->toBe('verified')
         ->and($entry->fresh()->medical_certificate_notes)->toBe('Reviewed before pairing')
         ->and(AthleteEntry::count())->toBe(2);
+});
+
+test('doubles assignment leaves flagged athletes selectable and saves their pair on the watchlist', function () {
+    [$edition, $team, $user, $student, $event] = doublesSelectionScenario('admin', 'Male', 'BADMINTON-DOUBLES-MEN');
+    $partner = Student::factory()->create(['gender' => 'Male', 'status' => 'active']);
+    TeamMember::create(['edition_id' => $edition->id, 'team_id' => $team->id, 'student_id' => $partner->id]);
+    $sport = Sport::create(['name' => 'Chess (Men)', 'code' => 'CHESS-MEN', 'participant_category' => 'male', 'status' => 'active']);
+    $chess = EditionSport::create(['edition_id' => $edition->id, 'sport_id' => $sport->id, 'participant_type' => 'team', 'game_mechanic' => 'round_robin', 'status' => 'active']);
+    AthleteEntry::create(['student_id' => $student->id, 'edition_sport_id' => $chess->id, 'team_id' => $team->id, 'status' => 'active']);
+    $page = $this->actingAs($user)->get(route('admin.sports.participants.assign', ['sport' => $event->sport, 'edition_id' => $edition->id, 'team_id' => $team->id]))
+        ->assertOk()->assertSee('Possible DQ');
+    preg_match_all('/<input[^>]+data-pair-radio[^>]*>/', $page->getContent(), $radios);
+    expect($radios[0])->toHaveCount(4);
+    foreach ($radios[0] as $radio) {
+        expect($radio)->not->toMatch('/\sdisabled(?:\s|=|>)/');
+    }
+    $this->post(route('admin.sports.participants.store', $event->sport), ['edition_id' => $edition->id, 'team_id' => $team->id, 'student_ids' => [$student->id, $partner->id]])
+        ->assertSessionHasNoErrors()->assertSessionHas('participation_warning')->assertRedirect();
+    $entries = AthleteEntry::where('edition_sport_id', $event->id)->get();
+    expect($entries)->toHaveCount(2)->and($entries->pluck('pair_key')->unique())->toHaveCount(1);
+    $this->get(route('admin.possible-dq.index'))->assertOk()->assertSee($student->full_name)->assertSee('More than 1 minor event.')->assertDontSee($partner->student_number);
 });
 
 test('pair assignment includes an orphaned partner but cannot take a player from a complete pair', function () {

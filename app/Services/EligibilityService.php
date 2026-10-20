@@ -162,38 +162,23 @@ class EligibilityService
             ]);
     }
 
-    /**
-     * @param  Collection<int, Student>  $students
-     *
-     * @throws ValidationException
-     */
-    public function assertStudentsCanJoin(Collection $students, IntramuralEdition $edition, EditionSport $additionalSport): void
+    /** @param Collection<int, Student> $students */
+    public function registrationWarningForStudents(Collection $students, IntramuralEdition $edition): ?string
     {
-        $evaluations = $this->previewForStudents($students, $edition, $additionalSport);
-        $violations = $evaluations
+        // Participation limits are advisory: keep registrations and surface the
+        // same evaluation used by the Possible DQ watchlist after saving.
+        $violations = $students
+            ->map(fn (Student $student): array => $this->evaluateStudent($student, $edition))
             ->filter(fn (array $evaluation): bool => $evaluation['possible_dq'])
             ->take(3);
 
-        $relayWithoutRun = $this->isRelayEvent($additionalSport)
-            ? $evaluations
-                ->filter(fn (array $evaluation): bool => ! collect($evaluation['entries'])->contains(fn (array $entry): bool => $entry['is_qualifying_run']))
-                ->take(3)
-            : collect();
-
-        if ($violations->isEmpty() && $relayWithoutRun->isEmpty()) {
-            return;
+        if ($violations->isEmpty()) {
+            return null;
         }
 
-        $message = $violations
+        return 'Possible DQ review required. '.$violations
             ->map(fn (array $evaluation): string => $evaluation['student']->full_name.': '.implode(' ', $evaluation['issues']))
-            ->merge($relayWithoutRun->map(fn (array $evaluation): string => $evaluation['student']->full_name.': Relay registration requires a 100m, 200m, or 400m run.'))
-            ->unique()
-            ->take(3)
             ->implode(' ');
-
-        throw ValidationException::withMessages([
-            'student_ids' => $message,
-        ]);
     }
 
     /**
@@ -347,6 +332,10 @@ class EligibilityService
 
         if ($total === $maxEvents && ! $this->matchesAllowedCombination($counts)) {
             $issues[] = 'Event combination does not match the allowed pairings.';
+        }
+
+        if ($items->contains('is_relay', true) && ! $items->contains('is_qualifying_run', true)) {
+            $issues[] = 'Relay registration requires a 100m, 200m, or 400m run.';
         }
 
         return [

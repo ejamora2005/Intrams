@@ -10,6 +10,7 @@ use App\Models\IntramuralEdition;
 use App\Models\Student;
 use App\Models\Team;
 use App\Services\AthleteEntryService;
+use App\Services\EligibilityService;
 use App\Services\StudentService;
 use App\Services\TeamService;
 use Illuminate\Http\RedirectResponse;
@@ -26,6 +27,7 @@ class StudentController extends Controller
         private readonly StudentService $studentService,
         private readonly TeamService $teamService,
         private readonly AthleteEntryService $athleteEntryService,
+        private readonly EligibilityService $eligibilityService,
     ) {}
 
     public function index(Request $request): View
@@ -127,7 +129,10 @@ class StudentController extends Controller
             return $student;
         });
 
-        return redirect()->route('admin.students.index')->with('success', "{$student->full_name} was added.");
+        return redirect()->route('admin.students.index')->with([
+            'success' => "{$student->full_name} was added.",
+            'participation_warning' => $edition ? $this->eligibilityService->registrationWarningForStudents(collect([$student]), $edition) : null,
+        ]);
     }
 
     public function edit(Student $student): View
@@ -173,7 +178,10 @@ class StudentController extends Controller
             ]);
         }
 
-        return redirect()->route('admin.students.index')->with('success', "{$student->full_name} was updated.");
+        return redirect()->route('admin.students.index')->with([
+            'success' => "{$student->full_name} was updated.",
+            'participation_warning' => $edition ? $this->eligibilityService->registrationWarningForStudents(collect([$student]), $edition) : null,
+        ]);
     }
 
     public function transferTeam(Request $request, Student $student): RedirectResponse

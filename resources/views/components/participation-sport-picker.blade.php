@@ -18,7 +18,7 @@
         <div class="flex flex-col justify-between gap-2 sm:flex-row sm:items-end">
             <div>
                 <legend class="text-sm font-semibold text-slate-800">Sports joined <span class="text-red-600">*</span></legend>
-                <p class="mt-1 text-sm text-slate-500">Choose the sports this student will join in the active intramurals edition. The participation rules are applied as you select.</p>
+                <p class="mt-1 text-sm text-slate-500">Choose all sports this student will join. Participation-rule violations are saved and flagged on the Possible DQ Watchlist.</p>
             </div>
             <p data-sport-picker-summary class="text-xs font-medium text-slate-600" aria-live="polite"></p>
         </div>
@@ -52,6 +52,7 @@
                         data-slot="{{ $slot }}"
                         data-counts-toward-limit="{{ $countsTowardLimit ? 'true' : 'false' }}"
                         data-relay="{{ $isRelay ? 'true' : 'false' }}"
+                        data-qualifying-run="{{ in_array(Str::upper($sport?->code ?? ''), config('intramurals.participation_rules.relay_qualifying_run_sport_codes', []), true) ? 'true' : 'false' }}"
                         data-paired-partner-exempt-for="{{ implode(',', $pairedPartnerExemptGenders) }}"
                         @checked($selectedSportIds->contains((string) $editionSport->id))
                         class="mt-0.5 rounded border-slate-300 text-blue-700 focus:ring-blue-600"
@@ -74,7 +75,8 @@
             <p data-list-search-empty hidden class="rounded-lg border border-dashed border-slate-300 px-4 py-8 text-center text-sm text-slate-500 sm:col-span-2">No sports match your search.</p>
         </div>
 
-        <p class="mt-3 text-xs text-slate-500">Allowed combinations: 1 Major + 1 Minor, 1 Major + 1 Individual/Dual, 1 Minor + 1 Individual/Dual, or up to 3 Individual/Dual events. A second Major or Minor is locked after the first selection. Relay events do not use an event slot, but require the student to join a 100m, 200m, or 400m run. {{ $teamSportNote }} Doubles selections can be added or removed here; existing partner assignments are kept while selected.</p>
+        <p data-sport-picker-warning hidden role="status" aria-live="polite" class="mt-3 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900"></p>
+        <p class="mt-3 text-xs text-slate-500">Allowed combinations: 1 Major + 1 Minor, 1 Major + 1 Individual/Dual, 1 Minor + 1 Individual/Dual, or up to 3 Individual/Dual events. You can select additional sports; violations are flagged for Possible DQ review after saving. Relay events do not use an event slot, but require the student to join a 100m, 200m, or 400m run. {{ $teamSportNote }} Doubles selections can be added or removed here; existing partner assignments are kept while selected.</p>
         <p data-sport-picker-client-error hidden class="mt-2 text-sm text-red-600">Choose at least one sport.</p>
         @error('edition_sport_ids')<p class="mt-2 text-sm text-red-600">{{ $message }}</p>@enderror
         @error('edition_sport_ids.*')<p class="mt-2 text-sm text-red-600">{{ $message }}</p>@enderror
@@ -88,6 +90,10 @@
             const inputs = [...picker.querySelectorAll('[data-sport-choice]')];
             const summary = picker.querySelector('[data-sport-picker-summary]');
             const error = picker.querySelector('[data-sport-picker-client-error]');
+            const warning = picker.querySelector('[data-sport-picker-warning]');
+            const maxEvents = @json(config('intramurals.participation_rules.max_events_per_student', 2));
+            const individualMaxEvents = @json(config('intramurals.participation_rules.individual_dual_only_max_events', 3));
+            const allowedCombinations = @json(config('intramurals.participation_rules.allowed_combinations', []));
             const form = picker.closest('form');
             const genderInput = form?.querySelector('[name="gender"]');
             const emptyCounts = () => ({ major: 0, minor: 0, individual_or_dual: 0 });
@@ -100,13 +106,6 @@
             const selectedRelayCount = () => inputs.filter(input => input.checked && input.dataset.relay === 'true').length;
             const selectedPairedPartnerCount = () => inputs.filter(input => input.checked && isPairedPartnerExempt(input)).length;
             const total = counts => Object.values(counts).reduce((sum, count) => sum + count, 0);
-            const canUse = (counts, slot) => {
-                const next = { ...counts, [slot]: (counts[slot] || 0) + 1 };
-                const maximum = next.major || next.minor ? 2 : 3;
-
-                return next.major <= 1 && next.minor <= 1 && total(next) <= maximum;
-            };
-
             const sync = () => {
                 const gender = (genderInput?.value || '').toLowerCase();
 
@@ -125,13 +124,21 @@
                     const genderAllowed = !['male', 'female'].includes(category) || !gender || category === gender;
                     const slotLabel = option.querySelector('[data-sport-slot-label]');
                     if (slotLabel) slotLabel.textContent = isPairedPartnerExempt(input) ? 'Paired partner (exempt)' : slotLabel.dataset.defaultSlotLabel;
-                    const allowed = genderAllowed && (input.checked || !countsTowardLimit(input) || canUse(counts, input.dataset.slot));
-                    input.disabled = !allowed;
-                    option.classList.toggle('cursor-not-allowed', !allowed);
-                    option.classList.toggle('opacity-50', !allowed);
+                    input.disabled = !genderAllowed;
+                    option.classList.toggle('cursor-not-allowed', !genderAllowed);
+                    option.classList.toggle('opacity-50', !genderAllowed);
                 });
 
                 summary.textContent = `Selected: Major ${counts.major} / Minor ${counts.minor} / Individual-Dual ${counts.individual_or_dual} / Relay ${selectedRelayCount()} (exempt) / Paired partner ${selectedPairedPartnerCount()} (exempt)`;
+                const maximum = counts.major || counts.minor ? maxEvents : individualMaxEvents;
+                const issues = [];
+                if (total(counts) > maximum) issues.push(`More than ${maximum} events selected.`);
+                if (counts.major > 1) issues.push('More than 1 major event.');
+                if (counts.minor > 1) issues.push('More than 1 minor event.');
+                if (total(counts) === maximum && !allowedCombinations.some(combination => Object.keys(counts).every(slot => Number(combination[slot] || 0) === counts[slot]))) issues.push('Event combination does not match the allowed pairings.');
+                if (selectedRelayCount() && !inputs.some(input => input.checked && input.dataset.qualifyingRun === 'true')) issues.push('Relay registration requires a 100m, 200m, or 400m run.');
+                warning.hidden = issues.length === 0;
+                warning.textContent = issues.length ? `Possible DQ: ${issues.join(' ')} You can still save these sports. This student will appear on the Possible DQ Watchlist.` : '';
                 if (inputs.some(input => input.checked)) error.hidden = true;
                 picker.dispatchEvent(new Event('list-search:refresh'));
             };

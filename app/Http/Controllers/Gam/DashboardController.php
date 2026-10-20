@@ -180,7 +180,7 @@ class DashboardController extends Controller
             'gender' => ['nullable', 'string', 'max:20'],
             'year_level' => ['nullable', 'string', 'max:30'],
             'section' => ['nullable', 'string', 'max:100'],
-            'edition_sport_ids' => ['nullable', 'array', 'max:5'],
+            'edition_sport_ids' => ['nullable', 'array'],
             'edition_sport_ids.*' => ['integer', 'distinct', 'exists:edition_sports,id'],
         ]);
 
@@ -209,7 +209,11 @@ class DashboardController extends Controller
 
         return redirect()
             ->route('gam.dashboard', ['team_id' => $team->id])
-            ->with(['success' => $student->full_name.' was added to '.$team->name.'.', 'ops_view' => 'roster-management']);
+            ->with([
+                'success' => $student->full_name.' was added to '.$team->name.'.',
+                'ops_view' => 'roster-management',
+                'participation_warning' => $this->eligibilityService->registrationWarningForStudents(collect([$student]), $team->edition),
+            ]);
     }
 
     public function assignExistingPlayer(Request $request, Team $team): RedirectResponse
@@ -234,14 +238,18 @@ class DashboardController extends Controller
         abort_unless($team->members()->where('student_id', $student->id)->exists(), 404);
 
         $data = $request->validate([
-            'edition_sport_ids' => ['nullable', 'array', 'max:5'],
+            'edition_sport_ids' => ['nullable', 'array'],
             'edition_sport_ids.*' => ['integer', 'distinct', 'exists:edition_sports,id'],
         ]);
 
         DB::transaction(fn () => $this->athleteEntryService->syncSelectedSports($student, $team->edition, $data['edition_sport_ids'] ?? [], $team));
 
         return redirect()->route('gam.dashboard', ['team_id' => $team->id])
-            ->with(['success' => $student->full_name.' sports were updated.', 'ops_view' => 'roster-management']);
+            ->with([
+                'success' => $student->full_name.' sports were updated.',
+                'ops_view' => 'roster-management',
+                'participation_warning' => $this->eligibilityService->registrationWarningForStudents(collect([$student]), $team->edition),
+            ]);
     }
 
     public function updateMedicalCertificate(Request $request, AthleteEntry $entry): RedirectResponse

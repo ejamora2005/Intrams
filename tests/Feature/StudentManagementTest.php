@@ -125,7 +125,7 @@ test('admin can create a student and the action is audited', function () {
     $this->assertDatabaseHas('audit_logs', ['user_id' => $admin->id, 'action' => 'student.created', 'outcome' => 'success']);
 });
 
-test('admin selects joined sports when creating a student and cannot select two major sports', function () {
+test('admin selects joined sports when creating a student and two major sports are saved for Possible DQ review', function () {
     $admin = activeAdmin();
     $edition = IntramuralEdition::query()->create([
         'name' => 'Active Intramurals',
@@ -169,9 +169,12 @@ test('admin selects joined sports when creating a student and cannot select two 
             'course_id' => $course->id,
             'edition_sport_ids' => [$major->id, $secondMajor->id],
         ]))
-        ->assertSessionHasErrors('edition_sport_ids');
+        ->assertSessionHasNoErrors()->assertSessionHas('participation_warning');
 
-    $this->assertDatabaseMissing('students', ['student_number' => '2026-SPORT-002']);
+    $this->assertDatabaseHas('students', ['student_number' => '2026-SPORT-002']);
+    $flagged = Student::where('student_number', '2026-SPORT-002')->sole();
+    expect($flagged->athleteEntries()->where('status', 'active')->count())->toBe(2);
+    $this->get(route('admin.possible-dq.index'))->assertOk()->assertSee('2026-SPORT-002')->assertSee('More than 1 major event.');
 });
 
 test('student ID is generated from the student name when omitted', function () {

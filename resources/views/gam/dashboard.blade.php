@@ -2,6 +2,7 @@
 
 @section('content')
     <x-ops-feedback />
+    <x-participation-warning />
     @if (request('modal'))
         <div data-ops-auto-modal="{{ request('modal') }}" hidden></div>
     @endif
@@ -178,7 +179,7 @@
                                                             <div>
                                                                 <p class="text-xs font-semibold uppercase tracking-wide text-blue-700">Roster update</p>
                                                                 <h3 class="mt-1 text-lg font-semibold">Edit sports for {{ $member->student->full_name }}</h3>
-                                                                <p class="mt-1 text-sm text-slate-500">Choose the sports this player has joined. Gender-matched events are shown automatically.</p>
+                                                                <p class="mt-1 text-sm text-slate-500">Choose all sports this player has joined. Gender-matched events are shown automatically. Participation-rule violations are saved and flagged on the Possible DQ Watchlist.</p>
                                                             </div>
                                                             <button type="button" data-ops-modal-close class="rounded-lg p-2 text-xl leading-none text-slate-400 transition hover:bg-slate-100 hover:text-slate-700" aria-label="Close edit sports dialog">&times;</button>
                                                         </div>

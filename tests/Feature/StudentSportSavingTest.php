@@ -107,18 +107,54 @@ test('reselecting a removed sport reuses its existing row and keeps the player i
     $this->assertDatabaseCount('athlete_entries', 2);
 });
 
-test('invalid additional sports roll back profile changes and keep the original registrations', function () {
+test('additional major sports save profile changes and flag the player until corrected', function () {
     [$admin, $edition, $team, $student] = playerSaveScenario();
     $volleyball = playerSaveEvent($edition, 'VOLLEYBALL-MEN');
     $basketball = playerSaveEvent($edition, 'BASKET-5X5-MEN');
     $entry = playerSaveEntry($student, $volleyball, $team);
-    $before = $student->fresh()->getAttributes();
     $this->actingAs($admin)->put(route('admin.students.update', $student), [
-        ...studentSportSavePayload($student, [$volleyball->id, $basketball->id]), 'first_name' => 'Rejected change',
-    ])->assertSessionHasErrors('edition_sport_ids');
-    expect($student->fresh()->getAttributes())->toBe($before)->and($entry->fresh()->status)->toBe('active');
-    $this->assertDatabaseCount('athlete_entries', 1);
+        ...studentSportSavePayload($student, [$volleyball->id, $basketball->id]), 'first_name' => 'Updated Player',
+    ])->assertSessionHasNoErrors()->assertSessionHas('participation_warning')->assertRedirect();
+    expect($student->fresh()->first_name)->toBe('Updated Player')->and($entry->fresh()->status)->toBe('active');
+    $this->assertDatabaseCount('athlete_entries', 2);
+    $this->actingAs($admin)->get(route('admin.possible-dq.index'))
+        ->assertOk()->assertSee($student->fresh()->full_name)->assertSee('More than 1 major event.');
+
+    $this->actingAs($admin)->put(route('admin.students.update', $student), studentSportSavePayload($student->fresh(), [$volleyball->id]))
+        ->assertSessionHasNoErrors()->assertSessionMissing('participation_warning');
+    expect(app(EligibilityService::class)->flaggedStudents($edition)->pluck('student.id')->all())->not->toContain($student->id);
+    $this->actingAs($admin)->get(route('admin.possible-dq.index'))->assertOk()->assertDontSee('Updated Player');
 });
+
+test('admin and GAM can create and update players with more than five sports and flag the saved selection', function (string $role) {
+    [$admin, $edition, $team, $student] = playerSaveScenario();
+    $user = $role === 'admin' ? $admin : User::factory()->create(['role' => 'gam', 'status' => 'active', 'managed_team_id' => $team->id]);
+    $codes = ['VOLLEYBALL-MEN', 'BASKET-5X5-MEN', 'CHESS-MEN', 'BADMINTON-DOUBLES-MEN', '100M-RUN-MEN', '200M-RUN-MEN'];
+    $events = collect($codes)->map(fn (string $code): EditionSport => playerSaveEvent($edition, $code, str_contains($code, 'DOUBLES') ? 'dual' : (str_contains($code, 'RUN') ? 'individual' : 'team')));
+    $ids = $events->pluck('id')->all();
+    $url = $role === 'admin' ? route('admin.students.update', $student) : route('gam.teams.players.sports.update', [$team, $student]);
+    $payload = $role === 'admin' ? studentSportSavePayload($student, $ids) : ['edition_sport_ids' => $ids];
+    $this->actingAs($user)->put($url, $payload)->assertSessionHasNoErrors()->assertSessionHas('participation_warning')->assertRedirect();
+    expect($student->athleteEntries()->where('status', 'active')->count())->toBe(6);
+    $this->get($role === 'admin' ? route('admin.students.index') : route('gam.dashboard', ['team_id' => $team->id]))
+        ->assertOk()->assertSee('Open Possible DQ Watchlist');
+    $this->get(route($role.'.possible-dq.index'))->assertOk()->assertSee($student->full_name)->assertSee('More than 2 events registered.');
+
+    $corrected = [$events->first()->id];
+    $this->put($url, $role === 'admin' ? studentSportSavePayload($student, $corrected) : ['edition_sport_ids' => $corrected])
+        ->assertSessionHasNoErrors()->assertSessionMissing('participation_warning');
+    $this->get(route($role.'.possible-dq.index'))->assertOk()->assertDontSee($student->student_number);
+
+    // Use a course so automatic admin faction assignment is unambiguous.
+    $course = \App\Models\Course::create(['name' => 'Multiple sport course', 'code' => 'MULTI', 'status' => 'active']);
+    $team->update(['course_id' => $course->id]);
+    $payload = ['first_name' => 'Multiple Sports', 'last_name' => 'New Player', 'gender' => 'Male', 'course_id' => $course->id, 'school_year' => $edition->school_year, 'year_level' => '1st', 'section' => 'A', 'status' => 'active', 'edition_sport_ids' => $ids];
+    $url = $role === 'admin' ? route('admin.students.store') : route('gam.teams.players.store', $team);
+    $this->post($url, $payload)->assertSessionHasNoErrors()->assertSessionHas('participation_warning')->assertRedirect();
+    $newPlayer = Student::where('first_name', 'Multiple Sports')->sole();
+    expect($newPlayer->athleteEntries()->where('status', 'active')->count())->toBe(6)
+        ->and(app(EligibilityService::class)->evaluateStudent($newPlayer, $edition)['possible_dq'])->toBeTrue();
+})->with(['admin', 'gam']);
 
 test('GAM saves selected sports while preserving cultural registrations and selected doubles', function () {
     [, $edition, $team, $student] = playerSaveScenario();

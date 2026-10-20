@@ -39,7 +39,7 @@
                     </article>
                 @endforeach
             </div>
-            <p class="mt-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">Students outside these combinations are marked red as Possible DQ so the team can correct the registration before scoring.</p>
+            <p class="mt-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">Sports can be saved even when these rules are exceeded. Students outside these combinations, or relay runners without a qualifying run, are flagged as Possible DQ so the team can review the registration before scoring.</p>
         </div>
 
         <div class="rounded-lg border border-slate-200 bg-white p-4 shadow-sm sm:p-6">

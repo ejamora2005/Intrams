@@ -550,7 +550,6 @@ class SportController extends Controller
         $students = Student::query()->where('status', 'active')->whereIn('id', $data['student_ids'])->get();
         abort_unless($students->count() === count($data['student_ids']), 422, 'Only active students can be assigned.');
         $this->eligibilityService->assertStudentsMatchSportCategory($students, $sport);
-        $this->eligibilityService->assertStudentsCanJoin($students, $edition, $editionSport);
 
         if ($requiresTeam) {
             $roster = TeamMember::query()->where('team_id', $team->id)->pluck('student_id');
@@ -591,7 +590,10 @@ class SportController extends Controller
             }
         });
 
-        return redirect()->route('admin.sports.participants', ['sport' => $sport, 'edition_id' => $edition->id])->with('success', $students->count().' participant(s) registered for '.$sport->name.'.');
+        return redirect()->route('admin.sports.participants', ['sport' => $sport, 'edition_id' => $edition->id])->with([
+            'success' => $students->count().' participant(s) registered for '.$sport->name.'.',
+            'participation_warning' => $this->eligibilityService->registrationWarningForStudents($students, $edition),
+        ]);
     }
 
     private function completePairKeys(EditionSport $editionSport): \Illuminate\Support\Collection

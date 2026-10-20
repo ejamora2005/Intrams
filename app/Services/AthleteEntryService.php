@@ -94,12 +94,6 @@ class AthleteEntryService
             ]);
         }
 
-        // When a runner and a relay are selected together, create the running
-        // entry first so the relay eligibility check can confirm the requirement.
-        $editionSports = $editionSports
-            ->sortBy(fn (EditionSport $editionSport): int => $this->eligibilityService->isRelayEvent($editionSport) ? 1 : 0)
-            ->values();
-
         // Athlete entries are retained as inactive history and the database
         // enforces one row per student/sport. Re-selecting a sport must
         // reactivate that historical row instead of attempting a duplicate
@@ -136,10 +130,9 @@ class AthleteEntryService
             }
         }
 
-        return $editionSports->map(function (EditionSport $editionSport) use ($student, $edition, $team, $existingEntries): AthleteEntry {
+        return $editionSports->map(function (EditionSport $editionSport) use ($student, $team, $existingEntries): AthleteEntry {
             try {
                 $this->eligibilityService->assertStudentsMatchSportCategory(collect([$student]), $editionSport->sport);
-                $this->eligibilityService->assertStudentsCanJoin(collect([$student]), $edition, $editionSport);
             } catch (ValidationException $exception) {
                 throw ValidationException::withMessages([
                     'edition_sport_ids' => collect($exception->errors())->flatten()->implode(' '),
