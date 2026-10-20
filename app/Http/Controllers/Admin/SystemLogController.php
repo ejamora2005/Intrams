@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\AuditLog;
+use App\Models\EditionSport;
 use App\Models\User;
+use App\Services\ActivityJournal;
 use App\Services\ActivitySanitizer;
 use Carbon\CarbonImmutable;
 use Illuminate\Http\Request;
@@ -13,21 +15,22 @@ use Illuminate\View\View;
 
 class SystemLogController extends Controller
 {
-    public function index(Request $request): View
+    public function index(Request $request, ActivityJournal $journal): View
     {
-        $roles = ['admin' => 'Admin', 'gam' => 'GAM', 'tabulator' => 'Tabulator', 'coordinator' => 'Coordinator'];
+        $roles = ['admin' => 'Administrator', 'gam' => 'General Athletics Manager (GAM)', 'tabulator' => 'Tabulator', 'coordinator' => 'Coordinator'];
         $filters = $request->validate([
             'search' => ['nullable', 'string', 'max:150'],
             'actor_id' => ['nullable', 'integer'],
             'role' => ['nullable', Rule::in(array_keys($roles))],
             'action' => ['nullable', 'string', 'max:150'],
+            'activity' => ['nullable', Rule::in(array_keys(ActivityJournal::TYPES))],
             'outcome' => ['nullable', Rule::in(['success', 'denied', 'failed'])],
             'from' => ['nullable', 'date_format:Y-m-d'],
             'to' => ['nullable', 'date_format:Y-m-d'],
             'request_id' => ['nullable', 'uuid'],
         ]);
-        $timezone = 'Asia/Shanghai';
-        $query = AuditLog::query()
+        $timezone = 'Asia/Manila';
+        $query = $journal->query()
             ->with('user:id,name,email')
             ->when($request->filled('actor_id'), fn ($query) => $query->where('user_id', $request->integer('actor_id')))
             ->when($request->filled('role'), fn ($query) => $query->where('actor_role', $request->string('role')->value()))
@@ -42,7 +45,14 @@ class SystemLogController extends Controller
                     ->orWhere('request_id', 'like', $search)->orWhere('ip_address', 'like', $search)
                     ->orWhere('new_values', 'like', $search)->orWhere('old_values', 'like', $search)
                     ->orWhereHas('user', fn ($users) => $users->where('name', 'like', $search)->orWhere('email', 'like', $search));
+                $eventIds = EditionSport::query()->whereHas('sport', fn ($sports) => $sports->withTrashed()->where('name', 'like', $search))->pluck('id');
+                if ($eventIds->isNotEmpty()) {
+                    $inner->orWhereIn('new_values->request->input->edition_sport_id', $eventIds);
+                }
             }));
+        if ($request->filled('activity')) {
+            $journal->filter($query, $filters['activity']);
+        }
         $summary = (clone $query)->reorder()->selectRaw('COUNT(*) AS total, SUM(outcome = ?) AS successful, SUM(outcome IN (?, ?)) AS issues', ['success', 'failed', 'denied'])->first();
         $logs = $query
             ->latest('created_at')
@@ -53,6 +63,8 @@ class SystemLogController extends Controller
             $log->old_values = app(ActivitySanitizer::class)->sanitize($log->old_values);
             $log->new_values = app(ActivitySanitizer::class)->sanitize($log->new_values);
         });
+        $presentations = $journal->presentations($logs->getCollection());
+        $logs->getCollection()->each(fn (AuditLog $log, $index) => $log->setAttribute('presentation', $presentations[$index]));
 
         return view('admin.system-logs.index', [
             'logs' => $logs,
@@ -61,6 +73,7 @@ class SystemLogController extends Controller
             'roles' => $roles,
             'summary' => $summary,
             'timezone' => $timezone,
+            'activityTypes' => ActivityJournal::TYPES,
         ]);
     }
 }

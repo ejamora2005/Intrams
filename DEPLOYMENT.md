@@ -2,6 +2,12 @@
 
 This project is ready for a Dokploy Docker Compose deployment on `slsubc.tech`.
 
+## Formal activity register
+
+System Logs displays record changes, approvals, winner declarations, and result revisions in readable language. Page visits, searches, authentication, score-sheet downloads, and unchanged saves are omitted from this view. Related audit rows from the same save appear as one activity. Staff, role, activity, status, search and Philippine date filters apply to this register.
+
+Future changes save readable event, player and winner names alongside the existing audit context so later renaming does not rewrite the displayed history. Older entries use their stored fields and available related records. Existing technical audit history is retained for diagnostics; no logs, competition results, player records, or scores are deleted or reset. No migration or seeder is required.
+
 ## Admin medical approvals
 
 Admin → Medical Approvals provides searchable player clearances with faction and event-status filters, review creation, viewing, editing, and confirmed removal. Administrators select the required sport registrations to mark Pending, Approved, or Rejected, with optional notes. It shares the existing certificate fields with GAM; Approved corresponds to the existing `verified` state. No migration, seeder, or reset is required.

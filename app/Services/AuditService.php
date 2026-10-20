@@ -41,6 +41,15 @@ class AuditService
     {
         $subject = collect($request->route()?->parameters() ?? [])->first(fn ($value) => $value instanceof Model);
         $action = 'request.'.($request->route()?->getName() ?: strtolower($request->method()).'.'.($request->route()?->uri() ?? 'unknown'));
+        try {
+            $snapshot = app(ActivityJournal::class)->snapshot($action, $subject, $details);
+            if ($snapshot !== null) {
+                $details['activity'] = $snapshot;
+            }
+        } catch (Throwable) {
+            // Related records may already be unavailable. Preserve the original
+            // audit data even if a readable summary cannot be prepared.
+        }
         $this->write($action, $subject, null, $details, $outcome, $actor, $request);
     }
 

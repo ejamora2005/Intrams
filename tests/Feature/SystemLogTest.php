@@ -13,7 +13,7 @@ test('administrators can browse and filter system activity logs', function () {
     ]);
 
     $this->actingAs($admin)->get(route('admin.system-logs.index', ['role' => 'admin']))
-        ->assertOk()->assertSee('student.created')->assertDontSee('result.submitted');
+        ->assertOk()->assertSee('Student created')->assertDontSee('Result submission submitted');
 });
 
 test('coordinators cannot browse system activity logs', function () {
@@ -29,18 +29,20 @@ test('logs can filter gam and tabulator and search actors and change details', f
     app(\App\Services\AuditService::class)->record('medical.reviewed', newValues: ['player' => 'Find This Player'], actor: $gam);
     app(\App\Services\AuditService::class)->record('sport.winners', actor: $tabulator);
     $this->actingAs($admin)->get(route('admin.system-logs.index', ['role' => 'gam', 'search' => 'Find This Player']))
-        ->assertOk()->assertSee('medical.reviewed')->assertDontSee('sport.winners');
-    $this->get(route('admin.system-logs.index', ['role' => 'tabulator']))->assertOk()->assertSee('sport.winners')->assertDontSee('medical.reviewed');
-    $this->get(route('admin.system-logs.index', ['search' => 'Searchable GAM']))->assertOk()->assertSee('medical.reviewed');
+        ->assertOk()->assertSee('Medical review updated')->assertSee('Find This Player')->assertDontSee('Event winners declared');
+    $this->get(route('admin.system-logs.index', ['role' => 'tabulator']))->assertOk()->assertSee('Event winners declared')->assertDontSee('Medical review updated');
+    $this->get(route('admin.system-logs.index', ['search' => 'Searchable GAM']))->assertOk()->assertSee('Medical review updated');
 });
 
 test('log date filters use the displayed local day and legacy values are redacted', function () {
     $admin = User::factory()->create(['role' => 'admin', 'status' => 'active']);
     DB::table('audit_logs')->insert([
-        ['action' => 'local.day.start', 'auditable_type' => 'User', 'created_at' => '2026-10-18 16:30:00', 'new_values' => json_encode(['password' => 'legacy-secret-do-not-show']), 'outcome' => 'success'],
-        ['action' => 'previous.day', 'auditable_type' => 'User', 'created_at' => '2026-10-18 15:59:00', 'new_values' => null, 'outcome' => 'success'],
+        ['action' => 'student.created', 'auditable_type' => 'Student', 'created_at' => '2026-10-18 16:30:00', 'new_values' => json_encode(['first_name' => 'Local', 'last_name' => 'Start', 'password' => 'legacy-secret-do-not-show']), 'outcome' => 'success'],
+        ['action' => 'student.created', 'auditable_type' => 'Student', 'created_at' => '2026-10-18 15:59:00', 'new_values' => json_encode(['first_name' => 'Previous', 'last_name' => 'Day']), 'outcome' => 'success'],
     ]);
-    $this->actingAs($admin)->get(route('admin.system-logs.index', ['from' => '2026-10-19', 'to' => '2026-10-19']))
-        ->assertOk()->assertSee('local.day.start')->assertDontSee('previous.day')->assertDontSee('legacy-secret-do-not-show')->assertSee('[redacted]');
+    $response = $this->actingAs($admin)->get(route('admin.system-logs.index', ['from' => '2026-10-19', 'to' => '2026-10-19']));
+    expect($response->viewData('logs')->pluck('presentation.subject')->all())->toBe(['Local Start']);
+    $response
+        ->assertOk()->assertSee('Local Start')->assertDontSee('Previous Day')->assertDontSee('legacy-secret-do-not-show')->assertDontSee('[redacted]');
     $this->get(route('admin.system-logs.index', ['from' => 'not-a-date']))->assertSessionHasErrors('from');
 });
