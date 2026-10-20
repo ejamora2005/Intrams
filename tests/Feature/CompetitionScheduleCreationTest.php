@@ -49,10 +49,10 @@ beforeEach(function () {
 
 test('live competition links to a usable schedule creation form', function () {
     $event = scheduleCreationEvent();
-    $this->get(route('admin.competition.index'))->assertOk()->assertSee(route('admin.competition.create'));
-    $this->get(route('admin.competition.create'))->assertOk()
+    $this->get(route('admin.schedules.matches.index'))->assertOk()->assertSee(route('admin.schedules.matches.create'));
+    $this->get(route('admin.schedules.matches.create'))->assertOk()
         ->assertSee('Add a schedule')->assertSee('datetime-local', false)->assertSee($event->sport->name)
-        ->assertSee('Search participants')->assertSee(route('admin.competition.schedules.store'));
+        ->assertSee('Search participants')->assertSee(route('admin.schedules.matches.store'));
 });
 
 test('administrators add a schedule with exact times registered teams facilitator and audit trail', function () {
@@ -67,11 +67,11 @@ test('administrators add a schedule with exact times registered teams facilitato
     ]);
     $before = $existing->fresh()->getAttributes();
 
-    $response = $this->post(route('admin.competition.schedules.store'), scheduleCreationData($event, [
+    $response = $this->post(route('admin.schedules.matches.store'), scheduleCreationData($event, [
         'participants' => $teams->map(fn ($team) => 'team:'.$team->id)->all(), 'coordinator_id' => $coordinator->id,
     ]))->assertSessionHasNoErrors();
     $schedule = CompetitionSchedule::where('title', 'Finals')->firstOrFail();
-    $response->assertRedirect(route('admin.competition.index', ['page' => 1]).'#schedule-'.$schedule->id);
+    $response->assertRedirect(route('admin.schedules.matches.index', ['page' => 1]).'#schedule-'.$schedule->id);
     expect($schedule->starts_at->format('Y-m-d H:i'))->toBe('2026-10-20 14:35')
         ->and($schedule->ends_at->format('H:i'))->toBe('16:10')
         ->and($schedule->venue)->toBe('MPCC')->and($schedule->coordinator_id)->toBe($coordinator->id)
@@ -90,7 +90,7 @@ test('administrators add a schedule with exact times registered teams facilitato
 test('track and field schedules select registered athletes and default to the oval without generating brackets', function () {
     $event = scheduleCreationEvent('100M-RUN-MEN', 'individual');
     $entry = scheduleCreationEntry($event);
-    $this->post(route('admin.competition.schedules.store'), scheduleCreationData($event, ['participants' => ['entry:'.$entry->id]]))
+    $this->post(route('admin.schedules.matches.store'), scheduleCreationData($event, ['participants' => ['entry:'.$entry->id]]))
         ->assertSessionHasNoErrors();
     $schedule = CompetitionSchedule::sole();
     expect($schedule->venue)->toBe('Field/Oval')->and($schedule->participants->sole()->athlete_entry_id)->toBe($entry->id);
@@ -103,7 +103,7 @@ test('selecting a registered doubles pair includes both players', function () {
     $pairKey = (string) Str::uuid();
     $one = scheduleCreationEntry($event, null, ['pair_key' => $pairKey]);
     $two = scheduleCreationEntry($event, null, ['pair_key' => $pairKey]);
-    $this->post(route('admin.competition.schedules.store'), scheduleCreationData($event, ['participants' => ['pair:'.$pairKey]]))
+    $this->post(route('admin.schedules.matches.store'), scheduleCreationData($event, ['participants' => ['pair:'.$pairKey]]))
         ->assertSessionHasNoErrors();
     expect(CompetitionSchedule::sole()->participants->pluck('athlete_entry_id')->sort()->values()->all())->toBe([$one->id, $two->id]);
 });
@@ -114,7 +114,7 @@ test('cultural schedules include every active faction even without cultural spor
         Team::create(['edition_id' => $event->edition_id, 'name' => $name, 'code' => Str::slug($name), 'status' => 'active']);
     }
     Team::create(['edition_id' => $event->edition_id, 'name' => 'Inactive', 'code' => 'INACTIVE', 'status' => 'inactive']);
-    $this->post(route('admin.competition.schedules.store'), scheduleCreationData($event))->assertSessionHasNoErrors();
+    $this->post(route('admin.schedules.matches.store'), scheduleCreationData($event))->assertSessionHasNoErrors();
     expect(CompetitionSchedule::sole()->participants)->toHaveCount(3);
     expect(app(PublicScheduleService::class)->today('2026-10-20')['todaySchedules']->sole()['category'])->toBe('cultural');
     $this->assertDatabaseCount('athlete_entries', 0);
@@ -123,8 +123,8 @@ test('cultural schedules include every active faction even without cultural spor
 test('school activities require a title and appear separately from sports', function () {
     $event = scheduleCreationEvent('CULT-FESTIVAL-PROGRAM');
     Team::create(['edition_id' => $event->edition_id, 'name' => 'Sea Dragons', 'code' => 'SEA', 'status' => 'active']);
-    $this->post(route('admin.competition.schedules.store'), scheduleCreationData($event, ['title' => '   ']))->assertSessionHasErrors('title');
-    $this->post(route('admin.competition.schedules.store'), scheduleCreationData($event, ['title' => 'Ruperto Run 2026', 'venue' => 'Field/Oval']))
+    $this->post(route('admin.schedules.matches.store'), scheduleCreationData($event, ['title' => '   ']))->assertSessionHasErrors('title');
+    $this->post(route('admin.schedules.matches.store'), scheduleCreationData($event, ['title' => 'Ruperto Run 2026', 'venue' => 'Field/Oval']))
         ->assertSessionHasNoErrors();
     expect(CompetitionSchedule::sole()->is_activity)->toBeTrue()
         ->and(app(PublicScheduleService::class)->today('2026-10-20')['todaySchedules']->sole())
@@ -134,17 +134,17 @@ test('school activities require a title and appear separately from sports', func
 
 test('editing a new schedule requires an end time instead of failing a database constraint', function () {
     $event = scheduleCreationEvent();
-    $this->post(route('admin.competition.schedules.store'), scheduleCreationData($event))->assertSessionHasNoErrors();
+    $this->post(route('admin.schedules.matches.store'), scheduleCreationData($event))->assertSessionHasNoErrors();
     $schedule = CompetitionSchedule::sole();
-    $this->put(route('admin.competition.schedules.update', $schedule), scheduleCreationData($event, ['ends_at' => '', 'venue' => 'MPCC']))
+    $this->put(route('admin.schedules.matches.update', $schedule), scheduleCreationData($event, ['ends_at' => '', 'venue' => 'MPCC']))
         ->assertSessionHasErrors('ends_at');
     expect($schedule->fresh()->ends_at->format('H:i'))->toBe('16:10');
 });
 
 test('invalid dates times venues and facilitators do not save any schedule', function (array $overrides, string $field) {
     $event = scheduleCreationEvent();
-    $this->from(route('admin.competition.create'))->post(route('admin.competition.schedules.store'), scheduleCreationData($event, $overrides))
-        ->assertRedirect(route('admin.competition.create'))->assertSessionHasErrors($field)->assertSessionHasInput('title', 'Finals');
+    $this->from(route('admin.schedules.matches.create'))->post(route('admin.schedules.matches.store'), scheduleCreationData($event, $overrides))
+        ->assertRedirect(route('admin.schedules.matches.create'))->assertSessionHasErrors($field)->assertSessionHasInput('title', 'Finals');
     $this->assertDatabaseCount('competition_schedules', 0);
     $this->assertDatabaseCount('schedule_participants', 0);
 })->with([
@@ -163,7 +163,7 @@ test('participants from another event withdrawn entries and wrong genders are re
     if ($kind === 'gender') {
         $entry->student->update(['gender' => 'Female']);
     }
-    $this->post(route('admin.competition.schedules.store'), scheduleCreationData($event, ['participants' => ['entry:'.$entry->id]]))
+    $this->post(route('admin.schedules.matches.store'), scheduleCreationData($event, ['participants' => ['entry:'.$entry->id]]))
         ->assertSessionHasErrors('participants');
     $this->assertDatabaseCount('competition_schedules', 0);
 })->with(['other', 'withdrawn', 'gender']);
@@ -171,18 +171,18 @@ test('participants from another event withdrawn entries and wrong genders are re
 test('only available current events in the chosen edition can be scheduled', function () {
     $open = scheduleCreationEvent('BASKET-5X5');
     $men = scheduleCreationEvent('BASKET-5X5-MEN', 'team', $open->edition);
-    $this->get(route('admin.competition.create'))->assertOk()->assertViewHas('events', fn ($events) => $events->modelKeys() === [$men->id]);
-    $this->post(route('admin.competition.schedules.store'), scheduleCreationData($open))->assertSessionHasErrors('edition_sport_id');
+    $this->get(route('admin.schedules.matches.create'))->assertOk()->assertViewHas('events', fn ($events) => $events->modelKeys() === [$men->id]);
+    $this->post(route('admin.schedules.matches.store'), scheduleCreationData($open))->assertSessionHasErrors('edition_sport_id');
     $men->update(['status' => 'archived']);
-    $this->post(route('admin.competition.schedules.store'), scheduleCreationData($men))->assertSessionHasErrors('edition_sport_id');
+    $this->post(route('admin.schedules.matches.store'), scheduleCreationData($men))->assertSessionHasErrors('edition_sport_id');
     $men->edition->update(['status' => 'closed']);
-    $this->post(route('admin.competition.schedules.store'), scheduleCreationData($men))->assertSessionHasErrors('edition_id');
+    $this->post(route('admin.schedules.matches.store'), scheduleCreationData($men))->assertSessionHasErrors('edition_id');
     $this->assertDatabaseCount('competition_schedules', 0);
 });
 
 test('sports can be scheduled before participants are announced', function () {
     $event = scheduleCreationEvent();
-    $this->post(route('admin.competition.schedules.store'), scheduleCreationData($event))->assertSessionHasNoErrors();
+    $this->post(route('admin.schedules.matches.store'), scheduleCreationData($event))->assertSessionHasNoErrors();
     expect(CompetitionSchedule::sole()->participants)->toBeEmpty();
     expect(app(PublicScheduleService::class)->today('2026-10-20')['todaySchedules']->sole()['competitors'])->toBe('To be announced');
 });
@@ -194,24 +194,24 @@ test('new schedule redirect opens the correct page when many schedules already e
             'edition_sport_id' => $event->id, 'starts_at' => '2026-10-19 08:00', 'ends_at' => '2026-10-19 10:00', 'status' => 'scheduled',
         ]);
     }
-    $response = $this->from(route('admin.competition.create'))
-        ->post(route('admin.competition.schedules.store'), scheduleCreationData($event))->assertSessionHasNoErrors();
+    $response = $this->from(route('admin.schedules.matches.create'))
+        ->post(route('admin.schedules.matches.store'), scheduleCreationData($event))->assertSessionHasNoErrors();
     $schedule = CompetitionSchedule::where('title', 'Finals')->sole();
-    $response->assertRedirect(route('admin.competition.index', ['page' => 2]).'#schedule-'.$schedule->id);
-    $this->get(route('admin.competition.index', ['page' => 2]))->assertOk()->assertSee('id="schedule-'.$schedule->id.'"', false);
+    $response->assertRedirect(route('admin.schedules.matches.index', ['page' => 2]).'#schedule-'.$schedule->id);
+    $this->get(route('admin.schedules.matches.index', ['page' => 2]))->assertOk()->assertSee('id="schedule-'.$schedule->id.'"', false);
 });
 
 test('schedule creation handles editions with no configured events and no editions', function () {
-    $this->get(route('admin.competition.create'))->assertOk()->assertSee('Create a draft or active edition');
+    $this->get(route('admin.schedules.matches.create'))->assertOk()->assertSee('Create a draft or active edition');
     $event = scheduleCreationEvent();
     $event->delete();
-    $this->get(route('admin.competition.create'))->assertOk()->assertSee('No available events');
+    $this->get(route('admin.schedules.matches.create'))->assertOk()->assertSee('No available events');
 });
 
 test('schedule creation is restricted to administrators', function (string $role) {
     $event = scheduleCreationEvent();
     $this->actingAs(User::factory()->create(['role' => $role, 'status' => 'active']));
-    $this->get(route('admin.competition.create'))->assertForbidden();
-    $this->post(route('admin.competition.schedules.store'), scheduleCreationData($event))->assertForbidden();
+    $this->get(route('admin.schedules.matches.create'))->assertForbidden();
+    $this->post(route('admin.schedules.matches.store'), scheduleCreationData($event))->assertForbidden();
     $this->assertDatabaseCount('competition_schedules', 0);
 })->with(['gam', 'tabulator', 'coordinator']);

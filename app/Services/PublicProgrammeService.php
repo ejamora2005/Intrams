@@ -131,7 +131,7 @@ class PublicProgrammeService
     }
 
     /** @return array<int, array<string, mixed>> */
-    public function matchupsFor(array $games, array $teams): array
+    public function matchupsFor(array $games, array $teams, ?Collection $matches = null): array
     {
         $participant = function (?string $reference) use ($teams): array {
             if (isset($teams[$reference])) {
@@ -144,9 +144,66 @@ class PublicProgrammeService
             return ['name' => 'To be announced', 'short' => 'TBA', 'logo_path' => null];
         };
 
-        return collect($games)->values()->map(fn (array $game, int $index): array => [
-            'number' => $index + 1, 'home' => $participant($game['home'] ?? null), 'away' => $participant($game['away'] ?? null),
-        ])->all();
+        return collect($games)->values()->flatMap(function (array $game, int $index) use ($participant, $matches): array {
+            $row = ['number' => $index + 1, 'home' => $participant($game['home'] ?? null), 'away' => $participant($game['away'] ?? null)];
+            $linked = app(ScheduleBracketService::class)->linkedMatches($game, $matches ?? collect());
+            if ($linked->isEmpty()) {
+                return [$row];
+            }
+            $service = app(ScheduleBracketService::class);
+
+            return $linked->map(fn ($match): array => [
+                ...$row,
+                'home' => empty($game['manual_teams']) ? $service->participant($match, 'home') : $row['home'],
+                'away' => empty($game['manual_teams']) ? $service->participant($match, 'away') : $row['away'],
+                'bracket_label' => $match->editionSport->sport->name.' · Round '.$match->round_number,
+                'bracket_url' => route('admin.sports.bracket', ['sport' => $match->editionSport->sport_id, 'edition_id' => $match->editionSport->edition_id]),
+                'schedule_url' => route('admin.schedules.matches.create', ['bracket_match_id' => $match->id, 'edition_id' => $match->editionSport->edition_id, 'edition_sport_id' => $match->edition_sport_id]),
+                'scheduled_time' => $match->schedule?->starts_at->format('M j, g:i A'),
+                'scheduled_venue' => $match->schedule?->venue,
+                'schedule_status' => $match->schedule?->status,
+                'winner' => $match->status === 'completed' ? ($match->winnerCompetitor?->label ?: $match->winner?->name) : null,
+            ])->values()->all();
+        })->all();
+    }
+
+    /** @return array<string, mixed> */
+    public function createEvent(IntramuralEdition $edition, array $attributes, User $actor): array
+    {
+        return DB::transaction(function () use ($edition, $attributes, $actor): array {
+            IntramuralEdition::whereKey($edition->id)->lockForUpdate()->firstOrFail();
+            $programme = PublicProgramme::where('edition_id', $edition->id)->lockForUpdate()->first();
+            $events = $programme ? collect($programme->events) : $this->initialEvents();
+            $key = bin2hex(random_bytes(12));
+            if (isset($attributes['games'])) {
+                app(ScheduleBracketService::class)->saveGameTimes($edition, $attributes['games'], $attributes['venue'] ?? null);
+                $attributes['games'] = app(ScheduleBracketService::class)->storedGames($attributes['games']);
+            }
+            $event = ['venue' => null, 'starts_at' => null, 'ends_at' => null, ...$attributes, 'key' => $key, 'cells' => 'admin:'.$key, 'version' => 1, 'position' => ($events->max('position') ?? -1) + 1, 'games' => $attributes['games'] ?? []];
+            $events->push($event);
+            $programme ??= new PublicProgramme(['edition_id' => $edition->id, 'source' => [...config('public_programme.source'), 'applied_updates' => [config('public_programme_games.id')]]]);
+            $programme->fill(['events' => $events->values()->all(), 'updated_by' => $actor->id])->save();
+            app(AuditService::class)->record('public_schedule.created', $programme, null, ['event' => $event], actor: $actor);
+
+            return $event;
+        });
+    }
+
+    public function deleteEvent(IntramuralEdition $edition, string $key, int $version, User $actor): void
+    {
+        DB::transaction(function () use ($edition, $key, $version, $actor): void {
+            IntramuralEdition::whereKey($edition->id)->lockForUpdate()->firstOrFail();
+            $programme = PublicProgramme::where('edition_id', $edition->id)->lockForUpdate()->first();
+            $events = $programme ? collect($programme->events) : $this->initialEvents();
+            $event = $events->firstWhere('key', $key);
+            abort_unless($event, 404);
+            if ((int) $event['version'] !== $version) {
+                throw ValidationException::withMessages(['version' => 'This schedule changed. Reload Schedules before deleting it.']);
+            }
+            $programme ??= new PublicProgramme(['edition_id' => $edition->id, 'source' => [...config('public_programme.source'), 'applied_updates' => [config('public_programme_games.id')]]]);
+            $programme->fill(['events' => $events->reject(fn ($row) => $row['key'] === $key)->values()->all(), 'updated_by' => $actor->id])->save();
+            app(AuditService::class)->record('public_schedule.deleted', $programme, ['event' => $event], null, actor: $actor);
+        });
     }
 
     /** @return array<string, mixed> */
@@ -164,6 +221,10 @@ class PublicProgrammeService
             if ((int) $before['version'] !== $version) {
                 throw ValidationException::withMessages(['version' => 'Another administrator updated this schedule. Reload the Schedules page before saving again.']);
             }
+            if (isset($attributes['games'])) {
+                app(ScheduleBracketService::class)->saveGameTimes($edition, $attributes['games'], $attributes['venue'] ?? $before['venue']);
+                $attributes['games'] = app(ScheduleBracketService::class)->storedGames($attributes['games']);
+            }
             $updated = [...$before, ...$attributes, 'version' => $version + 1];
             $events[$index] = $updated;
             $programme ??= new PublicProgramme(['edition_id' => $edition->id, 'source' => [...config('public_programme.source'), 'applied_updates' => [config('public_programme_games.id')]]]);
@@ -179,9 +240,10 @@ class PublicProgrammeService
     public function forDate(IntramuralEdition $edition, string $date, Collection $factions): Collection
     {
         $teams = $this->teamOptions($edition);
+        $matches = app(ScheduleBracketService::class)->matches($edition);
 
         return $this->eventsFor($edition)->where('is_published', true)->where('date', $date)
-            ->map(function (array $event) use ($factions, $teams): array {
+            ->map(function (array $event) use ($factions, $teams, $matches): array {
                 $category = $event['category'] ?? 'sports';
                 $isCultural = $category === 'cultural';
 
@@ -191,7 +253,7 @@ class PublicProgrammeService
                     'sport_group' => null,
                     'sport_group_label' => null,
                     'game' => '',
-                    'matchups' => $this->matchupsFor($event['games'] ?? [], $teams),
+                    'matchups' => $this->matchupsFor($event['games'] ?? [], $teams, $matches),
                     'time' => isset($event['starts_at']) ? $this->formatTime($event['starts_at']) : $event['session'],
                     'cutoff' => isset($event['ends_at']) ? 'Until '.$this->formatTime($event['ends_at']) : null,
                     'period' => match ($event['session']) {

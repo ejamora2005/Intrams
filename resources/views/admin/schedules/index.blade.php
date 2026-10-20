@@ -1,7 +1,9 @@
 @extends('layouts.admin', ['title' => 'Schedules', 'subtitle' => 'Manage the events shown on the public timetable. Times use Philippine time (UTC+8).'])
 
 @section('content')
+    @include('admin.schedules._tabs', ['activeTab' => 'public'])
     <x-ops-feedback />
+    @if ($errors->any() && old('schedule_action') === 'create')<span data-ops-auto-modal="add-public-schedule"></span>@endif
     @if ($errors->any() && is_string(old('entry_key')) && preg_match('/^[a-f0-9]{24}$/', old('entry_key')))
         <span data-ops-auto-modal="edit-public-schedule-{{ old('entry_key') }}"></span>
     @endif
@@ -13,7 +15,10 @@
                 <h2 class="mt-1 text-xl font-semibold text-slate-950">{{ $edition?->name ?? 'No active intramurals edition' }}</h2>
                 <p class="mt-2 text-sm text-slate-500">Edit an event below. Published changes appear immediately on the public schedule.</p>
             </div>
-            <a href="{{ route('public.schedule', ['date' => $date ?: now('Asia/Manila')->toDateString()]) }}" target="_blank" rel="noopener" class="inline-flex w-fit shrink-0 justify-center rounded-lg bg-blue-700 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-800">View public schedule</a>
+            <div class="flex flex-wrap gap-2">
+                @if ($available)<button type="button" data-ops-modal-open="add-public-schedule" class="rounded-lg bg-blue-700 px-4 py-2.5 text-sm font-semibold text-white">+ Add public schedule</button>@endif
+                <a href="{{ route('public.schedule', ['date' => $date ?: now('Asia/Manila')->toDateString()]) }}" target="_blank" rel="noopener" class="inline-flex w-fit shrink-0 justify-center rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700">View public schedule</a>
+            </div>
         </div>
         @if ($available)
             <form method="GET" action="{{ route('admin.schedules.index') }}" class="mt-5 grid gap-3 border-t border-slate-200 pt-5 sm:grid-cols-2 xl:grid-cols-4">
@@ -40,6 +45,18 @@
             <p class="mt-3 text-sm text-slate-500">Showing {{ $visibleCount }} of {{ $total }} sessions</p>
         @endif
     </section>
+
+    @if ($available)
+        @php
+            $key = 'create'; $modalId = 'add-public-schedule'; $editing = old('schedule_action') === 'create';
+            $defaultDate = $date ?: now('Asia/Manila')->toDateString();
+            $defaultDate = max(config('public_programme.starts_on'), min(config('public_programme.ends_on'), $defaultDate));
+            $defaults = ['event' => '', 'date' => $defaultDate, 'session' => 'AM', 'category' => 'sports', 'venue' => '', 'is_published' => true];
+            $value = function ($field, $default = null) use ($editing, $defaults) { $input = $editing ? old($field, $defaults[$field] ?? $default) : ($defaults[$field] ?? $default); return is_scalar($input) || $input === null ? $input : ($defaults[$field] ?? $default); };
+            $gameRows = $editing && is_array(old('games')) ? array_values(array_filter(old('games'), 'is_array')) : [];
+        @endphp
+        @include('admin.schedules._editor', ['creating' => true])
+    @endif
 
     @forelse ($eventsByDate as $day => $events)
         <section class="mt-6" aria-label="{{ \Carbon\Carbon::parse($day)->format('F j') }} schedules">
@@ -73,73 +90,19 @@
                         <p class="mt-3 text-sm font-semibold text-slate-800">{{ $time }} <span class="font-normal text-slate-500">· {{ $period }}</span></p>
                         @if (filled($event['ends_at'] ?? null))<p class="mt-1 text-sm text-slate-500">Until {{ \Carbon\Carbon::createFromFormat('!H:i', $event['ends_at'], 'Asia/Manila')->format('g:i A') }}</p>@endif
                         <p class="mb-5 mt-2 break-words text-sm text-slate-600">Venue: {{ $event['venue'] ?: 'TBA' }}</p>
-                        @if ($event['matchups'])<x-programme-matchups :games="$event['matchups']" />@endif
+                        @if ($event['matchups'])<x-programme-matchups :games="$event['matchups']" :manage="true" />@endif
                         <button type="button" data-ops-modal-open="{{ $modalId }}" class="mt-auto rounded-lg border border-blue-200 bg-blue-50 px-4 py-2.5 text-sm font-semibold text-blue-800 hover:bg-blue-100">Edit schedule</button>
+                        <button type="button" data-ops-modal-open="delete-public-schedule-{{ $key }}" class="mt-2 rounded-lg border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700">Delete schedule</button>
                     </article>
 
-                    <dialog id="{{ $modalId }}" aria-labelledby="{{ $modalId }}-title" data-ops-modal class="w-[min(40rem,calc(100vw-2rem))] max-h-[calc(100dvh-2rem)] overflow-y-auto rounded-2xl border-0 bg-white p-0 text-slate-900 shadow-2xl backdrop:bg-slate-950/60">
-                        <form method="POST" action="{{ route('admin.schedules.update', $key) }}" data-ops-form data-programme-editor>
-                            @csrf
-                            @method('PUT')
-                            <input type="hidden" name="edition_id" value="{{ $edition->id }}">
-                            <input type="hidden" name="entry_key" value="{{ $key }}">
-                            <input type="hidden" name="version" value="{{ $value('version', 0) }}">
-                            <header class="sticky top-0 z-10 flex items-center justify-between gap-4 border-b border-slate-200 bg-white px-5 py-4">
-                                <div><h2 id="{{ $modalId }}-title" class="text-lg font-semibold">Edit schedule</h2><p class="mt-1 text-sm text-slate-500">Times use Philippine time (UTC+8).</p></div>
-                                <button type="button" data-ops-modal-close aria-label="Close edit schedule dialog" class="rounded-lg px-2 py-1 text-xl text-slate-500 hover:bg-slate-100">&times;</button>
-                            </header>
-                            <div class="space-y-4 p-5">
-                                @if ($editing && $errors->any())<div role="alert" class="rounded-lg bg-red-50 p-3 text-sm text-red-800">{{ $errors->first() }}</div>@endif
-                                <label class="block text-sm font-medium">Event name
-                                    <input name="event" value="{{ $value('event') }}" required maxlength="160" class="mt-1 block w-full rounded-lg border-slate-300 px-3 py-2.5 text-sm focus:border-blue-600 focus:ring-blue-600">
-                                </label>
-                                <div class="grid gap-4 sm:grid-cols-2">
-                                    <label class="block text-sm font-medium">Date
-                                        <input name="date" type="date" value="{{ $value('date') }}" min="{{ config('public_programme.starts_on') }}" max="{{ config('public_programme.ends_on') }}" required class="mt-1 block w-full rounded-lg border-slate-300 px-3 py-2.5 text-sm">
-                                    </label>
-                                    <label class="block text-sm font-medium">Session
-                                        <select name="session" class="mt-1 block w-full rounded-lg border-slate-300 py-2.5 text-sm">
-                                            @foreach (['AM' => 'Morning (AM)', 'PM' => 'Afternoon (PM)', 'Evening' => 'Evening'] as $session => $label)<option value="{{ $session }}" @selected($value('session') === $session)>{{ $label }}</option>@endforeach
-                                        </select>
-                                    </label>
-                                    <label class="block text-sm font-medium">Start time <span class="font-normal text-slate-500">(optional)</span>
-                                        <input name="starts_at" type="time" data-public-start-time value="{{ $value('starts_at') }}" class="mt-1 block w-full rounded-lg border-slate-300 px-3 py-2.5 text-sm">
-                                    </label>
-                                    <label class="block text-sm font-medium">End / cutoff time <span class="font-normal text-slate-500">(optional)</span>
-                                        <input name="ends_at" type="time" value="{{ $value('ends_at') }}" class="mt-1 block w-full rounded-lg border-slate-300 px-3 py-2.5 text-sm">
-                                    </label>
-                                    <label class="block text-sm font-medium">Category
-                                        <select name="category" class="mt-1 block w-full rounded-lg border-slate-300 py-2.5 text-sm">
-                                            @foreach (['sports' => 'Sports', 'cultural' => 'Cultural', 'activities' => 'Campus activities'] as $kind => $label)<option value="{{ $kind }}" @selected($value('category') === $kind)>{{ $label }}</option>@endforeach
-                                        </select>
-                                    </label>
-                                    <label class="block text-sm font-medium">Venue
-                                        <input name="venue" value="{{ $value('venue') }}" maxlength="160" placeholder="TBA" list="public-schedule-venues" class="mt-1 block w-full rounded-lg border-slate-300 px-3 py-2.5 text-sm">
-                                    </label>
-                                </div>
-                                <p class="text-xs text-slate-500">Leave the start time blank to show only the selected session.</p>
-                                <section class="border-t border-slate-200 pt-4" aria-label="Edit game matchups">
-                                    <input type="hidden" name="games_present" value="1">
-                                    <div class="flex items-center justify-between gap-3">
-                                        <h3 class="text-base font-semibold">Games / matchups</h3>
-                                        <button type="button" data-programme-game-add class="rounded-lg border border-blue-200 px-3 py-2 text-sm font-semibold text-blue-700">Add game</button>
-                                    </div>
-                                    <p class="mt-2 text-xs text-slate-500">Choose factions or the winner/loser of an earlier game. Logos appear automatically. Changes here update the public timetable.</p>
-                                    <div data-programme-game-list class="mt-3 space-y-3">
-                                        @foreach ($gameRows as $index => $game)
-                                            @include('admin.schedules._game-row', ['index' => $index, 'game' => $game])
-                                        @endforeach
-                                    </div>
-                                    <template data-programme-game-template>@include('admin.schedules._game-row', ['index' => 0, 'game' => []])</template>
-                                    <p data-programme-game-empty class="mt-3 text-sm text-slate-500" @if ($gameRows) hidden @endif>No game matchups yet. Use Add game to set the opponents.</p>
-                                </section>
-                                <input type="hidden" name="is_published" value="0">
-                                <label class="flex items-start gap-3 rounded-lg border border-slate-200 p-3 text-sm font-medium"><input name="is_published" type="checkbox" value="1" @checked((bool) $value('is_published', true)) class="mt-0.5 rounded border-slate-300 text-blue-700 focus:ring-blue-600"><span>Show on the public schedule</span></label>
-                            </div>
-                            <footer class="sticky bottom-0 z-10 flex justify-end gap-2 border-t border-slate-200 bg-slate-50 px-5 py-4">
-                                <button type="button" data-ops-modal-close class="rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-100">Cancel</button>
-                                <button type="submit" data-loading-label="Saving schedule…" class="rounded-lg bg-blue-700 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-800">Save schedule</button>
-                            </footer>
+                    @include('admin.schedules._editor', ['creating' => false])
+                    <dialog id="delete-public-schedule-{{ $key }}" data-ops-modal aria-labelledby="delete-public-title-{{ $key }}" class="w-[min(30rem,calc(100vw-2rem))] rounded-xl border-0 bg-white p-5 text-slate-900 shadow-xl backdrop:bg-slate-950/60">
+                        <form method="POST" action="{{ route('admin.schedules.destroy', $key) }}" data-ops-form>
+                            @csrf @method('DELETE')
+                            <input type="hidden" name="edition_id" value="{{ $edition->id }}"><input type="hidden" name="version" value="{{ $event['version'] }}"><input type="hidden" name="confirmation" value="DELETE">
+                            <h2 id="delete-public-title-{{ $key }}" class="text-lg font-semibold">Delete {{ $event['event'] }}?</h2>
+                            <p class="mt-3 text-sm text-slate-600">This removes this public event. Linked bracket matches, match schedules, participants and recorded results are kept.</p>
+                            <div class="mt-5 flex justify-end gap-2"><button type="button" data-ops-modal-close class="rounded-lg border border-slate-300 px-4 py-2 text-sm">Cancel</button><button type="submit" class="rounded-lg bg-blue-700 px-4 py-2 text-sm font-semibold text-white">Delete schedule</button></div>
                         </form>
                     </dialog>
                 @endforeach

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\UpdatePublicScheduleRequest;
 use App\Models\IntramuralEdition;
 use App\Services\PublicProgrammeService;
+use App\Services\ScheduleBracketService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
@@ -28,7 +29,11 @@ class ProgrammeScheduleController extends Controller
         $available = $edition && $this->programmeService->appliesTo($edition);
         $allEvents = $available ? $this->programmeService->eventsFor($edition) : collect();
         $teamOptions = $this->programmeService->teamOptions($edition);
-        $allEvents = $allEvents->map(fn (array $event): array => [...$event, 'matchups' => $this->programmeService->matchupsFor($event['games'] ?? [], $teamOptions)]);
+        $brackets = app(ScheduleBracketService::class)->matches($edition);
+        $allEvents = $allEvents->map(fn (array $event): array => [...$event, 'games' => collect($event['games'] ?? [])->map(function (array $game) use ($brackets): array {
+            return empty($game['bracket_refs']) ? $game : [...$game, 'bracket_match_ids' => app(ScheduleBracketService::class)->linkedMatches($game, $brackets)->keys()->all()];
+        })->all()]);
+        $allEvents = $allEvents->map(fn (array $event): array => [...$event, 'matchups' => $this->programmeService->matchupsFor($event['games'] ?? [], $teamOptions, $brackets)]);
         $search = trim($filters['search'] ?? '');
         $date = $filters['date'] ?? '';
         $category = $filters['category'] ?? '';
@@ -43,7 +48,29 @@ class ProgrammeScheduleController extends Controller
             'dates' => $allEvents->pluck('date')->unique()->sort()->values(),
             'search' => $search, 'date' => $date, 'category' => $category,
             'teamOptions' => $teamOptions,
+            'bracketOptions' => app(ScheduleBracketService::class)->options($brackets),
         ]);
+    }
+
+    public function store(UpdatePublicScheduleRequest $request): RedirectResponse
+    {
+        $edition = $this->activeEdition();
+        abort_unless($edition && $edition->id === $request->integer('edition_id') && $this->programmeService->appliesTo($edition), 404);
+        $data = Arr::only($request->validated(), ['event', 'date', 'session', 'starts_at', 'ends_at', 'category', 'venue', 'is_published', 'games']);
+        $data['is_published'] = $request->boolean('is_published');
+        $event = $this->programmeService->createEvent($edition, $data, $request->user());
+
+        return redirect()->to(route('admin.schedules.index', ['date' => $event['date']]).'#schedule-'.$event['key'])->with('success', 'Public schedule created.');
+    }
+
+    public function destroy(Request $request, string $entryKey): RedirectResponse
+    {
+        $request->validate(['confirmation' => ['required', 'in:DELETE'], 'edition_id' => ['required', 'integer'], 'version' => ['required', 'integer', 'min:0']]);
+        $edition = $this->activeEdition();
+        abort_unless($edition && $edition->id === $request->integer('edition_id') && $this->programmeService->appliesTo($edition), 404);
+        $this->programmeService->deleteEvent($edition, $entryKey, $request->integer('version'), $request->user());
+
+        return redirect()->route('admin.schedules.index')->with('success', 'Public schedule deleted. Linked bracket matches, scores and match schedules were kept.');
     }
 
     public function update(UpdatePublicScheduleRequest $request, string $entryKey): RedirectResponse

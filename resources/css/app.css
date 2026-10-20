@@ -5,6 +5,9 @@
 .programme-matchups { display: grid; gap: 7px; min-width: 0; margin-block: 12px; }
 .programme-matchup { display: grid; grid-template-columns: 25px minmax(0, 1fr) 18px minmax(0, 1fr); align-items: center; gap: 6px; border: 1px solid #b6c9df30; border-radius: 9px; padding: 9px 7px; background: #ffffff05; }
 .programme-game-number { color: #efd29c; font-size: 11px; font-weight: 700; }
+.programme-game-link { display: flex; flex-wrap: wrap; gap: 6px 10px; color: #b4c6dc; font-size: 11px; line-height: 1.5; }
+.programme-game-link a { color: #efd29c; text-decoration: underline; }
+.ops-dashboard dialog .programme-game-link { color: #334155; }
 .programme-game-vs { color: #9fb6cf; font-size: 10px; text-align: center; }
 .programme-game-team { display: flex; align-items: center; gap: 6px; min-width: 0; color: #e7f1fd; font-size: 12px; font-weight: 600; line-height: 1.35; }
 .programme-game-team > span:last-child { overflow-wrap: anywhere; }

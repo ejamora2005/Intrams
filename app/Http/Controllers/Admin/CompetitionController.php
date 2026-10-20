@@ -3,11 +3,13 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\BracketMatch;
 use App\Models\CompetitionSchedule;
 use App\Models\IntramuralEdition;
 use App\Models\User;
 use App\Services\AuditService;
 use App\Services\CompetitionScheduleOptions;
+use App\Services\ScheduleBracketService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -21,24 +23,32 @@ class CompetitionController extends Controller
 
     public function __construct(private readonly AuditService $auditService) {}
 
-    public function index(): View
+    public function index(Request $request): View
     {
+        $search = trim($request->validate(['search' => ['nullable', 'string', 'max:160']])['search'] ?? '');
+
         return view('admin.competition.index', [
             'schedules' => CompetitionSchedule::with([
                 'editionSport.edition',
                 'editionSport.edition.teams',
                 'editionSport.sport',
-                'bracketMatch',
+                'bracketMatch.competitorOne.team', 'bracketMatch.competitorTwo.team', 'bracketMatch.teamOne', 'bracketMatch.teamTwo',
                 'participants.team',
                 'participants.athleteEntry.student',
-            ])->orderBy('starts_at')->orderBy('id')->paginate(20),
-            'scheduleStatuses' => self::SCHEDULE_STATUSES,
-            'venueOptions' => $this->venueOptions(),
+            ])->when($search !== '', fn ($query) => $query->where(fn ($q) => $q->where('title', 'like', '%'.$search.'%')->orWhere('venue', 'like', '%'.$search.'%')->orWhere('status', 'like', '%'.$search.'%')->orWhereHas('editionSport.sport', fn ($sport) => $sport->where('name', 'like', '%'.$search.'%'))->orWhereHas('participants.team', fn ($team) => $team->where('name', 'like', '%'.$search.'%'))->orWhereHas('bracketMatch.competitorOne', fn ($competitor) => $competitor->where('label', 'like', '%'.$search.'%'))->orWhereHas('bracketMatch.competitorTwo', fn ($competitor) => $competitor->where('label', 'like', '%'.$search.'%'))))->orderBy('starts_at')->orderBy('id')->paginate(20)->withQueryString(),
+            'manageSchedules' => $request->routeIs('admin.schedules.matches.index'),
+            'search' => $search,
         ]);
     }
 
-    public function create(Request $request, CompetitionScheduleOptions $options): View
+    public function create(Request $request, CompetitionScheduleOptions $options): View|RedirectResponse
     {
+        if ($request->integer('bracket_match_id')) {
+            $existing = CompetitionSchedule::where('bracket_match_id', $request->integer('bracket_match_id'))->first();
+            if ($existing) {
+                return redirect()->route('admin.schedules.matches.edit', $existing);
+            }
+        }
         $editions = IntramuralEdition::query()->whereIn('status', ['draft', 'active'])
             ->orderByRaw("status = 'active' desc")->orderByDesc('starts_on')->get();
         $edition = $editions->firstWhere('id', old('edition_id', $request->integer('edition_id'))) ?? $editions->first();
@@ -58,7 +68,16 @@ class CompetitionController extends Controller
             'editions' => $editions, 'edition' => $edition, 'events' => $events, 'eventDetails' => $eventDetails,
             'scheduleStatuses' => ['scheduled', 'live'], 'venueOptions' => $this->venueOptions(),
             'coordinators' => User::query()->where('role', 'coordinator')->where('status', 'active')->orderBy('name')->get(['id', 'name']),
+            'bracketOptions' => app(ScheduleBracketService::class)->options(app(ScheduleBracketService::class)->matches($edition)),
         ]);
+    }
+
+    public function edit(CompetitionSchedule $schedule): View
+    {
+        $schedule->load('editionSport.edition', 'editionSport.sport', 'bracketMatch');
+        $matches = app(ScheduleBracketService::class)->matches($schedule->editionSport->edition)->where('edition_sport_id', $schedule->edition_sport_id);
+
+        return view('admin.schedules.edit-match', ['schedule' => $schedule, 'scheduleStatuses' => self::SCHEDULE_STATUSES, 'venueOptions' => $this->venueOptions(), 'bracketOptions' => app(ScheduleBracketService::class)->options($matches)]);
     }
 
     public function storeSchedule(Request $request, CompetitionScheduleOptions $options): RedirectResponse
@@ -66,6 +85,7 @@ class CompetitionController extends Controller
         $data = $request->validate([
             'edition_id' => ['required', 'integer', Rule::exists('intramural_editions', 'id')->whereIn('status', ['draft', 'active'])],
             'edition_sport_id' => ['required', 'integer'],
+            'bracket_match_id' => ['nullable', 'integer'],
             'title' => ['nullable', 'string', 'max:160'],
             'starts_at' => ['required', 'date_format:Y-m-d\TH:i'],
             'ends_at' => ['required', 'date_format:Y-m-d\TH:i', 'after:starts_at'],
@@ -81,6 +101,9 @@ class CompetitionController extends Controller
         $event = $options->events($edition)->firstWhere('id', $data['edition_sport_id']);
         if (! $event) {
             throw ValidationException::withMessages(['edition_sport_id' => 'Choose an available event configured for this edition.']);
+        }
+        if (! empty($data['bracket_match_id']) && ! BracketMatch::whereKey($data['bracket_match_id'])->where('edition_sport_id', $event->id)->exists()) {
+            throw ValidationException::withMessages(['bracket_match_id' => 'Choose a bracket match for the selected event.']);
         }
 
         foreach (['starts_at', 'ends_at'] as $field) {
@@ -104,8 +127,15 @@ class CompetitionController extends Controller
         }
 
         $schedule = DB::transaction(function () use ($data, $event, $isActivity, $options, $available, $selected): CompetitionSchedule {
+            if (! empty($data['bracket_match_id'])) {
+                BracketMatch::whereKey($data['bracket_match_id'])->lockForUpdate()->firstOrFail();
+                if (CompetitionSchedule::where('bracket_match_id', $data['bracket_match_id'])->exists()) {
+                    throw ValidationException::withMessages(['bracket_match_id' => 'This match already has a schedule. Edit its existing schedule instead.']);
+                }
+            }
             $schedule = CompetitionSchedule::create([
                 'edition_sport_id' => $event->id,
+                'bracket_match_id' => $data['bracket_match_id'] ?? null,
                 'title' => trim((string) ($data['title'] ?? '')) ?: null,
                 'is_activity' => $isActivity,
                 'starts_at' => $data['starts_at'], 'ends_at' => $data['ends_at'],
@@ -135,13 +165,14 @@ class CompetitionController extends Controller
             });
         })->count();
 
-        return redirect()->to(route('admin.competition.index', ['page' => intdiv($preceding, 20) + 1]).'#schedule-'.$schedule->id)
+        return redirect()->to(route('admin.schedules.matches.index', ['page' => intdiv($preceding, 20) + 1]).'#schedule-'.$schedule->id)
             ->with('success', 'Schedule added for '.$schedule->starts_at->format('M j, Y g:i A').'.');
     }
 
     public function updateSchedule(Request $request, CompetitionSchedule $schedule): RedirectResponse
     {
         $data = $request->validate([
+            'bracket_match_id' => ['sometimes', 'nullable', 'integer', Rule::exists('bracket_matches', 'id')->where('edition_sport_id', $schedule->edition_sport_id)],
             'title' => ['nullable', 'string', 'max:160'],
             'starts_at' => ['required', 'date_format:Y-m-d\TH:i'],
             'ends_at' => ['required', 'date_format:Y-m-d\TH:i', 'after_or_equal:starts_at'],
@@ -149,8 +180,23 @@ class CompetitionController extends Controller
             'status' => ['required', 'in:'.implode(',', self::SCHEDULE_STATUSES)],
         ]);
 
-        $before = $schedule->only(['title', 'starts_at', 'ends_at', 'venue', 'status']);
+        foreach (['starts_at', 'ends_at'] as $field) {
+            $date = substr($data[$field], 0, 10);
+            if ($date < $schedule->editionSport->edition->starts_on->toDateString() || $date > $schedule->editionSport->edition->ends_on->toDateString()) {
+                throw ValidationException::withMessages([$field => 'Choose a date within this edition.']);
+            }
+        }
+        if (array_key_exists('bracket_match_id', $data) && (int) $data['bracket_match_id'] !== (int) $schedule->bracket_match_id) {
+            if ($schedule->results()->exists() || $schedule->bracketMatch?->status === 'completed') {
+                throw ValidationException::withMessages(['bracket_match_id' => 'The bracket link for a scored match is kept. You can still edit its dates and venue.']);
+            }
+            if (! empty($data['bracket_match_id']) && CompetitionSchedule::where('bracket_match_id', $data['bracket_match_id'])->whereKeyNot($schedule->id)->exists()) {
+                throw ValidationException::withMessages(['bracket_match_id' => 'This match already has another schedule.']);
+            }
+        }
+        $before = $schedule->only(['bracket_match_id', 'title', 'starts_at', 'ends_at', 'venue', 'status']);
         $schedule->update([
+            'bracket_match_id' => array_key_exists('bracket_match_id', $data) ? $data['bracket_match_id'] : $schedule->bracket_match_id,
             'title' => trim((string) ($data['title'] ?? '')) ?: null,
             'starts_at' => $data['starts_at'],
             'ends_at' => $data['ends_at'] ?? null,
@@ -158,7 +204,7 @@ class CompetitionController extends Controller
             'status' => $data['status'],
         ]);
 
-        $this->auditService->record('competition_schedule.updated', $schedule, $before, $schedule->only(['title', 'starts_at', 'ends_at', 'venue', 'status']));
+        $this->auditService->record('competition_schedule.updated', $schedule, $before, $schedule->only(['bracket_match_id', 'title', 'starts_at', 'ends_at', 'venue', 'status']));
 
         return back()->with('success', 'Schedule updated.');
     }
@@ -188,7 +234,7 @@ class CompetitionController extends Controller
         $schedule->loadMissing('editionSport');
         $destination = ($data['return_to'] ?? null) === 'bracket' && $schedule->bracket_match_id
             ? route('admin.sports.bracket', ['sport' => $schedule->editionSport->sport_id, 'edition_id' => $schedule->editionSport->edition_id])
-            : route('admin.competition.index');
+            : route('admin.schedules.matches.index');
 
         DB::transaction(function () use ($schedule): void {
             $schedule = CompetitionSchedule::query()->lockForUpdate()->findOrFail($schedule->id);
@@ -210,6 +256,8 @@ class CompetitionController extends Controller
     private function venueOptions(): array
     {
         return collect(config('intramurals.venues', ['TBA']))
+            ->merge(collect(config('public_programme_games.events', []))->pluck('venue')->filter())
+            ->merge(CompetitionSchedule::whereNotNull('venue')->distinct()->pluck('venue'))->unique()
             ->filter(fn (mixed $venue): bool => is_string($venue) && $venue !== '')
             ->values()
             ->all();

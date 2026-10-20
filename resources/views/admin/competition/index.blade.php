@@ -1,6 +1,9 @@
-@extends('layouts.admin', ['title' => 'Live Competition', 'subtitle' => 'Scheduled competitions use the configured sport, eligible athletes or teams, and the edition schedule window.'])
+@extends('layouts.admin', ['title' => $manageSchedules ? 'Schedules' : 'Live Competition', 'subtitle' => $manageSchedules ? 'Create and manage bracket and event schedules.' : 'Monitor competitions and open their brackets. Manage dates and venues in Schedules.'])
 
 @section('content')
+    @if ($manageSchedules)
+        @include('admin.schedules._tabs', ['activeTab' => 'matches'])
+    @endif
     @if (session('success'))
         <div class="mb-6 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800">{{ session('success') }}</div>
     @endif
@@ -20,9 +23,13 @@
         <div class="flex flex-col justify-between gap-2 border-b border-slate-200 bg-slate-50 px-5 py-4 sm:flex-row sm:items-center">
             <div class="flex flex-wrap items-center gap-3">
                 <h2 class="font-semibold text-slate-950">Competition schedule</h2>
-                <a href="{{ route('admin.competition.create') }}" class="inline-flex items-center justify-center rounded-lg bg-blue-700 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-800">+ Add schedule</a>
+                @if ($manageSchedules)
+                    <a href="{{ route('admin.schedules.matches.create') }}" class="inline-flex items-center justify-center rounded-lg bg-blue-700 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-800">+ Add schedule</a>
+                @else
+                    <a href="{{ route('admin.schedules.matches.index') }}" class="inline-flex items-center justify-center rounded-lg bg-blue-700 px-4 py-2.5 text-sm font-semibold text-white">Manage schedules</a>
+                @endif
             </div>
-            <label class="relative block min-w-0 sm:w-80"><span class="sr-only">Search competition schedule</span><input type="search" data-list-search-input placeholder="Search event, sport, team, venue, or status" class="block w-full rounded-lg border-slate-300 bg-white py-2.5 pl-10 pr-3 text-sm focus:border-blue-600 focus:ring-blue-600"><svg class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path stroke-linecap="round" d="m16 16 4.5 4.5"/></svg></label>
+            <form method="GET" class="flex min-w-0 items-center gap-2"><label class="relative block min-w-0 sm:w-80"><span class="sr-only">Search competition schedule</span><input type="search" name="search" value="{{ $search }}" data-list-search-input placeholder="Search event, sport, team, venue, or status" class="block w-full rounded-lg border-slate-300 bg-white py-2.5 pl-10 pr-3 text-sm focus:border-blue-600 focus:ring-blue-600"><svg class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path stroke-linecap="round" d="m16 16 4.5 4.5"/></svg></label><button class="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700">Search all</button></form>
         </div>
         <div class="flex justify-end border-b border-slate-200 px-5 py-2"><span data-list-search-count class="text-xs font-medium text-slate-500" aria-live="polite"></span></div>
 
@@ -66,7 +73,9 @@
                                 <p class="mt-3 font-medium leading-5 text-slate-800">{{ $scheduleLabel }}</p>
                             </td>
                             <td class="px-5 py-4 text-slate-700">
-                                @if ($participantTeams->isNotEmpty())
+                                @if ($schedule->bracketMatch)
+                                    <x-programme-matchups :games="[['number' => $schedule->bracketMatch->match_number, 'home' => app(\App\Services\ScheduleBracketService::class)->participant($schedule->bracketMatch, 'home'), 'away' => app(\App\Services\ScheduleBracketService::class)->participant($schedule->bracketMatch, 'away')]]" />
+                                @elseif ($participantTeams->isNotEmpty())
                                     <div class="flex flex-wrap items-center gap-2">
                                         @foreach ($participantTeams as $team)
                                             <x-team-badge :team="$team" :show-subtitle="false" :logo-only="$participantTeams->count() > 2" class="font-medium text-slate-900" />
@@ -92,55 +101,15 @@
                                 <span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold capitalize text-slate-700">{{ $schedule->status }}</span>
                             </td>
                             <td class="px-5 py-4">
+                                @if ($manageSchedules)
                                 <div class="flex items-start gap-2">
-                                <details class="group">
-                                    <summary class="inline-flex cursor-pointer list-none items-center justify-center rounded-lg border border-blue-200 bg-white px-3.5 py-2 text-sm font-semibold text-blue-700 transition hover:border-blue-300 hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-600 [&::-webkit-details-marker]:hidden">
-                                        Edit
-                                    </summary>
-                                    <form method="POST" action="{{ route('admin.competition.schedules.update', $schedule) }}" class="mt-3 grid w-80 gap-3 rounded-xl border border-slate-200 bg-slate-50 p-4 shadow-sm sm:grid-cols-2">
-                                        @csrf
-                                        @method('PUT')
-
-                                        <label class="block text-xs font-semibold uppercase tracking-wide text-slate-500 sm:col-span-2">
-                                            Schedule item
-                                            <input name="title" value="{{ $schedule->title }}" maxlength="160" placeholder="{{ $scheduleLabel }}" class="mt-1 block w-full rounded-lg border-slate-300 px-3 py-2 text-sm font-medium normal-case tracking-normal text-slate-900 focus:border-blue-600 focus:ring-blue-600">
-                                        </label>
-
-                                        <label class="block text-xs font-semibold uppercase tracking-wide text-slate-500">
-                                            Starts
-                                            <input name="starts_at" type="datetime-local" value="{{ $schedule->starts_at->format('Y-m-d\TH:i') }}" required class="mt-1 block w-full rounded-lg border-slate-300 px-3 py-2 text-sm font-medium normal-case tracking-normal text-slate-900 focus:border-blue-600 focus:ring-blue-600">
-                                        </label>
-
-                                        <label class="block text-xs font-semibold uppercase tracking-wide text-slate-500">
-                                            Ends
-                                            <input name="ends_at" type="datetime-local" value="{{ $schedule->ends_at?->format('Y-m-d\TH:i') }}" required class="mt-1 block w-full rounded-lg border-slate-300 px-3 py-2 text-sm font-medium normal-case tracking-normal text-slate-900 focus:border-blue-600 focus:ring-blue-600">
-                                        </label>
-
-                                        <label class="block text-xs font-semibold uppercase tracking-wide text-slate-500">
-                                            Venue
-                                            <select name="venue" required class="mt-1 block w-full rounded-lg border-slate-300 px-3 py-2 text-sm font-medium normal-case tracking-normal text-slate-900 focus:border-blue-600 focus:ring-blue-600">
-                                                @foreach ($venueOptions as $venue)
-                                                    <option value="{{ $venue }}" @selected(($schedule->venue ?: 'TBA') === $venue)>{{ $venue }}</option>
-                                                @endforeach
-                                            </select>
-                                        </label>
-
-                                        <label class="block text-xs font-semibold uppercase tracking-wide text-slate-500">
-                                            Status
-                                            <select name="status" required class="mt-1 block w-full rounded-lg border-slate-300 px-3 py-2 text-sm font-medium normal-case tracking-normal text-slate-900 focus:border-blue-600 focus:ring-blue-600">
-                                                @foreach ($scheduleStatuses as $status)
-                                                    <option value="{{ $status }}" @selected($schedule->status === $status)>{{ ucfirst($status) }}</option>
-                                                @endforeach
-                                            </select>
-                                        </label>
-
-                                        <div class="flex items-end justify-end sm:col-span-2">
-                                            <button class="rounded-lg bg-blue-700 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-800">Save schedule</button>
-                                        </div>
-                                    </form>
-                                </details>
+                                <a href="{{ route('admin.schedules.matches.edit', $schedule) }}" class="rounded-lg border border-blue-200 bg-white px-3.5 py-2 text-sm font-semibold text-blue-700">Edit schedule</a>
                                 <x-delete-schedule-button :schedule="$schedule" />
                                 </div>
+                                @endif
+                                @if ($schedule->bracket_match_id)
+                                    <a class="mt-2 inline-block text-sm font-semibold text-blue-700" href="{{ route('admin.sports.bracket', ['sport' => $schedule->editionSport->sport_id, 'edition_id' => $schedule->editionSport->edition_id]) }}">Open bracket</a>
+                                @endif
                             </td>
                         </tr>
                     @empty
@@ -157,5 +126,5 @@
             {{ $schedules->links() }}
         </div>
     </section>
-    <x-delete-schedule-dialog />
+    @if ($manageSchedules)<x-delete-schedule-dialog />@endif
 @endsection

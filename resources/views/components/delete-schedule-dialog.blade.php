@@ -9,7 +9,7 @@
             <p data-delete-schedule-name class="font-semibold text-slate-900"></p>
             <p data-delete-schedule-time class="mt-1 text-sm text-slate-600"></p>
         </div>
-        <p id="delete-schedule-description" class="mt-4 text-sm leading-6 text-slate-600">This removes the schedule and its participant list from Live Competition and the public schedule. The bracket lineup, player registrations, and recorded wins are kept.</p>
+        <p id="delete-schedule-description" class="mt-4 text-sm leading-6 text-slate-600">This removes the match schedule and its participant list. The public programme, bracket lineup, player registrations, and recorded wins are kept. Schedules with recorded results cannot be deleted.</p>
         <p class="mt-2 text-sm font-medium" style="color: #b91c1c">This schedule deletion cannot be undone.</p>
         <div class="mt-6 flex justify-end gap-3">
             <button type="button" data-cancel-delete-schedule autofocus class="rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50">Cancel</button>

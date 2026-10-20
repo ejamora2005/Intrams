@@ -17,7 +17,7 @@ class ReturnAdminSavesToModuleIndex
             $route = $request->route()?->getName() ?? '';
             // Creation redirects to the page containing the new schedule.
             // Returning to the form would make a successful save look lost.
-            if ($route === 'admin.competition.schedules.store') {
+            if ($route === 'admin.schedules.matches.store') {
                 return $response;
             }
             $destination = match (true) {

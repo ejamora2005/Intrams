@@ -164,12 +164,17 @@ Route::middleware([
         Route::post('/participation-rules', [RegistrationController::class, 'storeRule'])->name('participation-rules.store');
         Route::get('/competition', [CompetitionController::class, 'index'])->name('competition.index');
         Route::get('/schedules', [ProgrammeScheduleController::class, 'index'])->name('schedules.index');
+        Route::post('/schedules', [ProgrammeScheduleController::class, 'store'])->name('schedules.store');
+        Route::delete('/schedules/{entryKey}', [ProgrammeScheduleController::class, 'destroy'])->where('entryKey', '[a-f0-9]{24}')->name('schedules.destroy');
         Route::put('/schedules/{entryKey}', [ProgrammeScheduleController::class, 'update'])->where('entryKey', '[a-f0-9]{24}')->name('schedules.update');
-        Route::get('/competition/create', [CompetitionController::class, 'create'])->name('competition.create');
-        Route::post('/competition/schedules', [CompetitionController::class, 'storeSchedule'])->name('competition.schedules.store');
-        Route::put('/competition/schedules/{schedule}', [CompetitionController::class, 'updateSchedule'])->name('competition.schedules.update');
-        Route::delete('/competition/schedules/{schedule}', [CompetitionController::class, 'destroySchedule'])->name('competition.schedules.destroy');
-        Route::put('/competition/schedules/{schedule}/venue', [CompetitionController::class, 'updateVenue'])->name('competition.schedule-venue.update');
+        Route::get('/schedules/matches', [CompetitionController::class, 'index'])->name('schedules.matches.index');
+        Route::get('/schedules/matches/create', [CompetitionController::class, 'create'])->name('schedules.matches.create');
+        Route::get('/schedules/matches/{schedule}/edit', [CompetitionController::class, 'edit'])->name('schedules.matches.edit');
+        Route::post('/schedules/matches', [CompetitionController::class, 'storeSchedule'])->name('schedules.matches.store');
+        Route::put('/schedules/matches/{schedule}', [CompetitionController::class, 'updateSchedule'])->name('schedules.matches.update');
+        Route::delete('/schedules/matches/{schedule}', [CompetitionController::class, 'destroySchedule'])->name('schedules.matches.destroy');
+        Route::put('/schedules/matches/{schedule}/venue', [CompetitionController::class, 'updateVenue'])->name('schedules.matches.venue');
+        Route::redirect('/competition/create', '/admin/schedules/matches/create');
         Route::get('/system-logs', [SystemLogController::class, 'index'])->name('system-logs.index');
     });
 

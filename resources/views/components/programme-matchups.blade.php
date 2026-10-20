@@ -1,7 +1,16 @@
-@props(['games' => []])
+@props(['games' => [], 'manage' => false])
 
 <div {{ $attributes->class(['programme-matchups']) }} aria-label="Game matchups">
     @foreach ($games as $game)
+        @if (! empty($game['bracket_label']))
+            <div class="programme-game-link">
+                <span>{{ $game['bracket_label'] }}</span>
+                @if ($manage)<a href="{{ $game['bracket_url'] }}">Open bracket</a> <a href="{{ $game['schedule_url'] }}">Edit match schedule</a>@endif
+                @if ($game['scheduled_time'])<span>{{ $game['scheduled_time'] }} · {{ $game['scheduled_venue'] }}</span>@endif
+                @if (!empty($game['schedule_status']))<span>{{ ucfirst($game['schedule_status']) }}</span>@endif
+                @if ($game['winner'])<strong>Winner: {{ $game['winner'] }}</strong>@endif
+            </div>
+        @endif
         <div class="programme-matchup" data-programme-game="{{ $game['number'] }}">
             <span class="programme-game-number">G{{ $game['number'] }}</span>
             @foreach (['home', 'away'] as $side)

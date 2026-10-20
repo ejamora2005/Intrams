@@ -253,18 +253,18 @@ test('proposal defaults seed scoring groups and cultural schedule items', functi
         ->and(CompetitionSchedule::query()->where('title', 'Basketball 3x3 Finals (M&W)')->value('venue'))->toBe('MPCC');
 
     $this->actingAs($admin)
-        ->put(route('admin.competition.schedule-venue.update', $run), ['venue' => 'SSC Hall'])
+        ->put(route('admin.schedules.matches.venue', $run), ['venue' => 'SSC Hall'])
         ->assertRedirect();
 
     $this->actingAs($admin)
-        ->put(route('admin.competition.schedule-venue.update', $awarding), ['venue' => ''])
+        ->put(route('admin.schedules.matches.venue', $awarding), ['venue' => ''])
         ->assertRedirect();
 
     expect($run->fresh()->venue)->toBe('SSC Hall')
         ->and($awarding->fresh()->venue)->toBe('TBA');
 
     $this->actingAs($admin)
-        ->put(route('admin.competition.schedules.update', $run), [
+        ->put(route('admin.schedules.matches.update', $run), [
             'title' => 'Ruperto Run Qualifiers',
             'starts_at' => '2026-10-20T07:30',
             'ends_at' => '2026-10-20T09:00',

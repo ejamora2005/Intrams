@@ -1,17 +1,17 @@
-@extends('layouts.admin', ['title' => 'Add schedule', 'subtitle' => 'Schedule a sport, cultural event, or school activity from Live Competition.'])
+@extends('layouts.admin', ['title' => 'Add schedule', 'subtitle' => 'Schedule a sport, cultural event, or school activity in Schedules.'])
 
 @section('content')
     <section class="ops-hero p-5 sm:p-7">
         <div class="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
             <div>
-                <p class="ops-eyebrow">Live Competition</p>
+                <p class="ops-eyebrow">Schedules</p>
                 <h2 class="mt-2 text-2xl font-semibold text-slate-950">Add a schedule</h2>
                 <p class="mt-2 text-sm leading-6 text-slate-500">Choose the event, set its exact time, and add the participants.</p>
             </div>
-            <a href="{{ route('admin.competition.index') }}" class="inline-flex w-fit shrink-0 items-center justify-center rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700">Back to Live Competition</a>
+            <a href="{{ route('admin.schedules.matches.index') }}" class="inline-flex w-fit shrink-0 items-center justify-center rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700">Back to Schedules</a>
         </div>
         @if ($editions->isNotEmpty())
-            <form method="GET" action="{{ route('admin.competition.create') }}" class="mt-5 flex flex-wrap items-end gap-3">
+            <form method="GET" action="{{ route('admin.schedules.matches.create') }}" class="mt-5 flex flex-wrap items-end gap-3">
                 <label for="schedule-edition" class="min-w-0 flex-1 text-sm font-medium text-slate-700 sm:max-w-lg">Edition
                     <select id="schedule-edition" name="edition_id" class="mt-1 block w-full rounded-lg border-slate-300 py-2.5 text-sm">
                         @foreach ($editions as $item)
@@ -38,7 +38,7 @@
             }
             $selectedEvent = (string) old('edition_sport_id', request('edition_sport_id', ''));
         @endphp
-        <form method="POST" action="{{ route('admin.competition.schedules.store') }}" data-create-schedule data-ops-form class="mt-6 space-y-6">
+        <form method="POST" action="{{ route('admin.schedules.matches.store') }}" data-create-schedule data-ops-form class="mt-6 space-y-6">
             @csrf
             <input type="hidden" name="edition_id" value="{{ $edition->id }}">
 
@@ -73,6 +73,13 @@
                     </label>
                     <label class="min-w-0 text-sm font-medium text-slate-700 sm:col-span-2">Schedule title <span data-schedule-title-optional class="font-normal text-slate-500">(optional)</span>
                         <input name="title" value="{{ old('title') }}" maxlength="160" placeholder="e.g. Finals, Heat 1, or the school activity name" class="mt-1 block w-full rounded-lg border-slate-300 px-3 py-2.5 text-sm">
+                    </label>
+                    <label class="min-w-0 text-sm font-medium text-slate-700 sm:col-span-2">Bracket match (optional)
+                        <select name="bracket_match_id" class="mt-1 block w-full min-w-0 rounded-lg border-slate-300 text-sm">
+                            <option value="">Standalone event schedule</option>
+                            @foreach ($bracketOptions as $id => $option)<option value="{{ $id }}" @selected((string)old('bracket_match_id', request('bracket_match_id')) === (string)$id)>{{ $option['label'] }}</option>@endforeach
+                        </select>
+                        <span class="mt-1 block text-xs text-slate-500">Choose the matching event above. Linked schedules appear directly on its bracket.</span>
                     </label>
                 </div>
                 <p id="schedule-event-help" class="mt-3 text-sm text-slate-500">Choose a school activity for non-scoring program items such as Ruperto Run, the parade, or awarding.</p>
@@ -131,7 +138,7 @@
             </section>
 
             <div class="flex flex-wrap items-center justify-end gap-3 pb-3">
-                <a href="{{ route('admin.competition.index') }}" class="rounded-lg border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700">Cancel</a>
+                <a href="{{ route('admin.schedules.matches.index') }}" class="rounded-lg border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700">Cancel</a>
                 <button type="submit" data-loading-label="Adding schedule…" class="rounded-lg bg-blue-700 px-5 py-3 text-sm font-semibold text-white hover:bg-blue-800">Add schedule</button>
             </div>
         </form>

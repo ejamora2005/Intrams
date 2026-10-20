@@ -34,8 +34,8 @@ class UpdatePublicScheduleRequest extends FormRequest
 
         return [
             'edition_id' => ['required', 'integer', 'exists:intramural_editions,id'],
-            'entry_key' => ['required', 'string', Rule::in([$this->route('entryKey')])],
-            'version' => ['required', 'integer', 'min:0'],
+            'entry_key' => $this->routeIs('admin.schedules.store') ? ['prohibited'] : ['required', 'string', Rule::in([$this->route('entryKey')])],
+            'version' => [$this->routeIs('admin.schedules.store') ? 'sometimes' : 'required', 'integer', 'min:0'],
             'event' => ['required', 'string', 'max:160'],
             'date' => ['required', 'date_format:Y-m-d', 'after_or_equal:'.config('public_programme.starts_on'), 'before_or_equal:'.config('public_programme.ends_on')],
             'session' => ['required', Rule::in(['AM', 'PM', 'Evening'])],
@@ -46,9 +46,16 @@ class UpdatePublicScheduleRequest extends FormRequest
             'is_published' => ['required', 'boolean'],
             'games_present' => ['sometimes', 'boolean'],
             'games' => ['sometimes', 'array', 'max:12'],
-            'games.*' => ['array:home,away'],
+            'games.*' => ['array:home,away,bracket_match_ids,manual_teams,update_bracket_schedule,bracket_starts_at,bracket_ends_at,bracket_venue'],
             'games.*.home' => ['nullable', 'string', Rule::in([...$teams, ...$references])],
             'games.*.away' => ['nullable', 'string', Rule::in([...$teams, ...$references])],
+            'games.*.bracket_match_ids' => ['sometimes', 'array', 'max:12'],
+            'games.*.bracket_match_ids.*' => ['integer', 'distinct', Rule::exists('bracket_matches', 'id')->whereIn('edition_sport_id', \App\Models\EditionSport::where('edition_id', $this->integer('edition_id'))->pluck('id')->all())],
+            'games.*.manual_teams' => ['sometimes', 'boolean'],
+            'games.*.update_bracket_schedule' => ['sometimes', 'boolean'],
+            'games.*.bracket_starts_at' => ['nullable', 'date_format:Y-m-d\TH:i'],
+            'games.*.bracket_ends_at' => ['nullable', 'date_format:Y-m-d\TH:i'],
+            'games.*.bracket_venue' => ['nullable', 'string', 'max:160'],
         ];
     }
 
@@ -71,6 +78,18 @@ class UpdatePublicScheduleRequest extends FormRequest
                 }
             }
             foreach ($this->input('games', []) as $index => $game) {
+                if (! empty($game['update_bracket_schedule'])) {
+                    $edition = IntramuralEdition::findOrFail($this->integer('edition_id'));
+                    if (empty($game['bracket_match_ids']) || empty($game['bracket_starts_at']) || empty($game['bracket_ends_at']) || $game['bracket_ends_at'] <= $game['bracket_starts_at']) {
+                        $validator->errors()->add('games.'.$index, 'Choose a bracket match and exact start/end times for Game '.($index + 1).'.');
+                    }
+                    foreach (['bracket_starts_at', 'bracket_ends_at'] as $field) {
+                        $date = substr($game[$field] ?? '', 0, 10);
+                        if ($date < $edition->starts_on->toDateString() || $date > $edition->ends_on->toDateString()) {
+                            $validator->errors()->add('games.'.$index.'.'.$field, 'Choose a match date within the active edition.');
+                        }
+                    }
+                }
                 foreach (['home', 'away'] as $side) {
                     if (preg_match('/^(?:winner|loser):(\d+)$/', $game[$side] ?? '', $match) && (int) $match[1] >= $index + 1) {
                         $validator->errors()->add('games.'.$index.'.'.$side, 'Game '.($index + 1).' can only use a winner or loser from an earlier game.');
