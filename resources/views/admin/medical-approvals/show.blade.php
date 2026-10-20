@@ -1,0 +1,25 @@
+@extends('layouts.admin', ['title' => 'Medical review', 'subtitle' => 'Review the clearance for each registered sport.'])
+
+@section('content')
+    <x-ops-feedback />
+    @if ($errors->any() && old('_action') === 'remove')<div data-ops-auto-modal="remove-medical-review" hidden></div>@endif
+    <section class="rounded-xl border border-slate-200 bg-white p-5 sm:p-7">
+        <div class="flex flex-col justify-between gap-4 lg:flex-row lg:items-center"><div class="min-w-0"><h2 class="break-words text-xl font-semibold text-slate-950">{{ $profile['student']->full_name }}</h2><p class="mt-1 break-all text-sm text-slate-500">{{ $profile['student']->student_number }} · {{ $edition->name }}</p><div class="mt-3 text-sm">@if ($profile['team'])<x-team-badge :team="$profile['team']" />@else<span>Unassigned faction</span>@endif</div></div><div class="flex flex-wrap gap-3"><a href="{{ route('admin.medical-approvals.edit', $profile['student']) }}" class="rounded-lg bg-blue-700 px-4 py-3 text-sm font-semibold text-white">Edit review</a>@if ($reviewedEntries->isNotEmpty())<button type="button" data-ops-modal-open="remove-medical-review" class="rounded-lg border border-red-300 px-4 py-3 text-sm font-semibold text-red-700">Remove review</button>@endif<a href="{{ route('admin.medical-approvals.index') }}" class="rounded-lg border border-slate-300 px-4 py-3 text-sm font-semibold">Back to list</a></div></div>
+    </section>
+    <div class="mt-5 grid gap-4 lg:grid-cols-2">
+        @foreach ($profile['entries'] as $entry)
+            <article data-medical-entry="{{ $entry->id }}" class="min-w-0 rounded-xl border border-slate-200 bg-white p-5"><div class="flex flex-wrap items-start justify-between gap-3"><h3 class="min-w-0 break-words font-semibold text-slate-950">{{ $entry->editionSport->sport->name }}</h3>@include('admin.medical-approvals._status', ['status' => app(\App\Services\EligibilityService::class)->medicalCertificateStatusFor($entry)])</div><p class="mt-4 text-sm text-slate-500">{{ $entry->medical_certificate_reviewed_at ? 'Reviewed by '.($entry->medicalCertificateReviewer?->name ?? 'Staff').' · '.$entry->medical_certificate_reviewed_at->timezone('Asia/Manila')->format('M j, Y g:i A').' (UTC+8)' : 'No review recorded yet.' }}</p><p class="mt-3 whitespace-pre-wrap break-words text-sm text-slate-700">{{ $entry->medical_certificate_notes ?: 'No review notes.' }}</p></article>
+        @endforeach
+    </div>
+    @if ($reviewedEntries->isNotEmpty())
+        <dialog id="remove-medical-review" data-ops-modal aria-labelledby="remove-medical-title" class="ops-modal m-auto w-[calc(100%-2rem)] max-w-xl rounded-2xl border border-slate-200 bg-white p-0 shadow-2xl backdrop:bg-slate-950/65">
+            <form method="POST" action="{{ route('admin.medical-approvals.destroy', $profile['student']) }}" data-ops-form data-medical-review-form class="flex max-h-[85dvh] flex-col">
+                @csrf @method('DELETE')
+                <input type="hidden" name="_action" value="remove"><input type="hidden" name="edition_id" value="{{ $edition->id }}"><input type="hidden" name="version" value="{{ old('version', $version) }}">
+                <div class="flex justify-between gap-4 border-b border-slate-200 p-5"><h2 id="remove-medical-title" class="text-lg font-semibold">Remove medical reviews</h2><button type="button" data-ops-modal-close class="rounded-lg px-2 text-xl" aria-label="Close">×</button></div>
+                <div class="space-y-4 overflow-y-auto p-5"><p class="text-sm text-slate-600">Choose the reviews to remove for {{ $profile['student']->full_name }}. Selected events will return to Pending. Player registrations are kept.</p><fieldset><legend class="sr-only">Reviews to remove</legend><div class="space-y-3">@foreach ($reviewedEntries as $entry)<label class="flex gap-3 rounded-xl border border-slate-200 p-3 text-sm"><input type="checkbox" name="entry_ids[]" value="{{ $entry->id }}" @checked(collect(old('entry_ids', []))->map(fn ($id) => (string)$id)->contains((string)$entry->id)) class="mt-0.5 rounded border-slate-300 text-blue-700"><span class="min-w-0 break-words">{{ $entry->editionSport->sport->name }}</span></label>@endforeach</div></fieldset><p data-medical-selection-count class="text-sm text-slate-500" aria-live="polite"></p><label class="flex items-start gap-3 text-sm"><input type="checkbox" name="confirmation" value="REMOVE" required class="mt-0.5 rounded border-slate-300 text-blue-700"><span>Return the selected events to Pending and remove their current review notes.</span></label></div>
+                <div class="flex flex-wrap justify-end gap-3 border-t border-slate-200 p-5"><button type="button" data-ops-modal-close class="rounded-lg border border-slate-300 px-4 py-3 text-sm font-semibold">Cancel</button><button type="submit" data-loading-label="Removing…" class="rounded-lg bg-red-600 px-4 py-3 text-sm font-semibold text-white">Remove selected reviews</button></div>
+            </form>
+        </dialog>
+    @endif
+@endsection

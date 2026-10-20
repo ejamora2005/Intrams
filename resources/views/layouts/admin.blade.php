@@ -35,6 +35,7 @@
                             ['label' => 'Dashboard', 'route' => 'admin.dashboard', 'match' => 'admin/dashboard'],
                             ['label' => 'Events / Editions', 'route' => 'admin.editions.index', 'match' => 'admin/editions'],
                             ['label' => 'Students', 'route' => 'admin.students.index', 'match' => 'admin/students'],
+                            ['label' => 'Medical Approvals', 'route' => 'admin.medical-approvals.index', 'match' => 'admin/medical-approvals'],
                             ['label' => 'Courses', 'route' => 'admin.courses.index', 'match' => 'admin/courses'],
                             ['label' => 'Coordinators', 'route' => 'admin.coordinators.index', 'match' => 'admin/coordinators'],
                             ['label' => 'Operations Accounts', 'route' => 'admin.operations-accounts.index', 'match' => 'admin/operations-accounts'],

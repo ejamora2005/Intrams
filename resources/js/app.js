@@ -3,6 +3,7 @@ import './public-programme-editor';
 import './pwa';
 import './ops-interactions';
 import './competition-schedule';
+import './medical-approvals';
 
 if (document.querySelector('[data-tabulator-workspace]')) {
     void import('./tabulator');

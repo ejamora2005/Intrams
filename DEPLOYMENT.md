@@ -2,6 +2,12 @@
 
 This project is ready for a Dokploy Docker Compose deployment on `slsubc.tech`.
 
+## Admin medical approvals
+
+Admin → Medical Approvals provides searchable player clearances with faction and event-status filters, review creation, viewing, editing, and confirmed removal. Administrators select the required sport registrations to mark Pending, Approved, or Rejected, with optional notes. It shares the existing certificate fields with GAM; Approved corresponds to the existing `verified` state. No migration, seeder, or reset is required.
+
+Removal clears only the selected medical review fields and returns those events to Pending. Student records, sport registrations, brackets, scores and declared winners are kept. Reviews record the staff member and Philippine time, log their changes in System Logs, and reject stale forms if GAM or another administrator changes the medical reviews or registrations first. Exempt events, inactive registrations, archived students, and deleted sports cannot be submitted for approval.
+
 ## GAM dashboard archived-record fix
 
 Deploy the latest code; no migration or seeder is needed. Medical review excludes registrations whose student has been archived, and Ready Matches excludes brackets whose sport has been deleted. These historical registrations and brackets remain in the database. Scores, declared winners and rosters are not rewritten.

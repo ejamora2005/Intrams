@@ -1,0 +1,1 @@
+<span @class(['inline-flex w-fit rounded-full px-3 py-1 text-xs font-semibold', 'bg-green-50 text-green-700' => $status === 'verified', 'bg-red-50 text-red-700' => $status === 'rejected', 'bg-amber-50 text-amber-800' => !in_array($status, ['verified', 'rejected'], true)])>{{ $statuses[$status] ?? 'Mixed statuses' }}</span>

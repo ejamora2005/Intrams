@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\EditionController;
 use App\Http\Controllers\Admin\EditionSportController;
 use App\Http\Controllers\Admin\EventController;
+use App\Http\Controllers\Admin\MedicalApprovalController;
 use App\Http\Controllers\Admin\OperationsAccountController;
 use App\Http\Controllers\Admin\ProgrammeScheduleController;
 use App\Http\Controllers\Admin\RegistrationController;
@@ -176,6 +177,7 @@ Route::middleware([
         Route::put('/schedules/matches/{schedule}/venue', [CompetitionController::class, 'updateVenue'])->name('schedules.matches.venue');
         Route::redirect('/competition/create', '/admin/schedules/matches/create');
         Route::get('/system-logs', [SystemLogController::class, 'index'])->name('system-logs.index');
+        Route::resource('medical-approvals', MedicalApprovalController::class)->parameters(['medical-approvals' => 'student']);
     });
 
     Route::prefix('coordinator')->as('coordinator.')->middleware('role:coordinator')->group(function () {
