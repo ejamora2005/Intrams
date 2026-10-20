@@ -43,7 +43,7 @@
                     $isDual = $editionSport->participant_type === 'dual';
                     $defaultSlotLabel = $isRelay ? 'Relay (exempt)' : ($slot === 'individual_or_dual' ? 'Individual / dual' : ucfirst($slot));
                 @endphp
-                <label data-sport-option data-list-search-row data-search-text="{{ Str::lower($sport?->name ?? '') }}" data-sport-category="{{ $sport?->participant_category }}" data-sport-locked="{{ $isDual ? 'true' : 'false' }}" class="flex cursor-pointer items-start gap-3 rounded-lg border border-slate-200 p-4 transition hover:border-blue-300 hover:bg-blue-50">
+                <label data-sport-option data-list-search-row data-search-text="{{ Str::lower($sport?->name ?? '') }}" data-sport-category="{{ $sport?->participant_category }}" class="flex cursor-pointer items-start gap-3 rounded-lg border border-slate-200 p-4 transition hover:border-blue-300 hover:bg-blue-50">
                     <input
                         type="checkbox"
                         name="edition_sport_ids[]"
@@ -53,8 +53,6 @@
                         data-counts-toward-limit="{{ $countsTowardLimit ? 'true' : 'false' }}"
                         data-relay="{{ $isRelay ? 'true' : 'false' }}"
                         data-paired-partner-exempt-for="{{ implode(',', $pairedPartnerExemptGenders) }}"
-                        data-sport-locked="{{ $isDual ? 'true' : 'false' }}"
-                        @disabled($isDual)
                         @checked($selectedSportIds->contains((string) $editionSport->id))
                         class="mt-0.5 rounded border-slate-300 text-blue-700 focus:ring-blue-600"
                     >
@@ -67,7 +65,7 @@
                                 <span>{{ $sport->participant_category_label }}</span>
                             @endif
                             @if ($isDual)
-                                <span class="font-semibold text-amber-700">Assign both partners from sport management</span>
+                                <span>Partner assignments are managed in sport management</span>
                             @endif
                         </span>
                     </span>
@@ -76,7 +74,7 @@
             <p data-list-search-empty hidden class="rounded-lg border border-dashed border-slate-300 px-4 py-8 text-center text-sm text-slate-500 sm:col-span-2">No sports match your search.</p>
         </div>
 
-        <p class="mt-3 text-xs text-slate-500">Allowed combinations: 1 Major + 1 Minor, 1 Major + 1 Individual/Dual, 1 Minor + 1 Individual/Dual, or up to 3 Individual/Dual events. A second Major or Minor is locked after the first selection. Relay events do not use an event slot, but require the student to join a 100m, 200m, or 400m run. {{ $teamSportNote }} Dual events are assigned separately with both partners.</p>
+        <p class="mt-3 text-xs text-slate-500">Allowed combinations: 1 Major + 1 Minor, 1 Major + 1 Individual/Dual, 1 Minor + 1 Individual/Dual, or up to 3 Individual/Dual events. A second Major or Minor is locked after the first selection. Relay events do not use an event slot, but require the student to join a 100m, 200m, or 400m run. {{ $teamSportNote }} Doubles selections can be added or removed here; existing partner assignments are kept while selected.</p>
         <p data-sport-picker-client-error hidden class="mt-2 text-sm text-red-600">Choose at least one sport.</p>
         @error('edition_sport_ids')<p class="mt-2 text-sm text-red-600">{{ $message }}</p>@enderror
         @error('edition_sport_ids.*')<p class="mt-2 text-sm text-red-600">{{ $message }}</p>@enderror
@@ -127,8 +125,7 @@
                     const genderAllowed = !['male', 'female'].includes(category) || !gender || category === gender;
                     const slotLabel = option.querySelector('[data-sport-slot-label]');
                     if (slotLabel) slotLabel.textContent = isPairedPartnerExempt(input) ? 'Paired partner (exempt)' : slotLabel.dataset.defaultSlotLabel;
-                    const locked = input.dataset.sportLocked === 'true';
-                    const allowed = !locked && genderAllowed && (input.checked || !countsTowardLimit(input) || canUse(counts, input.dataset.slot));
+                    const allowed = genderAllowed && (input.checked || !countsTowardLimit(input) || canUse(counts, input.dataset.slot));
                     input.disabled = !allowed;
                     option.classList.toggle('cursor-not-allowed', !allowed);
                     option.classList.toggle('opacity-50', !allowed);

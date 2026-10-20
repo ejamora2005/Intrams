@@ -141,8 +141,8 @@ test('GAM add-player page lists every active edition sport', function () {
         ->assertSee('Baseball')
         ->assertSee('Chess (Men)')
         ->assertSee('Table Tennis (Doubles - Men)')
-        ->assertSee('Assign both partners from sport management')
-        ->assertSee('data-sport-locked="true"', false);
+        ->assertSee('Partner assignments are managed in sport management')
+        ->assertDontSee('data-sport-locked="true"', false);
 });
 
 test('GAM users select joined sports while adding a player and the selection rules reject two major sports', function () {

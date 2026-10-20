@@ -34,6 +34,10 @@ Bundled/local roster imports are disabled when `APP_ENV=production`, even with `
 
 Keep `DEPLOY_SEED_DEFAULT_COMPETITIONS=false` and `DEPLOY_SEED_DEFAULT_ACCOUNTS=false` after first setup. Add or edit live players through Admin/GAM. Do not change `APP_ENV` to bypass this protection or use `migrate:fresh` on Dokploy. This protection does not delete any names already in production or reset scores, winners or schedules.
 
+## Doubles selections in student forms (October 20)
+
+Redeploy the latest code; no roster seeding or new migration is required. Admin and GAM can add, keep, remove and reselect Badminton/Table Tennis doubles from student sport forms. Keeping a doubles selection preserves its pair key and medical review. Removing it deactivates only that student's entry and retains history; the other player is not automatically withdrawn. Sport management can pair registered players who do not have a complete active pair, reusing their existing entries. Complete pairs cannot be reassigned through a stale pairing form. Gender and participation limits still apply.
+
 ## Basketball 3x3 points correction (October 20)
 
 Redeploy, then run `php artisan migrate --force` in `/var/www/html`. Basketball 3x3 Men and Women receive their own 15 / 10 / 7 point group while remaining Minor events for participation rules. Existing winner placements, declaration times, bracket wins, schedules and rosters are kept. The migration updates the declared point details and recalculates standings. Other minor sports retain their point values. Subsequent changes saved in Admin > Points System recalculate already declared points and standings without changing winners; no redeclaration or roster seeding is needed.

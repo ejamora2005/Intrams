@@ -9,7 +9,7 @@
                 <p class="ops-eyebrow">Roster management</p>
                 <h1 class="ops-display mt-2">Add new player</h1>
                 <p class="mt-3 max-w-3xl text-sm leading-6 text-slate-600">
-                    Register a player for <span class="font-semibold text-slate-800">{{ $team->name }}</span> in {{ $edition?->name ?? 'the active edition' }}. Every available sport is listed below; gender-matched events can be selected and dual events are shown for separate partner assignment.
+                    Register a player for <span class="font-semibold text-slate-800">{{ $team->name }}</span> in {{ $edition?->name ?? 'the active edition' }}. Choose from all available gender-matched sports, including doubles.
                 </p>
             </div>
             <a href="{{ route('gam.dashboard', ['team_id' => $team->id]) }}#roster-management" class="inline-flex w-fit items-center justify-center rounded-lg border border-blue-200 bg-white px-4 py-2.5 text-sm font-semibold text-blue-800 shadow-sm transition hover:border-blue-300 hover:bg-blue-50">Back to roster</a>
@@ -91,7 +91,7 @@
             <div class="flex flex-col justify-between gap-2 border-b border-slate-100 pb-4 sm:flex-row sm:items-end">
                 <div>
                     <h2 class="text-base font-semibold text-slate-950">Sports joined</h2>
-                    <p class="mt-1 text-sm text-slate-500">All sports in the active edition are shown. Men’s and women’s events are enabled after gender is selected; dual events require partner assignment.</p>
+                    <p class="mt-1 text-sm text-slate-500">All sports in the active edition are shown. Men’s and women’s events are enabled after gender is selected. Doubles partners can be assigned in sport management after registration.</p>
                 </div>
                 <span class="text-xs font-medium text-slate-500">Faction: {{ $team->name }}</span>
             </div>

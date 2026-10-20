@@ -19,7 +19,7 @@ class AthleteEntryService
     ) {}
 
     /** @return Collection<int, EditionSport> */
-    public function selectableSportsFor(IntramuralEdition $edition, bool $includeDual = false): Collection
+    public function selectableSportsFor(IntramuralEdition $edition, bool $includeDual = true): Collection
     {
         $slotOrder = [
             EligibilityService::SLOT_MAJOR => 1,
@@ -56,8 +56,8 @@ class AthleteEntryService
     /**
      * Register a newly created student for the sports selected at creation time.
      *
-     * Dual events are intentionally excluded because they must be registered with
-     * both members of the pair from the sport participant-management page.
+     * Doubles selections register this student without choosing a partner.
+     * Complete pairs are assigned from the sport participant-management page.
      *
      * @param  array<int, int|string>  $editionSportIds
      * @return Collection<int, AthleteEntry>
@@ -115,11 +115,10 @@ class AthleteEntryService
             if (! $editionSport->sport instanceof Sport
                 || $editionSport->sport->status !== 'active'
                 || ! in_array($editionSport->status, ['preparation', 'active'], true)
-                || $editionSport->participant_type === 'dual'
                 || ! $availableIds->contains($editionSport->id)
                 || ! $this->eligibilityService->isParticipationSport($editionSport)) {
                 throw ValidationException::withMessages([
-                    'edition_sport_ids' => ($editionSport->sport?->name ?? 'This sport').' cannot be selected while adding one student. Dual events must be assigned with both partners from sport participant management.',
+                    'edition_sport_ids' => ($editionSport->sport?->name ?? 'This sport').' is no longer available. Refresh the page and choose from the current list.',
                 ]);
             }
 
@@ -211,10 +210,9 @@ class AthleteEntryService
             ->where('status', 'active')
             ->whereHas('editionSport', fn ($query) => $query->where('edition_id', $edition->id))
             ->get()
-            // Cultural registrations and complete pairs are managed elsewhere;
-            // their absent checkboxes must never withdraw those registrations.
-            ->filter(fn (AthleteEntry $entry): bool => $entry->editionSport->participant_type !== 'dual'
-                && $this->eligibilityService->isParticipationSport($entry->editionSport));
+            // Cultural registrations are managed elsewhere. Doubles are editable
+            // here; keeping a selection leaves its pair and medical review intact.
+            ->filter(fn (AthleteEntry $entry): bool => $this->eligibilityService->isParticipationSport($entry->editionSport));
 
         $remove = $current->filter(fn (AthleteEntry $entry): bool => ! $ids->contains((int) $entry->edition_sport_id));
         if ($remove->isNotEmpty()) {

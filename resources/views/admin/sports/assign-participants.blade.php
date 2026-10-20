@@ -54,7 +54,7 @@
         <div class="flex flex-col justify-between gap-2 border-b border-slate-200 px-5 py-4 sm:flex-row sm:items-center">
             <div>
                 <h2 id="eligible-students-heading" class="font-semibold text-slate-900">Add participants</h2>
-                <p class="mt-1 text-sm text-slate-500">Already registered students are excluded from this list.</p>
+                <p class="mt-1 text-sm text-slate-500">{{ $editionSport->participant_type === 'dual' ? 'Players already in a complete pair are excluded. Registered players without a partner can be paired here.' : 'Already registered students are excluded from this list.' }}</p>
             </div>
             @if ($editionSport->participant_type === 'dual')
                 <span class="w-fit rounded-full bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-800">Create one two-student pair</span>

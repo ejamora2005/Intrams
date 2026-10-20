@@ -294,6 +294,7 @@ class SportController extends Controller
         if (app(\App\Services\SportScoreSheetService::class)->profile($sport)['key'] === 'basketball-3x3') {
             return redirect()->route('admin.sports.score-sheet', ['sport' => $sport, 'edition_id' => $request->input('edition_id')]);
         }
+
         return view('admin.sports.basketball-score-sheet', $this->basketballScoreSheetContext($request, $sport));
     }
 
@@ -302,6 +303,7 @@ class SportController extends Controller
         if (in_array(app(\App\Services\SportScoreSheetService::class)->profile($sport)['key'], ['beach-volleyball', 'school-volleyball'], true)) {
             return redirect()->route('admin.sports.score-sheet', ['sport' => $sport, 'edition_id' => $request->input('edition_id')]);
         }
+
         return view('admin.sports.volleyball-score-sheet', $this->volleyballScoreSheetContext($request, $sport));
     }
 
@@ -504,11 +506,17 @@ class SportController extends Controller
         $teamId = $request->integer('team_id') ?: null;
         $requiresTeam = in_array($editionSport->participant_type, ['team', 'dual'], true);
         $teams = Team::query()->where('edition_id', $edition->id)->where('status', 'active')->orderBy('name')->get();
+        $completePairKeys = $editionSport->participant_type === 'dual' ? $this->completePairKeys($editionSport) : collect();
 
         $studentQuery = Student::query()
             ->where('status', 'active')
             ->with('course')
-            ->whereDoesntHave('athleteEntries', fn ($entryQuery) => $entryQuery->where('edition_sport_id', $editionSport->id))
+            ->whereDoesntHave('athleteEntries', function ($entryQuery) use ($editionSport, $completePairKeys): void {
+                $entryQuery->where('edition_sport_id', $editionSport->id);
+                if ($editionSport->participant_type === 'dual') {
+                    $entryQuery->where('status', 'active')->whereIn('pair_key', $completePairKeys);
+                }
+            })
             ->when(in_array($sport->participant_category, ['male', 'female'], true), fn ($query) => $query->where('gender', ucfirst($sport->participant_category)))
             ->when($requiresTeam && ! $teamId, fn ($query) => $query->whereRaw('1 = 0'))
             ->when($courseId, fn ($query) => $query->where('course_id', $courseId))
@@ -558,17 +566,39 @@ class SportController extends Controller
         $medicalCertificateStatus = $this->eligibilityService->requiresMedicalCertificate($editionSport) ? 'pending' : 'not_required';
 
         DB::transaction(function () use ($students, $editionSport, $team, $medicalCertificateStatus): void {
-            abort_if(AthleteEntry::query()->where('edition_sport_id', $editionSport->id)->whereIn('student_id', $students->pluck('id'))->exists(), 422, 'One or more selected students are already registered.');
+            $existing = AthleteEntry::query()->where('edition_sport_id', $editionSport->id)
+                ->whereIn('student_id', $students->pluck('id'))->lockForUpdate()->get()->keyBy('student_id');
+            if ($editionSport->participant_type === 'dual') {
+                $completePairKeys = $this->completePairKeys($editionSport);
+                if ($existing->contains(fn (AthleteEntry $entry): bool => $entry->status === 'active' && $completePairKeys->contains($entry->pair_key))) {
+                    throw ValidationException::withMessages(['student_ids' => 'One or more selected students already belong to a complete doubles pair. Refresh the list and choose unpaired players.']);
+                }
+            } else {
+                abort_if($existing->isNotEmpty(), 422, 'One or more selected students are already registered.');
+            }
             BracketMatch::query()->where('edition_sport_id', $editionSport->id)->delete();
             BracketCompetitor::query()->where('edition_sport_id', $editionSport->id)->delete();
             $pairKey = $editionSport->participant_type === 'dual' ? (string) Str::uuid() : null;
             foreach ($students as $student) {
-                $entry = AthleteEntry::query()->create(['edition_sport_id' => $editionSport->id, 'student_id' => $student->id, 'team_id' => $team?->id, 'pair_key' => $pairKey, 'status' => 'active', 'medical_certificate_status' => $medicalCertificateStatus, 'assigned_by' => auth()->id(), 'assigned_at' => now()]);
-                app(AuditService::class)->record('athlete_entry.created', $entry, null, $entry->only($entry->getFillable()));
+                $entry = $existing->get($student->id) ?? new AthleteEntry;
+                $before = $entry->exists ? $entry->only($entry->getFillable()) : null;
+                $attributes = ['edition_sport_id' => $editionSport->id, 'student_id' => $student->id, 'team_id' => $team?->id, 'pair_key' => $pairKey, 'status' => 'active'];
+                if (! $entry->exists || $entry->status !== 'active') {
+                    $attributes += ['medical_certificate_status' => $medicalCertificateStatus, 'medical_certificate_reviewed_by' => null, 'medical_certificate_reviewed_at' => null, 'medical_certificate_notes' => null, 'assigned_by' => auth()->id(), 'assigned_at' => now()];
+                }
+                $entry->fill($attributes)->save();
+                app(AuditService::class)->record($before === null ? 'athlete_entry.created' : 'athlete_entry.updated', $entry, $before, $entry->only($entry->getFillable()));
             }
         });
 
         return redirect()->route('admin.sports.participants', ['sport' => $sport, 'edition_id' => $edition->id])->with('success', $students->count().' participant(s) registered for '.$sport->name.'.');
+    }
+
+    private function completePairKeys(EditionSport $editionSport): \Illuminate\Support\Collection
+    {
+        return AthleteEntry::query()->where('edition_sport_id', $editionSport->id)->where('status', 'active')
+            ->whereNotNull('pair_key')->where('pair_key', '!=', '')
+            ->groupBy('pair_key')->havingRaw('COUNT(*) >= 2')->pluck('pair_key');
     }
 
     public function removeParticipants(Request $request, Sport $sport): RedirectResponse

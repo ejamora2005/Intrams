@@ -69,7 +69,7 @@ test('an explicitly blank identifier is rejected without changing a player or sp
     $this->assertDatabaseCount('athlete_entries', 0);
 });
 
-test('correcting an extra major sport keeps the chosen sport and separately managed cultural and pair registrations', function () {
+test('correcting an extra major sport keeps selected doubles and separately managed cultural registrations', function () {
     [$admin, $edition, $team, $student] = playerSaveScenario();
     $volleyball = playerSaveEvent($edition, 'VOLLEYBALL-MEN');
     $basketball = playerSaveEvent($edition, 'BASKET-5X5-MEN');
@@ -84,7 +84,7 @@ test('correcting an extra major sport keeps the chosen sport and separately mana
     $partnerEntry = playerSaveEntry($partner, $dual, $team, ['pair_key' => $pairKey]);
     expect(app(EligibilityService::class)->evaluateStudent($student, $edition)['possible_dq'])->toBeTrue();
 
-    $this->actingAs($admin)->put(route('admin.students.update', $student), studentSportSavePayload($student, [$volleyball->id]))
+    $this->actingAs($admin)->put(route('admin.students.update', $student), studentSportSavePayload($student, [$volleyball->id, $dual->id]))
         ->assertSessionHasNoErrors()->assertRedirect(route('admin.students.index'));
     expect($student->fresh()->student_number)->toBe('SEA-UNCHANGED-PLAYER')
         ->and($keep->fresh()->status)->toBe('active')->and($keep->fresh()->medical_certificate_status)->toBe('verified')
@@ -120,13 +120,13 @@ test('invalid additional sports roll back profile changes and keep the original 
     $this->assertDatabaseCount('athlete_entries', 1);
 });
 
-test('GAM saves a single sport while preserving cultural and dual registrations', function () {
+test('GAM saves selected sports while preserving cultural registrations and selected doubles', function () {
     [, $edition, $team, $student] = playerSaveScenario();
     $gam = User::factory()->create(['role' => 'gam', 'status' => 'active', 'managed_team_id' => $team->id]);
     $sport = playerSaveEvent($edition, 'VOLLEYBALL-MEN');
     $culturalEntry = playerSaveEntry($student, playerSaveEvent($edition, 'CULT-DIGITAL-POSTER'), $team);
     $pairEntry = playerSaveEntry($student, playerSaveEvent($edition, 'BADMINTON-DOUBLES-MEN', 'dual'), $team, ['pair_key' => (string) Str::uuid()]);
-    $this->actingAs($gam)->put(route('gam.teams.players.sports.update', [$team, $student]), ['edition_sport_ids' => [$sport->id]])
+    $this->actingAs($gam)->put(route('gam.teams.players.sports.update', [$team, $student]), ['edition_sport_ids' => [$sport->id, $pairEntry->edition_sport_id]])
         ->assertSessionHasNoErrors()->assertRedirect();
     expect($student->fresh()->student_number)->toBe('SEA-UNCHANGED-PLAYER')
         ->and($culturalEntry->fresh()->status)->toBe('active')->and($pairEntry->fresh()->status)->toBe('active');

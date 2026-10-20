@@ -47,7 +47,8 @@ test('current chess is team only and badminton keeps singles doubles and team fo
         foreach (['Team', 'Singles', 'Doubles'] as $format) {
             $response->assertSee('Badminton ('.$format.' - Men)')->assertSee('Badminton ('.$format.' - Women)');
         }
-        $response->assertSee('Assign both partners from sport management');
+        $response->assertSee('Partner assignments are managed in sport management')
+            ->assertDontSee('data-sport-locked="true"', false);
     }
     $tabulator = User::factory()->create(['role' => 'tabulator', 'status' => 'active']);
     $this->actingAs($tabulator)->get(route('tabulator.dashboard'))->assertOk()->assertSee('Chess (Men)')->assertSee('Badminton (Team - Men)');

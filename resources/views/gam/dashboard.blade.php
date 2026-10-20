@@ -195,10 +195,10 @@
                                                             @enderror
                                                             @forelse ($sportOptions->filter(fn ($option) => $option->sport?->acceptsStudentGender($member->student->gender)) as $option)
                                                                 <label data-list-search-row data-search-text="{{ Str::lower($option->sport?->name ?? '') }}" class="flex cursor-pointer items-start gap-3 rounded-xl border border-slate-200 p-3 text-sm text-slate-700 transition hover:border-blue-300 hover:bg-blue-50">
-                                                                    <input type="checkbox" name="edition_sport_ids[]" value="{{ $option->id }}" @disabled($option->participant_type === 'dual') @checked($editSportIds->contains((string) $option->id) || $editSportIds->contains((int) $option->id)) class="mt-0.5 rounded border-slate-300 text-blue-700 focus:ring-blue-600">
+                                                                    <input type="checkbox" name="edition_sport_ids[]" value="{{ $option->id }}" @checked($editSportIds->contains((string) $option->id) || $editSportIds->contains((int) $option->id)) class="mt-0.5 rounded border-slate-300 text-blue-700 focus:ring-blue-600">
                                                                     <span class="font-medium">{{ $option->sport?->name }}
                                                                         @if ($option->participant_type === 'dual')
-                                                                            <span class="mt-1 block text-xs font-normal text-amber-700">Ask Admin to assign both partners from sport management.</span>
+                                                                            <span class="mt-1 block text-xs font-normal text-slate-500">You can add or remove this selection. Existing partner assignments are kept while selected.</span>
                                                                         @endif
                                                                     </span>
                                                                 </label>
