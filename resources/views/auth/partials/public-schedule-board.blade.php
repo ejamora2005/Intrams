@@ -15,7 +15,7 @@
             <h2>{{ $sectionTitle }} <span class="schedule-count">{{ $schedules->count() }}</span></h2>
         </div>
         @if ($selectedDate)
-            <a class="schedule-refresh" href="{{ route('login', ['date' => $selectedDate]) }}#schedule-heading">
+            <a class="schedule-refresh" href="{{ route(request()->routeIs('public.schedule') ? 'public.schedule' : 'login', ['date' => $selectedDate]) }}#schedule-heading">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M20 7v5h-5M4 17v-5h5M6 7a7 7 0 0 1 12-1l2 6M4 12l2 6a7 7 0 0 0 12-1"/></svg>
                 <span>Refresh events</span>
             </a>

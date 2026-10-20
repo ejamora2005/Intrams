@@ -36,9 +36,19 @@ Keep `DEPLOY_SEED_DEFAULT_COMPETITIONS=false` and `DEPLOY_SEED_DEFAULT_ACCOUNTS=
 
 ## Public programme from the Sked sheet (October 20)
 
-Redeploy only; no migration or seeder is needed. For the current 2026 edition, the login/schedule page uses the October 19–23 `Sked` snapshot in `config/public_programme.php`. The source spreadsheet URL and cell ranges are recorded there. Repeated cells are grouped by session and venue. AM/PM remain session labels where no exact hour is supplied. Day 1 Badminton ends at 3:00 PM, Day 2 Basketball 3x3 ends at 2:00 PM, and Day 3 Awarding Mugna starts at 7:00 PM (Philippine time). Day 1's unspecified venue stays TBA.
+For the current 2026 edition, the login/schedule page initially uses the October 19–23 `Sked` snapshot in `config/public_programme.php`. The source spreadsheet URL and cell ranges are recorded there. Repeated cells are grouped by session and venue. AM/PM remain session labels where no exact hour is supplied. Day 1 Badminton ends at 3:00 PM, Day 2 Basketball 3x3 ends at 2:00 PM, and Day 3 Awarding Mugna starts at 7:00 PM (Philippine time). Day 1's unspecified venue stays TBA.
 
-The public board displays only the supplied programme, with separate sports, cultural and campus activity sections. Existing sport/bracket schedules stay linked and accessible internally; they are not displayed on this edition's public board. Sports, registrations, brackets, declared results, score details and standings are not updated or deleted. This is a reviewed snapshot, not an automatic Google Sheets sync; later sheet changes require updating the snapshot and redeploying. Other editions retain their existing schedule behavior.
+The public board displays only this programme, with separate sports, cultural and campus activity sections. Existing sport/bracket schedules stay linked and accessible internally; they are not displayed on this edition's public board. Sports, registrations, brackets, declared results, score details and standings are not updated or deleted. Other editions retain their existing schedule behavior.
+
+Administrators can edit these sessions at **Schedules** (`/admin/schedules`), including event name, date, session, exact start time, cutoff, category, venue and public visibility. Times use Philippine time (UTC+8). The first save copies the current programme into the new `public_programmes` table; subsequent saves edit that stored copy. Redeployments and bundled snapshot changes do not overwrite Admin edits or restore hidden sessions. Source-sheet edits are not synchronized automatically. Concurrent changes to the same session are rejected with a reload message instead of overwriting the other administrator's save.
+
+Keep `DEPLOY_RUN_MIGRATIONS=true` to create the new table during deployment. For a manual schema update, run only:
+
+```bash
+php artisan migrate --path=database/migrations/2026_10_20_060000_create_public_programmes_table.php --force
+```
+
+No seeder or score reset is needed. Opening the page does not create programme records; only an authorized save does.
 
 ## Doubles selections in student forms (October 20)
 

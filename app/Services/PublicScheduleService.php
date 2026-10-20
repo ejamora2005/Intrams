@@ -14,7 +14,7 @@ class PublicScheduleService
     /** @return array{currentEdition: ?IntramuralEdition, todayLabel: string, selectedDate: string, availableDates: array<int, string>, todaySchedules: Collection<int, array<string, mixed>>, factionRosters: Collection<int, array<string, mixed>>} */
     public function today(?string $requestedDate = null): array
     {
-        $now = now();
+        $now = now('Asia/Manila');
         $selectedDate = $this->parseDate($requestedDate) ?? $now->copy();
         $currentEdition = IntramuralEdition::query()
             ->where('status', 'active')
@@ -96,8 +96,8 @@ class PublicScheduleService
 
             if ($programmeService->appliesTo($currentEdition)) {
                 $availableDates = $programmeService->datesFor($currentEdition);
-                $todaySchedules = $programmeService->forDate($selectedDate->toDateString(), $factionRosters);
-                $programmeSource = config('public_programme.source');
+                $todaySchedules = $programmeService->forDate($currentEdition, $selectedDate->toDateString(), $factionRosters);
+                $programmeSource = $programmeService->sourceFor($currentEdition);
             } else {
                 $todaySchedules = CompetitionSchedule::query()
                     ->select(['id', 'edition_sport_id', 'bracket_match_id', 'title', 'is_activity', 'starts_at', 'venue', 'coordinator_id', 'status'])

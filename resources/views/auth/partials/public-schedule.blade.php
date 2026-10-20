@@ -29,7 +29,11 @@
             <nav class="schedule-links" aria-label="Event navigation">
                 <a href="{{ url('/') }}#event-results" class="schedule-home">Event results</a>
                 <a href="{{ url('/') }}" class="schedule-home" aria-label="Back to team standings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="m14 6-6 6 6 6M8 12h13" /></svg><span>Standings</span></a>
-                <button type="button" data-open-login class="schedule-login"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M14 4h5v16h-5M3 12h12m-4-4 4 4-4 4" /></svg>Login</button>
+                @auth
+                    <a href="{{ route('dashboard') }}" class="schedule-login">Dashboard</a>
+                @else
+                    <button type="button" data-open-login class="schedule-login"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M14 4h5v16h-5M3 12h12m-4-4 4 4-4 4" /></svg>Login</button>
+                @endauth
             </nav>
         </header>
 
@@ -57,7 +61,7 @@
                         <a class="schedule-home" href="{{ $programmeSource['url'] }}" target="_blank" rel="noopener noreferrer">View programme sheet</a>
                     @endif
                     @if (! empty($availableDates))
-                        <form method="GET" action="{{ route('login') }}" class="schedule-date-picker">
+                        <form method="GET" action="{{ route(request()->routeIs('public.schedule') ? 'public.schedule' : 'login') }}" class="schedule-date-picker">
                             <label for="schedule-date">View date</label>
                             <select id="schedule-date" name="date" onchange="this.form.submit()">
                                 @foreach ($availableDates as $availableDate)

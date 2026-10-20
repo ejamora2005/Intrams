@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\EditionController;
 use App\Http\Controllers\Admin\EditionSportController;
 use App\Http\Controllers\Admin\EventController;
 use App\Http\Controllers\Admin\OperationsAccountController;
+use App\Http\Controllers\Admin\ProgrammeScheduleController;
 use App\Http\Controllers\Admin\RegistrationController;
 use App\Http\Controllers\Admin\SportController;
 use App\Http\Controllers\Admin\SportModuleController;
@@ -20,7 +21,9 @@ use App\Http\Controllers\Gam\DashboardController as GamDashboardController;
 use App\Http\Controllers\RulesController;
 use App\Http\Controllers\SportScoreSheetController;
 use App\Http\Controllers\Tabulator\DashboardController as TabulatorDashboardController;
+use App\Services\PublicScheduleService;
 use App\Services\StandingsService;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -35,6 +38,12 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/up', fn () => response()->json(['status' => 'ok']))->name('health');
+
+Route::get('/schedule', function (Request $request, PublicScheduleService $schedules) {
+    $date = $request->query('date');
+
+    return view('auth.login', $schedules->today(is_string($date) ? $date : null));
+})->name('public.schedule');
 
 Route::get('/', function (StandingsService $standingsService) {
     try {
@@ -154,6 +163,8 @@ Route::middleware([
         Route::get('/participation-rules', [RegistrationController::class, 'rules'])->name('participation-rules.index');
         Route::post('/participation-rules', [RegistrationController::class, 'storeRule'])->name('participation-rules.store');
         Route::get('/competition', [CompetitionController::class, 'index'])->name('competition.index');
+        Route::get('/schedules', [ProgrammeScheduleController::class, 'index'])->name('schedules.index');
+        Route::put('/schedules/{entryKey}', [ProgrammeScheduleController::class, 'update'])->where('entryKey', '[a-f0-9]{24}')->name('schedules.update');
         Route::get('/competition/create', [CompetitionController::class, 'create'])->name('competition.create');
         Route::post('/competition/schedules', [CompetitionController::class, 'storeSchedule'])->name('competition.schedules.store');
         Route::put('/competition/schedules/{schedule}', [CompetitionController::class, 'updateSchedule'])->name('competition.schedules.update');

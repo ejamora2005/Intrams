@@ -55,6 +55,7 @@
                             ['label' => 'Rules & Guidelines', 'route' => 'admin.rules.index', 'match' => 'admin/rules-guidelines'],
                             ['label' => 'Possible DQ Watchlist', 'route' => 'admin.possible-dq.index', 'match' => 'admin/possible-dq'],
                             ['label' => 'Live Competition', 'route' => 'admin.competition.index', 'match' => 'admin/competition'],
+                            ['label' => 'Schedules', 'route' => 'admin.schedules.index', 'match' => 'admin/schedules'],
                             ['label' => 'System Logs', 'route' => 'admin.system-logs.index', 'match' => 'admin/system-logs'],
                         ];
                     @endphp
