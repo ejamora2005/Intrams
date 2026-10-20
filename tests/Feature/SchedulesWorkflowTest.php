@@ -142,3 +142,11 @@ test('a foreign edition bracket cannot be linked and saved results cannot be mov
     $this->put(route('admin.schedules.matches.update', $schedule), [...$update, 'bracket_match_id' => $match->id])->assertSessionHasNoErrors();
     expect($schedule->fresh()->bracket_match_id)->toBe($match->id)->and($match->fresh()->winner_team_id)->toBe($teams[1]->id)->and($schedule->fresh()->venue)->toBe('SSC');
 });
+
+test('activity schedule editing shows its activity name and relevant fields', function () {
+    extract(schedulesWorkflow());
+    $schedule = CompetitionSchedule::create(['edition_sport_id' => $event->id, 'title' => 'Campus fun run', 'is_activity' => true, 'starts_at' => '2026-10-22 06:00:00', 'ends_at' => '2026-10-22 08:00:00', 'venue' => 'Field/Oval', 'status' => 'scheduled']);
+    $this->actingAs($admin)->get(route('admin.schedules.matches.edit', $schedule))->assertOk()->assertSee('Edit activity schedule')->assertSee('Campus fun run')->assertSee('datetime-local', false)->assertDontSee('name="bracket_match_id"', false);
+    $schedule->update(['title' => 'Ruperto Run 2026', 'is_activity' => false]);
+    $this->get(route('admin.schedules.matches.edit', $schedule))->assertOk()->assertSee('Edit activity schedule')->assertSee('Ruperto Run 2026')->assertDontSee('name="bracket_match_id"', false);
+});

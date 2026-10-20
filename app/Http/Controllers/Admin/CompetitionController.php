@@ -75,9 +75,10 @@ class CompetitionController extends Controller
     public function edit(CompetitionSchedule $schedule): View
     {
         $schedule->load('editionSport.edition', 'editionSport.sport', 'bracketMatch');
+        $isSchoolActivity = $schedule->is_activity || preg_match('/^Ruperto\s+Run\b/i', trim((string) $schedule->title)) === 1;
         $matches = app(ScheduleBracketService::class)->matches($schedule->editionSport->edition)->where('edition_sport_id', $schedule->edition_sport_id);
 
-        return view('admin.schedules.edit-match', ['schedule' => $schedule, 'scheduleStatuses' => self::SCHEDULE_STATUSES, 'venueOptions' => $this->venueOptions(), 'bracketOptions' => app(ScheduleBracketService::class)->options($matches)]);
+        return view('admin.schedules.edit-match', ['schedule' => $schedule, 'isSchoolActivity' => $isSchoolActivity, 'scheduleStatuses' => self::SCHEDULE_STATUSES, 'venueOptions' => $this->venueOptions(), 'bracketOptions' => app(ScheduleBracketService::class)->options($matches)]);
     }
 
     public function storeSchedule(Request $request, CompetitionScheduleOptions $options): RedirectResponse
