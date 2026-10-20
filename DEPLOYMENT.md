@@ -2,6 +2,12 @@
 
 This project is ready for a Dokploy Docker Compose deployment on `slsubc.tech`.
 
+## GAM dashboard archived-record fix
+
+Deploy the latest code; no migration or seeder is needed. Medical review excludes registrations whose student has been archived, and Ready Matches excludes brackets whose sport has been deleted. These historical registrations and brackets remain in the database. Scores, declared winners and rosters are not rewritten.
+
+The PHPUnit bootstrap ignores the development configuration cache and checks that its connection targets the local `intrams_test` database before any database refresh starts.
+
 ## Dokploy Setup
 
 1. Point the DNS `A` record for `slsubc.tech` to the VPS public IP.

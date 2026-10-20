@@ -88,6 +88,7 @@ class DashboardController extends Controller
                     'editionSport.sport',
                 ])
                 ->where('status', 'active')
+                ->whereHas('student')
                 ->whereIn('edition_sport_id', $editionSportIds)
                 ->where(function ($query) use ($edition, $managedTeamId, $hasAllFactionAccess): void {
                     if (! $edition) {
@@ -143,6 +144,7 @@ class DashboardController extends Controller
                 : BracketMatch::query()
                     ->with(['editionSport.sport', 'competitorOne.team', 'competitorTwo.team', 'schedule'])
                     ->whereIn('edition_sport_id', $editionSportIds)
+                    ->whereHas('editionSport.sport')
                     ->where('status', 'pending')
                     ->orderBy('bracket')
                     ->orderBy('round_number')

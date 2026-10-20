@@ -899,3 +899,45 @@ test('GAM users cannot manage another faction', function () {
 
     $this->assertDatabaseMissing('students', ['student_number' => 'BLOCKED-001']);
 });
+
+test('GAM dashboard keeps archived student registrations without rendering a medical review form for them', function () {
+    $edition = operationsEdition();
+    $team = operationsTeam($edition);
+    $sport = operationsSport($edition);
+    $gam = User::factory()->create(['role' => 'gam', 'status' => 'active', 'managed_team_id' => null]);
+    $student = Student::query()->create([
+        'first_name' => 'Archived', 'last_name' => 'Athlete', 'school_year' => $edition->school_year,
+        'course_id' => $team->course_id, 'status' => 'active',
+    ]);
+    TeamMember::query()->create([
+        'edition_id' => $edition->id, 'team_id' => $team->id, 'student_id' => $student->id,
+        'assigned_by' => $gam->id, 'assigned_at' => now(),
+    ]);
+    $entry = AthleteEntry::query()->create([
+        'edition_sport_id' => $sport->id, 'student_id' => $student->id, 'team_id' => $team->id,
+        'status' => 'active', 'medical_certificate_status' => 'pending', 'assigned_at' => now(),
+    ]);
+    $student->delete();
+
+    $this->actingAs($gam)->get(route('gam.dashboard'))->assertOk()
+        ->assertSee('No medical certificate reviews are required yet.');
+
+    expect($entry->fresh()->status)->toBe('active');
+    $this->assertSoftDeleted($student);
+});
+
+test('GAM ready matches do not render a deleted sport while preserving its bracket history', function () {
+    $edition = operationsEdition();
+    operationsTeam($edition);
+    $sport = operationsSport($edition, 'Removed event', 'REMOVED-EVENT');
+    $gam = User::factory()->create(['role' => 'gam', 'status' => 'active', 'managed_team_id' => null]);
+    $match = \App\Models\BracketMatch::query()->create([
+        'edition_sport_id' => $sport->id, 'bracket' => 'round_robin', 'round_number' => 1,
+        'match_number' => 1, 'status' => 'pending',
+    ]);
+    $sport->sport->delete();
+
+    $this->actingAs($gam)->get(route('gam.dashboard'))->assertOk()->assertDontSee('Removed event');
+
+    expect($match->fresh()->status)->toBe('pending');
+});
