@@ -17,7 +17,7 @@ class DeclaredResultsExportService
      * Build a read-only snapshot of the data already saved for the active
      * edition. This method deliberately does not recalculate or persist data.
      *
-     * @return array{edition: IntramuralEdition|null, generated_at: string, standings: Collection, results: Collection, declared_count: int}
+     * @return array{edition: IntramuralEdition|null, generated_at: string, standings: Collection, results: Collection, result_groups: Collection, declared_count: int}
      */
     public function data(?IntramuralEdition $edition): array
     {
@@ -31,12 +31,17 @@ class DeclaredResultsExportService
 
             return $result;
         })->values();
+        $resultGroups = collect([
+            'Sports Results' => $results->filter(fn (array $result): bool => in_array($result['category'], ['sports', 'track-field'], true))->values(),
+            'Cultural Results' => $results->where('category', 'cultural')->values(),
+        ]);
 
         return [
             'edition' => $edition,
             'generated_at' => now('Asia/Manila')->format('M j, Y g:i:s A').' PHT (UTC+8)',
             'standings' => $this->standings->standingsFor($edition),
             'results' => $results,
+            'result_groups' => $resultGroups,
             'declared_count' => $results->count(),
         ];
     }
@@ -67,6 +72,8 @@ class DeclaredResultsExportService
             ['School year', $schoolYear, null, null, null, null],
             ['Generated', $data['generated_at'], null, null, null, null],
             ['Declared events', $data['declared_count'], null, null, null, null],
+            ['Sports events declared', $data['result_groups']['Sports Results']->count(), null, null, null, null],
+            ['Cultural events declared', $data['result_groups']['Cultural Results']->count(), null, null, null, null],
             [null, null, null, null, null, null],
             ['Rank', 'Faction', 'Points', 'Gold', 'Silver', 'Bronze'],
         ];
@@ -81,17 +88,29 @@ class DeclaredResultsExportService
             ];
         }
 
-        $resultRows = [
-            [$title.' - Declared results', null, null, null, null, null, null, null],
-            ['School year', $schoolYear, null, null, null, null, null, null],
-            ['Generated', $data['generated_at'], null, null, null, null, null, null],
-            [null, null, null, null, null, null, null, null],
-            ['Category', 'Event', 'Declared at (PHT)', 'Declared by', 'Placement', 'Placement label', 'Faction', 'Points'],
+        $sheets = ['Summary' => $summaryRows];
+        foreach ($data['result_groups'] as $groupName => $groupResults) {
+            $sheets[$groupName] = $this->resultRows($title.' - '.$groupName, $schoolYear, $data['generated_at'], $groupResults);
+        }
+
+        return $this->zipWorkbook($sheets);
+    }
+
+    /** @return array<int, array<int, mixed>> */
+    private function resultRows(string $title, string $schoolYear, string $generatedAt, Collection $results): array
+    {
+        $rows = [
+            [$title, null, null, null, null, null, null, null, null],
+            ['School year', $schoolYear, null, null, null, null, null, null, null],
+            ['Generated', $generatedAt, null, null, null, null, null, null, null],
+            [null, null, null, null, null, null, null, null, null],
+            ['Category', 'Score group', 'Event', 'Declared at (PHT)', 'Declared by', 'Placement', 'Placement label', 'Faction', 'Points'],
         ];
-        foreach ($data['results'] as $result) {
+        foreach ($results as $result) {
             foreach ($result['placements'] as $placement) {
-                $resultRows[] = [
+                $rows[] = [
                     $result['category_label'],
+                    ucfirst($result['score_group'] ?? 'student'),
                     $result['name'],
                     $this->formatDate($result['declared_at']),
                     $result['declared_by'],
@@ -102,14 +121,11 @@ class DeclaredResultsExportService
                 ];
             }
         }
-        if (count($resultRows) === 5) {
-            $resultRows[] = ['No declared results', null, null, null, null, null, null, null];
+        if (count($rows) === 5) {
+            $rows[] = ['No declared results in this category', null, null, null, null, null, null, null, null];
         }
 
-        return $this->zipWorkbook([
-            'Summary' => $summaryRows,
-            'Declared Results' => $resultRows,
-        ]);
+        return $rows;
     }
 
     private function formatDate(mixed $value): string

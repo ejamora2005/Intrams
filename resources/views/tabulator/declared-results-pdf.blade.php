@@ -42,28 +42,31 @@
         </tbody>
     </table>
 
-    <h2>Declared event placements</h2>
-    <table>
-        <thead><tr><th>Category</th><th>Event</th><th>Declared at (PHT)</th><th>Declared by</th><th>Placement</th><th>Label</th><th>Faction</th><th>Points</th></tr></thead>
-        <tbody>
-        @forelse ($results as $result)
-            @foreach ($result['placements'] as $placement)
-                <tr>
-                    <td>{{ $result['category_label'] }}</td>
-                    <td>{{ $result['name'] }}</td>
-                    <td>{{ $result['declared_at']?->copy()->setTimezone('Asia/Manila')->format('M j, Y g:i:s A') ?? 'Time unavailable' }}</td>
-                    <td>{{ $result['declared_by'] }}</td>
-                    <td class="number">{{ $placement['placement'] }}</td>
-                    <td>{{ $placement['label'] }}</td>
-                    <td>{{ $placement['team_name'] }}</td>
-                    <td class="number">{{ number_format((float) $placement['points'], 2) }}</td>
-                </tr>
-            @endforeach
-        @empty
-            <tr><td colspan="8" class="empty">No declared event results are available.</td></tr>
-        @endforelse
-        </tbody>
-    </table>
+    @foreach ($result_groups as $groupName => $groupResults)
+        <h2>{{ $groupName }}</h2>
+        <table>
+            <thead><tr><th>Category</th><th>Score group</th><th>Event</th><th>Declared at (PHT)</th><th>Declared by</th><th>Placement</th><th>Label</th><th>Faction</th><th>Points</th></tr></thead>
+            <tbody>
+            @forelse ($groupResults as $result)
+                @foreach ($result['placements'] as $placement)
+                    <tr>
+                        <td>{{ $result['category_label'] }}</td>
+                        <td>{{ ucfirst($result['score_group'] ?? 'student') }}</td>
+                        <td>{{ $result['name'] }}</td>
+                        <td>{{ $result['declared_at']?->copy()->setTimezone('Asia/Manila')->format('M j, Y g:i:s A') ?? 'Time unavailable' }}</td>
+                        <td>{{ $result['declared_by'] }}</td>
+                        <td class="number">{{ $placement['placement'] }}</td>
+                        <td>{{ $placement['label'] }}</td>
+                        <td>{{ $placement['team_name'] }}</td>
+                        <td class="number">{{ number_format((float) $placement['points'], 2) }}</td>
+                    </tr>
+                @endforeach
+            @empty
+                <tr><td colspan="9" class="empty">No declared results in this category.</td></tr>
+            @endforelse
+            </tbody>
+        </table>
+    @endforeach
     <p class="footer">This report is a read-only export of the declared results and standings saved in the system.</p>
 </body>
 </html>

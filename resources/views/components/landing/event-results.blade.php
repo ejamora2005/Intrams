@@ -1,4 +1,4 @@
-@props(['results' => collect(), 'unavailable' => false])
+@props(['results' => collect(), 'categoryStandings' => collect(), 'unavailable' => false])
 
 <dialog id="event-results" class="public-results-dialog" aria-labelledby="event-results-heading" data-public-event-results>
     <header class="public-results-header">
@@ -23,30 +23,59 @@
         @elseif ($results->isEmpty())
             <div class="public-results-empty"><h3>No declared results yet</h3><p>Results will appear here once event placements are declared.</p></div>
         @else
-            <div class="public-results-grid">
-                @foreach ($results as $result)
-                    <article class="public-result-card" data-public-result data-category="{{ $result['category'] }}" data-search="{{ Str::lower($result['name'].' '.$result['placements']->pluck('team_name')->implode(' ')) }}" aria-labelledby="public-result-{{ $result['id'] }}">
-                        <header>
-                            <span class="public-result-category">{{ $result['category_label'] }}</span>
-                            <h3 id="public-result-{{ $result['id'] }}">{{ $result['name'] }}</h3>
-                            <p class="public-result-time">Declared <x-result-time :value="$result['declared_at']" /></p>
-                        </header>
-                        <ol class="public-result-placements">
-                            @forelse ($result['placements'] as $placement)
-                                <li>
-                                    <div class="public-result-faction">
-                                        @if ($placement['team_logo'])<img src="{{ asset($placement['team_logo']) }}" alt="" width="36" height="36" loading="lazy">@endif
-                                        <div><span class="public-result-place">{{ $placement['label'] }}</span><strong>{{ $placement['team_name'] }}</strong></div>
-                                    </div>
-                                    <span class="public-result-points">{{ number_format($placement['points'], 2) }} <small>pts</small></span>
-                                </li>
-                            @empty
-                                <li>No placements available.</li>
-                            @endforelse
-                        </ol>
-                    </article>
-                @endforeach
-            </div>
+            <section class="public-results-leaders" aria-labelledby="category-leaders-heading">
+                <div class="public-results-group-heading"><div><p class="public-results-eyebrow">Faction race</p><h3 id="category-leaders-heading">Who is leading?</h3></div><span>Student totals only</span></div>
+                <div class="public-results-leaders-grid">
+                    @foreach (['sports' => 'Sports leader', 'cultural' => 'Cultural leader'] as $category => $label)
+                        @php($leaders = ($categoryStandings->get($category) ?? collect())->where('rank', 1)->filter(fn ($row) => (float) $row['tally']->points > 0))
+                        <article class="public-results-leader-card public-results-leader-card--{{ $category }}">
+                            <p class="public-result-category">{{ $label }}</p>
+                            @if ($leaders->isEmpty())
+                                <strong>No declared {{ $category }} scores yet</strong>
+                            @else
+                                <div class="public-results-leader-list">
+                                    @foreach ($leaders as $leader)
+                                        <div class="public-results-leader">
+                                            @if ($leader['team']->logo_path)<img src="{{ asset($leader['team']->logo_path) }}" alt="" width="42" height="42" loading="lazy">@endif
+                                            <div><strong>{{ $leader['team']->name }}</strong><span>{{ number_format((float) $leader['tally']->points, 2) }} points</span></div>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            @endif
+                        </article>
+                    @endforeach
+                </div>
+            </section>
+            @foreach (['sports' => 'Sports results', 'cultural' => 'Cultural results'] as $category => $heading)
+                @php($groupResults = $results->filter(fn (array $result): bool => $category === 'cultural' ? $result['category'] === 'cultural' : in_array($result['category'], ['sports', 'track-field'], true)))
+                <section class="public-results-group" data-public-result-group>
+                    <div class="public-results-group-heading"><div><p class="public-results-eyebrow">Declared results</p><h3>{{ $heading }}</h3></div><span>{{ $groupResults->count() }} {{ Str::plural('event', $groupResults->count()) }}</span></div>
+                    <div class="public-results-grid">
+                        @foreach ($groupResults as $result)
+                            <article class="public-result-card" data-public-result data-category="{{ $result['category'] }}" data-search="{{ Str::lower($result['name'].' '.$result['placements']->pluck('team_name')->implode(' ')) }}" aria-labelledby="public-result-{{ $result['id'] }}">
+                                <header>
+                                    <span class="public-result-category">{{ $result['category_label'] }}</span>
+                                    <h3 id="public-result-{{ $result['id'] }}">{{ $result['name'] }}</h3>
+                                    <p class="public-result-time">Declared <x-result-time :value="$result['declared_at']" /></p>
+                                </header>
+                                <ol class="public-result-placements">
+                                    @forelse ($result['placements'] as $placement)
+                                        <li>
+                                            <div class="public-result-faction">
+                                                @if ($placement['team_logo'])<img src="{{ asset($placement['team_logo']) }}" alt="" width="36" height="36" loading="lazy">@endif
+                                                <div><span class="public-result-place">{{ $placement['label'] }}</span><strong>{{ $placement['team_name'] }}</strong></div>
+                                            </div>
+                                            <span class="public-result-points">{{ number_format($placement['points'], 2) }} <small>pts</small></span>
+                                        </li>
+                                    @empty
+                                        <li>No placements available.</li>
+                                    @endforelse
+                                </ol>
+                            </article>
+                        @endforeach
+                    </div>
+                </section>
+            @endforeach
             <p class="public-results-empty" data-public-results-empty hidden>No results match your search. Try another event, faction, or category.</p>
         @endif
     </div>

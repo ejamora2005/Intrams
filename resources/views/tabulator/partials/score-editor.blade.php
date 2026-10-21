@@ -11,6 +11,14 @@
     <form method="POST" action="{{ route('tabulator.sport-results.store') }}" data-ops-form data-tab-score-form data-declare-winners data-allow-repeated-winners="{{ $allowRepeatedWinners ? 'true' : 'false' }}" data-review-modal="tabulator-declare-sports-modal" class="tab-stack">
         @csrf
         <input type="hidden" name="edition_sport_id" value="{{ $selectedSport->id }}">
+        <fieldset class="tab-score-group">
+            <legend class="tab-eyebrow">Score category</legend>
+            <p class="tab-muted tab-small">Employee scores are saved separately and are excluded from the student faction total.</p>
+            <div class="tab-score-group-options">
+                <label><input type="radio" name="score_group" value="student" @checked(old('score_group', $selectedSport->sportResult?->score_group ?? 'student') === 'student')> <span>Student score</span><small>Counts in student standings</small></label>
+                <label><input type="radio" name="score_group" value="employee" @checked(old('score_group', $selectedSport->sportResult?->score_group ?? 'student') === 'employee')> <span>Employee score</span><small>Separate employee total</small></label>
+            </div>
+        </fieldset>
         <div class="tab-placement-grid">
             @foreach ($pointRules as $rule)
                 <label class="tab-placement-card">

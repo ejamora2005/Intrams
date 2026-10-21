@@ -56,6 +56,7 @@ Route::get('/', function (StandingsService $standingsService) {
             'preview' => config('landing.preview', true),
             'updatedAt' => config('landing.updatedAt'),
             'results' => collect(),
+            'categoryStandings' => collect(['sports' => collect(), 'cultural' => collect()]),
             'resultsUnavailable' => true,
         ];
     }
@@ -65,6 +66,7 @@ Route::get('/', function (StandingsService $standingsService) {
         'landingPreview' => $landing['preview'],
         'landingUpdatedAt' => $landing['updatedAt'],
         'declaredEventResults' => $landing['results'],
+        'landingCategoryStandings' => $landing['categoryStandings'] ?? collect(['sports' => collect(), 'cultural' => collect()]),
         'eventResultsUnavailable' => $landing['resultsUnavailable'] ?? false,
     ]);
 });

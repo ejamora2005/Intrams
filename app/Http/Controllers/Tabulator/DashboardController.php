@@ -48,7 +48,8 @@ class DashboardController extends Controller
     public function index(Request $request): View
     {
         $edition = $this->standingsService->activeEdition();
-        $standings = $this->standingsService->standingsFor($edition);
+        $scoreGroup = $this->standingsService->normalizeScoreGroup($request->input('score_group', 'student'));
+        $standings = $this->standingsService->standingsFor($edition, $scoreGroup);
         $editionSports = $this->standingsService->scoringEventsFor($edition);
         $editionSportIds = $editionSports->pluck('id');
         $selectedSport = $editionSports->firstWhere('id', (int) $request->input('edition_sport_id', $request->old('edition_sport_id', 0)));
@@ -70,6 +71,7 @@ class DashboardController extends Controller
         return view('tabulator.dashboard', [
             'edition' => $edition,
             'standings' => $standings,
+            'scoreGroup' => $scoreGroup,
             'editionSports' => $editionSports,
             'selectedSport' => $selectedSport,
             'pointRules' => $selectedSport ? $this->standingsService->pointRulesFor($selectedSport) : [],
@@ -94,6 +96,7 @@ class DashboardController extends Controller
                 'edition_sport_id' => ['required', 'integer', 'exists:edition_sports,id'],
                 'placements' => ['required', 'array'],
                 'placements.*' => ['nullable', 'integer', 'exists:teams,id'],
+                'score_group' => ['nullable', 'string', 'in:student,employee'],
                 'tabulator_password' => ['required', 'string'],
             ]);
             $this->ensureCurrentPassword($request, $data['tabulator_password']);
@@ -137,7 +140,7 @@ class DashboardController extends Controller
                 ]);
             }
 
-            $this->standingsService->recordSportResult($editionSport, $data['placements'], $request->user());
+            $this->standingsService->recordSportResult($editionSport, $data['placements'], $request->user(), $data['score_group'] ?? 'student');
 
             return redirect()
                 ->to(route('tabulator.dashboard', ['edition_sport_id' => $editionSport->id]).'#declare-sports')

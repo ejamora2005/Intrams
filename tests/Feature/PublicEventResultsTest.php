@@ -54,6 +54,26 @@ test('guests can read every declared event across sports cultural and athletics 
     $this->get('/login')->assertOk()->assertSee(url('/').'#event-results', false)->assertSee('Event results');
 });
 
+test('landing results expose separate sports and cultural faction leaders', function () {
+    [$edition, $user, $teams] = publicResultsFixture();
+    $standings = app(StandingsService::class);
+    $sports = publicResultsEvent($edition, 'Basketball 5x5 (Men)', 'BASKET-5X5-MEN');
+    $cultural = publicResultsEvent($edition, 'Cultural: Poster Contest', 'CULT-POSTER');
+
+    $standings->recordSportResult($sports, [1 => $teams[1]->id], $user);
+    $standings->recordSportResult($cultural, [1 => $teams[2]->id], $user);
+
+    $data = $standings->landingData();
+    expect($data['categoryStandings']->get('sports')->first()['team']->name)->toBe('Terraquatic Eagles')
+        ->and($data['categoryStandings']->get('cultural')->first()['team']->name)->toBe('Trojan Warriors');
+
+    $this->get('/')->assertOk()
+        ->assertSee('Sports leader')
+        ->assertSee('Cultural leader')
+        ->assertSee('Sports results')
+        ->assertSee('Cultural results');
+});
+
 test('public results exclude undeclared archived superseded and other edition events', function () {
     [$edition, $user, $teams] = publicResultsFixture();
     $standings = app(StandingsService::class);
@@ -80,7 +100,15 @@ test('public results exclude undeclared archived superseded and other edition ev
 
 test('updated declarations replace public placements and retired fourth places are not published', function () {
     [$edition, $user, $teams] = publicResultsFixture();
-    $event = publicResultsEvent($edition, '100m Run (Men)', '100M-RUN-MEN', ['point_system' => 'sports_athletics', 'placements' => config('intramurals.point_systems.sports_athletics.placements')]);
+    $event = publicResultsEvent($edition, '100m Run (Men)', '100M-RUN-MEN', [
+        'point_system' => 'historical_four_place_test',
+        'placements' => collect([10, 7, 5, 0])->map(fn ($points, $index) => [
+            'placement' => $index + 1,
+            'label' => ($index + 1).' Place',
+            'points' => $points,
+            'medal' => ['gold', 'silver', 'bronze', null][$index],
+        ])->all(),
+    ]);
     $standings = app(StandingsService::class);
     $result = $standings->recordSportResult($event, [1 => $teams[0]->id, 2 => $teams[1]->id, 3 => $teams[2]->id, 4 => $teams[0]->id], $user);
     expect($standings->declaredResultsFor($edition)->first()['placements'])->toHaveCount(3);

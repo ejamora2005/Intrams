@@ -79,6 +79,6 @@
                 </div>
             </aside>
         </main>
-        <x-landing.event-results :results="$declaredEventResults ?? collect()" :unavailable="$eventResultsUnavailable ?? false" />
+        <x-landing.event-results :results="$declaredEventResults ?? collect()" :category-standings="$landingCategoryStandings ?? collect()" :unavailable="$eventResultsUnavailable ?? false" />
     </body>
 </html>

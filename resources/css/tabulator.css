@@ -61,6 +61,13 @@ a.tab-card:hover, .tab-card:focus-within { border-color: #a9d8ff80; }
 .tab-placements-list p { display: flex; gap: 10px; align-items: center; font-size: 12px; }
 .tab-rank-small { display: inline-flex; border-radius: 7px; padding: 4px 8px; background: #a9d8ff15; color: #edce93; font-size: 12px; font-weight: 700; }
 .tab-placement-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(min(100%,220px),1fr)); gap: 16px; }
+.tab-score-group { border: 1px solid #b8dfff26; border-radius: 14px; padding: 16px; background: #0d2c46; }
+.tab-score-group-options { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 12px; }
+.tab-score-group-options label { display: flex; flex-direction: column; gap: 4px; border: 1px solid #b8dfff33; border-radius: 10px; padding: 12px; color: #dfedfc; cursor: pointer; transition: border-color .15s ease, background .15s ease; }
+.tab-score-group-options label:has(input:checked) { border-color: #f2c66d; background: #f2c66d14; }
+.tab-score-group-options input { margin-right: 6px; accent-color: #f2c66d; }
+.tab-score-group-options span { font-weight: 700; }
+.tab-score-group-options small { color: #a9c3da; padding-left: 23px; }
 .tab-placement-card { display: grid; gap: 10px; border: 1px solid #b8dfff35; border-radius: 12px; padding: 20px; background: #ffffff04; }
 .tab-placement-card > strong { font-size: 18px; font-weight: 650; }
 .tab-point-chip { font-size: 12px; color: #c5e9ff; font-weight: 600; }
@@ -103,6 +110,7 @@ a.tab-card:hover, .tab-card:focus-within { border-color: #a9d8ff80; }
 @media(max-width:1100px) { .tab-kpis { grid-template-columns: repeat(2,minmax(0,1fr)); } }
 @media(max-width:640px) {
  .tab-heading, .tab-start, .tab-section-heading, .tab-review-bar { align-items: stretch; flex-direction: column; gap: 12px; }
+ .tab-score-group-options { grid-template-columns: 1fr; }
  .tab-heading h2 { font-size: 28px; }.tab-heading > a { align-self: start; }
  .tab-nav { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); }.tab-nav a { padding: 10px 8px; font-size: 12px; }
  .tab-card, .tab-panel { padding: 18px; }.tab-kpis { gap: 10px; }.tab-kpi { padding: 15px; }.tab-kpi strong { font-size: 30px; }

@@ -1,6 +1,7 @@
 @props(['team', 'index' => 0])
 
-<article class="team-banner team-banner--{{ $team['theme'] }}" aria-labelledby="team-name-{{ $index }}" style="--team-primary: {{ $team['primaryColor'] }}; --team-secondary: {{ $team['secondaryColor'] }}; --wind-duration: {{ 8.4 + $index * 1.7 }}s; --wind-delay: -{{ 2 + $index * 3.1 }}s;">
+@php($displayRank = (int) ($team['rank'] ?? ($index + 1)))
+<article class="team-banner team-banner--{{ $team['theme'] }} team-banner--rank-{{ $displayRank }}" aria-labelledby="team-name-{{ $index }}" style="--team-primary: {{ $team['primaryColor'] }}; --team-secondary: {{ $team['secondaryColor'] }}; --wind-duration: {{ 8.4 + $index * 1.7 }}s; --wind-delay: -{{ 2 + $index * 3.1 }}s;">
     <div class="banner-rod" aria-hidden="true"><span></span></div>
     <div class="banner-shadow">
         <div class="banner-cloth">

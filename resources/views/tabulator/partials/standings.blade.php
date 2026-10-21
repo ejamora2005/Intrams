@@ -1,7 +1,9 @@
 <section aria-label="Overall standings" class="tab-stack">
     <div class="tab-section-heading">
-        <div><h3>Overall standings</h3><span class="tab-muted tab-small">Points from declared event placements</span></div>
+        <div><h3>{{ $scoreGroup === 'employee' ? 'Employee standings' : 'Student standings' }}</h3><span class="tab-muted tab-small">{{ $scoreGroup === 'employee' ? 'Employee scores kept separate from student totals' : 'Student points from declared event placements' }}</span></div>
         <div class="tab-actions" aria-label="Download declared results">
+            <a class="tab-button {{ $scoreGroup === 'student' ? '' : 'tab-button-secondary' }}" href="{{ route('tabulator.dashboard', ['score_group' => 'student']) }}#declared-results">Student total</a>
+            <a class="tab-button {{ $scoreGroup === 'employee' ? '' : 'tab-button-secondary' }}" href="{{ route('tabulator.dashboard', ['score_group' => 'employee']) }}#declared-results">Employee total</a>
             <a class="tab-button tab-button-secondary" href="{{ route('tabulator.results.export', ['format' => 'xlsx']) }}">Download Excel</a>
             <a class="tab-button tab-button-secondary" href="{{ route('tabulator.results.export', ['format' => 'pdf']) }}">Download PDF</a>
         </div>

@@ -11,6 +11,7 @@ class SportResult extends Model
         'submitted_by',
         'placements_json',
         'points_json',
+        'score_group',
         'submitted_at',
     ];
 

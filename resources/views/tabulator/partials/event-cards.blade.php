@@ -15,7 +15,7 @@
                 $placedNames = $currentPlacements->map(fn ($teamId) => $teamsById->get((int) $teamId)?->name)->filter()->implode(' ');
             @endphp
             <article class="tab-card tab-event" data-tab-filter-card data-category="{{ $category }}" data-status="{{ $result ? 'declared' : 'pending' }}" data-search="{{ Str::lower($event->sport->name.' '.$event->sport->catalogue_group_label.' '.$placedNames) }}">
-                <div class="tab-card-top"><span class="tab-icon"><x-sport-group-icon :group="$event->sport->catalogue_group_key" /></span><span class="tab-state" data-state="{{ $result ? 'declared' : 'pending' }}">{{ $result ? 'Declared' : 'Pending' }}</span></div>
+                <div class="tab-card-top"><span class="tab-icon"><x-sport-group-icon :group="$event->sport->catalogue_group_key" /></span><span class="tab-state" data-state="{{ $result ? 'declared' : 'pending' }}">{{ $result ? 'Declared' : 'Pending' }}</span>@if ($result)<span class="tab-pill">{{ ucfirst($result->score_group ?? 'student') }}</span>@endif</div>
                 <div><p class="tab-eyebrow">{{ $category === 'cultural' ? 'Cultural' : $event->sport->catalogue_group_label }}</p><h3>{{ $event->sport->name }}</h3></div>
                 @if ($monitor && $result)
                     <div class="tab-placements-list">@foreach ($currentPlacements as $place => $teamId)<p><span class="tab-rank-small">#{{ $place }}</span><span>{{ $teamsById->get((int) $teamId)?->name ?? 'Removed faction' }}</span></p>@endforeach</div>

@@ -36,12 +36,16 @@ if (dialog) {
     const category = dialog.querySelector('[data-public-results-category]');
     const count = dialog.querySelector('[data-public-results-count]');
     const empty = dialog.querySelector('[data-public-results-empty]');
+    const groups = [...dialog.querySelectorAll('[data-public-result-group]')];
     const filter = () => {
         const query = search.value.trim().toLocaleLowerCase();
         let visible = 0;
         cards.forEach(card => {
             card.hidden = !((!query || card.dataset.search.includes(query)) && (!category.value || card.dataset.category === category.value));
             if (!card.hidden) visible++;
+        });
+        groups.forEach(group => {
+            group.hidden = !group.querySelector('[data-public-result]:not([hidden])');
         });
         count.textContent = `${visible} of ${cards.length} declared events`;
         if (empty) empty.hidden = visible > 0;

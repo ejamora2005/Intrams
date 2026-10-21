@@ -85,6 +85,31 @@ test('editing placements replaces the event totals instead of adding duplicate p
         ->and((float) TeamTally::where('team_id', $teams[1]->id)->value('points'))->toBe(10.0);
 });
 
+test('employee results are separated from student standings and can be viewed independently', function () {
+    $user = User::factory()->create(['role' => 'tabulator', 'status' => 'active']);
+    $this->actingAs($user);
+    [$edition, $events, $teams] = tabulatorScoringFixture();
+
+    $this->post(route('tabulator.sport-results.store'), [
+        'edition_sport_id' => $events[0]->id,
+        'placements' => [1 => $teams[0]->id],
+        'score_group' => 'employee',
+        'tabulator_password' => 'password',
+    ])->assertSessionHasNoErrors();
+
+    $result = SportResult::query()->where('edition_sport_id', $events[0]->id)->firstOrFail();
+    expect($result->score_group)->toBe('employee')
+        ->and((float) TeamTally::where('team_id', $teams[0]->id)->value('points'))->toBe(0.0);
+
+    $employeeRow = app(StandingsService::class)->standingsFor($edition, 'employee')->firstWhere('team.id', $teams[0]->id);
+    expect((float) $employeeRow['tally']->points)->toBe(10.0);
+
+    $this->get(route('tabulator.dashboard', ['score_group' => 'employee']))
+        ->assertOk()
+        ->assertSee('Employee standings')
+        ->assertSee('Employee total');
+});
+
 test('declared results can be downloaded as Excel or PDF without changing saved data', function () {
     $this->actingAs(User::factory()->create(['role' => 'tabulator', 'status' => 'active']));
     [$edition, $events, $teams] = tabulatorScoringFixture();
@@ -107,7 +132,8 @@ test('declared results can be downloaded as Excel or PDF without changing saved 
     file_put_contents($path, $excel->getContent());
     $zip = new ZipArchive;
     expect($zip->open($path))->toBeTrue();
-    expect($zip->getFromName('xl/workbook.xml'))->toContain('Declared Results')
+    expect($zip->getFromName('xl/workbook.xml'))->toContain('Sports Results')
+        ->and($zip->getFromName('xl/workbook.xml'))->toContain('Cultural Results')
         ->and($zip->getFromName('xl/worksheets/sheet2.xml'))->toContain('Sea Dragons');
     $zip->close();
     unlink($path);

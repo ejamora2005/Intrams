@@ -16,6 +16,8 @@ use Illuminate\Validation\ValidationException;
 
 class StandingsService
 {
+    public const SCORE_GROUPS = ['student', 'employee'];
+
     public const DEFAULT_PLACEMENTS = [
         ['placement' => 1, 'label' => 'Champion', 'points' => 10.0, 'medal' => 'gold'],
         ['placement' => 2, 'label' => 'Runner-up', 'points' => 7.0, 'medal' => 'silver'],
@@ -56,16 +58,19 @@ class StandingsService
     }
 
     /** @return Collection<int, array{team: Team, tally: TeamTally, rank: int}> */
-    public function standingsFor(?IntramuralEdition $edition): Collection
+    public function standingsFor(?IntramuralEdition $edition, string $scoreGroup = 'student'): Collection
     {
         if (! $edition instanceof IntramuralEdition) {
             return collect();
         }
 
-        $tallies = TeamTally::query()
-            ->where('edition_id', $edition->id)
-            ->get()
-            ->keyBy('team_id');
+        $scoreGroup = $this->normalizeScoreGroup($scoreGroup);
+        $tallies = $scoreGroup === 'student'
+            ? TeamTally::query()
+                ->where('edition_id', $edition->id)
+                ->get()
+                ->keyBy('team_id')
+            : $this->employeeTalliesFor($edition);
 
         return Team::query()
             ->with('course')
@@ -130,10 +135,12 @@ class StandingsService
 
                         return [
                             ...$rule,
+                            'team_id' => (int) $teamId,
                             'team_name' => $team?->name ?? 'Faction unavailable',
                             'team_logo' => $team?->logo_path,
                         ];
-                    })->filter()->sortBy('placement')->values();
+                    })->filter(fn (?array $placement): bool => $placement !== null && (float) ($placement['points'] ?? 0) > 0)
+                    ->sortBy('placement')->values();
                 $category = str_starts_with(strtoupper($event->sport->code), 'CULT-')
                     ? 'cultural' : ($event->sport->isTrackAndField() ? 'track-field' : 'sports');
 
@@ -142,6 +149,7 @@ class StandingsService
                     'name' => preg_replace('/^Cultural(?: Bonus)?:\s*/i', '', $event->sport->name),
                     'category' => $category,
                     'category_label' => ['sports' => 'Sports', 'cultural' => 'Cultural', 'track-field' => 'Track & Field'][$category],
+                    'score_group' => $this->normalizeScoreGroup($event->sportResult->score_group ?? 'student'),
                     'declared_at' => $event->sportResult->submitted_at,
                     'placements' => $placements,
                 ];
@@ -176,7 +184,89 @@ class StandingsService
             'preview' => $updatedAt === null,
             'updatedAt' => $updatedAt,
             'results' => $this->declaredResultsFor($edition),
+            'categoryStandings' => collect([
+                'sports' => $this->categoryStandingsFor($edition, 'sports'),
+                'cultural' => $this->categoryStandingsFor($edition, 'cultural'),
+            ]),
         ];
+    }
+
+    /** @return Collection<int, array{team: Team, tally: TeamTally, rank: int}> */
+    public function categoryStandingsFor(?IntramuralEdition $edition, string $category): Collection
+    {
+        if (! $edition instanceof IntramuralEdition) {
+            return collect();
+        }
+
+        $category = $category === 'cultural' ? 'cultural' : 'sports';
+        $teams = Team::query()
+            ->with('course')
+            ->where('edition_id', $edition->id)
+            ->where('status', 'active')
+            ->orderBy('name')
+            ->get();
+        $totals = $teams->mapWithKeys(fn (Team $team): array => [$team->id => [
+            'points' => 0.0,
+            'gold_count' => 0,
+            'silver_count' => 0,
+            'bronze_count' => 0,
+        ]])->all();
+
+        $results = $this->declaredResultsFor($edition)
+            ->filter(function (array $result) use ($category): bool {
+                if (($result['score_group'] ?? 'student') !== 'student') {
+                    return false;
+                }
+
+                return $category === 'cultural'
+                    ? $result['category'] === 'cultural'
+                    : in_array($result['category'], ['sports', 'track-field'], true);
+            });
+
+        foreach ($results as $result) {
+            foreach ($result['placements'] as $placement) {
+                $teamId = (int) ($placement['team_id'] ?? 0);
+                if (! array_key_exists($teamId, $totals)) {
+                    continue;
+                }
+                $totals[$teamId]['points'] += (float) ($placement['points'] ?? 0);
+                match ($this->normalizeMedal($placement['medal'] ?? null)) {
+                    'gold' => $totals[$teamId]['gold_count']++,
+                    'silver' => $totals[$teamId]['silver_count']++,
+                    'bronze' => $totals[$teamId]['bronze_count']++,
+                    default => null,
+                };
+            }
+        }
+
+        return $teams
+            ->map(fn (Team $team): array => [
+                'team' => $team,
+                'tally' => new TeamTally([
+                    'edition_id' => $edition->id,
+                    'team_id' => $team->id,
+                    ...$totals[$team->id],
+                    'updated_at' => null,
+                ]),
+                'rank' => 0,
+            ])
+            ->sort(function (array $a, array $b): int {
+                foreach (['points', 'gold_count', 'silver_count', 'bronze_count'] as $field) {
+                    $left = (float) $a['tally']->{$field};
+                    $right = (float) $b['tally']->{$field};
+                    if ($left !== $right) {
+                        return $right <=> $left;
+                    }
+                }
+
+                return strcasecmp($a['team']->name, $b['team']->name);
+            })
+            ->values()
+            ->map(function (array $row, int $index): array {
+                $row['rank'] = $index + 1;
+
+                return $row;
+            });
     }
 
     /** @return array<int, array{placement: int, label: string, points: float, medal: string|null}> */
@@ -231,12 +321,13 @@ class StandingsService
     }
 
     /** @param array<int|string, int|string|null> $placements */
-    public function recordSportResult(EditionSport $editionSport, array $placements, User $submittedBy): SportResult
+    public function recordSportResult(EditionSport $editionSport, array $placements, User $submittedBy, string $scoreGroup = 'student'): SportResult
     {
+        $scoreGroup = $this->normalizeScoreGroup($scoreGroup);
         $editionSport->loadMissing('edition');
         abort_unless($editionSport->edition?->status === 'active', 404);
 
-        return DB::transaction(function () use ($editionSport, $placements, $submittedBy): SportResult {
+        return DB::transaction(function () use ($editionSport, $placements, $submittedBy, $scoreGroup): SportResult {
             $editionSport = EditionSport::with(['edition', 'sport'])->lockForUpdate()->findOrFail($editionSport->id);
             if ($editionSport->status === 'archived' || ! $editionSport->sport || $editionSport->sport->status !== 'active'
                 || $editionSport->edition?->status !== 'active') {
@@ -262,6 +353,7 @@ class StandingsService
                     'submitted_by' => $submittedBy->id,
                     'placements_json' => $normalizedPlacements,
                     'points_json' => $points,
+                    'score_group' => $scoreGroup,
                     'submitted_at' => now('UTC'),
                 ],
             );
@@ -295,6 +387,9 @@ class StandingsService
                 ->get();
 
             foreach ($results as $result) {
+                if ($this->normalizeScoreGroup($result->score_group ?? 'student') !== 'student') {
+                    continue;
+                }
                 $editionSport = $result->editionSport;
                 if (! $editionSport instanceof EditionSport) {
                     continue;
@@ -344,6 +439,66 @@ class StandingsService
                     ],
                 );
             }
+        });
+    }
+
+    public function normalizeScoreGroup(mixed $scoreGroup): string
+    {
+        return in_array($scoreGroup, self::SCORE_GROUPS, true) ? $scoreGroup : 'student';
+    }
+
+    /** @return Collection<int, TeamTally> */
+    private function employeeTalliesFor(IntramuralEdition $edition): Collection
+    {
+        $teams = Team::query()
+            ->where('edition_id', $edition->id)
+            ->where('status', 'active')
+            ->get(['id']);
+        $totals = $teams->mapWithKeys(fn (Team $team): array => [$team->id => [
+            'points' => 0.0,
+            'gold_count' => 0,
+            'silver_count' => 0,
+            'bronze_count' => 0,
+        ]])->all();
+
+        $results = SportResult::query()
+            ->with('editionSport')
+            ->where('score_group', 'employee')
+            ->whereHas('editionSport', fn ($query) => $query->where('edition_id', $edition->id))
+            ->get();
+
+        foreach ($results as $result) {
+            $event = $result->editionSport;
+            if (! $event instanceof EditionSport) {
+                continue;
+            }
+            $rules = collect($this->pointRulesFor($event))->keyBy(fn (array $rule): string => (string) $rule['placement']);
+            foreach (($result->placements_json ?? []) as $placement => $teamId) {
+                $teamId = (int) $teamId;
+                if (! array_key_exists($teamId, $totals)) {
+                    continue;
+                }
+                $rule = $rules->get((string) (int) $placement);
+                if ($rule === null) {
+                    continue;
+                }
+                $totals[$teamId]['points'] += (float) ($rule['points'] ?? 0);
+                match ($this->normalizeMedal($rule['medal'] ?? null)) {
+                    'gold' => $totals[$teamId]['gold_count']++,
+                    'silver' => $totals[$teamId]['silver_count']++,
+                    'bronze' => $totals[$teamId]['bronze_count']++,
+                    default => null,
+                };
+            }
+        }
+
+        return collect($totals)->mapWithKeys(function (array $total, int|string $teamId) use ($edition): array {
+            return [(int) $teamId => new TeamTally([
+                'edition_id' => $edition->id,
+                'team_id' => (int) $teamId,
+                ...$total,
+                'updated_at' => null,
+            ])];
         });
     }
 
