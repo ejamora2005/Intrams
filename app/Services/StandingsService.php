@@ -213,11 +213,14 @@ class StandingsService
             ->all();
     }
 
-    /** More than one placed athlete can represent a faction in track and field. */
+    /** Cultural and athletics placements can represent the same faction. */
     public function allowsRepeatedWinnersFor(EditionSport $editionSport): bool
     {
-        // Several placed athletes can represent the same faction, even with only three places.
-        return $editionSport->sport?->isTrackAndField() || count($this->pointRulesFor($editionSport)) > 3;
+        $editionSport->loadMissing('sport');
+
+        return str_starts_with(strtoupper($editionSport->sport?->code ?? ''), 'CULT-')
+            || $editionSport->sport?->isTrackAndField()
+            || count($this->pointRulesFor($editionSport)) > 3;
     }
 
     /** @param array<int|string, int|string|null> $placements */

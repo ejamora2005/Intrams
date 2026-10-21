@@ -99,6 +99,51 @@ test('an existing cultural event can move between point systems and only its sel
     expect($event->fresh()->scoring_rules)->toBe($before);
 });
 
+test('custom cultural events allow repeating factions regardless of their linked point system', function (string $system) {
+    [$admin, $edition, $teams] = culturalCrudFixture();
+    $this->actingAs($admin)->post(route('admin.cultural.store'), [
+        'edition_id' => $edition->id, 'name' => 'Custom Cultural Awards', 'participant_type' => 'individual',
+        'status' => 'active', 'point_system' => $system,
+    ])->assertSessionHasNoErrors();
+    $event = EditionSport::whereHas('sport', fn ($query) => $query->where('name', 'Custom Cultural Awards'))->sole();
+    $tabulator = User::factory()->create(['role' => 'tabulator', 'status' => 'active']);
+    $placements = [1 => $teams[0]->id, 2 => $teams[0]->id, 3 => $teams[0]->id];
+    $this->actingAs($tabulator)->get(route('tabulator.dashboard', ['edition_sport_id' => $event->id]))
+        ->assertOk()->assertViewHas('allowRepeatedWinners', true)->assertSee('data-allow-repeated-winners="true"', false);
+    $this->post(route('tabulator.sport-results.store'), [
+        'edition_sport_id' => $event->id, 'placements' => $placements, 'tabulator_password' => 'password',
+    ])->assertSessionHasNoErrors()->assertRedirect();
+
+    $rules = app(StandingsService::class)->pointRulesFor($event);
+    $tally = TeamTally::where('team_id', $teams[0]->id)->sole();
+    expect($event->sportResult()->sole()->placements_json)->toBe($placements)
+        ->and((float) $tally->points)->toBe((float) array_sum(array_column($rules, 'points')))
+        ->and([$tally->gold_count, $tally->silver_count, $tally->bronze_count])->toBe([1, 1, 1]);
+    $public = app(StandingsService::class)->declaredResultsFor($edition)->firstWhere('id', $event->id);
+    expect($public['category'])->toBe('cultural')
+        ->and($public['placements']->pluck('team_name')->all())->toBe(array_fill(0, 3, $teams[0]->name))
+        ->and($public['placements']->pluck('points')->all())->toBe(array_column($rules, 'points'));
+    $savedPage = $this->get(route('tabulator.dashboard', ['edition_sport_id' => $event->id]))
+        ->assertOk()->assertSee('Editing declared results')->assertViewHas('allowRepeatedWinners', true);
+    expect(substr_count($savedPage->getContent(), '<option value="'.$teams[0]->id.'" selected>'))->toBe(3);
+})->with(['cultural points' => 'cultural_standard_10_7_5', 'sports points' => 'sports_major']);
+
+test('repeated cultural placements still reject inactive factions and factions from another edition', function () {
+    [, $edition, $teams] = culturalCrudFixture();
+    $event = culturalCrudEvent($edition);
+    $teams[1]->update(['status' => 'inactive']);
+    $otherEdition = IntramuralEdition::create(['name' => 'Other edition', 'school_year' => '2025-2026', 'starts_on' => '2025-10-19', 'ends_on' => '2025-10-23', 'status' => 'archived']);
+    $foreign = Team::create(['edition_id' => $otherEdition->id, 'name' => 'Other faction', 'code' => 'OTHER-CULT', 'status' => 'active']);
+    $this->actingAs(User::factory()->create(['role' => 'tabulator', 'status' => 'active']));
+    $before = culturalCrudSnapshot();
+    foreach ([$teams[1], $foreign] as $invalid) {
+        $this->post(route('tabulator.sport-results.store'), [
+            'edition_sport_id' => $event->id, 'placements' => [1 => $invalid->id, 2 => $invalid->id], 'tabulator_password' => 'password',
+        ])->assertSessionHasErrors(['placements' => 'Choose teams from the active intramurals edition.']);
+        expect(culturalCrudSnapshot())->toBe($before);
+    }
+});
+
 test('cultural events can link to a sports point system while remaining cultural and outside athlete limits', function () {
     [$admin, $edition] = culturalCrudFixture();
     $event = culturalCrudEvent($edition);

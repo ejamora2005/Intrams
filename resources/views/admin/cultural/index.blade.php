@@ -9,6 +9,7 @@
                 <p class="ops-eyebrow">Cultural management</p>
                 <h2 class="mt-2 text-2xl font-semibold">Cultural events</h2>
                 <p class="mt-2 text-sm text-slate-500">Add competitions, choose their points, and make them available for Tabulator scoring.</p>
+                <p class="mt-2 text-sm text-slate-500">When declaring cultural winners, a faction may receive multiple placements.</p>
             </div>
             <div class="flex flex-wrap gap-2">
                 <a href="{{ route('admin.sports-points.index') }}" class="rounded-lg border border-blue-200 bg-white px-4 py-2.5 text-sm font-semibold text-blue-700">Manage point systems</a>

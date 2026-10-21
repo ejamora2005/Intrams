@@ -8,6 +8,8 @@ Admin → Cultural now provides event creation, editing, search/filtering, archi
 
 An explicit link takes precedence over the event's original code. Future Points System saves update all current linked events, and catalogue refreshes preserve a manually selected link. Restoring an unscored archived event catches up to the group's current values when another current member provides them. Point systems are scoped to an edition.
 
+All cultural events, including custom events linked to sports point systems, allow the same faction in multiple winner placements. Each selected placement awards its configured points and medal. This change requires no seeding and does not alter existing declarations.
+
 Changing the linked system for a declared event requires the administrator's password and recalculates awarded points/standings while retaining winner placements, submitter and declaration time. A target group cannot drop a recorded placement. Name/description edits keep existing awarded points. Events with declared results cannot be archived; other archives preserve registrations and schedules and can be restored. Stale edits are rejected, and mutations appear in System Logs. Deploy the code and built assets; no migration, seeder, roster replacement or score reset is required for this module.
 
 ## Multiple sport registrations and Possible DQ
