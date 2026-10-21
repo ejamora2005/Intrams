@@ -5,6 +5,7 @@ import './ops-interactions';
 import './competition-schedule';
 import './medical-approvals';
 import './cultural-events';
+import './participant-management';
 
 if (document.querySelector('[data-tabulator-workspace]')) {
     void import('./tabulator');

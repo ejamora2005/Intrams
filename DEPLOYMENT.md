@@ -4,6 +4,8 @@ This project is ready for a Dokploy Docker Compose deployment on `slsubc.tech`.
 
 ## Sports event management
 
+Manage participants removes selected registrations by marking them inactive, retaining student records, medical reviews, schedules, brackets and results. Completed matches do not block roster withdrawal. Doubles partners are not automatically removed. The confirmation lists the selected players; selection counts, faction tabs and search remain scoped to each panel. Removed registrations can be added back without duplicate rows or resetting their saved matches, and archival editions stay read-only. No seeder, migration or score reset is required for this fix.
+
 Admin → Sports supports creating and editing events with a linked point system and a scoring preview. Cards show the actual placement points and offer Edit event & points, an archive confirmation, and restoration from the Archived filter. The selected edition is preserved throughout the forms. New sports appear in Tabulator automatically when active.
 
 Point links use the edition's currently edited group values. Future Points System edits update the linked events, and default catalogue refreshes preserve explicit links. Changing an existing sport's points retains its participation category. Existing custom rules can stay unlinked when editing other details.

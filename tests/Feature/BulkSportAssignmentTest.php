@@ -205,8 +205,8 @@ test('an admin can bulk-remove selected participant registrations without affect
         ->post(route('admin.sports.participants.bulk-remove', $editionSport->sport), ['edition_id' => $edition->id, 'athlete_entry_ids' => [$firstEntry->id, $secondEntry->id]])
         ->assertRedirect(route('admin.sports.participants', ['sport' => $editionSport->sport, 'edition_id' => $edition->id]));
 
-    $this->assertDatabaseMissing('athlete_entries', ['id' => $firstEntry->id]);
-    $this->assertDatabaseMissing('athlete_entries', ['id' => $secondEntry->id]);
+    $this->assertDatabaseHas('athlete_entries', ['id' => $firstEntry->id, 'status' => 'inactive']);
+    $this->assertDatabaseHas('athlete_entries', ['id' => $secondEntry->id, 'status' => 'inactive']);
     $this->assertDatabaseHas('athlete_entries', ['id' => $otherTeamEntry->id, 'team_id' => $secondTeam->id]);
     expect(DB::table('audit_logs')->where('action', 'athlete_entry.removed')->count())->toBe(2);
 });

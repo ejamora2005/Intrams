@@ -15,9 +15,9 @@ class ReturnAdminSavesToModuleIndex
 
         if (! $request->isMethodSafe() && $response instanceof RedirectResponse && ! $request->session()->has('errors')) {
             $route = $request->route()?->getName() ?? '';
-            // Creation redirects to the page containing the new schedule.
-            // Returning to the form would make a successful save look lost.
-            if ($route === 'admin.schedules.matches.store') {
+            // Keep the destination of a new schedule or the selected participant
+            // faction, rather than replacing it with the previous page.
+            if (in_array($route, ['admin.schedules.matches.store', 'admin.sports.participants.bulk-remove'], true)) {
                 return $response;
             }
             $destination = match (true) {

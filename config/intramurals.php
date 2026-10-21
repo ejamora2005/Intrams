@@ -37,9 +37,9 @@ $pointSystems = [
         ],
     ],
     'sports_basketball_3x3' => [
-        'label' => 'Basketball 3x3 (Men & Women)',
+        'label' => 'Individual Sports Points System',
         'category' => 'sports',
-        'description' => 'Basketball 3x3 awards 15, 10, and 7 points independently of other minor sports.',
+        'description' => 'Individual sports awards 15, 10, and 7 points independently of other minor sports.',
         'codes' => ['BASKET-3X3', 'BASKET-3X3-MEN', 'BASKET-3X3-WOMEN'],
         'placements' => [
             ['placement' => 1, 'label' => 'Champion', 'points' => 15.0, 'medal' => 'gold'],

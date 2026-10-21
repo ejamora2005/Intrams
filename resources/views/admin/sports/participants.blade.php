@@ -33,7 +33,7 @@
                 <div class="overflow-x-auto pb-1" aria-label="Faction filters">
                     <div class="flex min-w-max gap-2">
                         @foreach ($teamGroups as $group)
-                            <button type="button" data-team-tab data-team-id="{{ $group->team->id }}" aria-controls="team-panel-{{ $group->team->id }}" aria-selected="{{ $loop->first ? 'true' : 'false' }}" class="inline-flex items-center gap-2 rounded-lg border px-4 py-2 text-sm font-semibold transition {{ $loop->first ? 'border-blue-700 bg-blue-700 text-white' : 'border-slate-300 bg-white text-slate-700 hover:border-blue-300 hover:bg-blue-50' }}">
+                            <button type="button" data-team-tab data-team-id="{{ $group->team->id }}" aria-controls="team-panel-{{ $group->team->id }}" aria-selected="{{ $selectedTeamId === $group->team->id ? 'true' : 'false' }}" class="inline-flex items-center gap-2 rounded-lg border px-4 py-2 text-sm font-semibold transition {{ $selectedTeamId === $group->team->id ? 'border-blue-700 bg-blue-700 text-white' : 'border-slate-300 bg-white text-slate-700 hover:border-blue-300 hover:bg-blue-50' }}">
                                 <x-team-badge :team="$group->team" size="xs" class="pointer-events-none" />
                                 <span class="rounded-full px-1.5 py-0.5 text-xs opacity-80">{{ $group->entries->count() }}</span>
                             </button>
@@ -48,9 +48,10 @@
                         $team = $group->team;
                         $entries = $group->entries;
                     @endphp
-                    <form method="POST" action="{{ route('admin.sports.participants.bulk-remove', $sport) }}" id="team-panel-{{ $team->id }}" data-team-panel data-team-id="{{ $team->id }}" class="flex h-full flex-col{{ $loop->first ? '' : ' hidden' }}">
+                    <form method="POST" action="{{ route('admin.sports.participants.bulk-remove', $sport) }}" id="team-panel-{{ $team->id }}" data-team-panel data-team-id="{{ $team->id }}" data-participant-remove-form data-ops-form class="flex h-full flex-col{{ $selectedTeamId === $team->id ? '' : ' hidden' }}">
                         @csrf
                         <input type="hidden" name="edition_id" value="{{ $edition->id }}">
+                        <input type="hidden" name="team_id" value="{{ $team->id }}">
                         <div class="flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
                             <div>
                                 <h3 class="text-base font-semibold text-slate-900">
@@ -66,8 +67,9 @@
 
                         <div class="mt-4 flex items-center justify-between gap-3 border-y border-slate-200 bg-slate-50 px-4 py-3">
                             <label class="flex w-fit items-center gap-2 text-sm font-semibold text-slate-700"><input type="checkbox" data-team-select-all class="rounded border-slate-300 text-blue-700 focus:ring-blue-600"> Select visible students</label>
-                            <button type="submit" @disabled($entries->isEmpty()) class="rounded-lg border border-red-200 bg-white px-3.5 py-2 text-sm font-semibold text-red-700 transition hover:border-red-300 hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-60" onclick="return confirm('Remove the selected participant registrations?');">Remove selected</button>
+                            <button type="button" disabled data-participant-remove-open data-ops-modal-open="remove-participants-{{ $team->id }}" class="rounded-lg border border-red-200 bg-white px-3.5 py-2 text-sm font-semibold text-red-700 transition hover:border-red-300 hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-60">Remove selected</button>
                         </div>
+                        @include('admin.sports.partials.remove-participants', ['removalDialogId' => 'remove-participants-'.$team->id])
 
                         <div class="mt-4 min-h-0 flex-1 overflow-y-auto rounded-lg border border-slate-200 bg-white/5">
                             <table class="w-full table-fixed divide-y divide-slate-200 text-left text-sm">
@@ -85,7 +87,7 @@
                                             };
                                         @endphp
                                         <tr data-team-row data-search="{{ Str::lower($entry->student->full_name.' '.$entry->student->student_number) }}" @class(['bg-red-950/50' => $eligibility['possible_dq'] ?? false])>
-                                            <td class="px-4 py-3 align-middle"><input name="athlete_entry_ids[]" value="{{ $entry->id }}" type="checkbox" class="team-entry-checkbox rounded border-slate-300 text-blue-700 focus:ring-blue-600" aria-label="Select {{ $entry->student->full_name }}"></td>
+                                            <td class="px-4 py-3 align-middle"><input name="athlete_entry_ids[]" value="{{ $entry->id }}" type="checkbox" data-entry-name="{{ $entry->student->full_name }}" class="team-entry-checkbox rounded border-slate-300 text-blue-700 focus:ring-blue-600" aria-label="Select {{ $entry->student->full_name }}"></td>
                                             <td class="px-4 py-3 align-middle">
                                                 <span class="flex flex-wrap items-center gap-2 font-medium text-slate-900">
                                                     {{ $entry->student->full_name }}
@@ -96,7 +98,7 @@
                                                 <span class="block text-xs text-slate-500">
                                                     {{ $entry->student->course?->name }}
                                                     @if ($editionSport->participant_type === 'dual')
-                                                        <span class="ml-1">&middot; Dual pair</span>
+                                                        <span class="ml-1">&middot; {{ $completePairKeys->contains($entry->pair_key) ? 'Dual pair' : 'Needs a partner' }}</span>
                                                     @endif
                                                 </span>
                                                 <span class="mt-2 inline-flex max-w-full whitespace-nowrap rounded-full border px-2 py-0.5 text-[11px] font-semibold {{ $medicalBadge['class'] }}">{{ $medicalBadge['label'] }}</span>
@@ -115,13 +117,14 @@
                 @endforeach
             </div>
         @else
-            <form method="POST" action="{{ route('admin.sports.participants.bulk-remove', $sport) }}" class="flex h-[34rem] flex-col p-5 sm:p-6">
+            <form method="POST" action="{{ route('admin.sports.participants.bulk-remove', $sport) }}" id="unassigned-participants" data-participant-remove-form data-ops-form class="flex h-[34rem] flex-col p-5 sm:p-6">
                 @csrf
                 <input type="hidden" name="edition_id" value="{{ $edition->id }}">
                 <div class="flex items-center justify-between gap-3 border-y border-slate-200 bg-slate-50 px-4 py-3">
                     <p class="text-sm font-semibold text-slate-700">Registered students</p>
-                    <button type="submit" class="rounded-lg border border-red-200 bg-white px-3.5 py-2 text-sm font-semibold text-red-700 transition hover:border-red-300 hover:bg-red-50" onclick="return confirm('Remove the selected participant registrations?');">Remove selected</button>
+                    <button type="button" disabled data-participant-remove-open data-ops-modal-open="remove-unassigned-participants" class="rounded-lg border border-red-200 bg-white px-3.5 py-2 text-sm font-semibold text-red-700 disabled:opacity-60">Remove selected</button>
                 </div>
+                @include('admin.sports.partials.remove-participants', ['removalDialogId' => 'remove-unassigned-participants'])
                 <div class="mt-4 min-h-0 flex-1 overflow-y-auto rounded-lg border border-slate-200 bg-white/5">
                     @forelse ($participants as $groupName => $entries)
                         <div class="border-b border-slate-100 last:border-b-0">
@@ -130,7 +133,7 @@
                                 @php($eligibility = $eligibilityByStudentId->get($entry->student_id))
                                 <label @class(['flex cursor-pointer justify-between gap-4 px-5 py-3 text-sm transition hover:bg-white/10', 'bg-red-950/50 hover:bg-red-950/60' => $eligibility['possible_dq'] ?? false])>
                                     <span class="flex items-center gap-3">
-                                        <input name="athlete_entry_ids[]" value="{{ $entry->id }}" type="checkbox" class="rounded border-slate-300 text-blue-700 focus:ring-blue-600">
+                                        <input name="athlete_entry_ids[]" value="{{ $entry->id }}" type="checkbox" data-entry-name="{{ $entry->student->full_name }}" class="rounded border-slate-300 text-blue-700 focus:ring-blue-600">
                                         <span>
                                             <span class="flex flex-wrap items-center gap-2 font-medium text-slate-800">
                                                 {{ $entry->student->full_name }}
@@ -155,47 +158,4 @@
         @endif
     </section>
 
-    <script>
-        const tabs = [...document.querySelectorAll('[data-team-tab]')];
-        const panels = [...document.querySelectorAll('[data-team-panel]')];
-
-        tabs.forEach((tab) => tab.addEventListener('click', () => {
-            const teamId = tab.dataset.teamId;
-            tabs.forEach((item) => {
-                const active = item === tab;
-                item.setAttribute('aria-selected', active ? 'true' : 'false');
-                item.classList.toggle('border-blue-700', active);
-                item.classList.toggle('bg-blue-700', active);
-                item.classList.toggle('text-white', active);
-                item.classList.toggle('border-slate-300', !active);
-                item.classList.toggle('bg-white', !active);
-                item.classList.toggle('text-slate-700', !active);
-            });
-            panels.forEach((panel) => panel.classList.toggle('hidden', panel.dataset.teamId !== teamId));
-        }));
-
-        panels.forEach((panel) => {
-            const search = panel.querySelector('[data-team-search]');
-            const selectAll = panel.querySelector('[data-team-select-all]');
-            const rows = [...panel.querySelectorAll('[data-team-row]')];
-            const empty = panel.querySelector('[data-team-empty]');
-
-            search.addEventListener('input', () => {
-                const query = search.value.trim().toLowerCase();
-                const visibleCount = rows.reduce((count, row) => {
-                    const visible = row.dataset.search.includes(query);
-                    row.hidden = !visible;
-                    return count + (visible ? 1 : 0);
-                }, 0);
-                empty.hidden = visibleCount !== 0;
-                selectAll.checked = false;
-            });
-
-            selectAll.addEventListener('change', () => {
-                rows.filter((row) => !row.hidden).forEach((row) => {
-                    row.querySelector('.team-entry-checkbox').checked = selectAll.checked;
-                });
-            });
-        });
-    </script>
 @endsection

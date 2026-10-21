@@ -120,7 +120,7 @@ test('changing the minor point group no longer changes basketball three by three
     expect((float) $events['CHESS-MEN']->fresh()->scoring_rules['placements'][0]['points'])->toBe(21.0)
         ->and((float) $events['BASKET-3X3-MEN']->fresh()->scoring_rules['placements'][0]['points'])->toBe(15.0)
         ->and((float) $events['BASKET-3X3-WOMEN']->fresh()->scoring_rules['placements'][0]['points'])->toBe(15.0);
-    $page = $this->get(route('admin.sports-points.index'))->assertOk()->assertSee('Basketball 3x3 (Men &amp; Women)', false);
+    $page = $this->get(route('admin.sports-points.index'))->assertOk()->assertSee('Individual Sports Points System');
     $group = $page->viewData('pointSystems')->firstWhere('key', 'sports_basketball_3x3');
     expect($group['configured_count'])->toBe(2)->and($group['declared_count'])->toBe(2);
 });

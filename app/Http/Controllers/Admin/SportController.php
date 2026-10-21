@@ -303,7 +303,7 @@ class SportController extends Controller
 
         $competitors = match ($editionSport->participant_type) {
             'team' => $registeredTeamGroups->map(fn (object $group): array => ['name' => $group->team->name, 'detail' => $group->entries->count().' registered athlete(s)'])->values(),
-            'dual' => $activeEntries->groupBy(fn ($entry) => $entry->pair_key ?: 'entry-'.$entry->id)->map(fn ($entries) => ['name' => $entries->pluck('student.full_name')->implode(' / '), 'detail' => $entries->count().' paired athlete(s)'])->values(),
+            'dual' => $activeEntries->filter(fn ($entry) => filled($entry->pair_key))->groupBy('pair_key')->filter(fn ($entries) => $entries->count() === 2)->map(fn ($entries) => ['name' => $entries->pluck('student.full_name')->implode(' / '), 'detail' => $entries->count().' paired athlete(s)'])->values(),
             default => $activeEntries->map(fn ($entry) => ['name' => $entry->student->full_name, 'detail' => $entry->student->student_number])->values(),
         };
 
@@ -319,7 +319,12 @@ class SportController extends Controller
             }
         }
 
-        return view('admin.sports.participants', compact('sport', 'edition', 'editionSport', 'participants', 'teamGroups', 'competitors', 'bracketRounds', 'eligibilityByStudentId'));
+        $requestedTeamId = $request->integer('team_id') ?: (int) $request->old('team_id');
+        $selectedTeamId = $teamGroups->contains(fn ($group) => $group->team->id === $requestedTeamId) ? $requestedTeamId : $teamGroups->first()?->team->id;
+
+        return view('admin.sports.participants', compact('sport', 'edition', 'editionSport', 'participants', 'teamGroups', 'competitors', 'bracketRounds', 'eligibilityByStudentId', 'selectedTeamId') + [
+            'completePairKeys' => $editionSport->participant_type === 'dual' ? $this->completePairKeys($editionSport) : collect(),
+        ]);
     }
 
     private function resolvedEntryTeamId(AthleteEntry $entry, int $editionId): ?int
@@ -604,7 +609,7 @@ class SportController extends Controller
             ->where('status', 'active')
             ->with('course')
             ->whereDoesntHave('athleteEntries', function ($entryQuery) use ($editionSport, $completePairKeys): void {
-                $entryQuery->where('edition_sport_id', $editionSport->id);
+                $entryQuery->where('edition_sport_id', $editionSport->id)->where('status', 'active');
                 if ($editionSport->participant_type === 'dual') {
                     $entryQuery->where('status', 'active')->whereIn('pair_key', $completePairKeys);
                 }
@@ -648,15 +653,13 @@ class SportController extends Controller
             abort_unless($students->every(fn ($student) => $roster->contains($student->id)), 422, 'Each selected student must be on the chosen team roster.');
         }
 
-        abort_if(
-            BracketMatch::query()->where('edition_sport_id', $editionSport->id)->where('status', 'completed')->exists(),
-            422,
-            'Participant registrations cannot be changed after a bracket result has been recorded.'
-        );
-
         $medicalCertificateStatus = $this->eligibilityService->requiresMedicalCertificate($editionSport) ? 'pending' : 'not_required';
 
         DB::transaction(function () use ($students, $editionSport, $team, $medicalCertificateStatus): void {
+            $lockedEvent = EditionSport::with('edition')->whereKey($editionSport->id)->lockForUpdate()->firstOrFail();
+            if (! in_array($lockedEvent->edition->status, ['draft', 'active'], true) || $lockedEvent->status === 'archived') {
+                throw ValidationException::withMessages(['student_ids' => 'This event or edition is archived. Its participant history is read-only.']);
+            }
             $existing = AthleteEntry::query()->where('edition_sport_id', $editionSport->id)
                 ->whereIn('student_id', $students->pluck('id'))->lockForUpdate()->get()->keyBy('student_id');
             if ($editionSport->participant_type === 'dual') {
@@ -665,16 +668,25 @@ class SportController extends Controller
                     throw ValidationException::withMessages(['student_ids' => 'One or more selected students already belong to a complete doubles pair. Refresh the list and choose unpaired players.']);
                 }
             } else {
-                abort_if($existing->isNotEmpty(), 422, 'One or more selected students are already registered.');
+                abort_if($existing->contains(fn ($entry) => $entry->status === 'active'), 422, 'One or more selected students are already registered.');
             }
-            BracketMatch::query()->where('edition_sport_id', $editionSport->id)->delete();
-            BracketCompetitor::query()->where('edition_sport_id', $editionSport->id)->delete();
-            $pairKey = $editionSport->participant_type === 'dual' ? (string) Str::uuid() : null;
+            $restoring = $existing->count() === $students->count()
+                && $existing->contains(fn ($entry) => $entry->status === 'inactive')
+                && $existing->every(fn ($entry) => (int) $entry->team_id === (int) $team?->id)
+                && ($editionSport->participant_type !== 'dual' || ($existing->pluck('pair_key')->filter()->unique()->count() === 1 && $existing->every(fn ($entry) => filled($entry->pair_key))));
+            if (! $restoring && BracketMatch::where('edition_sport_id', $editionSport->id)->where('status', 'completed')->exists()) {
+                throw ValidationException::withMessages(['student_ids' => 'New competitors cannot be added after bracket results have been recorded. Previously removed registrations can be restored.']);
+            }
+            if (! $restoring) {
+                BracketMatch::query()->where('edition_sport_id', $editionSport->id)->delete();
+                BracketCompetitor::query()->where('edition_sport_id', $editionSport->id)->delete();
+            }
+            $pairKey = $editionSport->participant_type === 'dual' ? ($restoring ? $existing->first()->pair_key : (string) Str::uuid()) : null;
             foreach ($students as $student) {
                 $entry = $existing->get($student->id) ?? new AthleteEntry;
                 $before = $entry->exists ? $entry->only($entry->getFillable()) : null;
                 $attributes = ['edition_sport_id' => $editionSport->id, 'student_id' => $student->id, 'team_id' => $team?->id, 'pair_key' => $pairKey, 'status' => 'active'];
-                if (! $entry->exists || $entry->status !== 'active') {
+                if (! $entry->exists || (! $restoring && $entry->status !== 'active')) {
                     $attributes += ['medical_certificate_status' => $medicalCertificateStatus, 'medical_certificate_reviewed_by' => null, 'medical_certificate_reviewed_at' => null, 'medical_certificate_notes' => null, 'assigned_by' => auth()->id(), 'assigned_at' => now()];
                 }
                 $entry->fill($attributes)->save();
@@ -706,44 +718,30 @@ class SportController extends Controller
         $data = $request->validate([
             'athlete_entry_ids' => ['required', 'array', 'min:1'],
             'athlete_entry_ids.*' => ['integer', 'distinct', 'exists:athlete_entries,id'],
-        ]);
-        $entries = AthleteEntry::query()
-            ->where('edition_sport_id', $editionSport->id)
-            ->where('status', 'active')
-            ->whereIn('id', $data['athlete_entry_ids'])
-            ->get();
-        abort_unless($entries->count() === count($data['athlete_entry_ids']), 422, 'One or more selected registrations do not belong to this sport.');
-
-        if ($editionSport->participant_type === 'dual') {
-            $pairKeys = $entries->pluck('pair_key')->filter()->unique();
-            $entries = AthleteEntry::query()
-                ->where('edition_sport_id', $editionSport->id)
-                ->where('status', 'active')
-                ->where(fn ($query) => $query
-                    ->whereIn('id', $entries->pluck('id'))
-                    ->orWhereIn('pair_key', $pairKeys))
-                ->get();
-        }
-
-        abort_if(
-            BracketMatch::query()->where('edition_sport_id', $editionSport->id)->where('status', 'completed')->exists(),
-            422,
-            'Participant registrations cannot be changed after a bracket result has been recorded.'
-        );
-
-        DB::transaction(function () use ($entries, $editionSport): void {
-            BracketMatch::query()->where('edition_sport_id', $editionSport->id)->delete();
-            BracketCompetitor::query()->where('edition_sport_id', $editionSport->id)->delete();
+            'team_id' => ['nullable', 'integer'],
+        ], ['athlete_entry_ids.required' => 'Select at least one player to remove.']);
+        $removedCount = DB::transaction(function () use ($data, $editionSport): int {
+            $event = EditionSport::with('edition')->whereKey($editionSport->id)->lockForUpdate()->firstOrFail();
+            if (! in_array($event->edition->status, ['draft', 'active'], true) || $event->status === 'archived') {
+                throw ValidationException::withMessages(['athlete_entry_ids' => 'This event or edition is archived. Its participant history is read-only.']);
+            }
+            $entries = AthleteEntry::where('edition_sport_id', $event->id)->where('status', 'active')
+                ->whereIn('id', $data['athlete_entry_ids'])->orderBy('id')->lockForUpdate()->get();
+            if ($entries->count() !== count($data['athlete_entry_ids'])) {
+                throw ValidationException::withMessages(['athlete_entry_ids' => 'One or more selected registrations have changed or do not belong to this sport. Refresh the participant list.']);
+            }
 
             foreach ($entries as $entry) {
                 $before = $entry->only($entry->getFillable());
-                $entry->delete();
-                app(AuditService::class)->record('athlete_entry.removed', $entry, $before, null);
+                $entry->update(['status' => 'inactive']);
+                app(AuditService::class)->record('athlete_entry.removed', $entry, $before, $entry->only($entry->getFillable()));
             }
+
+            return $entries->count();
         });
 
-        return redirect()->route('admin.sports.participants', ['sport' => $sport, 'edition_id' => $edition->id])
-            ->with('success', $entries->count().' participant registration(s) removed.');
+        return redirect()->route('admin.sports.participants', ['sport' => $sport, 'edition_id' => $edition->id, 'team_id' => $data['team_id'] ?? null])
+            ->with('success', $removedCount.' participant registration(s) removed. Student records, schedules and results were kept.');
     }
 
     public function events(Sport $sport): View
