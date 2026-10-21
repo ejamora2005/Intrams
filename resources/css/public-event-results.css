@@ -28,9 +28,11 @@
 .public-results-leader-card { display: grid; gap: 12px; padding: 17px; border: 1px solid #52718f; border-radius: 13px; background: linear-gradient(135deg, #123956, #0c2943); }
 .public-results-leader-card--cultural { border-color: #a37a4d; background: linear-gradient(135deg, #3d2e26, #1e2b3e); }
 .public-results-leader-card > strong { color: #d6e6f7; font-size: 14px; }
-.public-results-leader-list { display: grid; gap: 10px; }
-.public-results-leader { display: flex; align-items: center; gap: 11px; }
-.public-results-leader img { width: 42px; height: 42px; object-fit: contain; }
+.public-results-leader-list { display: grid; gap: 0; overflow: hidden; border: 1px solid #52718f80; border-radius: 10px; }
+.public-results-leader { display: flex; align-items: center; gap: 10px; min-height: 58px; padding: 8px 10px; }
+.public-results-leader + .public-results-leader { border-top: 1px solid #52718f80; }
+.public-results-leader-rank { display: grid; place-items: center; flex: 0 0 24px; width: 24px; height: 24px; border-radius: 50%; background: #ffffff12; color: #e0bd7a; font-size: 12px; font-weight: 700; }
+.public-results-leader img { flex: 0 0 36px; width: 36px; height: 36px; object-fit: contain; }
 .public-results-leader div { display: grid; gap: 1px; }
 .public-results-leader strong { color: #fff; font-size: 17px; }
 .public-results-leader span { color: #b9cce2; font-size: 12px; }

@@ -26,18 +26,19 @@
             <section class="public-results-leaders" aria-labelledby="category-leaders-heading">
                 <div class="public-results-group-heading"><div><p class="public-results-eyebrow">Faction race</p><h3 id="category-leaders-heading">Who is leading?</h3></div><span>Student totals only</span></div>
                 <div class="public-results-leaders-grid">
-                    @foreach (['sports' => 'Sports leader', 'cultural' => 'Cultural leader'] as $category => $label)
-                        @php($leaders = ($categoryStandings->get($category) ?? collect())->where('rank', 1)->filter(fn ($row) => (float) $row['tally']->points > 0))
+                    @foreach (['sports' => 'Sports standings', 'cultural' => 'Cultural standings'] as $category => $label)
+                        @php($standings = $categoryStandings->get($category) ?? collect())
                         <article class="public-results-leader-card public-results-leader-card--{{ $category }}">
                             <p class="public-result-category">{{ $label }}</p>
-                            @if ($leaders->isEmpty())
-                                <strong>No declared {{ $category }} scores yet</strong>
+                            @if ($standings->isEmpty())
+                                <strong>No {{ $category }} factions available</strong>
                             @else
                                 <div class="public-results-leader-list">
-                                    @foreach ($leaders as $leader)
+                                    @foreach ($standings as $standing)
                                         <div class="public-results-leader">
-                                            @if ($leader['team']->logo_path)<img src="{{ asset($leader['team']->logo_path) }}" alt="" width="42" height="42" loading="lazy">@endif
-                                            <div><strong>{{ $leader['team']->name }}</strong><span>{{ number_format((float) $leader['tally']->points, 2) }} points</span></div>
+                                            <span class="public-results-leader-rank" aria-label="Rank {{ $standing['rank'] }}">{{ $standing['rank'] }}</span>
+                                            @if ($standing['team']->logo_path)<img src="{{ asset($standing['team']->logo_path) }}" alt="" width="36" height="36" loading="lazy">@endif
+                                            <div><strong>{{ $standing['team']->name }}</strong><span>{{ number_format((float) $standing['tally']->points, 2) }} points</span></div>
                                         </div>
                                     @endforeach
                                 </div>

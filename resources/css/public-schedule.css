@@ -28,7 +28,7 @@
 .schedule-date > svg { width: 33px; height: 33px; color: #e4c38e; flex-shrink: 0; }
 .schedule-date p { color: #abc0d8; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .15em; }
 .schedule-date strong { display: block; margin-top: 5px; font-size: 23px; font-weight: 600; white-space: nowrap; }
-.schedule-date div > span { display: block; margin-top: 6px; font-size: 12px; color: #a7bcd4; }
+.schedule-date-content > span { display: block; margin-top: 6px; font-size: 12px; color: #a7bcd4; }
 .schedule-date-picker { display: flex; align-items: center; gap: 8px; margin-top: 12px; }
 .schedule-date-picker label { color: #9db2cb; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .08em; }
 .schedule-date-picker select { min-height: 32px; border: 1px solid #7894b54d; border-radius: 5px; padding: 4px 8px; color: #e5edf8; background: #0b223ee8; font: inherit; font-size: 11px; }
@@ -150,7 +150,7 @@
     .schedule-date { margin-top: 23px; border: 0; padding: 0; gap: 13px; }
     .schedule-date > svg { width: 25px; height: 25px; }
     .schedule-date strong { font-size: 18px; margin-top: 3px; }
-    .schedule-date div > span { display: none; }
+    .schedule-date-content > span { display: none; }
     .schedule-date p { font-size: 9px; }
     .schedule-toolbar { padding: 20px 17px; gap: 10px; }
     .schedule-toolbar h2 { font-size: 16px; gap: 7px; flex-wrap: wrap; }
@@ -355,6 +355,11 @@
 }
 
 .schedule-date {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: start;
+    gap: 16px;
+    position: relative;
     min-height: 150px;
     padding: 24px;
     border: 1px solid #d9b87d66;
@@ -369,6 +374,50 @@
     color: var(--slsu-gold-bright);
 }
 
+.schedule-date-icon {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border: 1px solid #f0d49c66;
+    border-radius: 12px;
+    color: var(--slsu-gold-bright);
+    background: #d9b87d18;
+    box-shadow: inset 0 1px 0 #fff3;
+}
+
+.schedule-date-icon svg {
+    width: 25px;
+    height: 25px;
+}
+
+.schedule-date-content {
+    min-width: 0;
+}
+
+.schedule-date-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.schedule-date-badge {
+    display: inline-flex;
+    align-items: center;
+    min-height: 22px;
+    padding: 3px 8px;
+    border: 1px solid #35b46f66;
+    border-radius: 999px;
+    color: #9ff0bd;
+    background: #35b46f18;
+    font-size: 9px !important;
+    font-weight: 600;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
 .schedule-date p {
     color: #d5e5f6;
 }
@@ -378,8 +427,75 @@
     font-size: 24px;
 }
 
-.schedule-date div > span {
+.schedule-date-content > span {
     color: #b6c9df;
+}
+
+.schedule-date-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.schedule-programme-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    min-height: 34px;
+    padding: 7px 10px;
+    border: 1px solid #e4c38e80;
+    border-radius: 7px;
+    color: #06152c;
+    background: linear-gradient(180deg, #f1d8a8, #d7b676);
+    box-shadow: 0 7px 16px #0004, inset 0 1px 0 #fff6;
+    font-size: 11px;
+    font-weight: 600;
+    transition: transform .2s ease, box-shadow .2s ease;
+}
+
+.schedule-programme-link:hover {
+    color: #06152c;
+    background: linear-gradient(180deg, #f6dfb3, #e0c486);
+    transform: translateY(-1px);
+    box-shadow: 0 10px 20px #0005, inset 0 1px 0 #fff8;
+}
+
+.schedule-programme-link svg {
+    width: 15px;
+    height: 15px;
+}
+
+.schedule-date-picker {
+    margin-top: 0;
+}
+
+.schedule-date-picker label {
+    display: block;
+    margin-bottom: 4px;
+    color: #9db2cb;
+}
+
+.schedule-date-select {
+    position: relative;
+}
+
+.schedule-date-select select {
+    min-width: 118px;
+    padding-right: 27px;
+    appearance: none;
+}
+
+.schedule-date-select svg {
+    position: absolute;
+    top: 50%;
+    right: 8px;
+    width: 14px;
+    height: 14px;
+    pointer-events: none;
+    color: #d8e6f6;
+    transform: translateY(-50%);
 }
 
 .schedule-teams {
@@ -752,6 +868,36 @@
 
     .schedule-date {
         padding: 17px;
+        gap: 12px;
+    }
+
+    .schedule-date-icon {
+        width: 38px;
+        height: 38px;
+        border-radius: 10px;
+    }
+
+    .schedule-date-icon svg {
+        width: 22px;
+        height: 22px;
+    }
+
+    .schedule-date-meta {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .schedule-date-actions {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .schedule-programme-link,
+    .schedule-date-picker,
+    .schedule-date-select,
+    .schedule-date-select select {
+        width: 100%;
     }
 
     .schedule-date strong {

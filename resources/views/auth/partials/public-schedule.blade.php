@@ -52,24 +52,37 @@
                 </ul>
             </div>
             <div class="schedule-date">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M7 3v4m10-4v4M3 11h18m-13 4h3m2 0h3"/></svg>
-                <div>
-                    <p>SLSU event desk</p>
+                <div class="schedule-date-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M7 3v4m10-4v4M3 11h18m-13 4h3m2 0h3"/></svg>
+                </div>
+                <div class="schedule-date-content">
+                    <div class="schedule-date-meta">
+                        <p>SLSU event desk</p>
+                        <span class="schedule-date-badge">Live programme</span>
+                    </div>
                     <strong>{{ $todayLabel }}</strong>
                     <span>Daily event programme</span>
-                    @if ($programmeSource)
-                        <a class="schedule-home" href="{{ $programmeSource['url'] }}" target="_blank" rel="noopener noreferrer">View programme sheet</a>
-                    @endif
-                    @if (! empty($availableDates))
-                        <form method="GET" action="{{ route(request()->routeIs('public.schedule') ? 'public.schedule' : 'login') }}" class="schedule-date-picker">
-                            <label for="schedule-date">View date</label>
-                            <select id="schedule-date" name="date" onchange="this.form.submit()">
-                                @foreach ($availableDates as $availableDate)
-                                    <option value="{{ $availableDate }}" @selected($availableDate === $selectedDate)>{{ \Carbon\Carbon::parse($availableDate)->format('M j, Y') }}</option>
-                                @endforeach
-                            </select>
-                        </form>
-                    @endif
+                    <div class="schedule-date-actions">
+                        @if ($programmeSource)
+                            <a class="schedule-programme-link" href="{{ $programmeSource['url'] }}" target="_blank" rel="noopener noreferrer">
+                                <span>View programme sheet</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M14 5h5v5M19 5l-8 8"/><path d="M18 13v4a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4"/></svg>
+                            </a>
+                        @endif
+                        @if (! empty($availableDates))
+                            <form method="GET" action="{{ route(request()->routeIs('public.schedule') ? 'public.schedule' : 'login') }}" class="schedule-date-picker">
+                                <label for="schedule-date">View date</label>
+                                <div class="schedule-date-select">
+                                    <select id="schedule-date" name="date" onchange="this.form.submit()">
+                                        @foreach ($availableDates as $availableDate)
+                                            <option value="{{ $availableDate }}" @selected($availableDate === $selectedDate)>{{ \Carbon\Carbon::parse($availableDate)->format('M j, Y') }}</option>
+                                        @endforeach
+                                    </select>
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="m7 10 5 5 5-5"/></svg>
+                                </div>
+                            </form>
+                        @endif
+                    </div>
                 </div>
             </div>
         </section>

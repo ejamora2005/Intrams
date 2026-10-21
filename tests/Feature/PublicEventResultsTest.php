@@ -65,11 +65,16 @@ test('landing results expose separate sports and cultural faction leaders', func
 
     $data = $standings->landingData();
     expect($data['categoryStandings']->get('sports')->first()['team']->name)->toBe('Terraquatic Eagles')
-        ->and($data['categoryStandings']->get('cultural')->first()['team']->name)->toBe('Trojan Warriors');
+        ->and($data['categoryStandings']->get('sports'))->toHaveCount(3)
+        ->and($data['categoryStandings']->get('cultural')->first()['team']->name)->toBe('Trojan Warriors')
+        ->and($data['categoryStandings']->get('cultural'))->toHaveCount(3);
 
     $this->get('/')->assertOk()
-        ->assertSee('Sports leader')
-        ->assertSee('Cultural leader')
+        ->assertSee('Sports standings')
+        ->assertSee('Cultural standings')
+        ->assertSee('Sea Dragons')
+        ->assertSee('Terraquatic Eagles')
+        ->assertSee('Trojan Warriors')
         ->assertSee('Sports results')
         ->assertSee('Cultural results');
 });
