@@ -128,6 +128,54 @@ test('tabulators declare repeated factions and correct every configured cultural
     expect(SportResult::count())->toBe($cultural->count());
 });
 
+test('all table tennis formats allow a faction to receive multiple placements', function () {
+    $user = User::factory()->create(['role' => 'tabulator', 'status' => 'active']);
+    $this->actingAs($user);
+    [$edition, , $teams] = tabulatorScoringFixture();
+
+    $formats = [
+        ['TABLE-TENNIS-TEAM-MEN', 'Table Tennis (Team - Men)', 'team', 'male'],
+        ['TABLE-TENNIS-TEAM-WOMEN', 'Table Tennis (Team - Women)', 'team', 'female'],
+        ['TABLE-TENNIS-SINGLES-MEN', 'Table Tennis (Singles - Men)', 'individual', 'male'],
+        ['TABLE-TENNIS-SINGLES-WOMEN', 'Table Tennis (Singles - Women)', 'individual', 'female'],
+        ['TABLE-TENNIS-DOUBLES-MEN', 'Table Tennis (Doubles - Men)', 'dual', 'male'],
+        ['TABLE-TENNIS-DOUBLES-WOMEN', 'Table Tennis (Doubles - Women)', 'dual', 'female'],
+    ];
+
+    foreach ($formats as [$code, $name, $participantType, $category]) {
+        $sport = Sport::create([
+            'name' => $name,
+            'code' => $code,
+            'participant_category' => $category,
+            'status' => 'active',
+        ]);
+        $event = EditionSport::create([
+            'edition_id' => $edition->id,
+            'sport_id' => $sport->id,
+            'participant_type' => $participantType,
+            'game_mechanic' => 'round_robin',
+            'scoring_rules' => StandingsService::defaultScoringRules(),
+            'status' => 'active',
+        ]);
+
+        expect(app(StandingsService::class)->allowsRepeatedWinnersFor($event))->toBeTrue();
+
+        $this->get(route('tabulator.dashboard', ['edition_sport_id' => $event->id]))
+            ->assertOk()
+            ->assertViewHas('allowRepeatedWinners', true)
+            ->assertSee('data-allow-repeated-winners="true"', false);
+
+        $this->post(route('tabulator.sport-results.store'), [
+            'edition_sport_id' => $event->id,
+            'placements' => [1 => $teams[0]->id, 2 => $teams[0]->id, 3 => $teams[1]->id],
+            'tabulator_password' => 'password',
+        ])->assertSessionHasNoErrors()->assertRedirect();
+
+        expect(SportResult::where('edition_sport_id', $event->id)->value('placements_json'))
+            ->toBe([1 => $teams[0]->id, 2 => $teams[0]->id, 3 => $teams[1]->id]);
+    }
+});
+
 test('all default gender divisions replace generic and explicit open entries in tabulator cards and counts', function () {
     $this->actingAs(User::factory()->create(['role' => 'tabulator', 'status' => 'active']));
     app(DefaultSportsSeeder::class)->run();

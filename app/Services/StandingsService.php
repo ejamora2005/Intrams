@@ -213,12 +213,19 @@ class StandingsService
             ->all();
     }
 
-    /** Cultural and athletics placements can represent the same faction. */
+    /**
+     * Some event formats can award more than one placement to the same
+     * faction. Cultural and athletics results have always worked this way;
+     * Table Tennis also needs it because a faction may place in team, singles,
+     * and doubles divisions (including more than one placement in a division).
+     */
     public function allowsRepeatedWinnersFor(EditionSport $editionSport): bool
     {
         $editionSport->loadMissing('sport');
+        $code = strtoupper((string) ($editionSport->sport?->code ?? ''));
 
-        return str_starts_with(strtoupper($editionSport->sport?->code ?? ''), 'CULT-')
+        return str_starts_with($code, 'CULT-')
+            || str_starts_with($code, 'TABLE-TENNIS')
             || $editionSport->sport?->isTrackAndField()
             || count($this->pointRulesFor($editionSport)) > 3;
     }
