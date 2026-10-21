@@ -105,6 +105,28 @@ test('admin can search the add participants list by player name or student numbe
         ->assertDontSee($excluded->full_name);
 });
 
+test('doubles participant management remains available when a historical student was soft deleted', function () {
+    $admin = bulkAssignmentAdmin();
+    $edition = bulkAssignmentEdition();
+    $editionSport = bulkAssignmentSport($edition, 'dual');
+    $team = Team::query()->create(['edition_id' => $edition->id, 'name' => 'DOUBLES TEAM', 'code' => 'DOUBLESTEAM', 'status' => 'active']);
+    $student = Student::factory()->create(['status' => 'active', 'first_name' => 'Historical', 'last_name' => 'Doubles Player']);
+
+    AthleteEntry::query()->create([
+        'edition_sport_id' => $editionSport->id,
+        'student_id' => $student->id,
+        'team_id' => $team->id,
+        'pair_key' => 'historical-doubles-pair',
+        'status' => 'active',
+    ]);
+    $student->delete();
+
+    $this->actingAs($admin)
+        ->get(route('admin.sports.participants', [$editionSport->sport, 'edition_id' => $edition->id]))
+        ->assertOk()
+        ->assertSee('Historical Doubles Player');
+});
+
 test('admin can select students when medical certificates are not required or were verified for another event', function () {
     $admin = bulkAssignmentAdmin();
     $edition = bulkAssignmentEdition();

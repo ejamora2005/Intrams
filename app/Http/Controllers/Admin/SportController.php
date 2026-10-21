@@ -261,6 +261,11 @@ class SportController extends Controller
             ->where('edition_id', $edition->id)
             ->where('sport_id', $sport->id)
             ->with([
+                // Keep soft-deleted students available to the roster page.
+                // Historical doubles entries must remain visible so an admin
+                // can remove or repair them instead of hitting a null
+                // relationship while the view renders the pair.
+                'athleteEntries.student' => fn ($query) => $query->withTrashed(),
                 'athleteEntries.student.course',
                 'athleteEntries.student.teamMembers' => fn ($query) => $query->where('edition_id', $edition->id),
                 'athleteEntries.team',
@@ -268,6 +273,10 @@ class SportController extends Controller
             ->firstOrFail();
         $activeEntries = $editionSport->athleteEntries
             ->where('status', 'active')
+            // A hard-deleted legacy student must not make the roster view
+            // dereference a null relationship. Keep soft-deleted students
+            // above for repair/removal, but skip truly orphaned entries.
+            ->filter(fn (AthleteEntry $entry): bool => $entry->student instanceof Student)
             ->map(function (AthleteEntry $entry): AthleteEntry {
                 $entry->setAttribute('effective_medical_certificate_status', $this->eligibilityService->medicalCertificateStatusFor($entry));
 
