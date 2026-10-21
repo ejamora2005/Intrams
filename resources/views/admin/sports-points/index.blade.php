@@ -49,7 +49,7 @@
                             </div>
                         </div>
                         <div class="flex flex-wrap gap-2">
-                            <span class="rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-blue-700">{{ $system['configured_count'] }} {{ $system['category'] === 'cultural' ? 'cultural events' : 'sports' }}</span>
+                            <span class="rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-blue-700">{{ $system['configured_count'] }} events</span>
                             <span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-slate-600">{{ $system['declared_count'] }} declared</span>
                         </div>
                     </div>
@@ -57,11 +57,11 @@
                     @if ($system['configured_count'] > 0)
                         <details class="mt-4 rounded-lg border border-blue-100 bg-blue-50/60">
                             <summary class="flex cursor-pointer list-none items-center justify-between gap-3 px-4 py-3 text-sm font-semibold text-blue-900 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-600">
-                                <span>Show included {{ $system['category'] === 'cultural' ? 'cultural events' : 'sports' }}</span>
+                                <span>Show included events</span>
                                 <span class="text-xs font-medium text-blue-700">{{ $system['configured_count'] }} included <span aria-hidden="true">⌄</span></span>
                             </summary>
                             <div class="border-t border-blue-100 px-4 py-3">
-                                <ul class="grid gap-2 text-sm text-slate-700 sm:grid-cols-2" aria-label="Included {{ $system['category'] === 'cultural' ? 'cultural events' : 'sports' }}">
+                                <ul class="grid gap-2 text-sm text-slate-700 sm:grid-cols-2" aria-label="Included events">
                                     @foreach ($system['configured_items'] as $item)
                                         <li class="flex min-w-0 items-start gap-2 rounded-md bg-white px-3 py-2 shadow-sm">
                                             <span class="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-blue-600" aria-hidden="true"></span>

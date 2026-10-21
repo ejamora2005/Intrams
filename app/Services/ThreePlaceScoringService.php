@@ -19,7 +19,8 @@ class ThreePlaceScoringService
             $changedEditions = collect();
             foreach ($events as $event) {
                 $rules = $event->scoring_rules ?? [];
-                if (($rules['non_scoring'] ?? false) === true
+                if (($rules['point_system_override'] ?? false) === true
+                    || ($rules['non_scoring'] ?? false) === true
                     || (! $event->sport->isTrackAndField()
                         && ($rules['point_system'] ?? null) !== 'sports_athletics'
                         && count($rules['placements'] ?? []) !== 4)) {

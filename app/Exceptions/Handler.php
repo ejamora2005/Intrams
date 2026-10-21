@@ -17,6 +17,7 @@ class Handler extends ExceptionHandler
         'password',
         'password_confirmation',
         'tabulator_password',
+        'admin_password',
     ];
 
     /**

@@ -48,6 +48,7 @@
                             ]],
                             ['label' => 'Cultural', 'route' => 'admin.cultural.index', 'match' => 'admin/cultural', 'children' => [
                                 ['label' => 'All cultural events', 'route' => 'admin.cultural.index', 'anchor' => 'sports-list'],
+                                ['label' => 'Add cultural event', 'route' => 'admin.cultural.create', 'anchor' => 'cultural-event-form'],
                                 ['label' => 'Festival & group events', 'route' => 'admin.cultural.index', 'anchor' => 'sport-group-other'],
                                 ['label' => 'Visual & performing arts', 'route' => 'admin.cultural.index', 'anchor' => 'sport-group-other'],
                                 ['label' => 'Special awards', 'route' => 'admin.cultural.index', 'anchor' => 'sport-group-other'],

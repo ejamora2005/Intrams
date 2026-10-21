@@ -2,6 +2,14 @@
 
 This project is ready for a Dokploy Docker Compose deployment on `slsubc.tech`.
 
+## Cultural event management
+
+Admin → Cultural now provides event creation, editing, search/filtering, archive confirmation, and restore. Each event can link to any configured cultural or sports point system, with a placement/points preview. New events use that edition's currently edited group values, appear in the group's included-event count, and are available to Tabulator when the edition is active. Cultural events retain their cultural classification regardless of the linked group.
+
+An explicit link takes precedence over the event's original code. Future Points System saves update all current linked events, and catalogue refreshes preserve a manually selected link. Restoring an unscored archived event catches up to the group's current values when another current member provides them. Point systems are scoped to an edition.
+
+Changing the linked system for a declared event requires the administrator's password and recalculates awarded points/standings while retaining winner placements, submitter and declaration time. A target group cannot drop a recorded placement. Name/description edits keep existing awarded points. Events with declared results cannot be archived; other archives preserve registrations and schedules and can be restored. Stale edits are rejected, and mutations appear in System Logs. Deploy the code and built assets; no migration, seeder, roster replacement or score reset is required for this module.
+
 ## Multiple sport registrations and Possible DQ
 
 Admin and GAM player forms allow multiple sport selections, including combinations beyond the participation limits. The former five-selection cap is removed. Additional major/minor events, too many events, and invalid combinations are saved and flagged on the Possible DQ Watchlist. Flags reflect the current registrations and clear when corrected; they do not automatically disqualify a player.

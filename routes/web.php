@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\CompetitionController;
 use App\Http\Controllers\Admin\CoordinatorController;
 use App\Http\Controllers\Admin\CourseController;
+use App\Http\Controllers\Admin\CulturalEventController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\EditionController;
 use App\Http\Controllers\Admin\EditionSportController;
@@ -130,7 +131,13 @@ Route::middleware([
         Route::get('/operations-accounts/{operationsAccount}/edit', [OperationsAccountController::class, 'edit'])->name('operations-accounts.edit');
         Route::put('/operations-accounts/{operationsAccount}', [OperationsAccountController::class, 'update'])->name('operations-accounts.update');
         Route::get('/sports-events', fn () => redirect()->route('admin.events.index'))->name('sports-events.index');
-        Route::get('/cultural', [SportController::class, 'cultural'])->name('cultural.index');
+        Route::get('/cultural', [CulturalEventController::class, 'index'])->name('cultural.index');
+        Route::get('/cultural/create', [CulturalEventController::class, 'create'])->name('cultural.create');
+        Route::post('/cultural', [CulturalEventController::class, 'store'])->name('cultural.store');
+        Route::get('/cultural/{culturalEvent}/edit', [CulturalEventController::class, 'edit'])->name('cultural.edit');
+        Route::put('/cultural/{culturalEvent}', [CulturalEventController::class, 'update'])->name('cultural.update');
+        Route::delete('/cultural/{culturalEvent}', [CulturalEventController::class, 'destroy'])->name('cultural.destroy');
+        Route::post('/cultural/{culturalEvent}/restore', [CulturalEventController::class, 'restore'])->name('cultural.restore');
         Route::resource('sports', SportController::class)->except(['show']);
         Route::get('/sports-points', [SportPointController::class, 'index'])->name('sports-points.index');
         Route::put('/sports-points/{system}', [SportPointController::class, 'update'])->where('system', '[A-Za-z0-9_-]+')->name('sports-points.update');

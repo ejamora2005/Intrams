@@ -12,6 +12,7 @@ use App\Models\User;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 
 class StandingsService
 {
@@ -226,6 +227,16 @@ class StandingsService
         abort_unless($editionSport->edition?->status === 'active', 404);
 
         return DB::transaction(function () use ($editionSport, $placements, $submittedBy): SportResult {
+            $editionSport = EditionSport::with(['edition', 'sport'])->lockForUpdate()->findOrFail($editionSport->id);
+            if ($editionSport->status === 'archived' || ! $editionSport->sport || $editionSport->sport->status !== 'active'
+                || $editionSport->edition?->status !== 'active') {
+                throw ValidationException::withMessages(['edition_sport_id' => 'This event is no longer available for scoring. Refresh the event list.']);
+            }
+            $currentRules = $this->pointRulesFor($editionSport);
+            if ($currentRules === [] || array_diff(array_map('intval', array_keys($placements)), array_column($currentRules, 'placement')) !== []) {
+                throw ValidationException::withMessages(['placements' => 'The event point rules changed. Refresh the scoring form and choose the current placements.']);
+            }
+
             $normalizedPlacements = collect($placements)
                 ->filter(fn ($teamId): bool => filled($teamId))
                 ->mapWithKeys(fn ($teamId, int|string $placement): array => [(string) (int) $placement => (int) $teamId])

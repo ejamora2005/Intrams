@@ -120,10 +120,14 @@ class SportController extends Controller
         return redirect()->route('admin.sports.index', ['edition_id' => $edition->id])->with('success', 'Sport created for '.$edition->name.'.');
     }
 
-    public function edit(Request $request, Sport $sport): View
+    public function edit(Request $request, Sport $sport): View|RedirectResponse
     {
         $edition = $this->selectedEdition($request);
         $editionSport = $edition ? EditionSport::firstOrCreate(['edition_id' => $edition->id, 'sport_id' => $sport->id], ['participant_type' => 'team', 'game_mechanic' => $sport->isTrackAndField() ? 'custom' : 'round_robin', 'status' => 'preparation']) : null;
+
+        if ($editionSport && str_starts_with($sport->code, 'CULT-')) {
+            return redirect()->route('admin.cultural.edit', $editionSport);
+        }
 
         return view('admin.sports.edit', compact('sport', 'editionSport', 'edition'));
     }

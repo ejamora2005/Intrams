@@ -4,8 +4,8 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\EditionSport;
-use App\Models\Sport;
 use App\Services\AuditService;
+use App\Services\PointSystemService;
 use App\Services\StandingsService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -17,14 +17,14 @@ use Illuminate\View\View;
 
 class SportPointController extends Controller
 {
-    public function __construct(private readonly StandingsService $standingsService) {}
+    public function __construct(private readonly StandingsService $standingsService, private readonly PointSystemService $pointSystems) {}
 
     public function index(): View
     {
         $edition = $this->standingsService->activeEdition();
         $pointSystems = $this->pointSystemDefinitions()
             ->map(function (array $definition, string $key) use ($edition): array {
-                $editionSports = $this->editionSportsForSystem($edition, $definition);
+                $editionSports = $this->pointSystems->eventsFor($edition, $key);
                 $referenceSport = $editionSports->first();
 
                 return [
@@ -92,11 +92,15 @@ class SportPointController extends Controller
             ->values()
             ->all();
 
-        $editionSports = $this->editionSportsForSystem($edition, $definition);
+        $editionSports = $this->pointSystems->eventsFor($edition, $system);
         abort_if($editionSports->isEmpty(), 422, $definition['empty']);
 
         DB::transaction(function () use ($editionSports, $system, $placements, $edition): void {
             foreach ($editionSports as $editionSport) {
+                $editionSport = EditionSport::with('sport')->lockForUpdate()->find($editionSport->id);
+                if (! $editionSport || $editionSport->status === 'archived' || $this->pointSystems->keyFor($editionSport) !== $system) {
+                    continue;
+                }
                 $before = $editionSport->scoring_rules;
                 $editionSport->update(['scoring_rules' => [...($before ?? []), 'point_system' => $system, 'placements' => $placements]]);
                 app(AuditService::class)->record('edition_sport.scoring_rules_updated', $editionSport,
@@ -126,36 +130,6 @@ class SportPointController extends Controller
                     'placements' => $this->normalizePlacements($definition['placements'] ?? StandingsService::DEFAULT_PLACEMENTS),
                 ];
             });
-    }
-
-    private function editionSportsForSystem(mixed $edition, array $definition)
-    {
-        if ($edition === null) {
-            return collect();
-        }
-
-        $codes = collect($definition['codes'] ?? [])
-            ->filter()
-            ->values()
-            ->all();
-
-        if ($codes === []) {
-            return collect();
-        }
-
-        $events = $edition->editionSports()
-            ->with(['sport', 'sportResult'])
-            ->whereIn('status', ['preparation', 'active'])
-            ->whereHas(
-                'sport',
-                fn ($query) => $query->whereIn('code', $codes)->where('status', 'active')
-            )
-            ->get();
-        $currentIds = Sport::withoutSupersededOpenSports($events->pluck('sport'))->pluck('id');
-
-        return $events->filter(fn (EditionSport $event): bool => $currentIds->contains($event->sport_id))
-            ->sortBy(fn (EditionSport $editionSport): string => $editionSport->sport?->name ?? '')
-            ->values();
     }
 
     private function normalizePlacements(array $placements): array

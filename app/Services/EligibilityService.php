@@ -141,6 +141,9 @@ class EligibilityService
         }
 
         $sportCode = Str::upper((string) $editionSport->sport?->code);
+        if (Str::startsWith($sportCode, 'CULT-')) {
+            return false;
+        }
         $exemptCodes = collect(config('intramurals.medical_certificate.exempt_sport_codes', []))
             ->map(fn (string $code): string => Str::upper($code));
 

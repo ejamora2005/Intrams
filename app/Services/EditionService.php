@@ -68,6 +68,10 @@ class EditionService
                     $configuration->restore();
                 }
 
+                if (($configuration->scoring_rules['point_system_override'] ?? false) === true) {
+                    continue;
+                }
+
                 if (empty($configuration->scoring_rules['placements'])) {
                     $configuration->update(['scoring_rules' => $defaults['scoring_rules']]);
                 } elseif ($this->usesLegacyDefaultScoring($configuration->scoring_rules)) {
