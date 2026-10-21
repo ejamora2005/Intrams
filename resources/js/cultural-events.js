@@ -1,7 +1,6 @@
-const pointSystem = document.querySelector('[data-cultural-point-system]');
-const preview = document.querySelector('[data-cultural-points-preview]');
-
-if (pointSystem && preview) {
+document.querySelectorAll('[data-cultural-point-system], [data-sport-point-system]').forEach((pointSystem) => {
+    const preview = pointSystem.closest('form')?.querySelector('[data-cultural-points-preview], [data-sport-points-preview]');
+    if (!preview) return;
     const render = () => {
         const rules = JSON.parse(pointSystem.selectedOptions[0]?.dataset.pointRules || '[]');
         const rows = rules.map((rule) => {
@@ -20,4 +19,4 @@ if (pointSystem && preview) {
     };
     pointSystem.addEventListener('change', render);
     render();
-}
+});

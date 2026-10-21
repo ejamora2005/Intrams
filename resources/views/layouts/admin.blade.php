@@ -41,6 +41,7 @@
                             ['label' => 'Operations Accounts', 'route' => 'admin.operations-accounts.index', 'match' => 'admin/operations-accounts'],
                             ['label' => 'Teams', 'route' => 'admin.teams.index', 'match' => 'admin/teams'],
                             ['label' => 'Sports', 'route' => 'admin.sports.index', 'match' => 'admin/sports', 'children' => [
+                                ['label' => 'Add sport', 'route' => 'admin.sports.create', 'anchor' => 'sport-event-form'],
                                 ['label' => 'All sports', 'route' => 'admin.sports.index', 'anchor' => 'sports-list'],
                                 ['label' => 'Team sports', 'route' => 'admin.sports.index', 'anchor' => 'sport-group-team'],
                                 ['label' => 'Individual & pairs', 'route' => 'admin.sports.index', 'anchor' => 'sport-group-individual'],

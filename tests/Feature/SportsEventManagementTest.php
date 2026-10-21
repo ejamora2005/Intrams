@@ -10,7 +10,7 @@ function sportsEdition(): IntramuralEdition { return IntramuralEdition::create([
 test('admin can manage sports and create a draft event', function () {
     $admin = sportsAdmin();
     $edition = sportsEdition();
-    $this->actingAs($admin)->post(route('admin.sports.store'), ['name' => 'basketball', 'code' => 'bball', 'description' => null, 'status' => 'active'])->assertRedirect();
+    $this->actingAs($admin)->post(route('admin.sports.store'), ['edition_id' => $edition->id, 'name' => 'basketball', 'code' => 'bball', 'description' => null, 'status' => 'active', 'participant_type' => 'team', 'game_mechanic' => 'round_robin', 'configuration_status' => 'preparation', 'point_system' => 'sports_major'])->assertSessionHasNoErrors()->assertRedirect();
     $sport = Sport::firstOrFail();
     $this->assertDatabaseHas('sports', ['name' => 'Basketball']);
     expect($sport->code)->toStartWith('SPORT-');

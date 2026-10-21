@@ -33,6 +33,7 @@ test('an admin can set a sport participant category', function () {
             'description' => null,
             'participant_category' => 'female',
             'status' => 'active',
+            'participant_type' => 'team', 'game_mechanic' => 'round_robin', 'configuration_status' => 'preparation', 'point_system' => 'sports_major',
         ])
         ->assertRedirect();
 

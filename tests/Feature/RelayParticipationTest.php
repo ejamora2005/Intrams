@@ -129,10 +129,10 @@ test('relay edits preserve unique legacy names while displaying Open and accepti
     $admin = User::factory()->create(['role' => 'admin', 'status' => 'active']);
     $events = collect(['MEN' => 'Men', 'WOMEN' => 'Women'])->map(fn ($label, $suffix) => relayRuleEvent($edition, 'RELAY-4X100-'.$suffix, 'sports_athletics', '4x100m Relay ('.$label.')'));
     foreach ($events as $label => $event) {
-        $this->actingAs($admin)->get(route('admin.sports.edit', ['sport' => $event->sport, 'edition_id' => $edition->id]))
+        $page = $this->actingAs($admin)->get(route('admin.sports.edit', ['sport' => $event->sport, 'edition_id' => $edition->id]))
             ->assertOk()->assertSee('Relay events accept all genders.')->assertSee('4x100m Relay (Open)');
         $beforeName = $event->sport->getRawOriginal('name');
-        $this->put(route('admin.sports.update', $event->sport), ['edition_id' => $edition->id, 'name' => $event->sport->name, 'status' => 'active', 'participant_category' => 'male', 'participant_type' => 'team', 'game_mechanic' => 'custom', 'configuration_status' => 'active', 'rules' => null])
+        $this->put(route('admin.sports.update', $event->sport), ['edition_id' => $edition->id, 'event_version' => $page->viewData('version'), 'point_system' => 'sports_athletics', 'name' => $event->sport->name, 'status' => 'active', 'participant_category' => 'male', 'participant_type' => 'team', 'game_mechanic' => 'custom', 'configuration_status' => 'active', 'rules' => null])
             ->assertSessionHasNoErrors()->assertRedirect();
         expect($event->sport->fresh()->getRawOriginal('name'))->toBe($beforeName)
             ->and($event->sport->fresh()->participant_category)->toBe('open')

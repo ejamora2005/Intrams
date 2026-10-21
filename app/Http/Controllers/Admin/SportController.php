@@ -19,8 +19,11 @@ use App\Models\TeamMember;
 use App\Services\AuditService;
 use App\Services\BracketService;
 use App\Services\EligibilityService;
+use App\Services\PointSystemService;
 use App\Services\ScoreSheetImageOfficeService;
+use App\Services\SportEventService;
 use App\Services\SportService;
+use App\Services\StandingsService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -38,6 +41,9 @@ class SportController extends Controller
         private readonly SportService $service,
         private readonly BracketService $bracketService,
         private readonly EligibilityService $eligibilityService,
+        private readonly PointSystemService $pointSystems,
+        private readonly SportEventService $eventManagement,
+        private readonly StandingsService $standings,
     ) {}
 
     public function index(Request $request): View
@@ -55,8 +61,11 @@ class SportController extends Controller
         $status = $request->string('status')->value() ?: 'active';
         $search = trim($request->string('search')->value());
         $category = $request->string('category')->value();
+        $system = $request->string('point_system')->value();
         $edition = $this->selectedEdition($request);
         $editionId = $edition?->id;
+        $matchingEventIds = $system !== '' && $edition ? $edition->editionSports()->with(['sport' => fn ($query) => $query->withTrashed()])
+            ->get()->filter(fn (EditionSport $event): bool => $this->pointSystems->keyFor($event) === $system)->pluck('id') : collect();
         $sports = Sport::query()
             ->when(
                 $cultural,
@@ -65,18 +74,25 @@ class SportController extends Controller
             )
             ->when($edition, fn ($query) => $query->whereHas('editionSports', fn ($configuration) => $configuration->where('edition_id', $edition->id)))
             ->withCount(['editionSports as edition_sports_count' => fn ($query) => $edition ? $query->where('edition_id', $edition->id) : $query])
+            ->with(['editionSports' => fn ($query) => $query->where('edition_id', $editionId ?? 0)->with('sportResult')])
             ->when($search !== '', fn ($query) => $query->where(fn ($sportQuery) => $sportQuery
                 ->where('name', 'like', '%'.$search.'%')
                 ->orWhere('code', 'like', '%'.$search.'%')
                 ->orWhere('description', 'like', '%'.$search.'%')))
             ->when($category !== '' && array_key_exists($category, Sport::PARTICIPANT_CATEGORIES), fn ($query) => $query->where('participant_category', $category))
-            ->when($status === 'archived', fn ($query) => $query->onlyTrashed())
-            ->when(in_array($status, ['active', 'inactive'], true), fn ($query) => $query->where('status', $status))
+            ->when($status === 'archived', fn ($query) => $query->withTrashed()->where(fn ($archived) => $archived
+                ->whereNotNull('sports.deleted_at')->orWhereHas('editionSports', fn ($event) => $event->where('edition_id', $editionId)->where('status', 'archived'))))
+            ->when(in_array($status, ['active', 'inactive'], true), fn ($query) => $query->where('status', $status)
+                ->when($edition, fn ($current) => $current->whereHas('editionSports', fn ($event) => $event->where('edition_id', $editionId)->where('status', '!=', 'archived'))))
+            ->when($system !== '', fn ($query) => $query->whereHas('editionSports', fn ($event) => $event
+                ->where('edition_id', $editionId)->whereIn('id', $matchingEventIds)))
             ->orderByRaw("FIELD(participant_category, 'male', 'female', 'mixed', 'open', 'custom')")
             ->orderBy('name')
             ->paginate(60)
             ->withQueryString();
         $editions = IntramuralEdition::query()->orderByDesc('starts_on')->orderByDesc('id')->get();
+        $configurations = $sports->getCollection()->flatMap(fn (Sport $sport) => $sport->editionSports)->keyBy('sport_id');
+        $configurations->each(fn (EditionSport $event) => $event->setRelation('sport', $sports->getCollection()->firstWhere('id', $event->sport_id)));
 
         return view('admin.sports.index', [
             'sports' => $sports,
@@ -87,6 +103,13 @@ class SportController extends Controller
             'edition' => $edition,
             'editionId' => $editionId,
             'editions' => $editions,
+            'configurations' => $configurations,
+            'system' => $system,
+            'pointSystems' => $this->pointSystems->options($edition),
+            'eventSystems' => $configurations->mapWithKeys(fn (EditionSport $event): array => [$event->sport_id => $this->pointSystems->keyFor($event)]),
+            'eventRules' => $configurations->mapWithKeys(fn (EditionSport $event): array => [$event->sport_id => $this->standings->pointRulesFor($event)]),
+            'versions' => $sports->getCollection()->filter(fn (Sport $sport): bool => $configurations->has($sport->id))
+                ->mapWithKeys(fn (Sport $sport): array => [$sport->id => $this->eventManagement->version($configurations[$sport->id], $sport)]),
             'title' => $cultural ? 'Cultural' : 'Sports',
             'subtitle' => $cultural
                 ? 'Manage cultural scoring events and bonus awards.'
@@ -102,20 +125,27 @@ class SportController extends Controller
     {
         $edition = $this->selectedEdition($request);
         abort_unless($edition !== null, 422, 'Create an edition before adding sports.');
+        $this->eventManagement->ensureEditable($edition);
 
-        return view('admin.sports.create', ['sport' => new Sport, 'editionSport' => null, 'edition' => $edition]);
+        return view('admin.sports.create', ['sport' => new Sport, 'editionSport' => null, 'edition' => $edition,
+            'pointSystems' => $this->pointSystems->options($edition), 'selectedSystem' => 'sports_major', 'currentPointRules' => [], 'version' => null]);
     }
 
     public function store(StoreSportRequest $request): RedirectResponse
     {
-        $edition = $this->selectedEdition($request);
-        abort_unless($edition !== null, 422, 'Create an edition before adding sports.');
-        $sport = $this->service->create($request->validated());
-        $gameMechanic = $request->input('game_mechanic', 'round_robin');
-        if ($sport->isTrackAndField() || ($sport->participant_category === 'custom' && $gameMechanic === 'round_robin')) {
-            $gameMechanic = 'custom';
-        }
-        EditionSport::query()->firstOrCreate(['edition_id' => $edition->id, 'sport_id' => $sport->id], ['participant_type' => $request->input('participant_type', 'team'), 'game_mechanic' => $gameMechanic, 'rules' => $request->input('rules'), 'status' => $request->input('configuration_status', 'preparation')]);
+        $data = $request->validated();
+        $edition = IntramuralEdition::findOrFail($data['edition_id']);
+        $this->eventManagement->ensureEditable($edition);
+        DB::transaction(function () use ($data, $edition): void {
+            $sport = $this->service->create(array_intersect_key($data, array_flip((new Sport)->getFillable())));
+            $event = $edition->editionSports()->create([
+                'sport_id' => $sport->id, 'participant_type' => $data['participant_type'],
+                'game_mechanic' => $this->eventManagement->mechanicFor($sport, $data['game_mechanic']),
+                'rules' => $data['rules'] ?? null, 'status' => $data['configuration_status'],
+                'scoring_rules' => $this->eventManagement->initialScoring($edition, $data['point_system'], $data['participant_type']),
+            ]);
+            app(AuditService::class)->record('edition_sport.created', $event, null, $event->only($event->getFillable()));
+        });
 
         return redirect()->route('admin.sports.index', ['edition_id' => $edition->id])->with('success', 'Sport created for '.$edition->name.'.');
     }
@@ -123,45 +153,103 @@ class SportController extends Controller
     public function edit(Request $request, Sport $sport): View|RedirectResponse
     {
         $edition = $this->selectedEdition($request);
-        $editionSport = $edition ? EditionSport::firstOrCreate(['edition_id' => $edition->id, 'sport_id' => $sport->id], ['participant_type' => 'team', 'game_mechanic' => $sport->isTrackAndField() ? 'custom' : 'round_robin', 'status' => 'preparation']) : null;
+        abort_unless($edition, 404);
+        $editionSport = EditionSport::with('sportResult')->where('edition_id', $edition->id)->where('sport_id', $sport->id)->firstOrFail();
 
         if ($editionSport && str_starts_with($sport->code, 'CULT-')) {
             return redirect()->route('admin.cultural.edit', $editionSport);
         }
 
-        return view('admin.sports.edit', compact('sport', 'editionSport', 'edition'));
+        return view('admin.sports.edit', compact('sport', 'editionSport', 'edition') + [
+            'pointSystems' => $this->pointSystems->options($edition, $editionSport), 'selectedSystem' => $this->pointSystems->keyFor($editionSport),
+            'currentPointRules' => $this->standings->pointRulesFor($editionSport),
+            'version' => $this->eventManagement->version($editionSport, $sport),
+        ]);
     }
 
     public function update(UpdateSportRequest $request, Sport $sport): RedirectResponse
     {
-        $this->service->update($sport, $request->validated());
-        $data = $request->validate(['participant_type' => ['required', 'in:team,dual,individual'], 'game_mechanic' => ['required', 'in:single_elimination,double_elimination,round_robin,custom'], 'rules' => ['nullable', 'string', 'max:5000'], 'configuration_status' => ['required', 'in:preparation,active,archived']]);
-        $edition = $this->selectedEdition($request);
-        if ($edition) {
-            $editionSport = EditionSport::firstOrCreate(['edition_id' => $edition->id, 'sport_id' => $sport->id], ['participant_type' => 'team', 'game_mechanic' => 'round_robin', 'status' => 'preparation']);
-            $gameMechanic = $data['game_mechanic'];
-            if ($sport->isTrackAndField() || ($sport->participant_category === 'custom' && $gameMechanic === 'round_robin')) {
-                $gameMechanic = 'custom';
+        $this->eventManagement->ensureSport($sport);
+        $data = $request->validated();
+        $recalculated = DB::transaction(function () use ($data, $sport, $request): bool {
+            $event = EditionSport::with(['edition', 'sportResult'])->where('edition_id', $data['edition_id'])->where('sport_id', $sport->id)->lockForUpdate()->firstOrFail();
+            $sport = Sport::whereKey($sport->id)->lockForUpdate()->firstOrFail();
+            $event->setRelation('sport', $sport);
+            $this->eventManagement->ensureEditable($event->edition);
+            $this->eventManagement->checkVersion($data['event_version'], $event, $sport);
+            if ($event->status === 'archived') {
+                throw ValidationException::withMessages(['event' => 'Restore this sport before editing it.']);
             }
-            $editionSport->update(['participant_type' => $data['participant_type'], 'game_mechanic' => $gameMechanic, 'rules' => $data['rules'], 'status' => $data['configuration_status']]);
-        }
+            if ($sport->status !== $data['status'] && $data['status'] === 'inactive'
+                && $sport->editionSports()->get()->contains(fn ($configuration) => $this->eventManagement->hasResults($configuration))) {
+                throw ValidationException::withMessages(['status' => 'A sport with recorded results must remain active to preserve its published winners.']);
+            }
+            $scoring = $this->eventManagement->scoringFor($event, $data['point_system'] ?? null, $request->user(), $data['admin_password'] ?? null);
+            $prospectiveSport = clone $sport;
+            $prospectiveSport->fill(array_intersect_key($data, array_flip($sport->getFillable())));
+            $mechanic = $this->eventManagement->mechanicFor($prospectiveSport, $data['game_mechanic']);
+            $this->eventManagement->assertFormatChangeSafe($event, $data, $mechanic);
+            $this->service->update($sport, array_intersect_key($data, array_flip($sport->getFillable())));
+            $before = $event->only(['participant_type', 'game_mechanic', 'rules', 'status', 'scoring_rules']);
+            $event->update(['participant_type' => $data['participant_type'], 'game_mechanic' => $mechanic,
+                'rules' => $data['rules'] ?? null, 'status' => $data['configuration_status'], 'scoring_rules' => $scoring]);
+            app(AuditService::class)->record('edition_sport.updated', $event, $before, $event->only(array_keys($before)));
+            $pointsChanged = ($before['scoring_rules']['placements'] ?? []) != ($scoring['placements'] ?? [])
+                || ($before['scoring_rules']['non_scoring'] ?? false) !== ($scoring['non_scoring'] ?? false);
+            if ($pointsChanged && $event->sportResult) {
+                $this->standings->recalculateTallies($event->edition);
+            }
 
-        return redirect()->route('admin.sports.index', ['edition_id' => $edition?->id])->with('success', 'Sport and mechanics updated.');
+            return $pointsChanged && $event->sportResult !== null;
+        });
+
+        return redirect()->route('admin.sports.index', ['edition_id' => $data['edition_id']])
+            ->with('success', $recalculated ? 'Sport updated. Awarded points and standings were recalculated; winners and declaration time were kept.' : 'Sport and point system updated.');
     }
 
-    public function destroy(Sport $sport): RedirectResponse
+    public function destroy(Request $request, Sport $sport): RedirectResponse
     {
-        $this->service->archive($sport);
+        $this->eventManagement->ensureSport($sport);
+        $data = $request->validate(['edition_id' => ['required', 'integer', 'exists:intramural_editions,id'], 'event_version' => ['required', 'string', 'size:64']]);
+        DB::transaction(function () use ($sport, $data): void {
+            $event = EditionSport::with('edition')->where('edition_id', $data['edition_id'])->where('sport_id', $sport->id)->lockForUpdate()->firstOrFail();
+            $sport = Sport::whereKey($sport->id)->lockForUpdate()->firstOrFail();
+            $this->eventManagement->ensureEditable($event->edition);
+            $this->eventManagement->checkVersion($data['event_version'], $event, $sport);
+            $this->eventManagement->assertCanArchive($event);
+            $before = ['status' => $event->status];
+            $event->update(['status' => 'archived']);
+            app(AuditService::class)->record('edition_sport.archived', $event, $before, ['status' => 'archived']);
+        });
 
-        return redirect()->route('admin.sports.index')->with('success', 'Sport archived.');
+        return redirect()->route('admin.sports.index', ['edition_id' => $data['edition_id']])->with('success', 'Sport archived for this edition. Registrations and schedules were retained.');
     }
 
-    public function restore(int $sport): RedirectResponse
+    public function restore(Request $request, int $sport): RedirectResponse
     {
-        $sport = Sport::withTrashed()->findOrFail($sport);
-        $this->service->restore($sport);
+        $data = $request->validate(['edition_id' => ['required', 'integer', 'exists:intramural_editions,id'], 'event_version' => ['required', 'string', 'size:64']]);
+        DB::transaction(function () use ($sport, $data): void {
+            $event = EditionSport::with(['edition', 'sportResult'])->where('edition_id', $data['edition_id'])->where('sport_id', $sport)->lockForUpdate()->firstOrFail();
+            $sport = Sport::withTrashed()->whereKey($sport)->lockForUpdate()->firstOrFail();
+            $event->setRelation('sport', $sport);
+            $this->eventManagement->ensureSport($sport);
+            $this->eventManagement->ensureEditable($event->edition);
+            $this->eventManagement->checkVersion($data['event_version'], $event, $sport);
+            abort_unless($sport->trashed() || $event->status === 'archived', 404);
+            if ($sport->trashed()) {
+                $this->service->restore($sport);
+            }
+            $before = $event->only(['status', 'scoring_rules']);
+            $system = $this->pointSystems->keyFor($event);
+            if ($system && ! $event->sportResult && $this->pointSystems->eventsFor($event->edition, $system)->isNotEmpty()) {
+                $event->scoring_rules = [...($event->scoring_rules ?? []), 'placements' => $this->pointSystems->rulesFor($event->edition, $system)];
+            }
+            $event->status = 'preparation';
+            $event->save();
+            app(AuditService::class)->record('edition_sport.restored', $event, $before, $event->only(['status', 'scoring_rules']));
+        });
 
-        return redirect()->route('admin.sports.index', ['status' => 'archived'])->with('success', 'Sport restored.');
+        return redirect()->route('admin.sports.index', ['edition_id' => $data['edition_id']])->with('success', 'Sport restored.');
     }
 
     public function participants(Request $request, Sport $sport): View

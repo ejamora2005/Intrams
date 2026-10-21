@@ -48,6 +48,11 @@ class EligibilityService
             return self::SLOT_INDIVIDUAL_DUAL;
         }
 
+        $slot = $editionSport->scoring_rules['participation_slot'] ?? null;
+        if (in_array($slot, [self::SLOT_MAJOR, self::SLOT_MINOR, self::SLOT_INDIVIDUAL_DUAL], true)) {
+            return $slot;
+        }
+
         $pointSystem = $this->pointSystemKey($editionSport);
 
         return match ($pointSystem) {

@@ -2,6 +2,14 @@
 
 This project is ready for a Dokploy Docker Compose deployment on `slsubc.tech`.
 
+## Sports event management
+
+Admin → Sports supports creating and editing events with a linked point system and a scoring preview. Cards show the actual placement points and offer Edit event & points, an archive confirmation, and restoration from the Archived filter. The selected edition is preserved throughout the forms. New sports appear in Tabulator automatically when active.
+
+Point links use the edition's currently edited group values. Future Points System edits update the linked events, and default catalogue refreshes preserve explicit links. Changing an existing sport's points retains its participation category. Existing custom rules can stay unlinked when editing other details.
+
+Relinking a declared sport requires the administrator's password and recalculates its awarded points and standings while preserving winners, submitter, declaration time, registrations, brackets and schedules. A target system cannot drop recorded placements. Existing bracket/participant formats cannot be silently changed. Archives apply only to the selected edition, retain its records, and are blocked when the event has recorded results. Changes are version-checked and audited. Deploy code and built assets; no migration, roster import, seeder or score reset is needed.
+
 ## Cultural event management
 
 Admin → Cultural now provides event creation, editing, search/filtering, archive confirmation, and restore. Each event can link to any configured cultural or sports point system, with a placement/points preview. New events use that edition's currently edited group values, appear in the group's included-event count, and are available to Tabulator when the edition is active. Cultural events retain their cultural classification regardless of the linked group.
