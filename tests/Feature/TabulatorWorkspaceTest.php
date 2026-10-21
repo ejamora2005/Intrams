@@ -85,6 +85,42 @@ test('editing placements replaces the event totals instead of adding duplicate p
         ->and((float) TeamTally::where('team_id', $teams[1]->id)->value('points'))->toBe(10.0);
 });
 
+test('declared results can be downloaded as Excel or PDF without changing saved data', function () {
+    $this->actingAs(User::factory()->create(['role' => 'tabulator', 'status' => 'active']));
+    [$edition, $events, $teams] = tabulatorScoringFixture();
+
+    $this->post(route('tabulator.sport-results.store'), [
+        'edition_sport_id' => $events[0]->id,
+        'placements' => [1 => $teams[0]->id, 2 => $teams[1]->id],
+        'tabulator_password' => 'password',
+    ])->assertSessionHasNoErrors();
+
+    $savedResult = SportResult::query()->where('edition_sport_id', $events[0]->id)->firstOrFail()->toArray();
+    $savedTallies = TeamTally::query()->where('edition_id', $edition->id)->orderBy('team_id')->get()->toArray();
+
+    $excel = $this->get(route('tabulator.results.export', ['format' => 'xlsx']))
+        ->assertOk()
+        ->assertHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    expect($excel->headers->get('content-disposition'))->toContain('attachment; filename=');
+
+    $path = tempnam(sys_get_temp_dir(), 'declared-results-test-');
+    file_put_contents($path, $excel->getContent());
+    $zip = new ZipArchive;
+    expect($zip->open($path))->toBeTrue();
+    expect($zip->getFromName('xl/workbook.xml'))->toContain('Declared Results')
+        ->and($zip->getFromName('xl/worksheets/sheet2.xml'))->toContain('Sea Dragons');
+    $zip->close();
+    unlink($path);
+
+    $pdf = $this->get(route('tabulator.results.export', ['format' => 'pdf']))
+        ->assertOk()
+        ->assertHeader('Content-Type', 'application/pdf');
+    expect(substr($pdf->getContent(), 0, 4))->toBe('%PDF');
+
+    expect(SportResult::query()->where('edition_sport_id', $events[0]->id)->firstOrFail()->toArray())->toBe($savedResult)
+        ->and(TeamTally::query()->where('edition_id', $edition->id)->orderBy('team_id')->get()->toArray())->toBe($savedTallies);
+});
+
 test('tabulators declare repeated factions and correct every configured cultural event and bonus award with its own points', function () {
     $user = User::factory()->create(['role' => 'tabulator', 'status' => 'active']);
     $this->actingAs($user);

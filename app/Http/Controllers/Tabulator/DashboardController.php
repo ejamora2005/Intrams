@@ -8,6 +8,7 @@ use App\Models\BracketMatch;
 use App\Models\EditionSport;
 use App\Models\Team;
 use App\Services\BracketService;
+use App\Services\DeclaredResultsExportService;
 use App\Services\EligibilityService;
 use App\Services\StandingsService;
 use Illuminate\Http\RedirectResponse;
@@ -16,6 +17,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
+use Symfony\Component\HttpFoundation\Response;
 
 class DashboardController extends Controller
 {
@@ -23,7 +25,25 @@ class DashboardController extends Controller
         private readonly BracketService $bracketService,
         private readonly StandingsService $standingsService,
         private readonly EligibilityService $eligibilityService,
+        private readonly DeclaredResultsExportService $declaredResultsExportService,
     ) {}
+
+    public function exportResults(string $format): Response
+    {
+        abort_unless(in_array($format, ['xlsx', 'pdf'], true), 404);
+
+        $edition = $this->standingsService->activeEdition();
+        $isPdf = $format === 'pdf';
+        $content = $isPdf
+            ? $this->declaredResultsExportService->pdf($edition)
+            : $this->declaredResultsExportService->xlsx($edition);
+
+        return response($content, 200, [
+            'Content-Type' => $isPdf ? 'application/pdf' : 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'Content-Disposition' => 'attachment; filename="'.$this->declaredResultsExportService->filename($edition, $format).'"',
+            'Cache-Control' => 'no-store, private',
+        ]);
+    }
 
     public function index(Request $request): View
     {

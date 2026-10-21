@@ -6,6 +6,7 @@
 .tab-workspace .tab-muted { color: #b3c7de; }
 .tab-workspace .tab-small { font-size: 12px; }
 .tab-heading, .tab-section-heading, .tab-card-top, .tab-review-bar { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.tab-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
 .tab-heading { margin-bottom: 22px; }
 .tab-heading h2 { font-size: 32px; letter-spacing: -.025em; margin: 4px 0 6px; }
 .tab-eyebrow { color: #e9c68b; font-size: 10px; letter-spacing: .12em; font-weight: 700; text-transform: uppercase; }

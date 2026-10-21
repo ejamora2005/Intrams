@@ -1,5 +1,11 @@
 <section aria-label="Overall standings" class="tab-stack">
-    <div class="tab-section-heading"><h3>Overall standings</h3><span class="tab-muted tab-small">Points from declared event placements</span></div>
+    <div class="tab-section-heading">
+        <div><h3>Overall standings</h3><span class="tab-muted tab-small">Points from declared event placements</span></div>
+        <div class="tab-actions" aria-label="Download declared results">
+            <a class="tab-button tab-button-secondary" href="{{ route('tabulator.results.export', ['format' => 'xlsx']) }}">Download Excel</a>
+            <a class="tab-button tab-button-secondary" href="{{ route('tabulator.results.export', ['format' => 'pdf']) }}">Download PDF</a>
+        </div>
+    </div>
     <div class="tab-grid">
         @forelse ($standings as $row)
             <article class="tab-card tab-standing">

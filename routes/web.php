@@ -206,6 +206,7 @@ Route::middleware([
 
     Route::prefix('tabulator')->as('tabulator.')->middleware('role:tabulator')->group(function () {
         Route::get('/dashboard', [TabulatorDashboardController::class, 'index'])->name('dashboard');
+        Route::get('/results/export/{format}', [TabulatorDashboardController::class, 'exportResults'])->where('format', 'xlsx|pdf')->name('results.export');
         Route::get('/sports/{sport}/score-sheet', [SportScoreSheetController::class, 'show'])->name('sports.score-sheet');
         Route::post('/sports/{sport}/score-sheet/download', [SportScoreSheetController::class, 'download'])->name('sports.score-sheet.download');
         Route::get('/rules-guidelines', [RulesController::class, 'tabulator'])->name('rules.index');
