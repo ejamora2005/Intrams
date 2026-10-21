@@ -17,8 +17,12 @@
             <a href="{{ route('admin.sports.participants', ['sport' => $sport, 'edition_id' => $edition->id]) }}" class="text-sm font-semibold text-blue-700 hover:text-blue-900">Back to participants</a>
         </div>
 
-        <form method="GET" class="mt-5 grid gap-4 sm:grid-cols-2">
+        <form method="GET" class="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             <input type="hidden" name="edition_id" value="{{ $edition->id }}">
+            <div>
+                <label for="student_search" class="text-sm font-medium text-slate-700">Search player</label>
+                <input id="student_search" name="student_search" value="{{ $studentSearch }}" type="search" placeholder="Name or student ID" class="mt-1 block w-full rounded-lg border-slate-300 text-sm focus:border-blue-600 focus:ring-blue-600">
+            </div>
             <div>
                 <label for="course_id" class="text-sm font-medium text-slate-700">Course</label>
                 <select id="course_id" name="course_id" class="mt-1 block w-full rounded-lg border-slate-300 text-sm focus:border-blue-600 focus:ring-blue-600">
@@ -37,8 +41,11 @@
                     @endforeach
                 </select>
             </div>
-            <div class="sm:col-span-2">
-                <button type="submit" class="rounded-lg border border-blue-200 bg-white px-4 py-2.5 text-sm font-semibold text-blue-800 transition hover:border-blue-300 hover:bg-blue-50">Apply filters</button>
+            <div class="flex items-end gap-2 sm:col-span-2 lg:col-span-1">
+                <button type="submit" class="rounded-lg bg-blue-700 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-800">Search players</button>
+                @if ($studentSearch !== '')
+                    <a href="{{ route('admin.sports.participants.assign', ['sport' => $sport, 'edition_id' => $edition->id, 'course_id' => $courseId, 'team_id' => $teamId]) }}" class="rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50">Clear</a>
+                @endif
             </div>
         </form>
 

@@ -85,6 +85,26 @@ test('the universal assignment page filters students by the selected team', func
         ->assertDontSee($excluded->full_name);
 });
 
+test('admin can search the add participants list by player name or student number', function () {
+    $admin = bulkAssignmentAdmin();
+    $edition = bulkAssignmentEdition();
+    $editionSport = bulkAssignmentSport($edition);
+    $team = Team::query()->create(['edition_id' => $edition->id, 'name' => 'SEARCH TEAM', 'code' => 'SEARCHTEAM', 'status' => 'active']);
+    $matching = Student::factory()->create(['status' => 'active', 'first_name' => 'Findable', 'last_name' => 'Player', 'student_number' => 'SEARCH-001']);
+    $excluded = Student::factory()->create(['status' => 'active', 'first_name' => 'Other', 'last_name' => 'Player', 'student_number' => 'OTHER-002']);
+    foreach ([$matching, $excluded] as $student) {
+        TeamMember::query()->create(['edition_id' => $edition->id, 'team_id' => $team->id, 'student_id' => $student->id, 'assigned_by' => $admin->id, 'assigned_at' => now()]);
+    }
+
+    $this->actingAs($admin)
+        ->get(route('admin.sports.participants.assign', [$editionSport->sport, 'team_id' => $team->id, 'student_search' => 'SEARCH-001']))
+        ->assertOk()
+        ->assertSee('Search players')
+        ->assertSee('name="student_search"', false)
+        ->assertSee($matching->full_name)
+        ->assertDontSee($excluded->full_name);
+});
+
 test('admin can select students when medical certificates are not required or were verified for another event', function () {
     $admin = bulkAssignmentAdmin();
     $edition = bulkAssignmentEdition();

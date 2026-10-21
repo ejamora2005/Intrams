@@ -601,6 +601,7 @@ class SportController extends Controller
         $editionSport = EditionSport::query()->where('edition_id', $edition->id)->where('sport_id', $sport->id)->firstOrFail();
         $courseId = $request->integer('course_id') ?: null;
         $teamId = $request->integer('team_id') ?: null;
+        $studentSearch = trim((string) $request->input('student_search', ''));
         $requiresTeam = in_array($editionSport->participant_type, ['team', 'dual'], true);
         $teams = Team::query()->where('edition_id', $edition->id)->where('status', 'active')->orderBy('name')->get();
         $completePairKeys = $editionSport->participant_type === 'dual' ? $this->completePairKeys($editionSport) : collect();
@@ -618,6 +619,15 @@ class SportController extends Controller
             ->when($requiresTeam && ! $teamId, fn ($query) => $query->whereRaw('1 = 0'))
             ->when($courseId, fn ($query) => $query->where('course_id', $courseId))
             ->when($teamId, fn ($query) => $query->whereHas('teamMembers', fn ($memberQuery) => $memberQuery->where('team_id', $teamId)))
+            ->when($studentSearch !== '', function ($query) use ($studentSearch): void {
+                $term = '%'.addcslashes($studentSearch, '%_').'%';
+                $query->where(function ($searchQuery) use ($term): void {
+                    $searchQuery->where('student_number', 'like', $term)
+                        ->orWhere('first_name', 'like', $term)
+                        ->orWhere('middle_name', 'like', $term)
+                        ->orWhere('last_name', 'like', $term);
+                });
+            })
             ->orderBy('last_name')
             ->orderBy('first_name');
 
@@ -630,7 +640,7 @@ class SportController extends Controller
             : $students;
         $eligibilityPreviewByStudentId = $this->eligibilityService->previewForStudents($studentCollection, $edition, $editionSport);
 
-        return view('admin.sports.assign-participants', ['sport' => $sport, 'edition' => $edition, 'editionSport' => $editionSport, 'courses' => Course::query()->where('status', 'active')->orderBy('name')->get(), 'teams' => $teams, 'students' => $students, 'courseId' => $courseId, 'teamId' => $teamId, 'requiresTeam' => $requiresTeam, 'eligibilityPreviewByStudentId' => $eligibilityPreviewByStudentId]);
+        return view('admin.sports.assign-participants', ['sport' => $sport, 'edition' => $edition, 'editionSport' => $editionSport, 'courses' => Course::query()->where('status', 'active')->orderBy('name')->get(), 'teams' => $teams, 'students' => $students, 'courseId' => $courseId, 'teamId' => $teamId, 'studentSearch' => $studentSearch, 'requiresTeam' => $requiresTeam, 'eligibilityPreviewByStudentId' => $eligibilityPreviewByStudentId]);
     }
 
     public function storeParticipants(Request $request, Sport $sport): RedirectResponse
