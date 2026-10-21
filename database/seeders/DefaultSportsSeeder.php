@@ -26,10 +26,16 @@ class DefaultSportsSeeder extends Seeder
                 $attributes['participant_category_label'] = $sport['participant_category_label'] ?? null;
             }
 
-            $model = Sport::withTrashed()->updateOrCreate(
-                ['code' => $sport['code']],
-                $attributes,
-            );
+            $model = Sport::withTrashed()->firstOrNew(['code' => $sport['code']]);
+            if (! $model->exists) {
+                // Catalogue defaults initialize newly introduced sports. Existing
+                // records may have an administrator-edited name or description;
+                // keep those edits across deploys and reseeding.
+                $model->fill($attributes);
+            } else {
+                $model->fill(['is_system' => true]);
+            }
+            $model->save();
 
             if ($model->trashed()) {
                 $model->restore();

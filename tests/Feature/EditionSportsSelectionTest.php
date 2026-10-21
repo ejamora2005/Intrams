@@ -108,6 +108,16 @@ test('re-seeding default sports moves basketball 3x3 to its dedicated point syst
     expect($configuration->fresh()->scoring_rules['point_system'])->toBe('sports_basketball_3x3');
 });
 
+test('re-seeding preserves administrator-edited system sport names', function () {
+    Sport::query()->create(['name' => 'Custom Volleyball Label', 'code' => 'VOLLEYBALL-MEN', 'participant_category' => 'male', 'status' => 'active', 'is_system' => true]);
+    Sport::query()->create(['name' => 'Custom Chess Label', 'code' => 'CHESS-MEN', 'participant_category' => 'male', 'status' => 'active', 'is_system' => true]);
+
+    app(DefaultSportsSeeder::class)->run();
+
+    expect(Sport::query()->where('code', 'VOLLEYBALL-MEN')->value('name'))->toBe('Custom Volleyball Label')
+        ->and(Sport::query()->where('code', 'CHESS-MEN')->value('name'))->toBe('Custom Chess Label');
+});
+
 test('sports catalogue is organized into visible competition groups', function () {
     $admin = editionSportsAdmin();
 
@@ -159,10 +169,10 @@ test('complete sport catalogue includes gendered volleyball and individual athle
         '200M-RUN-WOMEN' => ['name' => '200m Run (Women)', 'participant_category' => 'female'],
         '400M-RUN-MEN' => ['name' => '400m Run (Men)', 'participant_category' => 'male'],
         '400M-RUN-WOMEN' => ['name' => '400m Run (Women)', 'participant_category' => 'female'],
-        'RELAY-4X100-MEN' => ['name' => '4x100m Relay (Open)', 'participant_category' => 'open'],
-        'RELAY-4X100-WOMEN' => ['name' => '4x100m Relay (Open)', 'participant_category' => 'open'],
-        'RELAY-4X400-MEN' => ['name' => '4x400m Relay (Open)', 'participant_category' => 'open'],
-        'RELAY-4X400-WOMEN' => ['name' => '4x400m Relay (Open)', 'participant_category' => 'open'],
+        'RELAY-4X100-MEN' => ['name' => '4x100m Relay (Men)', 'participant_category' => 'open'],
+        'RELAY-4X100-WOMEN' => ['name' => '4x100m Relay (Women)', 'participant_category' => 'open'],
+        'RELAY-4X400-MEN' => ['name' => '4x400m Relay (Men)', 'participant_category' => 'open'],
+        'RELAY-4X400-WOMEN' => ['name' => '4x400m Relay (Women)', 'participant_category' => 'open'],
         'THROWS-MEN' => ['name' => 'Throws (Men)', 'participant_category' => 'male'],
         'THROWS-WOMEN' => ['name' => 'Throws (Women)', 'participant_category' => 'female'],
         'SHOT-PUT-MEN' => ['name' => 'Shot Put (Men)', 'participant_category' => 'male'],

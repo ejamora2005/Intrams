@@ -139,7 +139,8 @@ test('renaming a sport preserves custom unlinked rules and does not recalculate 
     $original = $result->fresh()->getAttributes();
     $tallies = DB::table('team_tallies')->get()->toJson();
     $this->actingAs($admin)->put(route('admin.sports.update', $event->sport), sportPointsPayload($this, $event, ['name' => 'Renamed Custom Sport']))->assertSessionHasNoErrors();
-    expect($result->fresh()->getAttributes())->toBe($original)->and(DB::table('team_tallies')->get()->toJson())->toBe($tallies);
+    expect($event->sport->fresh()->getRawOriginal('name'))->toBe('Renamed Custom Sport')
+        ->and($result->fresh()->getAttributes())->toBe($original)->and(DB::table('team_tallies')->get()->toJson())->toBe($tallies);
 });
 
 test('new sports stay available to register when linked to a cultural point system', function () {

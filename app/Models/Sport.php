@@ -59,17 +59,10 @@ class Sport extends Model
         return preg_match('/(?:^|[-\s])RELAYS?(?:[-\s(]|$)/i', (string) $this->code.' '.(string) ($this->attributes['name'] ?? '')) === 1;
     }
 
-    /** Keep unique legacy catalogue names internally while displaying Open relays. */
+    /** Preserve the configured Men/Women relay display names. */
     public function getNameAttribute(?string $value): ?string
     {
-        return $this->isRelay() ? $this->openRelayName($value) : $value;
-    }
-
-    public function openRelayName(?string $value = null): string
-    {
-        $name = preg_replace('/\s*(?:[-(]\s*)?\b(?:Men|Women|Male|Female|Open)\s*\)?$/i', '', trim($value ?? (string) ($this->attributes['name'] ?? '')));
-
-        return trim($name).' (Open)';
+        return $value;
     }
 
     /** Legacy gender divisions and duplicate entries share one participation slot. */

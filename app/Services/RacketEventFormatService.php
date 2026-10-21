@@ -24,7 +24,13 @@ class RacketEventFormatService
         DB::transaction(function () use ($editions, $definitions): void {
             foreach ($definitions as $definition) {
                 $sport = Sport::withTrashed()->firstOrNew(['code' => $definition['code']]);
-                $sport->fill(collect($definition)->only(['name', 'participant_category'])->all());
+                if (! $sport->exists) {
+                    $sport->fill(collect($definition)->only(['name', 'participant_category'])->all());
+                } else {
+                    // Format repair must not undo an administrator's edited
+                    // display name. It only repairs the participation category.
+                    $sport->fill(['participant_category' => $definition['participant_category']]);
+                }
                 $sport->fill(['status' => 'active', 'is_system' => true])->save();
                 if ($sport->trashed()) {
                     $sport->restore();

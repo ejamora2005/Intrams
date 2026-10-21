@@ -36,11 +36,11 @@ function relayRuleEntry(Student $student, Team $team, EditionSport $event): Athl
     return AthleteEntry::create(['student_id' => $student->id, 'team_id' => $team->id, 'edition_sport_id' => $event->id, 'status' => 'active']);
 }
 
-test('Admin and GAM can register any gender for Open relays without a separate run', function (string $role) {
+test('Admin and GAM can register any gender for gender-labelled relays without a separate run', function (string $role) {
     [$edition, $team, $student] = relayRuleFixture();
     $user = User::factory()->create(['role' => $role, 'status' => 'active', 'managed_team_id' => $role === 'gam' ? $team->id : null]);
     $event = relayRuleEvent($edition, 'RELAY-4X100-MEN', 'sports_major', '4x100m Relay (Men)');
-    expect($event->sport->participant_category)->toBe('open')->and($event->sport->name)->toBe('4x100m Relay (Open)');
+    expect($event->sport->participant_category)->toBe('open')->and($event->sport->name)->toBe('4x100m Relay (Men)');
     $url = $role === 'admin' ? route('admin.students.update', $student) : route('gam.teams.players.sports.update', [$team, $student]);
     $payload = ['edition_sport_ids' => [$event->id]];
     if ($role === 'admin') {
@@ -117,20 +117,20 @@ test('relay migration opens existing records without changing registrations sche
     $before = $snapshot();
     $migration = require database_path('migrations/2026_10_20_040000_make_relay_events_open.php');
     $migration->up();
-    expect($snapshot())->toBe($before)->and($event->sport->fresh()->name)->toBe('4x100m Relay (Open)')
+    expect($snapshot())->toBe($before)->and($event->sport->fresh()->name)->toBe('4x100m Relay (Men)')
         ->and($event->sport->fresh()->participant_category)->toBe('open')->and($event->sport->fresh()->status)->toBe('inactive');
     $auditCount = AuditLog::count();
     $migration->up();
     expect(AuditLog::count())->toBe($auditCount)->and($snapshot())->toBe($before);
 });
 
-test('relay edits preserve unique legacy names while displaying Open and accepting every gender', function () {
+test('relay edits preserve unique gendered names while accepting every gender', function () {
     [$edition] = relayRuleFixture();
     $admin = User::factory()->create(['role' => 'admin', 'status' => 'active']);
     $events = collect(['MEN' => 'Men', 'WOMEN' => 'Women'])->map(fn ($label, $suffix) => relayRuleEvent($edition, 'RELAY-4X100-'.$suffix, 'sports_athletics', '4x100m Relay ('.$label.')'));
     foreach ($events as $label => $event) {
         $page = $this->actingAs($admin)->get(route('admin.sports.edit', ['sport' => $event->sport, 'edition_id' => $edition->id]))
-            ->assertOk()->assertSee('Relay events accept all genders.')->assertSee('4x100m Relay (Open)');
+            ->assertOk()->assertSee('Relay events accept all genders.')->assertSee('4x100m Relay ('.ucfirst(strtolower($label)).')');
         $beforeName = $event->sport->getRawOriginal('name');
         $this->put(route('admin.sports.update', $event->sport), ['edition_id' => $edition->id, 'event_version' => $page->viewData('version'), 'point_system' => 'sports_athletics', 'name' => $event->sport->name, 'status' => 'active', 'participant_category' => 'male', 'participant_type' => 'team', 'game_mechanic' => 'custom', 'configuration_status' => 'active', 'rules' => null])
             ->assertSessionHasNoErrors()->assertRedirect();
