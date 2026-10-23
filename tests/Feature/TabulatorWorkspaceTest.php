@@ -85,6 +85,32 @@ test('editing placements replaces the event totals instead of adding duplicate p
         ->and((float) TeamTally::where('team_id', $teams[1]->id)->value('points'))->toBe(10.0);
 });
 
+test('tabulator declarations stay private until the protected score update is published', function () {
+    $user = User::factory()->create(['role' => 'tabulator', 'status' => 'active']);
+    $this->actingAs($user);
+    [$edition, $events, $teams] = tabulatorScoringFixture();
+
+    $this->post(route('tabulator.sport-results.store'), [
+        'edition_sport_id' => $events[0]->id,
+        'placements' => [1 => $teams[0]->id],
+        'tabulator_password' => 'password',
+    ])->assertSessionHasNoErrors();
+
+    $result = SportResult::query()->where('edition_sport_id', $events[0]->id)->firstOrFail();
+    expect($result->published_placements_json)->toBeNull()
+        ->and(app(StandingsService::class)->declaredResultsFor($edition))->toHaveCount(0)
+        ->and((float) TeamTally::where('team_id', $teams[0]->id)->value('points'))->toBe(10.0);
+
+    $this->post(route('tabulator.score-updates.publish'), ['score_update_password' => 'wrong'])
+        ->assertSessionHasErrors('score_update_password');
+    expect($result->fresh()->published_placements_json)->toBeNull();
+
+    $this->post(route('tabulator.score-updates.publish'), ['score_update_password' => 'SLSUBCINTRAMURALS2026'])
+        ->assertSessionHasNoErrors();
+    expect($result->fresh()->published_placements_json)->toBe(['1' => $teams[0]->id])
+        ->and(app(StandingsService::class)->declaredResultsFor($edition))->toHaveCount(1);
+});
+
 test('employee results are separated from student standings and can be viewed independently', function () {
     $user = User::factory()->create(['role' => 'tabulator', 'status' => 'active']);
     $this->actingAs($user);

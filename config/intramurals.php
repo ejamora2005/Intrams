@@ -317,6 +317,8 @@ return [
         $bonus('Mash-Up Gen Z Balitaw - Best Musical Mash-Up', 'CULT-BONUS-MASHUP', 'Special award: Best Musical Mash-Up.', 'cultural_special_3'),
     ],
 
+    'score_update_password' => env('INTRAMURAL_SCORE_UPDATE_PASSWORD', 'SLSUBCINTRAMURALS2026'),
+
     'default_schedules' => [
         ['code' => 'RUNS-MEN', 'title' => 'Ruperto Run 2026', 'is_activity' => true, 'day' => 1, 'starts_at' => '06:00', 'ends_at' => '08:00', 'venue' => 'Field/Oval'],
         ['code' => 'CULT-FESTIVAL-PROGRAM', 'title' => 'Team Officials Meeting (Sports)', 'is_activity' => true, 'day' => 1, 'starts_at' => '07:00', 'ends_at' => '08:00'],

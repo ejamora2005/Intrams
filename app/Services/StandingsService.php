@@ -9,6 +9,7 @@ use App\Models\SportResult;
 use App\Models\Team;
 use App\Models\TeamTally;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -111,8 +112,81 @@ class StandingsService
             });
     }
 
+    /**
+     * Public standings use only explicitly published score snapshots. Draft
+     * declarations remain available to the operations workspaces and do not
+     * change the totals visitors see on the landing page.
+     *
+     * @return Collection<int, array{team: Team, tally: TeamTally, rank: int}>
+     */
+    public function publishedStandingsFor(?IntramuralEdition $edition, string $scoreGroup = 'student'): Collection
+    {
+        if (! $edition instanceof IntramuralEdition) {
+            return collect();
+        }
+
+        $scoreGroup = $this->normalizeScoreGroup($scoreGroup);
+        $teams = Team::query()
+            ->with('course')
+            ->where('edition_id', $edition->id)
+            ->where('status', 'active')
+            ->orderBy('name')
+            ->get();
+        $totals = $teams->mapWithKeys(fn (Team $team): array => [$team->id => [
+            'points' => 0.0,
+            'gold_count' => 0,
+            'silver_count' => 0,
+            'bronze_count' => 0,
+        ]])->all();
+
+        foreach ($this->declaredResultsFor($edition, true)->filter(fn (array $result): bool => ($result['score_group'] ?? 'student') === $scoreGroup) as $result) {
+            foreach ($result['placements'] as $placement) {
+                $teamId = (int) ($placement['team_id'] ?? 0);
+                if (! array_key_exists($teamId, $totals)) {
+                    continue;
+                }
+                $totals[$teamId]['points'] += (float) ($placement['points'] ?? 0);
+                match ($this->normalizeMedal($placement['medal'] ?? null)) {
+                    'gold' => $totals[$teamId]['gold_count']++,
+                    'silver' => $totals[$teamId]['silver_count']++,
+                    'bronze' => $totals[$teamId]['bronze_count']++,
+                    default => null,
+                };
+            }
+        }
+
+        return $teams
+            ->map(fn (Team $team): array => [
+                'team' => $team,
+                'tally' => new TeamTally([
+                    'edition_id' => $edition->id,
+                    'team_id' => $team->id,
+                    ...$totals[$team->id],
+                    'updated_at' => null,
+                ]),
+                'rank' => 0,
+            ])
+            ->sort(function (array $a, array $b): int {
+                foreach (['points', 'gold_count', 'silver_count', 'bronze_count'] as $field) {
+                    $left = (float) $a['tally']->{$field};
+                    $right = (float) $b['tally']->{$field};
+                    if ($left !== $right) {
+                        return $right <=> $left;
+                    }
+                }
+
+                return strcasecmp($a['team']->name, $b['team']->name);
+            })
+            ->values()
+            ->map(function (array $row, int $index): array {
+                $row['rank'] = $index + 1;
+
+                return $row;
+            });
+    }
+
     /** @return Collection<int, array<string, mixed>> */
-    public function declaredResultsFor(?IntramuralEdition $edition): Collection
+    public function declaredResultsFor(?IntramuralEdition $edition, bool $publishedOnly = true): Collection
     {
         if ($edition === null) {
             return collect();
@@ -121,11 +195,25 @@ class StandingsService
         $teams = Team::withTrashed()->where('edition_id', $edition->id)->get()->keyBy('id');
 
         return $this->scoringEventsFor($edition)
-            ->filter(fn (EditionSport $event): bool => $event->sportResult !== null)
-            ->sortByDesc(fn (EditionSport $event): int => $event->sportResult->submitted_at?->timestamp ?? 0)
-            ->map(function (EditionSport $event) use ($teams): array {
-                $rules = collect($this->pointRulesFor($event))->keyBy('placement');
-                $placements = collect($event->sportResult->placements_json ?? [])
+            ->filter(fn (EditionSport $event): bool => $event->sportResult !== null
+                && (! $publishedOnly || $event->sportResult->published_placements_json !== null))
+            ->sortByDesc(fn (EditionSport $event): int => ($publishedOnly
+                ? $event->sportResult->score_published_at
+                : $event->sportResult->submitted_at)?->timestamp ?? 0)
+            ->map(function (EditionSport $event) use ($teams, $publishedOnly): array {
+                $result = $event->sportResult;
+                $rules = $publishedOnly && $result->published_points_json !== null
+                    ? collect($result->published_points_json)->mapWithKeys(fn (array $rule, int|string $key): array => [(int) ($rule['placement'] ?? $key) => $rule])
+                    : collect($this->pointRulesFor($event))->keyBy('placement');
+                $rules = $rules->map(fn (array $rule, int|string $placement): array => [
+                    ...$rule,
+                    'placement' => (int) ($rule['placement'] ?? $placement),
+                    'points' => (float) ($rule['points'] ?? 0),
+                ]);
+                $placementsJson = $publishedOnly
+                    ? ($result->published_placements_json ?? [])
+                    : ($result->placements_json ?? []);
+                $placements = collect($placementsJson)
                     ->map(function ($teamId, $place) use ($rules, $teams): ?array {
                         $rule = $rules->get((int) $place);
                         if ($rule === null) {
@@ -149,8 +237,8 @@ class StandingsService
                     'name' => preg_replace('/^Cultural(?: Bonus)?:\s*/i', '', $event->sport->name),
                     'category' => $category,
                     'category_label' => ['sports' => 'Sports', 'cultural' => 'Cultural', 'track-field' => 'Track & Field'][$category],
-                    'score_group' => $this->normalizeScoreGroup($event->sportResult->score_group ?? 'student'),
-                    'declared_at' => $event->sportResult->submitted_at,
+                    'score_group' => $this->normalizeScoreGroup($result->score_group ?? 'student'),
+                    'declared_at' => $publishedOnly ? ($result->score_published_at ?? $result->submitted_at) : $result->submitted_at,
                     'placements' => $placements,
                 ];
             })->values();
@@ -161,12 +249,15 @@ class StandingsService
     {
         $configuredTeams = collect(config('landing.teams', []));
         $edition = $this->activeEdition();
-        $standings = $this->standingsFor($edition);
+        $standings = $this->publishedStandingsFor($edition);
         $standingByName = $standings->keyBy(fn (array $row): string => Str::lower($row['team']->name));
-        $updatedAt = $standings
-            ->map(fn (array $row) => $row['tally']->updated_at)
-            ->filter()
-            ->max();
+        $updatedAt = $edition === null ? null : SportResult::query()
+            ->whereNotNull('score_published_at')
+            ->where('score_group', 'student')
+            ->whereHas('editionSport', fn ($query) => $query->where('edition_id', $edition->id))
+            ->orderByDesc('score_published_at')
+            ->value('score_published_at');
+        $updatedAt = $updatedAt ? Carbon::parse($updatedAt, 'UTC') : null;
 
         return [
             'teams' => $configuredTeams
@@ -321,13 +412,13 @@ class StandingsService
     }
 
     /** @param array<int|string, int|string|null> $placements */
-    public function recordSportResult(EditionSport $editionSport, array $placements, User $submittedBy, string $scoreGroup = 'student'): SportResult
+    public function recordSportResult(EditionSport $editionSport, array $placements, User $submittedBy, string $scoreGroup = 'student', bool $publishImmediately = true): SportResult
     {
         $scoreGroup = $this->normalizeScoreGroup($scoreGroup);
         $editionSport->loadMissing('edition');
         abort_unless($editionSport->edition?->status === 'active', 404);
 
-        return DB::transaction(function () use ($editionSport, $placements, $submittedBy, $scoreGroup): SportResult {
+        return DB::transaction(function () use ($editionSport, $placements, $submittedBy, $scoreGroup, $publishImmediately): SportResult {
             $editionSport = EditionSport::with(['edition', 'sport'])->lockForUpdate()->findOrFail($editionSport->id);
             if ($editionSport->status === 'archived' || ! $editionSport->sport || $editionSport->sport->status !== 'active'
                 || $editionSport->edition?->status !== 'active') {
@@ -347,20 +438,97 @@ class StandingsService
                 ->mapWithKeys(fn (array $rule): array => [(string) $rule['placement'] => $rule])
                 ->all();
 
-            $result = SportResult::query()->updateOrCreate(
-                ['edition_sport_id' => $editionSport->id],
-                [
-                    'submitted_by' => $submittedBy->id,
-                    'placements_json' => $normalizedPlacements,
-                    'points_json' => $points,
-                    'score_group' => $scoreGroup,
-                    'submitted_at' => now('UTC'),
-                ],
-            );
+            $result = SportResult::query()
+                ->where('edition_sport_id', $editionSport->id)
+                ->lockForUpdate()
+                ->first();
+            $attributes = [
+                'submitted_by' => $submittedBy->id,
+                'placements_json' => $normalizedPlacements,
+                'points_json' => $points,
+                'score_group' => $scoreGroup,
+                'submitted_at' => now('UTC'),
+            ];
+            if ($publishImmediately) {
+                $attributes += [
+                    'published_placements_json' => $normalizedPlacements,
+                    'published_points_json' => $points,
+                    'score_published_at' => now('UTC'),
+                    'score_published_by' => $submittedBy->id,
+                ];
+            } elseif ($result === null) {
+                $attributes += [
+                    'published_placements_json' => null,
+                    'published_points_json' => null,
+                    'score_published_at' => null,
+                    'score_published_by' => null,
+                ];
+            }
+
+            if ($result === null) {
+                $result = SportResult::query()->create(['edition_sport_id' => $editionSport->id, ...$attributes]);
+            } else {
+                $result->fill($attributes);
+                $result->save();
+            }
 
             $this->recalculateTallies($editionSport->edition);
 
             return $result;
+        });
+    }
+
+    public function hasPendingScoreUpdate(EditionSport $editionSport): bool
+    {
+        $result = $editionSport->sportResult;
+        if (! $result instanceof SportResult) {
+            return false;
+        }
+
+        $currentPoints = collect($this->pointRulesFor($editionSport))
+            ->mapWithKeys(fn (array $rule): array => [(string) $rule['placement'] => $rule])
+            ->all();
+
+        return $result->published_placements_json === null
+            || $result->published_placements_json !== $result->placements_json
+            || $result->published_points_json !== $currentPoints;
+    }
+
+    public function publishPendingScores(IntramuralEdition $edition, User $publisher): int
+    {
+        return DB::transaction(function () use ($edition, $publisher): int {
+            $events = $this->scoringEventsFor($edition);
+            $published = 0;
+            foreach ($events as $event) {
+                $result = SportResult::query()
+                    ->where('edition_sport_id', $event->id)
+                    ->lockForUpdate()
+                    ->first();
+                if (! $result instanceof SportResult) {
+                    continue;
+                }
+
+                $currentPoints = collect($this->pointRulesFor($event))
+                    ->mapWithKeys(fn (array $rule): array => [(string) $rule['placement'] => $rule])
+                    ->all();
+                $pending = $result->published_placements_json === null
+                    || $result->published_placements_json !== $result->placements_json
+                    || $result->published_points_json !== $currentPoints;
+                if (! $pending) {
+                    continue;
+                }
+
+                $before = $result->only(['published_placements_json', 'published_points_json', 'score_published_at', 'score_published_by']);
+                $result->published_placements_json = $result->placements_json;
+                $result->published_points_json = $currentPoints;
+                $result->score_published_at = now('UTC');
+                $result->score_published_by = $publisher->id;
+                $result->save();
+                app(AuditService::class)->record('sport_result.score_published', $result, $before, $result->only(['published_placements_json', 'published_points_json', 'score_published_at', 'score_published_by']), $publisher);
+                $published++;
+            }
+
+            return $published;
         });
     }
 

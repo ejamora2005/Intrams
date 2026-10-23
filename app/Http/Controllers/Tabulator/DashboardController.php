@@ -50,6 +50,7 @@ class DashboardController extends Controller
         $edition = $this->standingsService->activeEdition();
         $scoreGroup = $this->standingsService->normalizeScoreGroup($request->input('score_group', 'student'));
         $standings = $this->standingsService->standingsFor($edition, $scoreGroup);
+        $publishedStandings = $this->standingsService->publishedStandingsFor($edition, $scoreGroup);
         $editionSports = $this->standingsService->scoringEventsFor($edition);
         $editionSportIds = $editionSports->pluck('id');
         $selectedSport = $editionSports->firstWhere('id', (int) $request->input('edition_sport_id', $request->old('edition_sport_id', 0)));
@@ -67,10 +68,15 @@ class DashboardController extends Controller
             ->where('status', 'pending')->whereNotNull('competitor_one_id')->whereNotNull('competitor_two_id')
             ->orderBy('edition_sport_id')->orderBy('round_number')->orderBy('match_number')->get();
         $declaredCount = $editionSports->filter(fn ($sport) => $sport->sportResult !== null)->count();
+        $pendingScoreUpdateEvents = $editionSports
+            ->filter(fn ($sport) => $this->standingsService->hasPendingScoreUpdate($sport))
+            ->values();
+        $pendingScoreUpdates = $pendingScoreUpdateEvents->count();
 
         return view('tabulator.dashboard', [
             'edition' => $edition,
             'standings' => $standings,
+            'publishedStandings' => $publishedStandings,
             'scoreGroup' => $scoreGroup,
             'editionSports' => $editionSports,
             'selectedSport' => $selectedSport,
@@ -81,6 +87,8 @@ class DashboardController extends Controller
             'eventPointRules' => $editionSports->mapWithKeys(fn ($sport) => [$sport->id => $this->standingsService->pointRulesFor($sport)]),
             'declaredCount' => $declaredCount,
             'pendingCount' => $editionSports->count() - $declaredCount,
+            'pendingScoreUpdates' => $pendingScoreUpdates,
+            'pendingScoreUpdateEvents' => $pendingScoreUpdateEvents,
             'recentResults' => $editionSports->filter(fn ($sport) => $sport->sportResult !== null)
                 ->sortByDesc(fn ($sport) => $sport->sportResult->submitted_at?->timestamp ?? 0)->take(4),
             'nextPendingSport' => $editionSports->first(fn ($sport) => $sport->sportResult === null && $sport->id !== $selectedSport?->id),
@@ -140,7 +148,7 @@ class DashboardController extends Controller
                 ]);
             }
 
-            $this->standingsService->recordSportResult($editionSport, $data['placements'], $request->user(), $data['score_group'] ?? 'student');
+            $this->standingsService->recordSportResult($editionSport, $data['placements'], $request->user(), $data['score_group'] ?? 'student', false);
 
             return redirect()
                 ->to(route('tabulator.dashboard', ['edition_sport_id' => $editionSport->id]).'#declare-sports')
@@ -150,6 +158,32 @@ class DashboardController extends Controller
                 'edition_sport_id' => $request->integer('edition_sport_id'),
                 'view' => 'declare-sports', 'modal' => 'tabulator-declare-sports-modal',
             ]).'#declare-sports');
+            throw $exception;
+        }
+    }
+
+    public function publishScores(Request $request): RedirectResponse
+    {
+        try {
+            $data = $request->validate([
+                'score_update_password' => ['required', 'string'],
+            ]);
+            if (! hash_equals((string) config('intramurals.score_update_password'), (string) $data['score_update_password'])) {
+                throw ValidationException::withMessages([
+                    'score_update_password' => 'The score update password did not match.',
+                ]);
+            }
+
+            $edition = $this->standingsService->activeEdition();
+            abort_unless($edition !== null, 404);
+            $count = $this->standingsService->publishPendingScores($edition, $request->user());
+
+            return redirect()->to(route('tabulator.dashboard', ['view' => 'declared-results']).'#declared-results')
+                ->with(['success' => $count === 0 ? 'There are no pending score updates.' : $count.' score update(s) published to the landing page.', 'ops_view' => 'declared-results']);
+        } catch (ValidationException $exception) {
+            $exception->redirectTo(route('tabulator.dashboard', [
+                'view' => 'declared-results', 'modal' => 'tabulator-score-update-modal',
+            ]).'#declared-results');
             throw $exception;
         }
     }

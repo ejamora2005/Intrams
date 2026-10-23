@@ -214,6 +214,7 @@ Route::middleware([
         Route::get('/rules-guidelines', [RulesController::class, 'tabulator'])->name('rules.index');
         Route::get('/possible-dq', [RulesController::class, 'possibleDqTabulator'])->name('possible-dq.index');
         Route::post('/sport-results', [TabulatorDashboardController::class, 'declareSportWinners'])->name('sport-results.store');
+        Route::post('/score-updates', [TabulatorDashboardController::class, 'publishScores'])->name('score-updates.publish');
         Route::post('/matches/{match}/result', [TabulatorDashboardController::class, 'recordBracketResult'])->name('matches.result');
     });
 });

@@ -29,5 +29,17 @@
         @include('tabulator.partials.event-cards', ['monitor' => true])
     </section>
     <section id="match-winners" data-ops-view-panel="match-winners" hidden class="ops-view-panel tab-stack">@include('tabulator.partials.matches')</section>
+    <dialog id="tabulator-score-update-modal" data-ops-modal class="tab-dialog" aria-labelledby="score-update-title">
+        <div class="tab-dialog-heading"><div><p class="tab-eyebrow">Publish landing score</p><h3 id="score-update-title">Update score</h3></div><button type="button" data-ops-modal-close class="tab-close" aria-label="Close score update dialog">×</button></div>
+        <form method="POST" action="{{ route('tabulator.score-updates.publish') }}" data-ops-form>
+            @csrf
+            <div class="tab-dialog-body">
+                <p class="tab-muted">This publishes the saved declarations and point changes to the public landing page. The current public totals stay unchanged until you confirm this step.</p>
+                <label class="tab-password">Score update password<input type="password" name="score_update_password" required autocomplete="off" autofocus></label>
+                @error('score_update_password')<p class="tab-dialog-error">{{ $message }}</p>@enderror
+            </div>
+            <div class="tab-dialog-footer"><button type="button" data-ops-modal-close class="tab-button tab-button-secondary">Cancel</button><button type="submit" data-loading-label="Publishing…" class="tab-button">Publish update</button></div>
+        </form>
+    </dialog>
 </div>
 @endsection
